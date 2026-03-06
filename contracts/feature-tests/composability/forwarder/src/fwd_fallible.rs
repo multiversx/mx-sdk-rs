@@ -17,7 +17,7 @@ pub trait ForwarderFallibleModule {
             .to(&to)
             .gas(half_gas)
             .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .arguments_raw(args.into_arg_buffer())
             .returns(ReturnsHandledOrError::new().returns(ReturnsRawResult))
             .sync_call_fallible();
 

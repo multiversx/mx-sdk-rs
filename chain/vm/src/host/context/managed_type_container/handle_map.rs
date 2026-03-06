@@ -49,6 +49,10 @@ impl<V> HandleMap<V> {
     }
 
     pub fn remove_handle(&mut self, handle: RawHandle) {
+        assert!(
+            self.map.contains_key(&handle),
+            "attempting to remove non-existing handle {handle}, this is a memory managedment issue"
+        );
         let _ = self.map.remove(&handle);
     }
 }

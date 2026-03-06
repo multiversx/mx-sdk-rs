@@ -29,8 +29,9 @@ impl VMHooksApiBackend for SingleTxApiBackend {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let vh_context = cell.lock().unwrap().clone();
             let mut dispatcher = VMHooksDispatcher::new(vh_context);
-            f(&mut dispatcher)
-                .unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
+            let result = f(&mut dispatcher);
+            std::mem::drop(dispatcher);
+            result.unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
         })
     }
 
