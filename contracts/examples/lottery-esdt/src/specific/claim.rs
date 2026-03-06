@@ -13,7 +13,7 @@ pub trait ClaimModule: storage::StorageModule {
             "You have no rewards to claim"
         );
 
-        let mut accumulated_rewards = MultiEsdtPayment::new();
+        let mut accumulated_rewards = EsdtTokenPaymentVec::new();
 
         // to save reviewers time, these 2 iterators have different generics, so it was not possible to make just 1 for loop
 
@@ -28,7 +28,7 @@ pub trait ClaimModule: storage::StorageModule {
         if !accumulated_rewards.is_empty() {
             self.tx()
                 .to(&caller)
-                .multi_esdt(accumulated_rewards)
+                .payment(accumulated_rewards)
                 .transfer();
         }
     }
@@ -36,7 +36,7 @@ pub trait ClaimModule: storage::StorageModule {
     fn handle_claim_with_unspecified_tokens(
         &self,
         caller_id: &u64,
-        accumulated_rewards: &mut MultiEsdtPayment<Self::Api>,
+        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
     ) {
         let mut all_tokens: ManagedVec<Self::Api, TokenIdentifier> = ManagedVec::new();
 
@@ -55,7 +55,7 @@ pub trait ClaimModule: storage::StorageModule {
         &self,
         tokens: ManagedVec<Self::Api, TokenIdentifier>,
         caller_id: &u64,
-        accumulated_rewards: &mut MultiEsdtPayment<Self::Api>,
+        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
     ) {
         for token_id in tokens.iter().rev() {
             let _ = &self
@@ -70,7 +70,7 @@ pub trait ClaimModule: storage::StorageModule {
         &self,
         token_id: TokenIdentifier,
         caller_id: &u64,
-        accumulated_rewards: &mut MultiEsdtPayment<Self::Api>,
+        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
     ) {
         let value = self.accumulated_rewards(&token_id, caller_id).take();
         accumulated_rewards.push(EsdtTokenPayment::new(token_id, 0, value));
