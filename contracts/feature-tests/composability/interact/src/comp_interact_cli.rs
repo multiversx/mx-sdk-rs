@@ -1,4 +1,4 @@
-use clap::{Args, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 
 /// Composability Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -12,17 +12,42 @@ pub struct InteractCli {
 /// Composability Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum InteractCliCommand {
-    #[command(name = "full", about = "Full scenario, whatever that means")]
-    Full(FullArgs),
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct FullArgs {
-    /// Endpoint name for Vault.
-    #[arg(long = "endpoint", verbatim_doc_comment)]
-    pub endpoint_name: String,
-
-    /// Endpoint args.
-    #[arg(long = "endpoint-args", verbatim_doc_comment)]
-    pub endpoint_args: Option<Vec<String>>,
+    #[command(
+        name = "s1",
+        about = "Generate scenario 1 (root → vault) and save to call_tree.toml"
+    )]
+    S1,
+    #[command(
+        name = "s2",
+        about = "Generate scenario 2 (linear sync-call chain of n contracts) and save to call_tree.toml"
+    )]
+    S2 {
+        #[arg(
+            short = 'n',
+            long,
+            default_value_t = 5,
+            help = "Number of contracts in the chain"
+        )]
+        n: usize,
+    },
+    #[command(
+        name = "update-gas",
+        about = "Recompute gas estimates in call_tree.toml and push updated programmed calls on-chain"
+    )]
+    UpdateGas,
+    #[command(
+        name = "setup",
+        about = "Deploy all contracts from call_tree.toml, configure, and save addresses back"
+    )]
+    Setup,
+    #[command(
+        name = "bump",
+        about = "Send the start transactions defined in call_tree.toml"
+    )]
+    Bump,
+    #[command(
+        name = "info",
+        about = "Query the trace view for all deployed contracts and print the results"
+    )]
+    Info,
 }

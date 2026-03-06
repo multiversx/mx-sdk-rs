@@ -1,66 +1,44 @@
 use crate::{
-    call_tree::CallState, comp_interact_controller::ComposabilityInteract, forwarder_queue_proxy,
-    vault_proxy,
+    call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
+    comp_interact_controller::ComposabilityInteract,
 };
 
+use forwarder_queue::forwarder_queue_proxy;
 use multiversx_sc_snippets::imports::*;
 
+const DEPLOY_GAS_LIMIT: NumExpr = NumExpr("80,000,000");
+
 impl ComposabilityInteract {
-    pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
-        let vault_deploy_addresses = self.typed_sc_deploy_vault(call_state).await;
-        let forwarder_deploy_addresses = self.typed_sc_deploy_forwarder_queue(call_state).await;
+    /// Deploy all contracts described in `call_tree.toml`, then write the
+    /// assigned addresses back into the same file.
+    pub async fn deploy_call_tree(&mut self) {
+        let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
-        let mut vault_iter = call_state.vaults.iter();
-        for address in vault_deploy_addresses.iter() {
-            let rc_vault = vault_iter.next().unwrap();
-            let mut vault = rc_vault.borrow_mut();
-            println!("New vault {0} deployed address: {1}", vault.name, address);
+        // Deploy all contracts in a single batch.
+        let name_address_pairs = self.deploy_all(&config).await;
 
-            vault.address = Some(address.to_address());
+        for (name, address) in name_address_pairs {
+            println!("Deployed '{name}' at {address}");
+            config.contracts.get_mut(&name).unwrap().address = Some(address.to_string());
         }
 
-        let mut fwd_iter = call_state.forwarders.iter();
-        for address in forwarder_deploy_addresses.iter() {
-            let rc_fwd = fwd_iter.next().unwrap();
-            let mut fwd = rc_fwd.borrow_mut();
-            println!("New forwarder {0} deployed address: {1}", fwd.name, address);
-
-            fwd.address = Some(address.to_address());
-        }
+        config.save_to_file(CALL_TREE_FILE);
+        println!("Addresses saved to {CALL_TREE_FILE}");
     }
 
-    pub async fn typed_sc_deploy_vault(&mut self, call_state: &CallState) -> Vec<Bech32Address> {
+    async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<(String, Bech32Address)> {
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for _ in call_state.vaults.iter() {
-            buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
-                    .typed(vault_proxy::VaultProxy)
-                    .init(OptionalValue::<BoxedBytes>::None)
-                    .code(&self.vault_code)
-                    .gas(NumExpr("70,000,000"))
-                    .returns(ReturnsNewBech32Address)
-            });
-        }
-
-        buffer.run().await
-    }
-
-    pub async fn typed_sc_deploy_forwarder_queue(
-        &mut self,
-        call_state: &CallState,
-    ) -> Vec<Bech32Address> {
-        let mut buffer = self.interactor.homogenous_call_buffer();
-        for _ in call_state.forwarders.iter() {
+        for name in config.contracts.keys() {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
-                    .init()
+                    .init(name)
                     .code(&self.forw_queue_code)
-                    .gas(NumExpr("70,000,000"))
+                    .gas(DEPLOY_GAS_LIMIT)
+                    .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)
             });
         }
-
         buffer.run().await
     }
 }

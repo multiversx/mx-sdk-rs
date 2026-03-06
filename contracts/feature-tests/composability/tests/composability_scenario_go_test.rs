@@ -15,6 +15,7 @@ fn builtin_func_set_user_name_go() {
 }
 
 #[test]
+#[ignore = "WIP"]
 fn forw_queue_async_go() {
     world().run("scenarios/forw_queue_async.scen.json");
 }

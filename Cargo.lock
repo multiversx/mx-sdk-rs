@@ -2527,6 +2527,7 @@ name = "interact"
 version = "0.0.0"
 dependencies = [
  "clap",
+ "forwarder-queue",
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",

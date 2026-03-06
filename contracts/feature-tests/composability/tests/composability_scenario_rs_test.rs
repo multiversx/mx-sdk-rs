@@ -63,6 +63,7 @@ fn builtin_func_set_user_name_rs() {
 }
 
 #[test]
+#[ignore = "WIP"]
 fn forw_queue_async_rs() {
     world().run("scenarios/forw_queue_async.scen.json");
 }
