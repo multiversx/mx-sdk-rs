@@ -50,10 +50,8 @@ impl TransferRoleTestState {
     }
 
     fn deploy(&mut self) -> &mut Self {
-        let whitelist = MultiValueVec::from(vec![
-            AddressValue::from(OWNER_ADDRESS).to_address(),
-            AddressValue::from(VAULT_ADDRESS).to_address(),
-        ]);
+        let whitelist =
+            MultiValueVec::from(vec![OWNER_ADDRESS.to_address(), VAULT_ADDRESS.to_address()]);
 
         self.world
             .tx()

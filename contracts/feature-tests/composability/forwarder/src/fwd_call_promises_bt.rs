@@ -13,7 +13,7 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
         self.tx()

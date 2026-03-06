@@ -2,7 +2,7 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 
 use crate::{
     host::vm_hooks::VMHooksContext,
-    types::{RawHandle, VMAddress},
+    types::{Address, RawHandle},
 };
 
 use super::VMHooksHandler;
@@ -31,7 +31,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     ) -> Result<(), VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.storage_load)?;
 
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let value = self
             .context
             .storage_read_any_address(&address, self.context.m_types_lock().mb_get(key_handle));

@@ -38,6 +38,45 @@ pub(crate) const DEFAULT_ISSUE_CALLBACK_NAME: &str = "default_issue_cb";
 pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
     "default_issue_init_supply_cb";
 
+/// High-level mapper for fungible ESDT tokens, providing token issuance, minting, burning,
+/// and management operations. This mapper handles the complete lifecycle of fungible tokens
+/// from issuance to day-to-day operations.
+///
+/// # Storage Layout
+///
+/// The mapper stores the token state at the base key:
+/// - `base_key` → `TokenMapperState<SA>` (NotSet | Pending | Token(EsdtTokenIdentifier))
+///
+/// # Main Operations
+///
+/// ## Token Lifecycle
+/// - **Issue**: Create new fungible token via `issue()` or `issue_and_set_all_roles()`
+/// - **Set ID**: Manually set token ID with `set_token_id()` for existing tokens
+/// - **Query**: Check token state with `is_empty()`, `get_token_id()`, etc.
+///
+/// ## Token Operations
+/// - **Mint**: Create new token supply with `mint()` or `mint_and_send()`
+/// - **Burn**: Destroy token supply with `burn()`
+/// - **Transfer**: Send tokens with `send_payment()`
+/// - **Roles**: Manage token roles with `set_local_roles()`
+///
+/// ## Balance Management
+/// - **Query Balance**: Check contract's balance with `get_balance()`
+/// - **Payment Validation**: Ensure payments match expected token
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Complete token lifecycle management in one mapper
+/// - Built-in async callback handling for issuance
+/// - Payment validation and role management
+/// - Automatic error handling for invalid states
+///
+/// **Limitations:**
+/// - Single token per mapper instance
+/// - Requires careful callback implementation for custom flows
+/// - Token issuance requires blockchain interaction
+/// - State transitions must follow protocol rules
 pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,

@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use crate::{
     blockchain::state::{AccountData, BlockchainState},
-    types::VMAddress,
+    types::Address,
 };
 
 #[derive(Default)]
 pub struct BlockchainUpdate {
-    pub accounts: HashMap<VMAddress, AccountData>,
+    pub accounts: HashMap<Address, AccountData>,
     pub new_token_identifiers: Option<Vec<String>>,
 }
 

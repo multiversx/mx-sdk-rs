@@ -162,7 +162,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             }
         }
 
-        self.tx().to(caller).multi_esdt(tokens_to_send).transfer();
+        self.tx().to(caller).payment(tokens_to_send).transfer();
 
         self.token_details(&token)
             .update(|token_ownership| token_ownership.token_nonces = nonces);

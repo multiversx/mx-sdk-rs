@@ -192,7 +192,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn overwrite_i64(&self, value: i64) {
+    pub fn overwrite_i64(&mut self, value: i64) {
         Self::set_value(self.handle.clone(), value);
     }
 
@@ -371,6 +371,34 @@ impl<M: ManagedTypeApi> BigInt<M> {
             M::managed_type_impl().bi_pow(result.get_handle(), self.get_handle(), exp_handle);
             result
         }
+    }
+
+    /// Calculates proportion of this value, consuming self.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (can be negative)
+    /// * `total` - The denominator value for the ratio calculation
+    ///
+    /// # Returns
+    /// The proportional amount as BigInt (self * part / total)
+    pub fn into_proportion(mut self, part: i64, total: i64) -> Self {
+        let mut temp = BigInt::from(part);
+        self *= &temp;
+        temp.overwrite_i64(total);
+        self /= &temp;
+        self
+    }
+
+    /// Calculates proportion of this value.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (can be negative)
+    /// * `total` - The denominator value for the ratio calculation
+    ///
+    /// # Returns
+    /// The proportional amount as BigInt (self * part / total)
+    pub fn proportion(&self, part: i64, total: i64) -> Self {
+        self.clone().into_proportion(part, total)
     }
 }
 

@@ -197,7 +197,7 @@ impl WasmInfo {
     ) {
         let signature_map = crate::ei::vm_hook_signature_map();
 
-        for (index, import) in import_section.into_iter().flatten().enumerate() {
+        for (index, import) in import_section.into_imports().flatten().enumerate() {
             if let TypeRef::Func(type_index) = &import.ty {
                 let func_type = self
                     .func_types

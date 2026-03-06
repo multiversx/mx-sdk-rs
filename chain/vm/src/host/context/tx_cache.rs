@@ -9,14 +9,14 @@ use colored::Colorize;
 use crate::{
     blockchain::state::{AccountData, BlockchainState},
     display_util::address_hex,
-    types::VMAddress,
+    types::Address,
 };
 
 use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
     source_ref: Arc<dyn TxCacheSource>,
-    pub(super) accounts: Mutex<HashMap<VMAddress, AccountData>>,
+    pub(super) accounts: Mutex<HashMap<Address, AccountData>>,
     pub(super) new_token_identifiers: Mutex<Option<Vec<String>>>,
 }
 
@@ -41,7 +41,7 @@ impl TxCache {
         self.source_ref.blockchain_ref()
     }
 
-    fn load_account_if_necessary(&self, address: &VMAddress) {
+    fn load_account_if_necessary(&self, address: &Address) {
         let mut accounts_mut = self.accounts.lock().unwrap();
         if !accounts_mut.contains_key(address) {
             if let Some(blockchain_account) = self.source_ref.load_account(address) {
@@ -50,7 +50,7 @@ impl TxCache {
         }
     }
 
-    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -59,7 +59,7 @@ impl TxCache {
         })
     }
 
-    pub fn with_account_or_else<R, F, Else>(&self, address: &VMAddress, f: F, or_else: Else) -> R
+    pub fn with_account_or_else<R, F, Else>(&self, address: &Address, f: F, or_else: Else) -> R
     where
         F: FnOnce(&AccountData) -> R,
         Else: FnOnce() -> R,
@@ -73,7 +73,7 @@ impl TxCache {
         }
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -92,20 +92,20 @@ impl TxCache {
             .insert(account_data.address.clone(), account_data);
     }
 
-    pub fn increase_account_nonce(&self, address: &VMAddress) {
+    pub fn increase_account_nonce(&self, address: &Address) {
         self.with_account_mut(address, |account| {
             account.nonce += 1;
         });
     }
 
     /// Assumes the nonce has already been increased.
-    pub fn get_new_address(&self, creator_address: &VMAddress) -> VMAddress {
+    pub fn get_new_address(&self, creator_address: &Address) -> Address {
         let current_nonce = self.with_account(creator_address, |account| account.nonce);
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
             .unwrap_or_else(|| {
                 let new_mock_address =
-                    VMAddress::generate_mock_address(&creator_address.to_vec(), current_nonce - 1);
+                    Address::generate_mock_address(&creator_address.to_vec(), current_nonce - 1);
                 println!(
                     "{}",
                     format!(

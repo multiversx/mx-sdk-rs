@@ -29,8 +29,114 @@ const ID_TO_VALUE_SUFFIX: &[u8] = b"_id_to_value";
 
 type Keys<'a, SA, T, A> = unordered_set_mapper::Iter<'a, SA, T, A>;
 
-/// A bi-directional map, from values to ids and viceversa.
-/// The mapper is based on UnorderedSetMapper, reason why the remove is done by swap_remove
+/// A storage mapper implementing a bidirectional map with one-to-one correspondence between IDs and values.
+///
+/// # Storage Layout
+///
+/// The `BiDiMapper` uses two `UnorderedSetMapper` instances and maintains bidirectional lookups:
+///
+/// 1. **ID set** (via `UnorderedSetMapper`):
+///    - `base_key + "_id.len"` → count of IDs
+///    - `base_key + "_id.item" + index` → ID at index (1-based)
+///    - `base_key + "_id.index" + encoded_id` → index of ID
+///
+/// 2. **Value set** (via `UnorderedSetMapper`):
+///    - `base_key + "_value.len"` → count of values
+///    - `base_key + "_value.item" + index` → value at index (1-based)
+///    - `base_key + "_value.index" + encoded_value` → index of value
+///
+/// 3. **Bidirectional mappings**:
+///    - `base_key + "_value_to_id" + encoded_value` → corresponding ID
+///    - `base_key + "_id_to_value" + encoded_id` → corresponding value
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert(id, value)` - Adds bidirectional mapping. O(1). Fails if ID or value already exists.
+/// - **Lookup ID**: `get_id(value)` - Retrieves ID for a value. O(1) with one storage read.
+/// - **Lookup Value**: `get_value(id)` - Retrieves value for an ID. O(1) with one storage read.
+/// - **Contains**: `contains_id(id)` / `contains_value(value)` - Checks existence. O(1).
+/// - **Remove by ID**: `remove_by_id(id)` - Removes by ID, clears both directions. O(1).
+/// - **Remove by Value**: `remove_by_value(value)` - Removes by value, clears both directions. O(1).
+/// - **Batch Remove**: `remove_all_by_ids(iter)` / `remove_all_by_values(iter)` - Removes multiple entries.
+/// - **Iteration**: `iter()` - Iterates over (ID, value) pairs; `get_all_ids()` / `get_all_values()` - specific direction.
+///
+/// # Uniqueness Guarantee
+///
+/// Both IDs and values must be unique:
+/// - Each ID maps to exactly one value
+/// - Each value maps to exactly one ID
+/// - Inserting a duplicate ID or value fails and returns `false`
+///
+/// # Trade-offs
+///
+/// - **Pros**: O(1) bidirectional lookup; enforces one-to-one correspondence; efficient for reverse lookups.
+/// - **Cons**: Double storage overhead (two sets + two mappings); removal changes element positions (swap_remove);
+///   cannot have duplicate IDs or values; more complex than unidirectional maps.
+///
+/// # Use Cases
+///
+/// - Token ID ↔ Token name mappings
+/// - User address ↔ Username associations
+/// - NFT ID ↔ Metadata hash relationships
+/// - Any scenario requiring efficient lookup in both directions
+/// - Implementing invertible mappings
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, BiDiMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = BiDiMapper::<SA, u32, u64>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"token_mapping"[..])
+/// # );
+/// // Insert bidirectional mappings
+/// assert!(mapper.insert(1, 100));
+/// assert!(mapper.insert(2, 200));
+/// assert!(mapper.insert(3, 300));
+///
+/// // Cannot insert duplicate ID or value
+/// assert!(!mapper.insert(1, 400));  // ID 1 already exists
+/// assert!(!mapper.insert(4, 100));  // Value 100 already exists
+///
+/// assert_eq!(mapper.len(), 3);
+///
+/// // Bidirectional lookup
+/// assert_eq!(mapper.get_value(&2), 200);
+/// assert_eq!(mapper.get_id(&200), 2);
+///
+/// // Check existence in both directions
+/// assert!(mapper.contains_id(&1));
+/// assert!(mapper.contains_value(&300));
+///
+/// // Remove by ID
+/// assert!(mapper.remove_by_id(&2));
+/// assert!(!mapper.contains_id(&2));
+/// assert!(!mapper.contains_value(&200));  // Both directions removed
+/// assert_eq!(mapper.len(), 2);
+///
+/// // Remove by value
+/// assert!(mapper.remove_by_value(&100));
+/// assert!(!mapper.contains_id(&1));
+/// assert!(!mapper.contains_value(&100));
+///
+/// // Iterate over all mappings
+/// for (id, value) in mapper.iter() {
+///     // Process each bidirectional pair
+/// }
+///
+/// // Iterate only IDs or values
+/// for id in mapper.get_all_ids() {
+///     // Process IDs
+/// }
+/// for value in mapper.get_all_values() {
+///     // Process values
+/// }
+///
+/// // Batch removal
+/// mapper.remove_all_by_ids(vec![3]);
+/// assert!(mapper.is_empty());
+/// # }
+/// ```
 pub struct BiDiMapper<SA, K, V, A = CurrentStorage>
 where
     SA: StorageMapperApi,

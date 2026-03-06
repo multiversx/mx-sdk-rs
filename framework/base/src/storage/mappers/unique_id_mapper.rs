@@ -21,9 +21,69 @@ use crate::{
 pub type UniqueId = usize;
 const EMPTY_ENTRY: UniqueId = 0;
 
-/// Holds the values from 1 to N with as little storage interaction as possible
-/// If Mapper[i] = i, then it stores nothing, i.e. "0"
-/// If Mapper[i] is equal to another value, then it stores the value
+/// A space-optimized storage mapper for managing ID permutations with minimal storage overhead.
+///
+/// # Storage Layout
+///
+/// The `UniqueIdMapper` is optimized for scenarios where most IDs map to themselves (identity mapping).
+/// It uses a `VecMapper` internally but only stores non-identity mappings:
+///
+/// - `base_key + ".len"` → number of slots in the mapper
+/// - `base_key + ".item" + index` → stored value only if `value != index` (stores 0 otherwise)
+///
+/// **Key Optimization**: When `Mapper[i] == i` (identity mapping), it stores `0` instead of `i`,
+/// significantly reducing storage costs when most IDs remain in their original positions.
+///
+/// **Important**: Indexes are 1-based (range: `1..=len()`), consistent with `VecMapper` conventions.
+///
+/// # Main Operations
+///
+/// - **Initialize**: `set_initial_len(n)` - Sets the mapper size (can only be called once).
+/// - **Read**: `get(index)` - Returns the ID at the given index. O(1) with one storage read.
+/// - **Write**: `set(index, id)` - Assigns an ID to an index. O(1) with one storage write.
+/// - **Remove**: `swap_remove(index)` - Removes an index by swapping with the last element. O(1).
+/// - **Iteration**: `iter()` - Iterates over all ID values in index order.
+///
+/// # Trade-offs
+///
+/// - **Pros**: Extremely space-efficient for permutation tracking; zero storage cost for identity mappings.
+/// - **Cons**: Limited to ID permutations (1 to N); length must be set upfront and cannot be extended.
+///
+/// # Use Cases
+///
+/// - NFT position tracking where most NFTs remain in their original slots
+/// - Shuffle/permutation algorithms where most elements stay in place
+/// - ID reassignment systems with minimal changes
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, UniqueIdMapper};
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = UniqueIdMapper::<SA>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"id_map"[..])
+/// # );
+/// // Initialize with 5 slots (IDs 1-5)
+/// mapper.set_initial_len(5);
+///
+/// // Initially, all IDs map to themselves: [1, 2, 3, 4, 5]
+/// assert_eq!(mapper.get(1), 1);
+/// assert_eq!(mapper.get(3), 3);
+///
+/// // Swap positions 2 and 4
+/// mapper.set(2, 4);
+/// mapper.set(4, 2);
+///
+/// // Now the mapping is: [1, 4, 3, 2, 5]
+/// assert_eq!(mapper.get(2), 4);
+/// assert_eq!(mapper.get(4), 2);
+///
+/// // Remove index 3 (swaps with last)
+/// let removed = mapper.swap_remove(3);
+/// assert_eq!(removed, 3);
+/// assert_eq!(mapper.len(), 4);
+/// # }
+/// ```
 pub struct UniqueIdMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi,

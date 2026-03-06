@@ -267,7 +267,7 @@ where
     ) {
         let payment = self.single_esdt();
         if payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
         }
 
         unsafe {
@@ -309,7 +309,7 @@ where
     pub fn egld_or_single_fungible_esdt(&self) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
         let payment = self.egld_or_single_esdt();
         if payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
+            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
         }
 
         (payment.token_identifier, payment.amount)

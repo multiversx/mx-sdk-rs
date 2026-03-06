@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt::Write};
 
-use crate::{display_util::address_hex, types::VMAddress};
+use crate::{display_util::address_hex, types::Address};
 
 use super::{AccountData, BlockchainState};
 
@@ -15,7 +15,7 @@ impl BlockchainState {
         self.add_account(acct);
     }
 
-    pub fn update_accounts(&mut self, accounts: HashMap<VMAddress, AccountData>) {
+    pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
         self.accounts.extend(accounts);
     }
 
@@ -29,19 +29,15 @@ impl BlockchainState {
 
     pub fn put_new_address(
         &mut self,
-        creator_address: VMAddress,
+        creator_address: Address,
         creator_nonce: u64,
-        new_address: VMAddress,
+        new_address: Address,
     ) {
         self.new_addresses
             .insert((creator_address, creator_nonce), new_address);
     }
 
-    pub fn get_new_address(
-        &self,
-        creator_address: VMAddress,
-        creator_nonce: u64,
-    ) -> Option<VMAddress> {
+    pub fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
         self.new_addresses
             .get(&(creator_address, creator_nonce))
             .cloned()

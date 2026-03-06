@@ -422,6 +422,11 @@ fn storage_i_64_bad_go() {
 }
 
 #[test]
+fn storage_i_64_bug_go() {
+    world().run("scenarios/storage_i64_bug.scen.json");
+}
+
+#[test]
 fn storage_load_from_address_go() {
     world().run("scenarios/storage_load_from_address.scen.json");
 }

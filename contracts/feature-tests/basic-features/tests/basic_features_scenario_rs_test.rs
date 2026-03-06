@@ -445,6 +445,12 @@ fn storage_i_64_bad_rs() {
 }
 
 #[test]
+#[ignore = "requires the small-int-bug feature to reproduce"]
+fn storage_i_64_bug_rs() {
+    world().run("scenarios/storage_i64_bug.scen.json");
+}
+
+#[test]
 fn storage_load_from_address_rs() {
     world().run("scenarios/storage_load_from_address.scen.json");
 }

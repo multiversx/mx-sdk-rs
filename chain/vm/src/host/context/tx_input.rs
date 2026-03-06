@@ -3,7 +3,7 @@ use num_traits::Zero;
 
 use crate::{
     display_util::*,
-    types::{H256, VMAddress},
+    types::{Address, H256},
 };
 use std::fmt;
 
@@ -11,8 +11,8 @@ use super::{CallType, TxFunctionName};
 
 #[derive(Clone, Debug)]
 pub struct TxInput {
-    pub from: VMAddress,
-    pub to: VMAddress,
+    pub from: Address,
+    pub to: Address,
     pub egld_value: BigUint,
     pub esdt_values: Vec<TxTokenTransfer>,
     pub func_name: TxFunctionName,
@@ -29,8 +29,8 @@ pub struct TxInput {
 impl Default for TxInput {
     fn default() -> Self {
         TxInput {
-            from: VMAddress::zero(),
-            to: VMAddress::zero(),
+            from: Address::zero(),
+            to: Address::zero(),
             egld_value: BigUint::zero(),
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,

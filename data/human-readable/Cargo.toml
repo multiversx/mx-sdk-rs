@@ -15,8 +15,8 @@ keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools"]
 
 [dependencies]
-serde_json = { version = "1.0.68" }
+serde_json = { version = "1.0" }
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.64.1"
+version = "=0.65.0"
 path = "../../framework/scenario"

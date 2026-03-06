@@ -15,7 +15,7 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
         }
     }
 
-    fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
+    pub(super) fn wrap_big_int_assert_gt_zero(value: BigInt<M>) -> Self {
         let result = Self::wrap_big_int_unchecked(value);
         result.validate_after_op();
         result

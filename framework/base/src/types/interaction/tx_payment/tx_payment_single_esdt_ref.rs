@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EsdtTokenPaymentRefs<'_, Env::Api>
 where
@@ -23,7 +23,7 @@ where
     ) -> Result<(), TransferExecuteFailed> {
         // TODO: some clones could be avoided?
         let mut payments = ManagedVec::new();
-        payments.push(self.to_owned_payment().into_multi_egld_or_esdt_payment());
+        payments.push(self.to_owned_payment().into_egld_or_esdt_payment());
 
         // using multi-transfer (instead of single ESDT/NFT), because it is the only one that is fallible
         SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
@@ -90,12 +90,10 @@ where
         })
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(
-                self.to_owned_payment().into_multi_egld_or_esdt_payment(),
-            ),
+            multi_esdt: ManagedVec::from_single_item(self.to_owned_payment().into_payment()),
         }
     }
 }

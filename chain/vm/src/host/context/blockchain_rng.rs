@@ -1,4 +1,4 @@
-use rand::{Fill, Rng};
+use rand::Rng;
 use rand_seeder::{SipHasher, SipRng};
 
 use super::{TxCache, TxInput};
@@ -33,13 +33,9 @@ impl BlockchainRng {
         }
     }
 
-    fn fill<T: Fill + ?Sized>(&mut self, dest: &mut T) {
-        self.rng.fill(dest);
-    }
-
     pub fn next_bytes(&mut self, length: usize) -> Vec<u8> {
         let mut bytes = vec![0; length];
-        self.fill(&mut bytes[..]);
+        self.rng.fill_bytes(&mut bytes);
         bytes
     }
 }

@@ -22,6 +22,7 @@ where
     fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step =
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
+        step.tx_id = self.env.take_tx_id();
         step.explicit_tx_hash = self.env.take_tx_hash();
         step.expect = Some(self.result_handler.list_preprocessing());
 
@@ -57,7 +58,7 @@ where
 
     step.tx.gas_limit = gas_annotated(env, gas);
 
-    let full_payment_data = payment.into_full_payment_data(env);
+    let full_payment_data = payment.into_scenario_payments(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     }

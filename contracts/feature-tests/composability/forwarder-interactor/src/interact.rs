@@ -457,9 +457,9 @@ impl ContractInteract {
 
     pub async fn forward_sync_retrieve_funds(&mut self) {
         let to = Address::zero();
-        let token = EgldOrEsdtTokenIdentifier::esdt(&b""[..]);
+        let token = EgldOrEsdtTokenIdentifier::egld();
         let token_nonce = 0u64;
-        let amount = BigUint::<StaticApi>::from(0u128);
+        let amount = NonZeroBigUint::<StaticApi>::try_from(1u128).unwrap();
 
         let response = self
             .interactor
@@ -659,10 +659,11 @@ impl ContractInteract {
     }
 
     pub async fn forward_async_retrieve_funds(&mut self) {
+        // TODO: this was partially generated and is not currently functional
         let to = Address::zero();
-        let token = EgldOrEsdtTokenIdentifier::esdt(&b""[..]);
+        let token = EgldOrEsdtTokenIdentifier::egld();
         let token_nonce = 0u64;
-        let amount = BigUint::<StaticApi>::from(0u128);
+        let amount = NonZeroBigUint::<StaticApi>::try_from(1u32).unwrap();
 
         let response = self
             .interactor

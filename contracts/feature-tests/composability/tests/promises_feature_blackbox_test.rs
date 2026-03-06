@@ -56,7 +56,7 @@ impl PromisesFeaturesTestState {
 #[test]
 fn test_back_transfers() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
 
     state
         .world
@@ -70,13 +70,13 @@ fn test_back_transfers() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_back_transfers_reset() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     state
@@ -96,13 +96,13 @@ fn test_back_transfers_reset() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_multi_call_back_transfers() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     state
@@ -122,13 +122,13 @@ fn test_multi_call_back_transfers() {
     state
         .world
         .check_account(FORWARDER_ADDRESS)
-        .esdt_balance(TOKEN_ID_EXPR, token_amount);
+        .esdt_balance(TOKEN_ID_EXPR, token_amount.as_big_uint());
 }
 
 #[test]
 fn test_back_transfers_logs() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
 
     let logs = state
         .world
@@ -148,7 +148,7 @@ fn test_back_transfers_logs() {
 #[test]
 fn test_multi_call_back_transfers_logs() {
     let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+    let token_amount = NonZeroBigUint::try_from(1000u64).unwrap();
     let half_token_amount = token_amount.clone() / 2u64;
 
     let logs = state
@@ -197,24 +197,24 @@ fn test_back_transfers_handlers() {
         .to(FORWARDER_ADDRESS)
         .typed(forwarder_proxy::ForwarderProxy)
         .forward_sync_accept_funds_rh_single_esdt(VAULT_ADDRESS)
-        .single_esdt(&TOKEN_ID_EXPR.to_token_identifier(), 0u64, &token_amount)
+        .payment(Payment::try_new(TOKEN_ID_EXPR, 0, token_amount.clone()).unwrap())
         .returns(ReturnsResult)
         .run();
 
     assert!(
-        result.token_identifier == TOKEN_ID_EXPR.to_token_identifier()
+        result.token_identifier == TOKEN_ID_EXPR.to_esdt_token_identifier()
             && result.token_nonce == 0u64
             && result.amount == token_amount
     );
 
     let mut multi_transfer = ManagedVec::<StaticApi, EsdtTokenPayment<StaticApi>>::new();
     multi_transfer.push(EsdtTokenPayment::new(
-        TOKEN_ID_EXPR.to_token_identifier(),
+        TOKEN_ID_EXPR.to_esdt_token_identifier(),
         0u64,
         token_amount.clone(),
     ));
     multi_transfer.push(EsdtTokenPayment::new(
-        OTHER_TOKEN_ID_EXPR.to_token_identifier(),
+        OTHER_TOKEN_ID_EXPR.to_esdt_token_identifier(),
         0u64,
         token_amount.clone(),
     ));
@@ -232,11 +232,11 @@ fn test_back_transfers_handlers() {
 
     assert_eq!(result.len(), 2usize);
     assert!(
-        result.get(0).token_identifier == TOKEN_ID_EXPR.to_token_identifier()
+        result.get(0).token_identifier == TOKEN_ID_EXPR.to_esdt_token_identifier()
             && result.get(0).amount == token_amount
     );
     assert!(
-        result.get(1).token_identifier == OTHER_TOKEN_ID_EXPR.to_token_identifier()
+        result.get(1).token_identifier == OTHER_TOKEN_ID_EXPR.to_esdt_token_identifier()
             && result.get(1).amount == token_amount
     );
 }

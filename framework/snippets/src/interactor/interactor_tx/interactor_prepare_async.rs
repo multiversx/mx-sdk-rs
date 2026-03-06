@@ -10,6 +10,7 @@ where
     pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
         ScenarioTxEnvData {
             interpreter_context: InterpreterContext::new().with_dir(self.current_dir.clone()),
+            tx_id: None,
             tx_hash: None,
         }
     }

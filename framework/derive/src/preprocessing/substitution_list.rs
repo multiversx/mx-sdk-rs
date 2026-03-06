@@ -75,6 +75,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(EsdtTokenData));
     add_managed_type(substitutions, &quote!(EsdtTokenPayment));
     add_managed_type(substitutions, &quote!(Payment));
+    add_managed_type(substitutions, &quote!(FungiblePayment));
     add_managed_type(substitutions, &quote!(ManagedAddress));
     add_managed_type(substitutions, &quote!(ManagedBufferBuilder));
     add_managed_type(substitutions, &quote!(PaymentVec));
@@ -83,8 +84,6 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(ManagedRef));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecOwnedIterator));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVecRefIterator));
-    add_managed_type_with_generics(substitutions, &quote!(ManagedVecRef));
-    add_managed_type_with_generics(substitutions, &quote!(Ref));
     add_managed_type_with_generics(substitutions, &quote!(ManagedVec));
     add_managed_type_with_generics(substitutions, &quote!(PreloadedManagedBuffer));
     add_managed_type(substitutions, &quote!(RandomnessSource));

@@ -20,6 +20,53 @@ use crate::{
 const ITEM_INDEX: &[u8] = b".index";
 const NULL_ENTRY: usize = 0;
 
+/// A storage mapper for managing an unordered set of items with efficient membership testing.
+///
+/// # Storage Layout
+///
+/// The `UnorderedSetMapper` uses two storage patterns:
+///
+/// 1. **Value storage** (via `VecMapper`):
+///    - `base_key + ".len"` → count of items
+///    - `base_key + ".item" + index` → value at index (1-based indexing)
+///
+/// 2. **Index lookup** (for fast membership testing):
+///    - `base_key + ".index" + encoded_value` → index of value (0 means not present)
+///
+/// # Main Operations
+///
+/// - **Insert**: `insert(value)` - Adds a value if not already present. O(1) with storage writes.
+/// - **Remove**: `swap_remove(value)` - Removes a value by swapping with the last element. O(1) with storage writes.
+/// - **Contains**: `contains(value)` - Checks membership by looking up the index. O(1) with one storage read.
+/// - **Iteration**: `iter()` - Iterates over all values in arbitrary order.
+/// - **Random Access**: `get_by_index(index)` - Gets value at a specific position (1-based).
+///
+/// # Trade-offs
+///
+/// - **Pros**: O(1) insert, remove, and contains operations; efficient for membership testing.
+/// - **Cons**: No ordering guarantees; removal changes element positions; uses more storage than `SetMapper`.
+///
+/// # Example
+///
+/// ```rust
+/// # use multiversx_sc::storage::mappers::{StorageMapper, UnorderedSetMapper};
+/// # use multiversx_sc::api::ManagedTypeApi;
+/// # fn example<SA: multiversx_sc::api::StorageMapperApi>() {
+/// # let mut mapper = UnorderedSetMapper::<SA, u32>::new(
+/// #     multiversx_sc::storage::StorageKey::new(&b"my_set"[..])
+/// # );
+/// mapper.insert(10);
+/// mapper.insert(20);
+/// mapper.insert(30);
+///
+/// assert!(mapper.contains(&20));
+/// assert_eq!(mapper.len(), 3);
+///
+/// mapper.swap_remove(&20);
+/// assert!(!mapper.contains(&20));
+/// assert_eq!(mapper.len(), 2);
+/// # }
+/// ```
 pub struct UnorderedSetMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

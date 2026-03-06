@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    blockchain::state::AccountData, host::vm_hooks::VMHooksDispatcher, types::VMAddress,
+    blockchain::state::AccountData, host::vm_hooks::VMHooksDispatcher, types::Address,
 };
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::api::RawHandle;
@@ -66,7 +66,7 @@ impl SingleTxApi {
     where
         F: FnOnce(&mut AccountData) -> R,
     {
-        Self::with_global(|data| data.with_account_mut(&VMAddress::zero(), f))
+        Self::with_global(|data| data.with_account_mut(&Address::zero(), f))
     }
 }
 

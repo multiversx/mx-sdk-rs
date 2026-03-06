@@ -1,8 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment, MultiEgldOrEsdtPayment,
-        MultiEsdtPayment, MultiValueEncoded, PaymentVec,
+        BigUint, EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPayment, EsdtTokenPaymentVec,
+        MultiEgldOrEsdtPayment, MultiValueEncoded, PaymentVec,
     },
 };
 
@@ -17,7 +17,7 @@ where
     A: ManagedTypeApi,
 {
     pub total_egld_amount: BigUint<A>,
-    pub esdt_payments: MultiEsdtPayment<A>,
+    pub esdt_payments: EsdtTokenPaymentVec<A>,
 }
 
 /// Holding back-transfer data, as retrieved from the VM.

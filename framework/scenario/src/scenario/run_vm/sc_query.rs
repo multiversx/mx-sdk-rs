@@ -18,7 +18,7 @@ impl ScenarioVMRunner {
     pub fn perform_sc_query_update_results(&mut self, step: &mut ScQueryStep) {
         let tx_result = self.perform_sc_query_in_debugger(step, RuntimeInstanceCallLambdaDefault);
         if let Some(tx_expect) = &step.expect {
-            check_tx_output(&step.id, tx_expect, &tx_result);
+            check_tx_output(step.get_tx_id(), tx_expect, &tx_result);
         }
         let response: TxResponse = TxResponse::from_tx_result(tx_result);
         step.save_response(response);
@@ -59,7 +59,7 @@ fn tx_input_from_query(
             .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
-        tx_hash: generate_tx_hash(&sc_query_step.id, &sc_query_step.explicit_tx_hash),
+        tx_hash: generate_tx_hash(sc_query_step.get_tx_id(), &sc_query_step.explicit_tx_hash),
         ..Default::default()
     }
 }

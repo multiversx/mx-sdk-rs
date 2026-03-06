@@ -12,20 +12,20 @@ publish = false
 crate-type=["cdylib"]
 
 [dependencies]
-plotters = "^0.3.2"
-wasm-bindgen = "0.2.78"
-web-sys = { version = "0.3.39", features = ["HtmlCanvasElement"] }
-plotters-canvas = "^0.3.0"
+plotters = "0.3"
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["HtmlCanvasElement"] }
+plotters-canvas = "0.3"
 
 [profile.release]
 lto = true
 
 [dependencies.multiversx-sc]
-version = "=0.64.1"
+version = "=0.65.0"
 path = "../../framework/base"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.64.1"
+version = "=0.65.0"
 path = "../../framework/scenario"
 default-features = false
 

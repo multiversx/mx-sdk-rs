@@ -2,7 +2,7 @@ use crate::{
     blockchain::state::BlockchainStateRef,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
 };
 
 /// Executes deploy transaction and commits changes back to the underlying blockchain state.
@@ -13,7 +13,7 @@ pub fn commit_deploy<F>(
     state: &mut BlockchainStateRef,
     runtime: &RuntimeRef,
     f: F,
-) -> (VMAddress, TxResult)
+) -> (Address, TxResult)
 where
     F: RuntimeInstanceCallLambda,
 {
@@ -51,7 +51,7 @@ pub fn execute_deploy<F>(
     tx_cache: TxCache,
     runtime: &RuntimeRef,
     f: F,
-) -> (TxResult, VMAddress, BlockchainUpdate)
+) -> (TxResult, Address, BlockchainUpdate)
 where
     F: RuntimeInstanceCallLambda,
 {
@@ -66,7 +66,7 @@ where
     {
         return (
             TxResult::from_panic_obj(&err),
-            VMAddress::zero(),
+            Address::zero(),
             BlockchainUpdate::empty(),
         );
     }

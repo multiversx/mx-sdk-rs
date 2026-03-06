@@ -20,10 +20,7 @@ impl TypeDescription {
     /// We use this as value while the fields are being computed.
     pub const PLACEHOLDER: TypeDescription = TypeDescription {
         docs: Vec::new(),
-        names: TypeNames {
-            abi: String::new(),
-            rust: String::new(),
-        },
+        names: TypeNames::new(),
         contents: TypeContents::NotSpecified,
         macro_attributes: Vec::new(),
     };

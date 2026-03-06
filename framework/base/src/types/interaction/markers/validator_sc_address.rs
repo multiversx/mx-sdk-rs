@@ -1,4 +1,3 @@
-use hex_literal::hex;
 use multiversx_chain_core::types::Address;
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
@@ -9,8 +8,8 @@ use crate::{
 };
 
 /// Address of the validator system smart contract.
-const VALIDATOR_SC_ADDRESS_BYTES: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000001ffff");
+const VALIDATOR_SC_ADDRESS: Address =
+    Address::from_hex("000000000000000000010000000000000000000000000000000000000001ffff");
 const VALIDATOR_SC_ADDRESS_BECH32: &str =
     "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l";
 const VALIDATOR_SC_ADDRESS_ANNOTATION: &str =
@@ -24,11 +23,11 @@ impl ValidatorSystemSCAddress {
     where
         Api: ManagedTypeApi,
     {
-        ManagedAddress::from(VALIDATOR_SC_ADDRESS_BYTES)
+        ManagedAddress::from(VALIDATOR_SC_ADDRESS)
     }
 
     pub fn to_address(&self) -> Address {
-        VALIDATOR_SC_ADDRESS_BYTES.into()
+        VALIDATOR_SC_ADDRESS
     }
 
     pub fn to_bech32_str(&self) -> &str {
@@ -62,7 +61,7 @@ impl TopEncode for ValidatorSystemSCAddress {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        VALIDATOR_SC_ADDRESS_BYTES.top_encode_or_handle_err(output, h)
+        VALIDATOR_SC_ADDRESS.top_encode_or_handle_err(output, h)
     }
 }
 

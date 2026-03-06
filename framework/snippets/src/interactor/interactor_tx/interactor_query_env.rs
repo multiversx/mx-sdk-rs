@@ -1,6 +1,7 @@
 use multiversx_sc_scenario::{
     ScenarioTxEnv, ScenarioTxEnvData,
     api::StaticApi,
+    imports::{H256, TxEnvWithTxHash, TxId},
     multiversx_sc::types::{ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv},
     scenario_model::TxExpect,
 };
@@ -54,5 +55,26 @@ where
 {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
+    }
+}
+
+impl<GatewayProxy> TxEnvWithTxHash for InteractorEnvQuery<'_, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    fn set_tx_id(&mut self, tx_id: TxId) {
+        self.data.set_tx_id(tx_id);
+    }
+
+    fn take_tx_id(&mut self) -> Option<TxId> {
+        self.data.take_tx_id()
+    }
+
+    fn set_tx_hash(&mut self, tx_hash: H256) {
+        self.data.set_tx_hash(tx_hash);
+    }
+
+    fn take_tx_hash(&mut self) -> Option<H256> {
+        self.data.take_tx_hash()
     }
 }

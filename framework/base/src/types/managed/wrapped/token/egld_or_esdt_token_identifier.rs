@@ -16,7 +16,7 @@ use crate::{
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
 /// Equivalent to a structure of the form
-/// ```
+/// ```rust
 /// # use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenIdentifier};
 /// enum EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 ///     Egld,
@@ -129,6 +129,11 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     pub fn as_token_id(&self) -> &TokenId<M> {
         // safe because of #[repr(transparent)]
         unsafe { core::mem::transmute(self) }
+    }
+
+    /// Converts reference to the newer, non-legacy TokenId.
+    pub fn into_token_id(self) -> TokenId<M> {
+        self.token_id
     }
 
     #[inline]
