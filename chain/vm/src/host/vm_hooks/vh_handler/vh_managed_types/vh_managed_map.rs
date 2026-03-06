@@ -50,4 +50,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .m_types_lock()
             .mm_contains(map_handle, key.as_slice())
     }
+
+    pub fn mm_drop(&self, map_handle: RawHandle) {
+        self.context.m_types_lock().mm_remove(map_handle);
+    }
 }
