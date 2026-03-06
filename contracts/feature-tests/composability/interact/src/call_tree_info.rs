@@ -1,4 +1,4 @@
-use forwarder_queue::{Trace, forwarder_queue_proxy};
+use forwarder_queue::{Trace, TraceName, forwarder_queue_proxy};
 use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
@@ -59,21 +59,41 @@ impl ComposabilityInteract {
                 println!("  trace: (empty)");
             } else {
                 for (i, entry) in trace.0.iter().enumerate() {
+                    let location = match entry.location {
+                        TraceName::Bump => "Bump",
+                        TraceName::AsyncV1CallbackOk => "Cb1✓",
+                        TraceName::AsyncV1CallbackErr => "Cb1✗",
+                    };
                     let gas_used = entry.initial_gas.saturating_sub(entry.final_gas);
                     print!(
-                        "  trace[{i}] (block_nonce:{}, gas:{} - {} = {}, items: [",
+                        "  trace[{i}] {location} (block_nonce:{}, gas:{} - {} = {}, items: [",
                         entry.block_nonce,
                         fmt_gas(entry.initial_gas),
                         fmt_gas(gas_used),
                         fmt_gas(entry.final_gas),
                     );
-                    for (j, item) in entry.items.iter().enumerate() {
+                    for (j, item) in entry.input.iter().enumerate() {
                         if j > 0 {
                             print!(", ");
                         }
                         print!("({} #{})", item.caller_id, item.call_index);
                     }
-                    println!("])");
+                    print!("])");
+                    if !entry.results.is_empty() {
+                        print!(" results: [");
+                        for (j, buf) in entry.results.iter().enumerate() {
+                            if j > 0 {
+                                print!(", ");
+                            }
+                            let bytes = buf.to_boxed_bytes();
+                            print!("0x");
+                            for byte in bytes.as_slice() {
+                                print!("{byte:02x}");
+                            }
+                        }
+                        print!("]");
+                    }
+                    println!();
                 }
             }
         }

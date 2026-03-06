@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            7
-// Async Callback (empty):               1
+// Endpoints:                            5
+// Async Callback:                       1
 // Promise callbacks:                    1
-// Total number of exported functions:  10
+// Total number of exported functions:   8
 
 #![no_std]
 
@@ -24,10 +24,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         trace => trace
         set_queued_calls => set_queued_calls
         bump => bump
-        callback_count => callback_count
-        callback_payments => callback_payments
-        promises_callback_method => promises_callback_method
+        async_v2_callback => async_v2_callback
     )
 }
 
-multiversx_sc_wasm_adapter::async_callback_empty! {}
+multiversx_sc_wasm_adapter::async_callback! { forwarder_queue }

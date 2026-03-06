@@ -153,8 +153,8 @@ impl ComposabilityInteract {
 fn to_queued_call_type(call_type: &ProgrammedCallTypeConfig) -> ProgrammedCallType {
     match call_type {
         ProgrammedCallTypeConfig::Sync => ProgrammedCallType::Sync,
-        ProgrammedCallTypeConfig::LegacyAsync => ProgrammedCallType::LegacyAsync,
+        ProgrammedCallTypeConfig::LegacyAsync => ProgrammedCallType::AsyncV1,
         ProgrammedCallTypeConfig::TransferExecute => ProgrammedCallType::TransferExecute,
-        ProgrammedCallTypeConfig::Promise => ProgrammedCallType::Promise,
+        ProgrammedCallTypeConfig::Promise => ProgrammedCallType::AsyncV2,
     }
 }

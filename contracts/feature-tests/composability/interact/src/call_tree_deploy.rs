@@ -6,6 +6,8 @@ use crate::{
 use forwarder_queue::forwarder_queue_proxy;
 use multiversx_sc_snippets::imports::*;
 
+const DEPLOY_GAS_LIMIT: NumExpr = NumExpr("80,000,000");
+
 impl ComposabilityInteract {
     /// Deploy all contracts described in `call_tree.toml`, then write the
     /// assigned addresses back into the same file.
@@ -26,13 +28,13 @@ impl ComposabilityInteract {
 
     async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<(String, Bech32Address)> {
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for (name, _) in &config.contracts {
+        for name in config.contracts.keys() {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
                     .typed(forwarder_queue_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
-                    .gas(NumExpr("50,000,000"))
+                    .gas(DEPLOY_GAS_LIMIT)
                     .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)
             });

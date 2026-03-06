@@ -118,22 +118,4 @@ where
             .argument(&call_trace)
             .original_result()
     }
-
-    pub fn callback_count(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("callback_count")
-            .original_result()
-    }
-
-    pub fn callback_payments(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("callback_payments")
-            .original_result()
-    }
 }
