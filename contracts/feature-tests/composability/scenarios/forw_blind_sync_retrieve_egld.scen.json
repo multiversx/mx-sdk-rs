@@ -22,11 +22,11 @@
         },
         {
             "step": "scCall",
-            "id": "blind_sync_call retrieve EGLD back to caller",
+            "id": "blind_sync retrieve EGLD back to caller",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "blind_sync_call",
+                "function": "blind_sync",
                 "arguments": [
                     "sc:vault",
                     "str:retrieve_funds",

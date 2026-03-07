@@ -42,7 +42,10 @@ Uses the async v2 mechanism (`register_promise`).
 ### `fwd_blind_sync` — Synchronous Call
 
 - **`blind_sync_call(to, endpoint_name, ...args)`** `#[payable]`  
-  Forwards the full payment to `to::endpoint_name(args)` synchronously. Any tokens or EGLD returned (back-transfers) are forwarded to the original caller.
+  Forwards the full payment to `to::endpoint_name(args)` synchronously. Any tokens or EGLD returned (back-transfers) are forwarded to the original caller. Emits `blind_sync_ok` on success.
+
+- **`blind_sync_call_fallible(to, endpoint_name, ...args)`** `#[payable]`  
+  Same as `blind_sync_call` but does not propagate failure — the call result is handled explicitly. Emits `blind_sync_ok` on success or `blind_sync_error` (with error code and message) on failure.
 
 ---
 

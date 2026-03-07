@@ -22,15 +22,15 @@
         },
         {
             "step": "scCall",
-            "id": "blind_sync accept EGLD",
+            "id": "blind_sync_fallible reject EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "blind_sync",
+                "function": "blind_sync_fallible",
                 "arguments": [
                     "sc:vault",
-                    "str:accept_funds"
+                    "str:reject_funds"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -48,14 +48,12 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "*",
-                    "balance": "0"
+                    "balance": "1000"
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "1000",
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "1"
-                    },
+                    "balance": "0",
+                    "storage": {},
                     "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {

@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-const GAS_OVERHEAD: u64 = 500_000;
+const GAS_OVERHEAD: u64 = 700_000;
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindCommon {

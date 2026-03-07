@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-const ASYNC_V2_CALLBACK_GAS: u64 = 500_000;
+const ASYNC_V2_CALLBACK_GAS: u64 = 1_500_000;
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {

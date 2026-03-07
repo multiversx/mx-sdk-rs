@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
     #[endpoint]
     #[payable]
-    fn blind_sync_call(
+    fn blind_sync(
         &self,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
@@ -32,6 +32,40 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
         self.sync_ok(raw_results.into());
     }
 
+    #[endpoint]
+    #[payable]
+    fn blind_sync_fallible(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let payment = self.call_value().all();
+        let result = self
+            .tx()
+            .to(to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .payment(&payment)
+            .gas(self.tx_gas())
+            .returns(ReturnsHandledOrError::new().returns(ReturnsRawResult))
+            .sync_call_fallible();
+
+        match result {
+            Ok(results) => self.sync_ok(results.into()),
+            Err(err_code) => {
+                self.tx()
+                    .to(self.blockchain().get_caller())
+                    .payment(&payment)
+                    .transfer();
+                self.sync_error(err_code);
+            }
+        }
+    }
+
     #[event("blind_sync_ok")]
     fn sync_ok(&self, #[indexed] results: MultiValueEncoded<ManagedBuffer>);
+
+    #[event("blind_sync_error")]
+    fn sync_error(&self, #[indexed] err_code: u32);
 }

@@ -65,6 +65,16 @@ fn forw_blind_sync_retrieve_egld_go() {
 }
 
 #[test]
+fn forw_blind_sync_fallible_accept_egld_go() {
+    world().run("scenarios/forw_blind_sync_fallible_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_fallible_reject_egld_go() {
+    world().run("scenarios/forw_blind_sync_fallible_reject_egld.scen.json");
+}
+
+#[test]
 fn forw_blind_transf_exec_accept_egld_go() {
     world().run("scenarios/forw_blind_transf_exec_accept_egld.scen.json");
 }

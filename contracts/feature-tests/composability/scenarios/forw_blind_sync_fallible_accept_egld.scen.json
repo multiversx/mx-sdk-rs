@@ -22,12 +22,12 @@
         },
         {
             "step": "scCall",
-            "id": "blind_sync accept EGLD",
+            "id": "blind_sync_fallible accept EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "blind_sync",
+                "function": "blind_sync_fallible",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

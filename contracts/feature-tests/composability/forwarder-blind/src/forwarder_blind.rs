@@ -23,13 +23,4 @@ pub trait ForwarderBlind:
 {
     #[init]
     fn init(&self) {}
-
-    // #[callback_raw]
-    // fn callback_raw(&self, args: MultiValueEncoded<ManagedBuffer>) {
-    //     let args_as_vec = args.into_vec_of_buffers();
-    //     self.callback_raw_event(&args_as_vec);
-    // }
-
-    // #[event("callback_raw")]
-    // fn callback_raw_event(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
 }
