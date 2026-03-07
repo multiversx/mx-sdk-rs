@@ -17,6 +17,9 @@ path = "forwarder-legacy"
 [dev-dependencies.forwarder-queue]
 path = "forwarder-queue"
 
+[dev-dependencies.forwarder-blind]
+path = "forwarder-blind"
+
 [dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
 
