@@ -28,9 +28,9 @@ pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .payment(payment)
+            .payment(&payment)
             .gas(fwd_gas)
-            .callback(self.callbacks().blind_async_v2_callback(original_caller))
+            .callback(self.callbacks().blind_async_v2_callback(original_caller, &payment))
             .gas_for_callback(ASYNC_V2_CALLBACK_GAS)
             .register_promise();
     }
@@ -39,21 +39,18 @@ pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
     fn blind_async_v2_callback(
         &self,
         original_caller: ManagedAddress,
+        original_payment: &PaymentVec,
         #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(results) => {
-                let back_payments = self.call_value().all();
                 self.async_v2_callback_ok_event(&results);
-                if !back_payments.is_empty() {
-                    self.tx()
-                        .to(original_caller)
-                        .payment(back_payments)
-                        .transfer();
-                }
+                let back_payments = self.call_value().all();
+                self.send_back_payments(&original_caller, &back_payments);
             }
             ManagedAsyncCallResult::Err(err) => {
                 self.async_v2_callback_error_event(err.err_code, &err.err_msg);
+                self.send_back_payments(&original_caller, original_payment);
             }
         }
     }

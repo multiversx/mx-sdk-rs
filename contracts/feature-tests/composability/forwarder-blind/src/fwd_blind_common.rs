@@ -12,4 +12,10 @@ pub trait ForwarderBlindCommon {
 
         self.blockchain().get_gas_left() - GAS_OVERHEAD
     }
+
+    fn send_back_payments(&self, original_caller: &ManagedAddress, payments: &PaymentVec) {
+        if !payments.is_empty() {
+            self.tx().to(original_caller).payment(payments).transfer();
+        }
+    }
 }

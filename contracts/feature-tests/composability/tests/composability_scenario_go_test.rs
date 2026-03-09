@@ -25,8 +25,18 @@ fn forw_blind_async_v_1_accept_esdt_go() {
 }
 
 #[test]
+fn forw_blind_async_v_1_accept_multi_esdt_go() {
+    world().run("scenarios/forw_blind_async_v1_accept_multi_esdt.scen.json");
+}
+
+#[test]
 fn forw_blind_async_v_1_accept_nft_go() {
     world().run("scenarios/forw_blind_async_v1_accept_nft.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_1_reject_egld_go() {
+    world().run("scenarios/forw_blind_async_v1_reject_egld.scen.json");
 }
 
 #[test]
@@ -45,6 +55,16 @@ fn forw_blind_async_v_2_accept_egld_go() {
 }
 
 #[test]
+fn forw_blind_async_v_2_accept_multi_esdt_go() {
+    world().run("scenarios/forw_blind_async_v2_accept_multi_esdt.scen.json");
+}
+
+#[test]
+fn forw_blind_async_v_2_reject_egld_go() {
+    world().run("scenarios/forw_blind_async_v2_reject_egld.scen.json");
+}
+
+#[test]
 fn forw_blind_async_v_2_retrieve_egld_go() {
     world().run("scenarios/forw_blind_async_v2_retrieve_egld.scen.json");
 }
@@ -60,11 +80,6 @@ fn forw_blind_sync_accept_egld_go() {
 }
 
 #[test]
-fn forw_blind_sync_retrieve_egld_go() {
-    world().run("scenarios/forw_blind_sync_retrieve_egld.scen.json");
-}
-
-#[test]
 fn forw_blind_sync_fallible_accept_egld_go() {
     world().run("scenarios/forw_blind_sync_fallible_accept_egld.scen.json");
 }
@@ -72,6 +87,21 @@ fn forw_blind_sync_fallible_accept_egld_go() {
 #[test]
 fn forw_blind_sync_fallible_reject_egld_go() {
     world().run("scenarios/forw_blind_sync_fallible_reject_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_fallible_retrieve_egld_go() {
+    world().run("scenarios/forw_blind_sync_fallible_retrieve_egld.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_fallible_retrieve_esdt_go() {
+    world().run("scenarios/forw_blind_sync_fallible_retrieve_esdt.scen.json");
+}
+
+#[test]
+fn forw_blind_sync_retrieve_egld_go() {
+    world().run("scenarios/forw_blind_sync_retrieve_egld.scen.json");
 }
 
 #[test]

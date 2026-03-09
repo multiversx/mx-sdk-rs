@@ -48,17 +48,24 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
             .arguments_raw(args.to_arg_buffer())
             .payment(&payment)
             .gas(self.tx_gas())
-            .returns(ReturnsHandledOrError::new().returns(ReturnsRawResult))
+            .returns(
+                ReturnsHandledOrError::new()
+                    .returns(ReturnsBackTransfers)
+                    .returns(ReturnsRawResult),
+            )
             .sync_call_fallible();
 
         match result {
-            Ok(results) => self.sync_ok(results.into()),
+            Ok((back_transfers, raw_results)) => {
+                self.sync_ok(raw_results.into());
+                self.send_back_payments(
+                    &self.blockchain().get_caller(),
+                    &back_transfers.into_payment_vec(),
+                );
+            }
             Err(err_code) => {
-                self.tx()
-                    .to(self.blockchain().get_caller())
-                    .payment(&payment)
-                    .transfer();
                 self.sync_error(err_code);
+                self.send_back_payments(&self.blockchain().get_caller(), &payment);
             }
         }
     }

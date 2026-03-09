@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
-pub trait ForwarderBlindAsyncV1 {
+pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
     #[endpoint]
     #[payable]
     fn blind_async_v1(
@@ -16,8 +16,11 @@ pub trait ForwarderBlindAsyncV1 {
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .payment(payment)
-            .callback(self.callbacks().blind_async_v1_callback(original_caller))
+            .payment(&payment)
+            .callback(
+                self.callbacks()
+                    .blind_async_v1_callback(original_caller, &payment),
+            )
             .async_call_and_exit()
     }
 
@@ -25,21 +28,18 @@ pub trait ForwarderBlindAsyncV1 {
     fn blind_async_v1_callback(
         &self,
         original_caller: ManagedAddress,
+        original_payment: &PaymentVec,
         #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(results) => {
-                let back_payments = self.call_value().all();
                 self.async_v1_callback_ok_event(&results);
-                if !back_payments.is_empty() {
-                    self.tx()
-                        .to(original_caller)
-                        .payment(back_payments)
-                        .transfer();
-                }
+                let back_payments = self.call_value().all();
+                self.send_back_payments(&original_caller, &back_payments);
             }
             ManagedAsyncCallResult::Err(err) => {
                 self.async_v1_callback_error_event(err.err_code, &err.err_msg);
+                self.send_back_payments(&original_caller, original_payment);
             }
         }
     }
