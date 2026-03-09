@@ -11,7 +11,9 @@ It is a simplified counterpart to [forwarder-raw](../forwarder-raw), which has m
 ### `fwd_blind_common`
 Shared helper used across modules.
 
-- `tx_gas()` — returns `get_gas_left() - 500_000`. Used to reserve a gas overhead before forwarding.
+- `GAS_OVERHEAD` — `7_000_000`. Gas reserved before forwarding to cover the contract's own overhead.
+- `tx_gas()` — returns `get_gas_left() - GAS_OVERHEAD`. Panics if there is not enough gas left.
+- `send_back_payments(original_caller, payments)` — transfers a `PaymentVec` back to the original caller if non-empty.
 
 ---
 
@@ -19,11 +21,11 @@ Shared helper used across modules.
 Uses the async v1 mechanism (`async_call_and_exit`).
 
 - **`blind_async_v1(to, endpoint_name, ...args)`** `#[payable]`  
-  Forwards the full payment to `to::endpoint_name(args)` as an async call. Captures the original caller so the callback can return funds.
+  Forwards the full payment to `to::endpoint_name(args)` as an async call. Captures the original caller and original payment in the callback data.
 
 - **`blind_async_v1_callback`** `#[callback]`  
-  On success: emits `blind_async_v1_callback_ok` and sends any back-payments to the original caller.  
-  On error: emits `blind_async_v1_callback_error` with the error code and message.
+  On success: emits `blind_async_v1_callback_ok` and sends back any back-transfers received as `call_value` to the original caller.  
+  On error: emits `blind_async_v1_callback_error` with the error code and message, then returns the original payment to the original caller.
 
 ---
 
@@ -31,21 +33,21 @@ Uses the async v1 mechanism (`async_call_and_exit`).
 Uses the async v2 mechanism (`register_promise`).
 
 - **`blind_async_v2(to, endpoint_name, ...args)`** `#[payable]`  
-  Forwards the full payment to `to::endpoint_name(args)` as a promise. Allocates explicit gas for the call and the callback (`ASYNC_V2_CALLBACK_GAS`). Captures the original caller.
+  Forwards the full payment to `to::endpoint_name(args)` as a promise. Reserves `GAS_OVERHEAD + ASYNC_V2_CALLBACK_GAS` (3,000,000) locally and forwards the remainder. Captures the original caller and original payment in the callback data.
 
 - **`blind_async_v2_callback`** `#[promises_callback]`  
-  On success: emits `async_v2_callback_ok` and sends any back-payments to the original caller.  
-  On error: emits `async_v2_callback_error` with the error code and message.
+  On success: emits `async_v2_callback_ok` and sends back any back-transfers received as `call_value` to the original caller.  
+  On error: emits `async_v2_callback_error` with the error code and message, then returns the original payment to the original caller.
 
 ---
 
 ### `fwd_blind_sync` — Synchronous Call
 
-- **`blind_sync_call(to, endpoint_name, ...args)`** `#[payable]`  
-  Forwards the full payment to `to::endpoint_name(args)` synchronously. Any tokens or EGLD returned (back-transfers) are forwarded to the original caller. Emits `blind_sync_ok` on success.
+- **`blind_sync(to, endpoint_name, ...args)`** `#[payable]`  
+  Forwards the full payment to `to::endpoint_name(args)` synchronously. Any back-transfers returned by the callee are forwarded to the caller. Emits `blind_sync_ok`.
 
-- **`blind_sync_call_fallible(to, endpoint_name, ...args)`** `#[payable]`  
-  Same as `blind_sync_call` but does not propagate failure — the call result is handled explicitly. Emits `blind_sync_ok` on success or `blind_sync_error` (with error code and message) on failure.
+- **`blind_sync_fallible(to, endpoint_name, ...args)`** `#[payable]`  
+  Same as `blind_sync` but handles failure explicitly instead of propagating it. On success: sends back-transfers to the caller and emits `blind_sync_ok`. On failure: returns the original payment to the caller and emits `blind_sync_error` with the error code.
 
 ---
 
@@ -82,12 +84,20 @@ Scenario tests are located in [`../scenarios/`](../scenarios) and cover:
 | `forw_blind_async_v1_accept_egld` | Send EGLD to vault via async v1 |
 | `forw_blind_async_v1_accept_esdt` | Send ESDT to vault via async v1 |
 | `forw_blind_async_v1_accept_nft` | Send NFT to vault via async v1 |
+| `forw_blind_async_v1_accept_multi_esdt` | Send multi-ESDT (including EGLD) to vault via async v1 |
 | `forw_blind_async_v1_retrieve_egld` | Retrieve EGLD from vault back to caller via async v1 callback |
 | `forw_blind_async_v1_retrieve_nft` | Retrieve NFT from vault back to caller via async v1 callback |
+| `forw_blind_async_v1_reject_egld` | Vault rejects payment; original EGLD returned to caller via async v1 error callback |
 | `forw_blind_async_v2_accept_egld` | Send EGLD to vault via async v2 promise |
+| `forw_blind_async_v2_accept_multi_esdt` | Send multi-ESDT (including EGLD) to vault via async v2 promise |
 | `forw_blind_async_v2_retrieve_egld` | Retrieve EGLD from vault back to caller via async v2 callback |
+| `forw_blind_async_v2_reject_egld` | Vault rejects payment; original EGLD returned to caller via async v2 error callback |
 | `forw_blind_sync_accept_egld` | Send EGLD to vault via sync call |
 | `forw_blind_sync_retrieve_egld` | Retrieve EGLD from vault back to caller via sync call |
+| `forw_blind_sync_fallible_accept_egld` | Send EGLD to vault via sync fallible call |
+| `forw_blind_sync_fallible_reject_egld` | Vault rejects payment; original EGLD returned to caller via sync fallible error path |
+| `forw_blind_sync_fallible_retrieve_egld` | Retrieve EGLD from vault back to caller via sync fallible back-transfers |
+| `forw_blind_sync_fallible_retrieve_esdt` | Retrieve ESDT from vault back to caller via sync fallible back-transfers |
 | `forw_blind_transf_exec_accept_egld` | Send EGLD to vault via transfer-execute |
 | `forw_blind_deploy` | Deploy a new contract |
 | `forw_blind_upgrade` | Upgrade an existing contract |
