@@ -2,7 +2,7 @@ use convert_case::{Case, Casing};
 
 use super::stg_section::ScenarioTestFn;
 
-pub type WriteTestFn = fn(&str) -> String;
+pub type WriteTestFn = fn(&str, bool) -> String;
 
 pub const WORLD_FN_DECLARATION: &str = "fn world() ->";
 pub const DEFAULT_SETUP_GO: &str = "use multiversx_sc_scenario::imports::*;
@@ -20,22 +20,24 @@ pub fn contains_world_fn(s: &str) -> bool {
     s.contains(WORLD_FN_DECLARATION)
 }
 
-pub fn format_test_fn_rs(scenario_file_name: &str) -> String {
+pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
+    let ghost = if insert_ghost_accounts { ".insert_ghost_accounts()" } else { "" };
     format!(
         "
 fn {}_rs() {{
-    world().run(\"scenarios/{}.scen.json\");
+    world(){ghost}.run(\"scenarios/{}.scen.json\");
 }}",
         scenario_file_name.to_case(Case::Snake),
         scenario_file_name,
     )
 }
 
-pub fn format_test_fn_go(scenario_file_name: &str) -> String {
+pub fn format_test_fn_go(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
+    let ghost = if insert_ghost_accounts { ".insert_ghost_accounts()" } else { "" };
     format!(
         "
 fn {}_go() {{
-    world().run(\"scenarios/{}.scen.json\");
+    world(){ghost}.run(\"scenarios/{}.scen.json\");
 }}",
         scenario_file_name.to_case(Case::Snake),
         scenario_file_name,
@@ -53,6 +55,9 @@ pub fn format_section(test_fn: &ScenarioTestFn, write_test_fn: WriteTestFn) -> S
         section_str.push('\n');
         section_str.push_str(should_panic_line);
     }
-    section_str.push_str(&write_test_fn(&test_fn.scenario_file_name));
+    section_str.push_str(&write_test_fn(
+        &test_fn.scenario_file_name,
+        test_fn.insert_ghost_accounts,
+    ));
     section_str
 }
