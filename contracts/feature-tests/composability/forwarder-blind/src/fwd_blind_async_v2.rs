@@ -30,7 +30,10 @@ pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
             .arguments_raw(args.to_arg_buffer())
             .payment(&payment)
             .gas(fwd_gas)
-            .callback(self.callbacks().blind_async_v2_callback(original_caller, &payment))
+            .callback(
+                self.callbacks()
+                    .blind_async_v2_callback(original_caller, &payment),
+            )
             .gas_for_callback(ASYNC_V2_CALLBACK_GAS)
             .register_promise();
     }
