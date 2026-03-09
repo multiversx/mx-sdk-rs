@@ -20,8 +20,16 @@ pub fn contains_world_fn(s: &str) -> bool {
     s.contains(WORLD_FN_DECLARATION)
 }
 
+fn insert_ghost_accounts_snippet(insert_ghost_accounts: bool) -> &'static str {
+    if insert_ghost_accounts {
+        ".insert_ghost_accounts()"
+    } else {
+        ""
+    }
+}
+
 pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
-    let ghost = if insert_ghost_accounts { ".insert_ghost_accounts()" } else { "" };
+    let ghost = insert_ghost_accounts_snippet(insert_ghost_accounts);
     format!(
         "
 fn {}_rs() {{
@@ -33,7 +41,7 @@ fn {}_rs() {{
 }
 
 pub fn format_test_fn_go(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
-    let ghost = if insert_ghost_accounts { ".insert_ghost_accounts()" } else { "" };
+    let ghost = insert_ghost_accounts_snippet(insert_ghost_accounts);
     format!(
         "
 fn {}_go() {{
