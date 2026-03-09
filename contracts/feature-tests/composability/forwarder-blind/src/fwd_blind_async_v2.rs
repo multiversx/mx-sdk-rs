@@ -1,3 +1,5 @@
+use crate::fwd_blind_common::GAS_OVERHEAD;
+
 multiversx_sc::imports!();
 
 const ASYNC_V2_CALLBACK_GAS: u64 = 3_000_000;
@@ -14,12 +16,20 @@ pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
     ) {
         let original_caller = self.blockchain().get_caller();
         let payment = self.call_value().all();
+
+        const RESERVED_GAS: u64 = GAS_OVERHEAD + ASYNC_V2_CALLBACK_GAS;
+        require!(
+            self.blockchain().get_gas_left() > RESERVED_GAS,
+            "not enough gas for forwarding with async callback"
+        );
+        let fwd_gas = self.blockchain().get_gas_left() - RESERVED_GAS;
+
         self.tx()
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
             .payment(payment)
-            .gas(self.tx_gas() - ASYNC_V2_CALLBACK_GAS)
+            .gas(fwd_gas)
             .callback(self.callbacks().blind_async_v2_callback(original_caller))
             .gas_for_callback(ASYNC_V2_CALLBACK_GAS)
             .register_promise();
