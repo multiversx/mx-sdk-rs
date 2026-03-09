@@ -726,6 +726,7 @@ version = "0.0.0"
 dependencies = [
  "builtin-func-features",
  "forwarder",
+ "forwarder-blind",
  "forwarder-legacy",
  "forwarder-queue",
  "forwarder-raw",
@@ -1626,6 +1627,22 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "forwarder-blind"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "forwarder-blind-meta"
+version = "0.0.0"
+dependencies = [
+ "forwarder-blind",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
