@@ -1,5 +1,5 @@
 [package]
-name = "interact"
+name = "forwarder-net-interactor"
 version = "0.0.0"
 authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
 edition = "2024"
@@ -23,5 +23,5 @@ path = "../../../../framework/base"
 version = "0.65.0"
 path = "../../../../framework/snippets"
 
-[dependencies.forwarder-queue]
-path = "../forwarder-queue"
+[dependencies.forwarder-net]
+path = "../forwarder-net"

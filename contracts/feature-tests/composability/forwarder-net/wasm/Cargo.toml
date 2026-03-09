@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "forwarder-queue-wasm"
+name = "forwarder-net-wasm"
 version = "0.0.0"
 edition = "2024"
 publish = false
@@ -24,7 +24,7 @@ overflow-checks = false
 [profile.dev]
 panic = "abort"
 
-[dependencies.forwarder-queue]
+[dependencies.forwarder-net]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use forwarder_queue::{ProgrammedCall, ProgrammedCallType, forwarder_queue_proxy};
+use forwarder_net::{ProgrammedCall, ProgrammedCallType, forwarder_net_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
@@ -74,7 +74,7 @@ impl ComposabilityInteract {
                 tx.from(&self.wallet_address)
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
-                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
                     .set_queued_calls(calls)
                     .returns(ReturnsStatus)
             });
@@ -133,7 +133,7 @@ impl ComposabilityInteract {
                 tx.from(&self.wallet_address)
                     .to(to_addr)
                     .gas(gas_limit)
-                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
                     .bump(IgnoreValue)
                     .returns(ReturnsStatus)
             });

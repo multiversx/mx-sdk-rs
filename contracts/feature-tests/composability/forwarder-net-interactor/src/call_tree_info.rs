@@ -1,4 +1,4 @@
-use forwarder_queue::{Trace, TraceName, forwarder_queue_proxy};
+use forwarder_net::{Trace, TraceName, forwarder_net_proxy};
 use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
@@ -49,7 +49,7 @@ impl ComposabilityInteract {
                 .interactor
                 .query()
                 .to(addr)
-                .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                .typed(forwarder_net_proxy::ForwarderQueueProxy)
                 .trace()
                 .returns(ReturnsResultUnmanaged)
                 .run()

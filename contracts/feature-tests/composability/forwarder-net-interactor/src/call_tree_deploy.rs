@@ -3,7 +3,7 @@ use crate::{
     comp_interact_controller::ComposabilityInteract,
 };
 
-use forwarder_queue::forwarder_queue_proxy;
+use forwarder_net::forwarder_net_proxy;
 use multiversx_sc_snippets::imports::*;
 
 const DEPLOY_GAS_LIMIT: NumExpr = NumExpr("80,000,000");
@@ -31,7 +31,7 @@ impl ComposabilityInteract {
         for name in config.contracts.keys() {
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
-                    .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
                     .gas(DEPLOY_GAS_LIMIT)

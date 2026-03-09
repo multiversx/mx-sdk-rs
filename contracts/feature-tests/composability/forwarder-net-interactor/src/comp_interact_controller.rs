@@ -27,7 +27,7 @@ impl ComposabilityInteract {
         interactor.set_current_dir_from_workspace("contracts/feature-tests/composability/interact");
         let wallet_address = interactor.register_wallet(test_wallets::judy()).await;
         let forw_queue_code = BytesValue::interpret_from(
-            "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
+            "mxsc:../forwarder-net/output/forwarder-net.mxsc.json",
             &InterpreterContext::default(),
         );
 

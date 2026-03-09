@@ -1,10 +1,10 @@
 [package]
-name = "forwarder-queue-meta"
+name = "forwarder-net-meta"
 version = "0.0.0"
 edition = "2024"
 publish = false
 
-[dependencies.forwarder-queue]
+[dependencies.forwarder-net]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]

@@ -4,7 +4,7 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-pub mod forwarder_queue_proxy;
+pub mod forwarder_net_proxy;
 
 pub type NodeName<M> = ManagedBuffer<M>;
 
@@ -116,7 +116,7 @@ pub trait ForwarderQueue {
         let contract_call = self
             .tx()
             .to(&call.to)
-            .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+            .typed(forwarder_net_proxy::ForwarderQueueProxy)
             .bump(&child_call_trace)
             .payment(&call.payments);
 

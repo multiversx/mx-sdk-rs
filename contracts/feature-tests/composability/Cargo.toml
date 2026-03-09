@@ -14,8 +14,8 @@ path = "forwarder"
 [dev-dependencies.forwarder-legacy]
 path = "forwarder-legacy"
 
-[dev-dependencies.forwarder-queue]
-path = "forwarder-queue"
+[dev-dependencies.forwarder-net]
+path = "forwarder-net"
 
 [dev-dependencies.forwarder-blind]
 path = "forwarder-blind"

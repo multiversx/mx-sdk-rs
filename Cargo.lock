@@ -728,7 +728,7 @@ dependencies = [
  "forwarder",
  "forwarder-blind",
  "forwarder-legacy",
- "forwarder-queue",
+ "forwarder-net",
  "forwarder-raw",
  "multiversx-sc",
  "multiversx-sc-scenario",
@@ -1683,7 +1683,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "forwarder-queue"
+name = "forwarder-net"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
@@ -1692,10 +1692,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "forwarder-queue-meta"
+name = "forwarder-net-interactor"
 version = "0.0.0"
 dependencies = [
- "forwarder-queue",
+ "clap",
+ "forwarder-net",
+ "multiversx-sc",
+ "multiversx-sc-snippets",
+ "serde",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "forwarder-net-meta"
+version = "0.0.0"
+dependencies = [
+ "forwarder-net",
  "multiversx-sc-meta-lib",
 ]
 
@@ -2537,19 +2550,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "879f10e63c20629ecabbb64a8010319738c66a5cd0c29b02d63d272b03751d01"
 dependencies = [
  "generic-array 0.14.7",
-]
-
-[[package]]
-name = "interact"
-version = "0.0.0"
-dependencies = [
- "clap",
- "forwarder-queue",
- "multiversx-sc",
- "multiversx-sc-snippets",
- "serde",
- "tokio",
- "toml",
 ]
 
 [[package]]

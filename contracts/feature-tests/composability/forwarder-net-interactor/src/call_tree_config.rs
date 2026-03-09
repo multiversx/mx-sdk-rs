@@ -36,7 +36,7 @@ impl GatewayConfig {
     }
 }
 
-/// Equivalent of `ProgrammedCallType` from the forwarder-queue proxy, for TOML config.
+/// Equivalent of `ProgrammedCallType` from the forwarder-net proxy, for TOML config.
 #[derive(Default, Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ProgrammedCallTypeConfig {
@@ -58,7 +58,7 @@ pub struct PaymentConfig {
     pub amount: String,
 }
 
-/// Equivalent of `ProgrammedCall` from the forwarder-queue proxy, for TOML config.
+/// Equivalent of `ProgrammedCall` from the forwarder-net proxy, for TOML config.
 ///
 /// `to` is the name (map key) of the target contract in `CallTreeConfig::contracts`.
 #[derive(Debug, Serialize, Deserialize)]

@@ -1,12 +1,12 @@
 [package]
-name = "forwarder-queue"
+name = "forwarder-net"
 version = "0.0.0"
 authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
 edition = "2024"
 publish = false
 
 [lib]
-path = "src/forwarder_queue.rs"
+path = "src/forwarder_net.rs"
 
 [dependencies.multiversx-sc]
 version = "0.65.0"
