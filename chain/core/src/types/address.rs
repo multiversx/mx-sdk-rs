@@ -237,7 +237,7 @@ impl Address {
     ///   3. Bytes [10..25] (the "on-meta" region) are all zero.
     pub fn is_smart_contract_on_metachain(&self) -> bool {
         let bytes = self.as_bytes();
-        if bytes[30] != 0xFF && bytes[31] != 0xFF {
+        if bytes[30] != 0xFF || bytes[31] != 0xFF {
             return false;
         }
         if !self.is_smart_contract_address() {
@@ -366,5 +366,93 @@ mod address_tests {
         const ADDR: Address =
             Address::from_hex("e32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60");
         assert!(!ADDR.is_zero());
+    }
+
+    // --- is_smart_contract_on_metachain tests ---
+
+    /// ESDT system SC: canonical metachain SC address — all conditions satisfied.
+    #[test]
+    fn test_metachain_sc_esdt_system_sc() {
+        let addr =
+            Address::from_hex("000000000000000000010000000000000000000000000000000000000002ffff");
+        assert!(addr.is_smart_contract_on_metachain());
+    }
+
+    /// A manually constructed metachain SC address:
+    /// bytes 0-7 zero, bytes 10-24 zero, bytes 30-31 = 0xFF.
+    #[test]
+    fn test_metachain_sc_custom_address() {
+        let mut arr = [0u8; 32];
+        arr[30] = 0xFF;
+        arr[31] = 0xFF;
+        let addr = Address::new(arr);
+        assert!(addr.is_smart_contract_on_metachain());
+    }
+
+    /// Regular user address: first bytes are non-zero, so not a SC at all.
+    #[test]
+    fn test_metachain_sc_user_address() {
+        let addr =
+            Address::from_hex("e32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60");
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// Regular SC address: first 8 bytes zero, but bytes 30-31 are not 0xFF.
+    #[test]
+    fn test_metachain_sc_regular_sc_not_metachain() {
+        let addr =
+            Address::from_hex("0000000000000000000100000000000000000000000000000000000000020001");
+        assert!(addr.is_smart_contract_address());
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// Fails condition 1: only byte 30 is 0xFF, byte 31 is not.
+    #[test]
+    fn test_metachain_sc_only_byte30_is_ff() {
+        let mut arr = [0u8; 32];
+        arr[30] = 0xFF;
+        arr[31] = 0x00;
+        let addr = Address::new(arr);
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// Fails condition 1: only byte 31 is 0xFF, byte 30 is not.
+    #[test]
+    fn test_metachain_sc_only_byte31_is_ff() {
+        let mut arr = [0u8; 32];
+        arr[30] = 0x00;
+        arr[31] = 0xFF;
+        let addr = Address::new(arr);
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// Fails condition 2: bytes 30-31 are 0xFF but first 8 bytes are not all zero.
+    #[test]
+    fn test_metachain_sc_not_a_sc_address() {
+        let mut arr = [0u8; 32];
+        arr[0] = 0x01; // breaks SC condition
+        arr[30] = 0xFF;
+        arr[31] = 0xFF;
+        let addr = Address::new(arr);
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// Fails condition 3: bytes 30-31 are 0xFF, it IS a SC, but the metachain
+    /// region (bytes 10-24) contains a non-zero byte.
+    #[test]
+    fn test_metachain_sc_nonzero_in_metachain_region() {
+        let mut arr = [0u8; 32];
+        arr[10] = 0x01; // breaks metachain-region condition
+        arr[30] = 0xFF;
+        arr[31] = 0xFF;
+        let addr = Address::new(arr);
+        assert!(addr.is_smart_contract_address());
+        assert!(!addr.is_smart_contract_on_metachain());
+    }
+
+    /// All-zero address: IS a SC address, but bytes 30-31 are 0x00, not 0xFF.
+    #[test]
+    fn test_metachain_sc_zero_address() {
+        assert!(!Address::zero().is_smart_contract_on_metachain());
     }
 }
