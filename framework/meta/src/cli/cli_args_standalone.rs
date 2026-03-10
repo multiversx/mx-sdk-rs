@@ -537,13 +537,20 @@ pub struct WalletNewArgs {
 
     #[arg(long = "hrp", verbatim_doc_comment)]
     pub hrp: Option<String>,
+
+    /// If set, mines a wallet whose address last byte equals this value (0-255).
+    #[arg(long = "shard", verbatim_doc_comment)]
+    pub shard: Option<u8>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
+    /// The format of the input wallet. Allowed values: mnemonic, pem, keystore-secret.
     #[arg(long = "in-format", verbatim_doc_comment)]
     pub from: String,
 
+    /// The format of the output wallet. Allowed values: pem, keystore-secret.
+    /// Supported conversions: mnemonic -> pem, keystore-secret -> pem, pem -> keystore-secret.
     #[arg(long = "out-format", verbatim_doc_comment)]
     pub to: String,
 

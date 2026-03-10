@@ -153,17 +153,60 @@ pub fn generate_mnemonic() -> Mnemonic {
     Mnemonic::generate_in(Language::English, 24).unwrap()
 }
 
+struct WalletInfo {
+    mnemonic: Mnemonic,
+    private_key_str: String,
+    public_key_str: String,
+    address: Address,
+}
+
+impl WalletInfo {
+    fn generate() -> Self {
+        let mnemonic = generate_mnemonic();
+        let (private_key_str, public_key_str) =
+            Wallet::get_wallet_keys_mnemonic(mnemonic.to_string());
+        let address = get_wallet_address(private_key_str.as_str());
+        WalletInfo {
+            mnemonic,
+            private_key_str,
+            public_key_str,
+            address,
+        }
+    }
+
+    fn generate_for_shard(shard: u8) -> Self {
+        loop {
+            let wallet = Self::generate();
+            if wallet.address.shard_of_3().as_u32() == shard as u32 {
+                return wallet;
+            }
+        }
+    }
+}
+
 fn new(new_args: &WalletNewArgs) {
     let format = new_args.wallet_format.as_deref();
-    let outfile = new_args.outfile.as_ref(); // Handle outfile as Option<&str> if it's an Option<String>
+    let outfile = new_args.outfile.as_ref();
     let hrp = new_args.hrp.clone().unwrap_or_else(|| "erd".to_string());
-    let mnemonic = generate_mnemonic();
+
+    let wallet = if let Some(shard) = new_args.shard {
+        WalletInfo::generate_for_shard(shard)
+    } else {
+        WalletInfo::generate()
+    };
+
+    let WalletInfo {
+        mnemonic,
+        private_key_str,
+        public_key_str,
+        address,
+    } = wallet;
+
     println!("Mnemonic: {}", mnemonic);
 
-    let (private_key_str, public_key_str) = Wallet::get_wallet_keys_mnemonic(mnemonic.to_string());
-    let address = get_wallet_address(private_key_str.as_str());
-
-    println!("Wallet address: {}", address.to_bech32(&hrp));
+    println!("Wallet address:");
+    println!("  - bech32: {}", address.to_bech32(&hrp));
+    println!("  - hex:    0x{}", address.to_hex());
 
     match format {
         Some("pem") => {
