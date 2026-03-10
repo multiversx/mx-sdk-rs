@@ -3,8 +3,8 @@ use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
-pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
-const NUM_INIT_CHARS_FOR_ONMETA_SC: usize = 15;
+const NUM_INIT_CHARS_FOR_SC: usize = 10;
+const NUM_INIT_CHARS_FOR_METACHAIN_SC: usize = 15;
 pub const VM_TYPE_LEN: usize = 2;
 pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
@@ -57,7 +57,7 @@ impl Address {
         result[29] = creator_nonce as u8;
         result[30..].copy_from_slice(&creator_address[30..]);
 
-        let start_index = NUM_INT_CHARACTERS_FOR_ADDRESS - VM_TYPE_LEN;
+        let start_index = NUM_INIT_CHARS_FOR_SC - VM_TYPE_LEN;
         result[start_index..(start_index + DEFAULT_VM_TYPE.len())].copy_from_slice(DEFAULT_VM_TYPE);
 
         Address::from(result)
@@ -243,8 +243,7 @@ impl Address {
         if !self.is_smart_contract_address() {
             return false;
         }
-        bytes[NUM_INT_CHARACTERS_FOR_ADDRESS
-            ..NUM_INT_CHARACTERS_FOR_ADDRESS + NUM_INIT_CHARS_FOR_ONMETA_SC]
+        bytes[NUM_INIT_CHARS_FOR_SC..NUM_INIT_CHARS_FOR_SC + NUM_INIT_CHARS_FOR_METACHAIN_SC]
             .iter()
             .all(|&b| b == 0)
     }
