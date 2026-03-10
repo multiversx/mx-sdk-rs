@@ -146,7 +146,7 @@ mod tests {
     // --- constructor tests ---
 
     #[test]
-    fn test_new_multi_shard_coordinator() {
+    fn test_new_multi_shard_config() {
         let num_of_shards = 10u32;
         let sr = ShardConfig::new(num_of_shards).unwrap();
         assert_eq!(sr.number_of_shards, num_of_shards);
