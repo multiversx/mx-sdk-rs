@@ -4,6 +4,7 @@ use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
+const NUM_INIT_CHARS_FOR_ONMETA_SC: usize = 15;
 pub const VM_TYPE_LEN: usize = 2;
 pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
@@ -16,6 +17,7 @@ pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 pub struct Address(H256);
 
 impl Address {
+    /// Creates a new `Address` from a 32-byte array.
     pub const fn new(bytes: [u8; 32]) -> Self {
         Address(H256::new(bytes))
     }
@@ -41,6 +43,8 @@ impl Address {
         Address(H256::from_hex(hex_str))
     }
 
+    /// Generates a mock smart contract address deterministically from a creator address and nonce.
+    /// Used in testing environments to simulate address generation without a real VM.
     pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
         let mut result = [0x00; 32];
 
@@ -59,16 +63,24 @@ impl Address {
         Address::from(result)
     }
 
+    /// Returns the shard ID of this address in a 3-shard configuration.
+    pub fn shard_of_3(&self) -> ShardId {
+        ShardConfig::THREE_SHARDS.compute_id(self)
+    }
+
+    /// Encodes the address as a bech32 string using the given human-readable part (HRP).
     #[cfg(feature = "std")]
     pub fn to_bech32(&self, hrp: &str) -> crate::std::Bech32Address {
         crate::std::Bech32Address::encode_address(hrp, self.clone())
     }
 
+    /// Encodes the address as a bech32 string using the default HRP (`erd`).
     #[cfg(feature = "std")]
     pub fn to_bech32_default(&self) -> crate::std::Bech32Address {
         crate::std::Bech32Address::encode_address_default_hrp(self.clone())
     }
 
+    /// Returns the address as a lowercase hex string (64 characters, no prefix).
     #[cfg(feature = "std")]
     pub fn to_hex(&self) -> String {
         self.0.to_hex()
@@ -125,6 +137,8 @@ impl From<Box<[u8; 32]>> for Address {
 }
 
 impl Address {
+    /// Constructs an `Address` from a byte slice. Pads with zeros if shorter than 32 bytes,
+    /// truncates if longer.
     pub fn from_slice(slice: &[u8]) -> Self {
         Address(H256::from_slice(slice))
     }
@@ -171,16 +185,19 @@ impl Address {
         self.0.as_bytes()
     }
 
+    /// Returns a reference to the underlying 32-byte array.
     #[inline]
     pub fn as_array(&self) -> &[u8; 32] {
         self.0.as_array()
     }
 
+    /// Copies the address bytes into the provided 32-byte array.
     #[inline]
     pub fn copy_to_array(&self, target: &mut [u8; 32]) {
         self.0.copy_to_array(target)
     }
 
+    /// Returns the address bytes as a heap-allocated `Vec<u8>`.
     #[inline]
     pub fn to_vec(&self) -> Vec<u8> {
         self.0.to_vec()
@@ -204,15 +221,39 @@ impl Address {
         self.0.is_zero()
     }
 
+    /// Returns true if this address belongs to a smart contract.
+    /// A smart contract address has its first 8 bytes set to zero.
     pub fn is_smart_contract_address(&self) -> bool {
         self.as_bytes()
             .iter()
             .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
             .all(|item| item == &0u8)
     }
+
+    /// Returns true if this is a smart contract address deployed on the metachain.
+    /// Conditions:
+    ///   1. The last byte is 0xFF (metachain identifier).
+    ///   2. The address is a smart contract address (first 8 bytes are zero).
+    ///   3. Bytes [10..25] (the "on-meta" region) are all zero.
+    pub fn is_smart_contract_on_metachain(&self) -> bool {
+        let bytes = self.as_bytes();
+        if bytes[30] != 0xFF && bytes[31] != 0xFF {
+            return false;
+        }
+        if !self.is_smart_contract_address() {
+            return false;
+        }
+        bytes[NUM_INT_CHARACTERS_FOR_ADDRESS
+            ..NUM_INT_CHARACTERS_FOR_ADDRESS + NUM_INIT_CHARS_FOR_ONMETA_SC]
+            .iter()
+            .all(|&b| b == 0)
+    }
 }
 
-use crate::codec::*;
+use crate::{
+    codec::*,
+    types::{ShardConfig, ShardId},
+};
 
 impl NestedEncode for Address {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>

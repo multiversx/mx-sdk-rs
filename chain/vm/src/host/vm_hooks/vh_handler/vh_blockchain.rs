@@ -89,7 +89,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_shard_of_address)?;
 
-        Ok((address_bytes[address_bytes.len() - 1] % 3).into())
+        let address = Address::from_slice(address_bytes);
+        Ok(address.shard_of_3().as_u32() as i32)
     }
 
     pub fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
