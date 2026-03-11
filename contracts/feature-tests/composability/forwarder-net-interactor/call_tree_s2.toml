@@ -4,12 +4,15 @@ chain_type = "real"
 
 [[start]]
 to = "s2_9"
+shard = 2
 gas_limit = 87000000
 
 [contracts.s2_0]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqmd6ynsz3qg67yuzmj52ntrttxlgwse9zn54qdv60lg"
 
 [contracts.s2_1]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqf84jp9yj92yv0tjtrfgn9zn5y0qkqwm2n54qzw3qvs"
 
 [[contracts.s2_1.calls]]
@@ -18,6 +21,7 @@ call_type = "sync"
 gas_limit = 7000000
 
 [contracts.s2_2]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqn7jalsl99qt5n8jgpcjt02gmgczhlpwyn54q5a04p3"
 
 [[contracts.s2_2.calls]]
@@ -26,6 +30,7 @@ call_type = "sync"
 gas_limit = 17000000
 
 [contracts.s2_3]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqhcuwwx23w86h0uj46nuv3xrgg36kxgp4n54qd7c2ex"
 
 [[contracts.s2_3.calls]]
@@ -34,6 +39,7 @@ call_type = "sync"
 gas_limit = 27000000
 
 [contracts.s2_4]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqalzhyfgcpsahkedyvvyfnvcae298ljszn54qk7t3ym"
 
 [[contracts.s2_4.calls]]
@@ -42,6 +48,7 @@ call_type = "sync"
 gas_limit = 37000000
 
 [contracts.s2_5]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqmx4vc4k2kdlc25mnxxyxgz3sh3w4yym5n54qfs4gy4"
 
 [[contracts.s2_5.calls]]
@@ -50,6 +57,7 @@ call_type = "sync"
 gas_limit = 47000000
 
 [contracts.s2_6]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqx5z5qqh27409l0la20frwz2ln7gqzsp7n54q8z5kuj"
 
 [[contracts.s2_6.calls]]
@@ -58,6 +66,7 @@ call_type = "sync"
 gas_limit = 57000000
 
 [contracts.s2_7]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqsxuq597tdt4q9ay38xdas4t5xhmx626mn54qn9fsxx"
 
 [[contracts.s2_7.calls]]
@@ -66,6 +75,7 @@ call_type = "sync"
 gas_limit = 67000000
 
 [contracts.s2_8]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqadn8mzskseens9uss0l5aszj4gntnsysn54q3nexh2"
 
 [[contracts.s2_8.calls]]
@@ -74,6 +84,7 @@ call_type = "sync"
 gas_limit = 77000000
 
 [contracts.s2_9]
+shard = 2
 address = "erd1qqqqqqqqqqqqqpgqu2ny49tqyz0qw7f834hhnsetrmzajcaan54qwqw9h0"
 
 [[contracts.s2_9.calls]]

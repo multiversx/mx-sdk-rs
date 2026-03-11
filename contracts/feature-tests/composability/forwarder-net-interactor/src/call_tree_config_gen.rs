@@ -57,24 +57,28 @@ pub fn scenario_1() -> CallTreeConfig {
         start: vec![
             StartCall {
                 to: "async_v1_root".to_string(),
+                shard: None,
                 gas_limit: None,
                 args: Vec::new(),
                 payments: Vec::new(),
             },
             StartCall {
                 to: "async_v2_root".to_string(),
+                shard: None,
                 gas_limit: None,
                 args: Vec::new(),
                 payments: Vec::new(),
             },
             StartCall {
                 to: "sync_root".to_string(),
+                shard: None,
                 gas_limit: None,
                 args: Vec::new(),
                 payments: Vec::new(),
             },
             StartCall {
                 to: "direct".to_string(),
+                shard: None,
                 gas_limit: None,
                 args: Vec::new(),
                 payments: Vec::new(),
@@ -84,6 +88,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "async_v1_root".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: vec![ProgrammedCallConfig {
                         to: "async_v1_target".to_string(),
@@ -96,6 +101,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "async_v1_target".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: Vec::new(),
                 },
@@ -103,6 +109,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "async_v2_root".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: vec![ProgrammedCallConfig {
                         to: "async_v2_target".to_string(),
@@ -115,6 +122,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "async_v2_target".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: Vec::new(),
                 },
@@ -122,6 +130,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "direct".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: Vec::new(),
                 },
@@ -129,6 +138,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "sync_root".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: vec![ProgrammedCallConfig {
                         to: "sync_target".to_string(),
@@ -141,6 +151,7 @@ pub fn scenario_1() -> CallTreeConfig {
             (
                 "sync_target".to_string(),
                 ContractConfig {
+                    shard: None,
                     address: None,
                     calls: Vec::new(),
                 },
@@ -159,6 +170,7 @@ pub fn scenario_2(n: usize) -> CallTreeConfig {
 
     let start = vec![StartCall {
         to: format!("s2_{}", n - 1),
+        shard: None,
         gas_limit: None,
         args: Vec::new(),
         payments: Vec::new(),
@@ -180,6 +192,7 @@ pub fn scenario_2(n: usize) -> CallTreeConfig {
         contracts.insert(
             name,
             ContractConfig {
+                shard: None,
                 address: None,
                 calls,
             },

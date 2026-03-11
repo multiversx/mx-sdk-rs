@@ -26,6 +26,14 @@ impl ComposabilityInteract {
             })
             .collect();
 
+        // Pre-compute shard wallets before creating the buffer (wallet_for_shard
+        // borrows &self, which conflicts with the mutable borrow held by the buffer).
+        let wallet_map: HashMap<&String, Address> = config
+            .contracts
+            .iter()
+            .map(|(name, c)| (name, self.wallets.wallet_for_shard(c.shard)))
+            .collect();
+
         let mut buffer = self.interactor.homogenous_call_buffer();
 
         for (name, contract) in &config.contracts {
@@ -66,12 +74,13 @@ impl ComposabilityInteract {
                 });
             }
 
+            let wallet = &wallet_map[name];
             println!(
                 "Setting {} programmed call(s) on forwarder '{name}'",
                 calls.len(),
             );
             buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
+                tx.from(wallet)
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
                     .typed(forwarder_net_proxy::ForwarderQueueProxy)
@@ -99,6 +108,13 @@ impl ComposabilityInteract {
             return;
         }
 
+        // Pre-compute shard wallets before creating the buffer.
+        let start_wallets: Vec<Address> = config
+            .start
+            .iter()
+            .map(|s| self.wallets.wallet_for_shard(s.shard))
+            .collect();
+
         // Build name → bech32 address map.
         let addr_map: HashMap<String, Bech32Address> = config
             .contracts
@@ -112,7 +128,7 @@ impl ComposabilityInteract {
 
         let mut buffer = self.interactor.homogenous_call_buffer();
 
-        for start_call in &config.start {
+        for (start_call, wallet) in config.start.iter().zip(start_wallets.iter()) {
             let to_addr = addr_map
                 .get(&start_call.to)
                 .unwrap_or_else(|| panic!("no address for contract '{}'", start_call.to))
@@ -130,7 +146,7 @@ impl ComposabilityInteract {
             );
 
             buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
+                tx.from(wallet)
                     .to(to_addr)
                     .gas(gas_limit)
                     .typed(forwarder_net_proxy::ForwarderQueueProxy)

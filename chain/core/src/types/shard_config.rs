@@ -5,6 +5,11 @@ use super::Address;
 /// Regular shards are numbered from `0` to `number_of_shards - 1`.
 /// The special value [`ShardId::METACHAIN_ID`] (`u32::MAX`) identifies the metachain.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(
+    feature = "serde",
+    derive(serde::Serialize, serde::Deserialize),
+    serde(transparent)
+)]
 pub struct ShardId(u32);
 
 impl ShardId {

@@ -4,6 +4,7 @@ use std::{
     path::Path,
 };
 
+use multiversx_sc::types::ShardId;
 use serde::{Deserialize, Serialize};
 
 /// Chain type for the gateway connection.
@@ -81,6 +82,9 @@ pub struct ProgrammedCallConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StartCall {
     pub to: String,
+    /// Shard of the wallet used to send this transaction. Defaults to shard 0 when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard: Option<ShardId>,
     /// Estimated gas; filled by the `estimate-gas` command.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gas_limit: Option<u64>,
@@ -97,6 +101,9 @@ pub struct StartCall {
 /// `children` is omitted when empty.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ContractConfig {
+    /// Shard of the wallet that deploys and manages this contract. Defaults to shard 0 when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shard: Option<ShardId>,
     /// Bech32 address; populated after deployment and saved back to the file.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,

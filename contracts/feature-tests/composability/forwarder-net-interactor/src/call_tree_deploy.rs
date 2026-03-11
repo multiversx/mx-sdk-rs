@@ -27,10 +27,12 @@ impl ComposabilityInteract {
     }
 
     async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<(String, Bech32Address)> {
+        let wallets = self.wallets.clone();
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for name in config.contracts.keys() {
-            buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
+        for (name, contract) in &config.contracts {
+            let wallet = wallets.wallet_for_shard(contract.shard);
+            buffer.push_tx(|tx: Tx<ScenarioTxEnvData, (), (), (), (), (), ()>| {
+                tx.from(wallet)
                     .typed(forwarder_net_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
