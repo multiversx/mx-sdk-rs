@@ -537,13 +537,21 @@ pub struct WalletNewArgs {
 
     #[arg(long = "hrp", verbatim_doc_comment)]
     pub hrp: Option<String>,
+
+    /// If set, mines a wallet assigned to the given shard ID.
+    /// For the standard 3-shard mainnet configuration, valid shard IDs are 0, 1, or 2.
+    #[arg(long = "shard", verbatim_doc_comment)]
+    pub shard: Option<u8>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
+    /// The format of the input wallet. Allowed values: mnemonic, pem, keystore-secret.
     #[arg(long = "in-format", verbatim_doc_comment)]
     pub from: String,
 
+    /// The format of the output wallet. Allowed values: pem, keystore-secret.
+    /// Supported conversions: mnemonic -> pem, keystore-secret -> pem, pem -> keystore-secret.
     #[arg(long = "out-format", verbatim_doc_comment)]
     pub to: String,
 
