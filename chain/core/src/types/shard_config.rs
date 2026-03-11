@@ -3,7 +3,7 @@ use super::Address;
 /// Identifies a shard by its numeric index.
 ///
 /// Regular shards are numbered from `0` to `number_of_shards - 1`.
-/// The special value [`METACHAIN_SHARD_ID`] (`u32::MAX`) identifies the metachain.
+/// The special value [`ShardId::METACHAIN_ID`] (`u32::MAX`) identifies the metachain.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ShardId(u32);
 

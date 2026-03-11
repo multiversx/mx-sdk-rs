@@ -538,7 +538,8 @@ pub struct WalletNewArgs {
     #[arg(long = "hrp", verbatim_doc_comment)]
     pub hrp: Option<String>,
 
-    /// If set, mines a wallet whose address last byte equals this value (0-255).
+    /// If set, mines a wallet assigned to the given shard ID.
+    /// For the standard 3-shard mainnet configuration, valid shard IDs are 0, 1, or 2.
     #[arg(long = "shard", verbatim_doc_comment)]
     pub shard: Option<u8>,
 }
