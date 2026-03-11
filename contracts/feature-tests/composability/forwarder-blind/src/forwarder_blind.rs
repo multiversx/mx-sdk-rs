@@ -23,4 +23,7 @@ pub trait ForwarderBlind:
 {
     #[init]
     fn init(&self) {}
+
+    #[upgrade]
+    fn upgrade(&self) {}
 }
