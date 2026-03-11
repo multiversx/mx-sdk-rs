@@ -232,7 +232,7 @@ impl Address {
 
     /// Returns true if this is a smart contract address deployed on the metachain.
     /// Conditions:
-    ///   1. The last byte is 0xFF (metachain identifier).
+    ///   1. The last two bytes are both 0xFF (metachain identifier).
     ///   2. The address is a smart contract address (first 8 bytes are zero).
     ///   3. Bytes [10..25] (the "on-meta" region) are all zero.
     pub fn is_smart_contract_on_metachain(&self) -> bool {
