@@ -35,11 +35,15 @@ pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
             ManagedAsyncCallResult::Ok(results) => {
                 self.async_v1_callback_ok_event(&results);
                 let back_payments = self.call_value().all();
-                self.send_back_payments(&original_caller, &back_payments);
+                self.send_back_payments("blindAsyncV1CallbackOk", &original_caller, &back_payments);
             }
             ManagedAsyncCallResult::Err(err) => {
                 self.async_v1_callback_error_event(err.err_code, &err.err_msg);
-                self.send_back_payments(&original_caller, original_payment);
+                self.send_back_payments(
+                    "blindAsyncV1CallbackError",
+                    &original_caller,
+                    original_payment,
+                );
             }
         }
     }

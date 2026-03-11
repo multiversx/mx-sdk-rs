@@ -22,12 +22,11 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
             .returns(ReturnsRawResult)
             .sync_call();
 
-        if !back_transfers.is_empty() {
-            self.tx()
-                .to(self.blockchain().get_caller())
-                .payment(back_transfers.into_payment_vec())
-                .transfer();
-        }
+        self.send_back_payments(
+            "blindSync",
+            &self.blockchain().get_caller(),
+            &back_transfers.into_payment_vec(),
+        );
 
         self.sync_ok(raw_results.into());
     }
@@ -59,13 +58,18 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
             Ok((back_transfers, raw_results)) => {
                 self.sync_ok(raw_results.into());
                 self.send_back_payments(
+                    "blindSyncOk",
                     &self.blockchain().get_caller(),
                     &back_transfers.into_payment_vec(),
                 );
             }
             Err(err_code) => {
                 self.sync_error(err_code);
-                self.send_back_payments(&self.blockchain().get_caller(), &payment);
+                self.send_back_payments(
+                    "blindSyncError",
+                    &self.blockchain().get_caller(),
+                    &payment,
+                );
             }
         }
     }
