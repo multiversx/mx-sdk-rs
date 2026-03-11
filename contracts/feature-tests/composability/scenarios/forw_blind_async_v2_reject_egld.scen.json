@@ -26,7 +26,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "blind_async_v2",
+                "function": "blindAsyncV2",
                 "arguments": [
                     "sc:vault",
                     "str:reject_funds"

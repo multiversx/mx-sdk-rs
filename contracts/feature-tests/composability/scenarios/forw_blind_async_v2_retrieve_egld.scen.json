@@ -25,7 +25,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "blind_async_v2",
+                "function": "blindAsyncV2",
                 "arguments": [
                     "sc:vault",
                     "str:retrieve_funds",

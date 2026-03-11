@@ -6,7 +6,7 @@ const ASYNC_V2_CALLBACK_GAS: u64 = 3_000_000;
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindAsyncV2)]
     #[payable]
     fn blind_async_v2(
         &self,
@@ -58,9 +58,9 @@ pub trait ForwarderBlindAsyncV2: super::fwd_blind_common::ForwarderBlindCommon {
         }
     }
 
-    #[event("async_v2_callback_ok")]
+    #[event("blindAsyncV2CallbackOk")]
     fn async_v2_callback_ok_event(&self, #[indexed] results: &MultiValueEncoded<ManagedBuffer>);
 
-    #[event("async_v2_callback_error")]
+    #[event("blindAsyncV2CallbackError")]
     fn async_v2_callback_error_event(&self, #[indexed] err_code: u32, err_msg: &ManagedBuffer);
 }

@@ -19,14 +19,14 @@ multiversx_sc_wasm_adapter::endpoints! {
     forwarder_blind
     (
         init => init
-        blind_async_v1 => blind_async_v1
-        blind_async_v2 => blind_async_v2
-        blind_deploy => blind_deploy
-        blind_sync => blind_sync
-        blind_sync_fallible => blind_sync_fallible
-        blind_transf_exec => blind_transf_exec
-        blind_upgrade => blind_upgrade
-        blind_upgrade_from_source => blind_upgrade_from_source
+        blindAsyncV1 => blind_async_v1
+        blindAsyncV2 => blind_async_v2
+        blindDeploy => blind_deploy
+        blindSync => blind_sync
+        blindSyncFallible => blind_sync_fallible
+        blindTransfExec => blind_transf_exec
+        blindUpgrade => blind_upgrade
+        blindUpgradeFromSource => blind_upgrade_from_source
         blind_async_v2_callback => blind_async_v2_callback
     )
 }

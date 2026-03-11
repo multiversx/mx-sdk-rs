@@ -19,11 +19,11 @@
         },
         {
             "step": "scCall",
-            "id": "blind_upgrade_from_source",
+            "id": "blindUpgradeFromSource",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "blind_upgrade_from_source",
+                "function": "blindUpgradeFromSource",
                 "arguments": [
                     "sc:child",
                     "sc:reference",
@@ -53,7 +53,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "blind_upgrade",
+                "function": "blindUpgrade",
                 "arguments": [
                     "sc:child",
                     "mxsc:../vault/output/vault.mxsc.json",

@@ -28,7 +28,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "blind_deploy",
+                "function": "blindDeploy",
                 "arguments": [
                     "mxsc:../vault/output/vault.mxsc.json",
                     "0x0100"

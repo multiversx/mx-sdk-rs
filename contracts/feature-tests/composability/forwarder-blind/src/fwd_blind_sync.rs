@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindSync)]
     #[payable]
     fn blind_sync(
         &self,
@@ -32,7 +32,7 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
         self.sync_ok(raw_results.into());
     }
 
-    #[endpoint]
+    #[endpoint(blindSyncFallible)]
     #[payable]
     fn blind_sync_fallible(
         &self,
@@ -70,9 +70,9 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
         }
     }
 
-    #[event("blind_sync_ok")]
+    #[event("blindSyncOk")]
     fn sync_ok(&self, #[indexed] results: MultiValueEncoded<ManagedBuffer>);
 
-    #[event("blind_sync_error")]
+    #[event("blindSyncError")]
     fn sync_error(&self, #[indexed] err_code: u32);
 }

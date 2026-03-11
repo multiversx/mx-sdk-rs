@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindAsyncV1)]
     #[payable]
     fn blind_async_v1(
         &self,
@@ -44,9 +44,9 @@ pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
         }
     }
 
-    #[event("blind_async_v1_callback_ok")]
+    #[event("blindAsyncV1CallbackOk")]
     fn async_v1_callback_ok_event(&self, #[indexed] results: &MultiValueEncoded<ManagedBuffer>);
 
-    #[event("blind_async_v1_callback_error")]
+    #[event("blindAsyncV1CallbackError")]
     fn async_v1_callback_error_event(&self, #[indexed] err_code: u32, err_msg: &ManagedBuffer);
 }
