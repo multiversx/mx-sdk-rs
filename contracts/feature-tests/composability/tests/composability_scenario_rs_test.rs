@@ -130,6 +130,11 @@ fn forw_blind_deploy_rs() {
 }
 
 #[test]
+fn forw_blind_drain_rs() {
+    world().run("scenarios/forw_blind_drain.scen.json");
+}
+
+#[test]
 fn forw_blind_sync_accept_egld_rs() {
     world().run("scenarios/forw_blind_sync_accept_egld.scen.json");
 }

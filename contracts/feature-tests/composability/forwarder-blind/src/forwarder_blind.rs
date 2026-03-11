@@ -26,4 +26,17 @@ pub trait ForwarderBlind:
 
     #[upgrade]
     fn upgrade(&self) {}
+
+    #[only_owner]
+    #[endpoint(drain)]
+    fn drain(&self, token: TokenId, token_nonce: u64) {
+        let caller = self.blockchain().get_caller();
+        let token_amount = self.blockchain().get_sc_balance(&token, token_nonce);
+        if let Some(token_amount_nz) = token_amount.into_non_zero() {
+            self.tx()
+                .to(caller)
+                .payment(Payment::new(token, token_nonce, token_amount_nz))
+                .transfer();
+        }
+    }
 }
