@@ -34,8 +34,12 @@ pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
         match result {
             ManagedAsyncCallResult::Ok(results) => {
                 self.async_v1_callback_ok_event(&results);
-                let back_payments = self.call_value().all();
-                self.send_back_payments("blindAsyncV1CallbackOk", &original_caller, &back_payments);
+                let back_payments = self.blockchain().get_back_transfers();
+                self.send_back_payments(
+                    "blindAsyncV1CallbackOk",
+                    &original_caller,
+                    &back_payments.into_payment_vec(),
+                );
             }
             ManagedAsyncCallResult::Err(err) => {
                 self.async_v1_callback_error_event(err.err_code, &err.err_msg);
