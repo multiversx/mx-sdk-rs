@@ -175,6 +175,7 @@ impl WalletInfo {
     }
 
     fn generate_for_shard(shard: u8) -> Self {
+        assert!(shard < 3, "Shard must be between 0 and 2");
         loop {
             let wallet = Self::generate();
             if wallet.address.shard_of_3().as_u32() == shard as u32 {
