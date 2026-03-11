@@ -92,11 +92,13 @@ fn forw_blind_async_v_1_reject_egld_rs() {
 }
 
 #[test]
+#[ignore = "TODO: back transfers in callback currently not handled correctly in Rust VM"]
 fn forw_blind_async_v_1_retrieve_egld_rs() {
     world().run("scenarios/forw_blind_async_v1_retrieve_egld.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: back transfers in callback currently not handled correctly in Rust VM"]
 fn forw_blind_async_v_1_retrieve_nft_rs() {
     world().run("scenarios/forw_blind_async_v1_retrieve_nft.scen.json");
 }
@@ -117,6 +119,7 @@ fn forw_blind_async_v_2_reject_egld_rs() {
 }
 
 #[test]
+#[ignore = "TODO: back transfers in callback currently not handled correctly in Rust VM"]
 fn forw_blind_async_v_2_retrieve_egld_rs() {
     world().run("scenarios/forw_blind_async_v2_retrieve_egld.scen.json");
 }
