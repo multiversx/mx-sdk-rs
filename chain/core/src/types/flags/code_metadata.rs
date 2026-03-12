@@ -10,29 +10,49 @@ const PAYABLE_BY_SC_STRING: &str = "PayableBySC";
 const DEFAULT_STRING: &str = "Default";
 
 bitflags! {
+    /// Flags representing the smart contract's allowed actions after deploy.
     #[derive(Default, PartialEq, Debug, Clone, Copy)]
     pub struct CodeMetadata: u16 {
+        /// No flags set. The contract is not upgradeable, not readable, and not payable.
         const DEFAULT = 0;
+
+        /// The contract can be upgraded in the future.
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
+
+        /// The contract's storage can be read by other contracts.
         const READABLE = 0b0000_0100_0000_0000; // 3rd LSB of first byte
+
+        /// The contract can receive funds without having any endpoint called,
+        /// just like user accounts.
+        ///
+        /// Note: a contract does NOT have to be payable to receive funds
+        /// in payable endpoints.
         const PAYABLE = 0b0000_0000_0000_0010; // 2nd LSB of second byte
+
+        /// Like [`CodeMetadata::PAYABLE`], but only allows receiving funds from
+        /// other smart contracts. Direct user transfers will be rejected.
         const PAYABLE_BY_SC = 0b0000_0000_0000_0100; // 3rd LSB of second byte
     }
 }
 
 impl CodeMetadata {
+    /// Returns `true` if the contract is allowed to be upgraded.
     pub fn is_upgradeable(&self) -> bool {
         *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
     }
 
+    /// Returns `true` if the contract can receive funds without an endpoint call.
     pub fn is_payable(&self) -> bool {
         *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
     }
 
+    /// Returns `true` if the contract can receive funds from other smart contracts
+    /// without an endpoint call. Direct user transfers are rejected.
     pub fn is_payable_by_sc(&self) -> bool {
         *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
     }
 
+    /// Returns `true` if the contract's storage can be read by other contracts.
     pub fn is_readable(&self) -> bool {
         *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
