@@ -67,13 +67,7 @@ pub fn async_sharded() -> CallTreeLayout {
             let root_name = format!("{}_root_{}", type_name, v.suffix);
             let target_name = format!("{}_target_{}", type_name, v.suffix);
 
-            start.push(StartCall {
-                to: root_name.clone(),
-                shard: Some(v.sender_shard.into()),
-                gas_limit: None,
-                args: Vec::new(),
-                payments: Vec::new(),
-            });
+            start.push(StartCall::new(root_name.clone(), v.sender_shard));
 
             contracts.insert(
                 root_name,
@@ -121,13 +115,7 @@ pub fn transf_exec_sharded() -> CallTreeLayout {
         let root_name = format!("transf_exec_root_{}", v.suffix);
         let target_name = format!("transf_exec_target_{}", v.suffix);
 
-        start.push(StartCall {
-            to: root_name.clone(),
-            shard: Some(v.sender_shard.into()),
-            gas_limit: None,
-            args: Vec::new(),
-            payments: Vec::new(),
-        });
+        start.push(StartCall::new(root_name.clone(), v.sender_shard));
 
         contracts.insert(
             root_name,
@@ -166,13 +154,7 @@ pub fn transf_exec_sharded() -> CallTreeLayout {
 pub fn sync_chain(n: usize) -> CallTreeLayout {
     assert!(n >= 1, "chain length must be at least 1");
 
-    let start = vec![StartCall {
-        to: format!("s2_{}", n - 1),
-        shard: Some(ShardId::from(2)),
-        gas_limit: None,
-        args: Vec::new(),
-        payments: Vec::new(),
-    }];
+    let start = vec![StartCall::new(format!("s2_{}", n - 1), 2)];
 
     let mut contracts = BTreeMap::new();
     for i in 0..n {

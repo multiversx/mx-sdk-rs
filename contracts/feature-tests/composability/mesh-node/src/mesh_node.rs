@@ -81,7 +81,7 @@ pub trait ForwarderQueue {
 
     /// Records the call, then calls all programmed calls.
     #[endpoint]
-    #[payable("*")]
+    #[payable]
     fn bump(&self, call_trace: MultiValueManagedVec<TraceItem<Self::Api>>) {
         let initial_gas = self.blockchain().get_gas_left();
         let trace_index = self.trace().push(&Trace {

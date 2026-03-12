@@ -26,6 +26,12 @@ impl ComposabilityInteract {
             state.contracts.get_mut(&name).unwrap().address = Some(address.to_string());
         }
 
+        // Fill in the `from` field for each start call with the wallet bech32 address.
+        for start in &mut state.start {
+            let wallet = self.wallets.wallet_for_shard(start.shard);
+            start.wallet = Some(Bech32Address::from(wallet).to_bech32_string());
+        }
+
         state.save_to_file(STATE_FILE);
         println!("Addresses saved to {STATE_FILE}");
     }

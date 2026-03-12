@@ -4,45 +4,53 @@
 to = "async_v1_root_s222"
 shard = 2
 gas_limit = 17000000
+wallet = "erd1t63lx7924204rnhhvzfmvtssg8ysks2szm06f9mq675yd2xeqqpqrcqe86"
 
 [[start]]
 to = "async_v1_root_s022"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start]]
 to = "async_v1_root_s012"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start]]
 to = "async_v1_root_s010"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start]]
 to = "async_v2_root_s222"
 shard = 2
 gas_limit = 17000000
+wallet = "erd1t63lx7924204rnhhvzfmvtssg8ysks2szm06f9mq675yd2xeqqpqrcqe86"
 
 [[start]]
 to = "async_v2_root_s022"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start]]
 to = "async_v2_root_s012"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start]]
 to = "async_v2_root_s010"
 shard = 0
 gas_limit = 17000000
+wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [contracts.async_v1_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqlqc659fd7dnw5gzs8g87r589faxf0x67qqqs9x8cg0"
+address = "erd1qqqqqqqqqqqqqpgq8lwn0wvyvzqektqdmp0czrvqngg2vltsqqqs44w7vw"
 
 [[contracts.async_v1_root_s010.calls]]
 to = "async_v1_target_s010"
@@ -51,7 +59,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqqffcfs82t0zhpjm6gww6sxaqa2cugc7pqqqsmdr7u6"
+address = "erd1qqqqqqqqqqqqqpgqn5vapuh3gefsvvrfw3f6knnfg4m5w3epqqqsw0qpfs"
 
 [[contracts.async_v1_root_s012.calls]]
 to = "async_v1_target_s012"
@@ -60,7 +68,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqlleqj70znurkgcx4vs5lprr05a88jfpaqqpqgktg4k"
+address = "erd1qqqqqqqqqqqqqpgqw4ua6qwm947g3c978fnx0sxxfq6s0luuqqpq8rz490"
 
 [[contracts.async_v1_root_s022.calls]]
 to = "async_v1_target_s022"
@@ -69,7 +77,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqvja4cs79ez3r6dkcs89c4thuye6f060vqqpqqdcwz8"
+address = "erd1qqqqqqqqqqqqqpgqlmd4gqq6rxtv288lr3d7m6f9hv9djjz9qqpqwghekk"
 
 [[contracts.async_v1_root_s222.calls]]
 to = "async_v1_target_s222"
@@ -78,23 +86,23 @@ gas_limit = 7000000
 
 [contracts.async_v1_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqm85s8y5q5slvjlxgraaxvhjqpqyl7pgzqqpq6724ca"
+address = "erd1qqqqqqqqqqqqqpgq9m6tvxyzclmrv0r22ytw6zdc6smg8yt4qqpqqa7zua"
 
 [contracts.async_v1_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq4wve86z74hhgfdupkqta2qa2dss55v9xqqpqju7sxh"
+address = "erd1qqqqqqqqqqqqqpgq5nh8kvu4dn3zqawsu3cpy9hh3hhj0yf5qqpqknxqwj"
 
 [contracts.async_v1_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq35kftj45zmlwp9052grxmxwdnkye8m78qqpqcvkj0d"
+address = "erd1qqqqqqqqqqqqqpgqrxlautlvuhtq4hdadutrxh9f0amhl664qqpq8p9u3c"
 
 [contracts.async_v1_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqlyw76ggetsymghmw63dpchxyfr4kd4xpqqpq9kr8u3"
+address = "erd1qqqqqqqqqqqqqpgqa6qdfc9j9hetxzfvu2ydf2wmllftrf3qqqpqwxd6cc"
 
 [contracts.async_v2_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqptqc2jad900t4kr0tqrs93q37055kmyqqqqsndcrsf"
+address = "erd1qqqqqqqqqqqqqpgqgzs9t8edmvth9uqp646aay734z8tpgjvqqqsurmwmw"
 
 [[contracts.async_v2_root_s010.calls]]
 to = "async_v2_target_s010"
@@ -103,7 +111,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqesta4vspx0wjq33rxd3zm34ah00vd57dqqqs50znr8"
+address = "erd1qqqqqqqqqqqqqpgq9qve5z8qngvmyyvymvppjfld6j33qwpgqqqskzaz9w"
 
 [[contracts.async_v2_root_s012.calls]]
 to = "async_v2_target_s012"
@@ -112,7 +120,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqwl39xumhls6lak7wf4yzdyrwt702wy6kqqpq7ya8v3"
+address = "erd1qqqqqqqqqqqqqpgqnjq6zhcsjhec6zcqa82plzm724mkudccqqpqmkxlwh"
 
 [[contracts.async_v2_root_s022.calls]]
 to = "async_v2_target_s022"
@@ -121,7 +129,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqed3ctsy0c8xhqllj5kythpzz9netwxm7qqpq59sct6"
+address = "erd1qqqqqqqqqqqqqpgq3cryh6fhn0ts754lpfakm2nsmw7ymsxgqqpqqwe6cd"
 
 [[contracts.async_v2_root_s222.calls]]
 to = "async_v2_target_s222"
@@ -130,16 +138,16 @@ gas_limit = 7000000
 
 [contracts.async_v2_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq54xzzt5mk87l24m9f08c44cfd3m5rh8cqqpqw6c4ze"
+address = "erd1qqqqqqqqqqqqqpgqfpe7mezn8he572qnkxe8jg4l6662434yqqpqfwsmcp"
 
 [contracts.async_v2_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqv8r7t9lge2mlx3pvflssuq5q9svxkdxsqqpq09rz47"
+address = "erd1qqqqqqqqqqqqqpgqnu2cnwf3wnthsuwvppztlv32dpq8h3trqqpq55hel2"
 
 [contracts.async_v2_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqcndde9ymy35wwj8vvyfdyj3kjjgeddvdqqpqq50ws3"
+address = "erd1qqqqqqqqqqqqqpgq78t8sav5zfcm762c4kgpwnl2c9yu39kjqqpquyj35e"
 
 [contracts.async_v2_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq42vjwz6p2vezxhdsxp96jcd3f4ldxlaaqqpqgkfk3v"
+address = "erd1qqqqqqqqqqqqqpgq9xayaxuc9wmmkxsl3hgnyuxt2vppt5jfqqpqx6430v"

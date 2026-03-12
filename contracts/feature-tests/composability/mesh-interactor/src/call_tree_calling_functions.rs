@@ -116,7 +116,13 @@ impl ComposabilityInteract {
         let start_wallets: Vec<Address> = layout
             .start
             .iter()
-            .map(|s| self.wallets.wallet_for_shard(s.shard))
+            .map(|s| {
+                if let Some(from) = &s.wallet {
+                    Bech32Address::from_bech32_string(from.clone()).to_address()
+                } else {
+                    self.wallets.wallet_for_shard(s.shard)
+                }
+            })
             .collect();
 
         // Build name → bech32 address map from state.

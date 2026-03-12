@@ -143,9 +143,23 @@ pub struct StartCall {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub gas_limit: Option<u64>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub args: Vec<String>,
-    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub payments: Vec<PaymentConfig>,
+    /// Bech32 address of the wallet sending this transaction.
+    /// When present, takes precedence over `shard`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub wallet: Option<String>,
+}
+
+impl StartCall {
+    pub fn new(to: impl Into<String>, shard: u32) -> Self {
+        StartCall {
+            to: to.into(),
+            shard: Some(ShardId::from(shard)),
+            gas_limit: None,
+            payments: Vec::new(),
+            wallet: None,
+        }
+    }
 }
 
 /// Serializable description of a single contract node in the call tree.
