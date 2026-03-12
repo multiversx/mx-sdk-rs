@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindDeploy: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindDeploy)]
     fn blind_deploy(
         &self,
         code: ManagedBuffer,
@@ -25,7 +25,7 @@ pub trait ForwarderBlindDeploy: super::fwd_blind_common::ForwarderBlindCommon {
         new_address
     }
 
-    #[event("blind_deploy_ok")]
+    #[event("blindDeployOk")]
     fn blind_deploy_ok_event(
         &self,
         #[indexed] new_address: &ManagedAddress,
