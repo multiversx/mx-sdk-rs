@@ -75,12 +75,12 @@ where
             .original_result()
     }
 
-    pub fn queued_calls(
+    pub fn programmed_calls(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, crate::ProgrammedCall<Env::Api>>> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("queued_calls")
+            .raw_call("programmed_calls")
             .original_result()
     }
 
@@ -93,7 +93,7 @@ where
             .original_result()
     }
 
-    pub fn set_queued_calls<
+    pub fn program_calls<
         Arg0: ProxyArg<MultiValueManagedVec<Env::Api, crate::ProgrammedCall<Env::Api>>>,
     >(
         self,
@@ -101,7 +101,7 @@ where
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("set_queued_calls")
+            .raw_call("program_calls")
             .argument(&calls)
             .original_result()
     }

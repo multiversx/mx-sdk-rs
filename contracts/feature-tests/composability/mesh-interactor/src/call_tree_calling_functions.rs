@@ -12,7 +12,7 @@ impl ComposabilityInteract {
     /// For every forwarder in the layout that has children, build the
     /// corresponding `ProgrammedCall` list and send a `set_queued_calls` tx.
     /// All txs are batched in a single homogenous call buffer.
-    pub async fn set_programmed_calls(&mut self, layout: &CallTreeLayout) {
+    pub async fn program_calls(&mut self, layout: &CallTreeLayout) {
         let state = CallTreeLayout::load_from_file(STATE_FILE);
 
         println!("Setting up programmed calls from config...");
@@ -88,7 +88,7 @@ impl ComposabilityInteract {
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
                     .typed(mesh_node_proxy::ForwarderQueueProxy)
-                    .set_queued_calls(calls)
+                    .program_calls(calls)
                     .returns(ReturnsStatus)
             });
         }
@@ -96,9 +96,9 @@ impl ComposabilityInteract {
         let results = buffer.run().await;
         for (i, status) in results.iter().enumerate() {
             if *status == 0u64 {
-                println!("set_queued_calls #{i}: ok");
+                println!("program_calls #{i}: ok");
             } else {
-                println!("set_queued_calls #{i}: failed with status {status}");
+                println!("program_calls #{i}: failed with status {status}");
             }
         }
     }

@@ -50,14 +50,14 @@ async fn main() {
             layout.fill_gas_estimates();
             layout.save_to_file(&layout_path);
             println!("Gas estimates updated in {layout_path}");
-            interact.set_programmed_calls(&layout).await;
+            interact.program_calls(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Setup) => {
             let mut interact = ComposabilityInteract::init().await;
             let layout_path = interact.config.call_tree_path.clone();
             let layout = CallTreeLayout::load_from_file(&layout_path);
             interact.deploy_call_tree(&layout).await;
-            interact.set_programmed_calls(&layout).await;
+            interact.program_calls(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Bump) => {
             let mut interact = ComposabilityInteract::init().await;

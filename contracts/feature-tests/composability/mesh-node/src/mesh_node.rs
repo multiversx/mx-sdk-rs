@@ -62,8 +62,8 @@ pub trait ForwarderQueue {
     fn id(&self) -> SingleValueMapper<NodeName<Self::Api>>;
 
     #[view]
-    #[storage_mapper("queued_calls")]
-    fn queued_calls(&self) -> SingleValueMapper<ManagedVec<ProgrammedCall<Self::Api>>>;
+    #[storage_mapper("programmed_calls")]
+    fn programmed_calls(&self) -> SingleValueMapper<ManagedVec<ProgrammedCall<Self::Api>>>;
 
     #[view]
     #[storage_mapper("trace")]
@@ -75,8 +75,8 @@ pub trait ForwarderQueue {
     }
 
     #[endpoint]
-    fn set_queued_calls(&self, calls: MultiValueManagedVec<ProgrammedCall<Self::Api>>) {
-        self.queued_calls().set(calls.into_vec());
+    fn program_calls(&self, calls: MultiValueManagedVec<ProgrammedCall<Self::Api>>) {
+        self.programmed_calls().set(calls.into_vec());
     }
 
     /// Records the call, then calls all programmed calls.
@@ -92,7 +92,7 @@ pub trait ForwarderQueue {
             input: call_trace.as_vec().clone(),
             results: ManagedVec::new(),
         });
-        let calls = self.queued_calls().get();
+        let calls = self.programmed_calls().get();
         for (call_index, call) in calls.into_iter().enumerate() {
             self.forward_programmed_call(call, call_index, &call_trace);
         }

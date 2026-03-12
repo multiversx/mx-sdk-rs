@@ -50,7 +50,7 @@ wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [contracts.async_v1_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq8lwn0wvyvzqektqdmp0czrvqngg2vltsqqqs44w7vw"
+address = "erd1qqqqqqqqqqqqqpgq32ejea0jdpa70dhaxxfcjnhqrlkz4x3mqqqshpg4p5"
 
 [[contracts.async_v1_root_s010.calls]]
 to = "async_v1_target_s010"
@@ -59,7 +59,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqn5vapuh3gefsvvrfw3f6knnfg4m5w3epqqqsw0qpfs"
+address = "erd1qqqqqqqqqqqqqpgqwcg3sxz3j5pudptx57fqk0jufcyf0g87qqqsgfsneg"
 
 [[contracts.async_v1_root_s012.calls]]
 to = "async_v1_target_s012"
@@ -68,7 +68,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqw4ua6qwm947g3c978fnx0sxxfq6s0luuqqpq8rz490"
+address = "erd1qqqqqqqqqqqqqpgqgcygkng4f6t64maf86y54apdae6e6242qqpqtwgs32"
 
 [[contracts.async_v1_root_s022.calls]]
 to = "async_v1_target_s022"
@@ -77,7 +77,7 @@ gas_limit = 7000000
 
 [contracts.async_v1_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqlmd4gqq6rxtv288lr3d7m6f9hv9djjz9qqpqwghekk"
+address = "erd1qqqqqqqqqqqqqpgqunqre62w3wmyfsuf5wnc07vj0yp6pchrqqpq3qcgr9"
 
 [[contracts.async_v1_root_s222.calls]]
 to = "async_v1_target_s222"
@@ -86,23 +86,23 @@ gas_limit = 7000000
 
 [contracts.async_v1_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq9m6tvxyzclmrv0r22ytw6zdc6smg8yt4qqpqqa7zua"
+address = "erd1qqqqqqqqqqqqqpgq9esfwafammp9mzklyqrpxuwk0m4k0tkcqqpqntm4hh"
 
 [contracts.async_v1_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq5nh8kvu4dn3zqawsu3cpy9hh3hhj0yf5qqpqknxqwj"
+address = "erd1qqqqqqqqqqqqqpgq90qwpplqvw8grhh06yerdmrdxxqnxxfvqqpqsfjp6f"
 
 [contracts.async_v1_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqrxlautlvuhtq4hdadutrxh9f0amhl664qqpq8p9u3c"
+address = "erd1qqqqqqqqqqqqqpgqrnv85adlaup5vurdxczfv3szxtntqvrgqqpqmlwzkt"
 
 [contracts.async_v1_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqa6qdfc9j9hetxzfvu2ydf2wmllftrf3qqqpqwxd6cc"
+address = "erd1qqqqqqqqqqqqqpgqqwhm44yavfxwmg3l08pjvp8sjtvjsa8dqqpqqjshes"
 
 [contracts.async_v2_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqgzs9t8edmvth9uqp646aay734z8tpgjvqqqsurmwmw"
+address = "erd1qqqqqqqqqqqqqpgqndldvtwnpjxa8tj3fjs6j8svddfe90fgqqqse84mh9"
 
 [[contracts.async_v2_root_s010.calls]]
 to = "async_v2_target_s010"
@@ -111,7 +111,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq9qve5z8qngvmyyvymvppjfld6j33qwpgqqqskzaz9w"
+address = "erd1qqqqqqqqqqqqqpgqrfh4eg6dpe6msl7w66jxya0396l4a2naqqqs9rpv8g"
 
 [[contracts.async_v2_root_s012.calls]]
 to = "async_v2_target_s012"
@@ -120,7 +120,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqnjq6zhcsjhec6zcqa82plzm724mkudccqqpqmkxlwh"
+address = "erd1qqqqqqqqqqqqqpgqyln0l9azj5wamcel09pwkhct49eggazjqqpqg7jtk4"
 
 [[contracts.async_v2_root_s022.calls]]
 to = "async_v2_target_s022"
@@ -129,7 +129,7 @@ gas_limit = 7000000
 
 [contracts.async_v2_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq3cryh6fhn0ts754lpfakm2nsmw7ymsxgqqpqqwe6cd"
+address = "erd1qqqqqqqqqqqqqpgquwtg65a822e9sq37plfe9ych5ezlxkx2qqpqcjgdc0"
 
 [[contracts.async_v2_root_s222.calls]]
 to = "async_v2_target_s222"
@@ -138,16 +138,16 @@ gas_limit = 7000000
 
 [contracts.async_v2_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqfpe7mezn8he572qnkxe8jg4l6662434yqqpqfwsmcp"
+address = "erd1qqqqqqqqqqqqqpgqvvzkmca45cuj0a4x9tf6esdxpkwhprseqqpqgl76cv"
 
 [contracts.async_v2_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqnu2cnwf3wnthsuwvppztlv32dpq8h3trqqpq55hel2"
+address = "erd1qqqqqqqqqqqqqpgqxr9wchwv0v5rs6fqvqaxlucdy04s9zgtqqpqp74myk"
 
 [contracts.async_v2_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq78t8sav5zfcm762c4kgpwnl2c9yu39kjqqpquyj35e"
+address = "erd1qqqqqqqqqqqqqpgq87l7zpjq6xg2ucpsm9fax7fjsy862zswqqpqngkzc3"
 
 [contracts.async_v2_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq9xayaxuc9wmmkxsl3hgnyuxt2vppt5jfqqpqx6430v"
+address = "erd1qqqqqqqqqqqqqpgqjv0ver8szg8ertp7qcqgxadxt9z4s7xeqqpqujkd55"

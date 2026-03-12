@@ -20,9 +20,9 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         id => id
-        queued_calls => queued_calls
+        programmed_calls => programmed_calls
         trace => trace
-        set_queued_calls => set_queued_calls
+        program_calls => program_calls
         bump => bump
         async_v2_callback => async_v2_callback
     )
