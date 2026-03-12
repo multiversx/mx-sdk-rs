@@ -13,20 +13,15 @@ pub struct InteractCli {
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum InteractCliCommand {
     #[command(
-        name = "s1",
-        about = "Generate scenario 1 (root → vault) and save to call_tree.toml"
+        name = "gen",
+        about = "Generate all call tree layouts: layout/async_sharded.toml and layout/sync_chain.toml"
     )]
-    S1,
-    #[command(
-        name = "s2",
-        about = "Generate scenario 2 (linear sync-call chain of n contracts) and save to call_tree.toml"
-    )]
-    S2 {
+    Generate {
         #[arg(
             short = 'n',
             long,
-            default_value_t = 5,
-            help = "Number of contracts in the chain"
+            default_value_t = 10,
+            help = "Number of contracts in the sync chain"
         )]
         n: usize,
     },

@@ -83,6 +83,7 @@ pub struct TransactionOnNetwork {
     pub miniblock_type: String,
     #[serde(default)]
     pub miniblock_hash: String,
+    #[serde(default)]
     pub timestamp: u64,
     pub data: Option<String>,
     pub status: String,

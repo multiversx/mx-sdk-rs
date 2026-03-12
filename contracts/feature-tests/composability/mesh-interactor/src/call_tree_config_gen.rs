@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
 
+use multiversx_sc::types::ShardId;
+
 use crate::call_tree_config::{
-    CallTreeConfig, ContractConfig, GatewayConfig, ProgrammedCallConfig, ProgrammedCallTypeConfig,
-    StartCall,
+    CallTreeLayout, ContractConfig, ProgrammedCallConfig, ProgrammedCallTypeConfig, StartCall,
 };
 
 /// Scenario 1: async-v1, async-v2 and transfer-execute each tested in three shard layouts,
@@ -15,7 +16,7 @@ use crate::call_tree_config::{
 ///
 /// Call types covered: `async_v1` (legacy_async), `async_v2` (promise),
 /// `transfer_execute`, and `sync` (shard 2 only).
-pub fn scenario_1() -> CallTreeConfig {
+pub fn async_sharded() -> CallTreeLayout {
     struct ShardVariant {
         suffix: &'static str,
         sender_shard: u32,
@@ -47,10 +48,7 @@ pub fn scenario_1() -> CallTreeConfig {
     let async_call_types: &[(&str, ProgrammedCallTypeConfig)] = &[
         ("async_v1", ProgrammedCallTypeConfig::LegacyAsync),
         ("async_v2", ProgrammedCallTypeConfig::Promise),
-        (
-            "transfer_execute",
-            ProgrammedCallTypeConfig::TransferExecute,
-        ),
+        ("transf_exec", ProgrammedCallTypeConfig::TransfExec),
     ];
 
     let mut start = Vec::new();
@@ -124,11 +122,7 @@ pub fn scenario_1() -> CallTreeConfig {
         },
     );
 
-    CallTreeConfig {
-        gateway: GatewayConfig::default(),
-        start,
-        contracts,
-    }
+    CallTreeLayout { start, contracts }
 }
 
 /// Scenario 2: a linear chain of `n` contracts, each calling the next via sync call.
@@ -136,12 +130,12 @@ pub fn scenario_1() -> CallTreeConfig {
 /// Contract names are `"s2_{n-1}"`, `"s2_{n-2}"`, ..., `"s2_0"`.
 /// The start call goes to `"s2_{n-1}"`, which calls `"s2_{n-2}"` synchronously, and so on,
 /// until `"s2_0"` which has no further calls.
-pub fn scenario_2(n: usize) -> CallTreeConfig {
+pub fn sync_chain(n: usize) -> CallTreeLayout {
     assert!(n >= 1, "chain length must be at least 1");
 
     let start = vec![StartCall {
         to: format!("s2_{}", n - 1),
-        shard: None,
+        shard: Some(ShardId::from(2)),
         gas_limit: None,
         args: Vec::new(),
         payments: Vec::new(),
@@ -163,16 +157,12 @@ pub fn scenario_2(n: usize) -> CallTreeConfig {
         contracts.insert(
             name,
             ContractConfig {
-                shard: None,
+                shard: Some(ShardId::from(2)),
                 address: None,
                 calls,
             },
         );
     }
 
-    CallTreeConfig {
-        gateway: GatewayConfig::default(),
-        start,
-        contracts,
-    }
+    CallTreeLayout { start, contracts }
 }

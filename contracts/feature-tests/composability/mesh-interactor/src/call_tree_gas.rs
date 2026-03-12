@@ -1,4 +1,4 @@
-use crate::call_tree_config::CallTreeConfig;
+use crate::call_tree_config::CallTreeLayout;
 
 /// Gas consumed by the execution of any contract call, regardless of further calls.
 const PER_EXECUTION_GAS: u64 = 7_000_000;
@@ -6,7 +6,7 @@ const PER_EXECUTION_GAS: u64 = 7_000_000;
 /// Additional gas reserved by the caller for each outgoing call it makes.
 const PER_CALL_GAS: u64 = 3_000_000;
 
-impl CallTreeConfig {
+impl CallTreeLayout {
     /// Recursively computes the gas needed when calling contract `name`.
     ///
     /// Built bottom-up:

@@ -4,33 +4,35 @@ use mesh_node::{ProgrammedCall, ProgrammedCallType, mesh_node_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig, ProgrammedCallTypeConfig},
+    call_tree_config::{CallTreeLayout, ProgrammedCallTypeConfig, STATE_FILE},
     mesh_interact_controller::ComposabilityInteract,
 };
 
 impl ComposabilityInteract {
-    /// For every forwarder in `call_tree.toml` that has children, build the
+    /// For every forwarder in the layout that has children, build the
     /// corresponding `ProgrammedCall` list and send a `set_queued_calls` tx.
     /// All txs are batched in a single homogenous call buffer.
-    pub async fn set_programmed_calls(&mut self) {
-        let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+    pub async fn set_programmed_calls(&mut self, layout: &CallTreeLayout) {
+        let state = CallTreeLayout::load_from_file(STATE_FILE);
 
         println!("Setting up programmed calls from config...");
 
-        // Build name → bech32 address map.
-        let addr_map: HashMap<String, Bech32Address> = config
+        // Build name → bech32 address map from state.
+        let addr_map: HashMap<String, Bech32Address> = state
             .contracts
             .iter()
-            .filter_map(|(name, c)| {
-                c.address
-                    .as_ref()
-                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
+            .map(|(name, c)| {
+                let addr = c
+                    .address
+                    .clone()
+                    .unwrap_or_else(|| panic!("no address in state for '{name}'"));
+                (name.clone(), Bech32Address::from_bech32_string(addr))
             })
             .collect();
 
         // Pre-compute shard wallets before creating the buffer (wallet_for_shard
         // borrows &self, which conflicts with the mutable borrow held by the buffer).
-        let wallet_map: HashMap<&String, Address> = config
+        let wallet_map: HashMap<&String, Address> = layout
             .contracts
             .iter()
             .map(|(name, c)| (name, self.wallets.wallet_for_shard(c.shard)))
@@ -38,7 +40,7 @@ impl ComposabilityInteract {
 
         let mut buffer = self.interactor.homogenous_call_buffer();
 
-        for (name, contract) in &config.contracts {
+        for (name, contract) in &layout.contracts {
             if contract.calls.is_empty() {
                 continue;
             }
@@ -101,36 +103,38 @@ impl ComposabilityInteract {
         }
     }
 
-    /// Send all `[[start]]` transactions from `call_tree.toml` in a single batch.
-    pub async fn bump(&mut self) {
-        let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+    /// Send all `[[start]]` transactions from the layout in a single batch.
+    pub async fn bump(&mut self, layout: &CallTreeLayout) {
+        let state = CallTreeLayout::load_from_file(STATE_FILE);
 
-        if config.start.is_empty() {
-            println!("No start calls defined in {CALL_TREE_FILE}");
+        if layout.start.is_empty() {
+            println!("No start calls defined in the call tree layout");
             return;
         }
 
         // Pre-compute shard wallets before creating the buffer.
-        let start_wallets: Vec<Address> = config
+        let start_wallets: Vec<Address> = layout
             .start
             .iter()
             .map(|s| self.wallets.wallet_for_shard(s.shard))
             .collect();
 
-        // Build name → bech32 address map.
-        let addr_map: HashMap<String, Bech32Address> = config
+        // Build name → bech32 address map from state.
+        let addr_map: HashMap<String, Bech32Address> = state
             .contracts
             .iter()
-            .filter_map(|(name, c)| {
-                c.address
-                    .as_ref()
-                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
+            .map(|(name, c)| {
+                let addr = c
+                    .address
+                    .clone()
+                    .unwrap_or_else(|| panic!("no address in state for '{name}'"));
+                (name.clone(), Bech32Address::from_bech32_string(addr))
             })
             .collect();
 
         let mut buffer = self.interactor.homogenous_call_buffer();
 
-        for (start_call, wallet) in config.start.iter().zip(start_wallets.iter()) {
+        for (start_call, wallet) in layout.start.iter().zip(start_wallets.iter()) {
             let to_addr = addr_map
                 .get(&start_call.to)
                 .unwrap_or_else(|| panic!("no address for contract '{}'", start_call.to))
@@ -172,7 +176,7 @@ fn to_queued_call_type(call_type: &ProgrammedCallTypeConfig) -> ProgrammedCallTy
     match call_type {
         ProgrammedCallTypeConfig::Sync => ProgrammedCallType::Sync,
         ProgrammedCallTypeConfig::LegacyAsync => ProgrammedCallType::AsyncV1,
-        ProgrammedCallTypeConfig::TransferExecute => ProgrammedCallType::TransferExecute,
+        ProgrammedCallTypeConfig::TransfExec => ProgrammedCallType::TransferExecute,
         ProgrammedCallTypeConfig::Promise => ProgrammedCallType::AsyncV2,
     }
 }

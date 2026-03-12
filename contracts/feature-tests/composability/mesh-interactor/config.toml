@@ -1,0 +1,5 @@
+call_tree_path = "layouts/async_sharded.toml"
+
+[gateway]
+uri = "https://testnet-gateway.multiversx.com"
+chain_type = "real"

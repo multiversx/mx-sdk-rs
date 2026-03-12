@@ -7,13 +7,15 @@ mod call_tree_deploy;
 mod call_tree_gas;
 mod call_tree_info;
 mod mesh_interact_cli;
-mod mesh_interact_state;
 
-use call_tree_config::{CALL_TREE_FILE, CallTreeConfig};
+use call_tree_config::CallTreeLayout;
 use clap::Parser;
 use mesh_interact_controller::ComposabilityInteract;
 mod mesh_interact_controller;
 use multiversx_sc_snippets::imports::*;
+
+const ASYNC_SHARDED_LAYOUT: &str = "layouts/async_sharded.toml";
+const SYNC_CHAIN_LAYOUT: &str = "layouts/sync_chain.toml";
 
 #[tokio::main]
 async fn main() {
@@ -22,34 +24,40 @@ async fn main() {
     let cli = mesh_interact_cli::InteractCli::parse();
 
     match &cli.command {
-        Some(mesh_interact_cli::InteractCliCommand::S1) => {
-            let mut config = call_tree_config_gen::scenario_1();
-            config.fill_gas_estimates();
-            config.save_to_file(CALL_TREE_FILE);
-            println!("Scenario 1 call tree saved to {CALL_TREE_FILE}");
-        }
-        Some(mesh_interact_cli::InteractCliCommand::S2 { n }) => {
-            let mut config = call_tree_config_gen::scenario_2(*n);
-            config.fill_gas_estimates();
-            config.save_to_file(CALL_TREE_FILE);
-            println!("Scenario 2 call tree (n={n}) saved to {CALL_TREE_FILE}");
+        Some(mesh_interact_cli::InteractCliCommand::Generate { n }) => {
+            std::fs::create_dir_all("layouts").expect("failed to create layouts/ directory");
+
+            let mut async_sharded = call_tree_config_gen::async_sharded();
+            async_sharded.fill_gas_estimates();
+            async_sharded.save_to_file(ASYNC_SHARDED_LAYOUT);
+            println!("Async sharded layout saved to {ASYNC_SHARDED_LAYOUT}");
+
+            let mut sync_chain = call_tree_config_gen::sync_chain(*n);
+            sync_chain.fill_gas_estimates();
+            sync_chain.save_to_file(SYNC_CHAIN_LAYOUT);
+            println!("Sync chain layout (n={n}) saved to {SYNC_CHAIN_LAYOUT}");
         }
         Some(mesh_interact_cli::InteractCliCommand::UpdateGas) => {
-            let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
-            config.fill_gas_estimates();
-            config.save_to_file(CALL_TREE_FILE);
-            println!("Gas estimates updated in {CALL_TREE_FILE}");
             let mut interact = ComposabilityInteract::init().await;
-            interact.set_programmed_calls().await;
+            let layout_path = interact.config.call_tree_path.clone();
+            let mut layout = CallTreeLayout::load_from_file(&layout_path);
+            layout.fill_gas_estimates();
+            layout.save_to_file(&layout_path);
+            println!("Gas estimates updated in {layout_path}");
+            interact.set_programmed_calls(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Setup) => {
             let mut interact = ComposabilityInteract::init().await;
-            interact.deploy_call_tree().await;
-            interact.set_programmed_calls().await;
+            let layout_path = interact.config.call_tree_path.clone();
+            let layout = CallTreeLayout::load_from_file(&layout_path);
+            interact.deploy_call_tree(&layout).await;
+            interact.set_programmed_calls(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Bump) => {
             let mut interact = ComposabilityInteract::init().await;
-            interact.bump().await;
+            let layout_path = interact.config.call_tree_path.clone();
+            let layout = CallTreeLayout::load_from_file(&layout_path);
+            interact.bump(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Info) => {
             let mut interact = ComposabilityInteract::init().await;

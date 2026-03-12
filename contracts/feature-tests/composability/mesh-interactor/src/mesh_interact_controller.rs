@@ -1,7 +1,4 @@
-use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
-    mesh_interact_state::State,
-};
+use crate::call_tree_config::{CONFIG_FILE, InteractConfig};
 
 use multiversx_sc_snippets::imports::*;
 
@@ -9,17 +6,16 @@ pub struct ComposabilityInteract {
     pub interactor: Interactor,
     pub wallets: ComposabilityInteractWallets,
     pub forw_queue_code: BytesValue,
-    #[allow(dead_code)]
-    pub state: State,
+    pub config: InteractConfig,
 }
 
 impl ComposabilityInteract {
     pub async fn init() -> Self {
-        let tree_config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
-        let gateway_config = &tree_config.gateway;
+        let config = InteractConfig::load_from_file(CONFIG_FILE);
+        let gateway_config = &config.gateway;
         let mut interactor = Interactor::new(&gateway_config.uri)
             .await
-            .use_chain_simulator(tree_config.gateway.use_chain_simulator());
+            .use_chain_simulator(gateway_config.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/feature-tests/composability/interact");
         let shard_wallet_addresses = [
             interactor.register_wallet(test_wallets::for_shard(0)).await,
@@ -37,7 +33,7 @@ impl ComposabilityInteract {
                 shard_wallet_addresses,
             },
             forw_queue_code,
-            state: State::load_state(),
+            config,
         }
     }
 }

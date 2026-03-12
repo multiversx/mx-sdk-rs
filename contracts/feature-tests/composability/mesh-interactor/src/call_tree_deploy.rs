@@ -1,5 +1,5 @@
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
+    call_tree_config::{CallTreeLayout, STATE_FILE},
     mesh_interact_controller::ComposabilityInteract,
 };
 
@@ -9,34 +9,33 @@ use multiversx_sc_snippets::imports::*;
 const DEPLOY_GAS_LIMIT: NumExpr = NumExpr("80,000,000");
 
 impl ComposabilityInteract {
-    /// Deploy all contracts described in `call_tree.toml`, then write the
-    /// assigned addresses back into the same file.
-    pub async fn deploy_call_tree(&mut self) {
-        let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
-
+    /// Deploy all contracts described in the call tree layout, then write the
+    /// assigned addresses into `state.toml`.
+    pub async fn deploy_call_tree(&mut self, layout: &CallTreeLayout) {
         println!(
             "Deploying {} call tree contracts...",
-            config.contracts.len()
+            layout.contracts.len()
         );
 
         // Deploy all contracts in a single batch.
-        let name_address_pairs = self.deploy_all(&config).await;
+        let name_address_pairs = self.deploy_all(layout).await;
 
+        let mut state = layout.clone();
         for (name, address) in name_address_pairs {
             println!("Deployed '{name}' at {address}");
-            config.contracts.get_mut(&name).unwrap().address = Some(address.to_string());
+            state.contracts.get_mut(&name).unwrap().address = Some(address.to_string());
         }
 
-        config.save_to_file(CALL_TREE_FILE);
-        println!("Addresses saved to {CALL_TREE_FILE}");
+        state.save_to_file(STATE_FILE);
+        println!("Addresses saved to {STATE_FILE}");
     }
 
-    async fn deploy_all(&mut self, config: &CallTreeConfig) -> Vec<(String, Bech32Address)> {
+    async fn deploy_all(&mut self, layout: &CallTreeLayout) -> Vec<(String, Bech32Address)> {
         let wallets = self.wallets.clone();
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for (name, contract) in &config.contracts {
+        for (name, contract) in &layout.contracts {
             let wallet = wallets.wallet_for_shard(contract.shard);
-            buffer.push_tx(|tx: Tx<ScenarioTxEnvData, (), (), (), (), (), ()>| {
+            buffer.push_tx(|tx| {
                 tx.from(wallet)
                     .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .init(name)

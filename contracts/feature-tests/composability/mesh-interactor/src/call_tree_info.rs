@@ -3,7 +3,7 @@ use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
+    call_tree_config::{CallTreeLayout, STATE_FILE},
     mesh_interact_controller::ComposabilityInteract,
 };
 
@@ -22,23 +22,26 @@ fn fmt_gas(v: u64) -> String {
 }
 
 impl ComposabilityInteract {
-    /// Queries the `trace` view for every deployed contract in `call_tree.toml`
+    /// Queries the `trace` view for every deployed contract in `state.toml`
     /// and prints the results to console.
     pub async fn query_trace_info(&mut self) {
-        let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
+        let state = CallTreeLayout::load_from_file(STATE_FILE);
 
-        let contracts_with_addresses: Vec<_> = config
+        let contracts_with_addresses: Vec<_> = state
             .contracts
             .iter()
             .filter_map(|(name, c)| {
-                c.address
-                    .as_ref()
-                    .map(|a| (name.clone(), Bech32Address::from_bech32_string(a.clone())))
+                c.address.as_ref().map(|addr| {
+                    (
+                        name.clone(),
+                        Bech32Address::from_bech32_string(addr.clone()),
+                    )
+                })
             })
             .collect();
 
         if contracts_with_addresses.is_empty() {
-            println!("No deployed contracts found in {CALL_TREE_FILE}. Run `setup` first.");
+            println!("No deployed contracts found in {STATE_FILE}. Run `setup` first.");
             return;
         }
 
