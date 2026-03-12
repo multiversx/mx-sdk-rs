@@ -728,8 +728,8 @@ dependencies = [
  "forwarder",
  "forwarder-blind",
  "forwarder-legacy",
- "forwarder-net",
  "forwarder-raw",
+ "mesh-node",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "proxy-test-first",
@@ -1679,36 +1679,6 @@ name = "forwarder-meta"
 version = "0.0.0"
 dependencies = [
  "forwarder",
- "multiversx-sc-meta-lib",
-]
-
-[[package]]
-name = "forwarder-net"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
-name = "forwarder-net-interactor"
-version = "0.0.0"
-dependencies = [
- "clap",
- "forwarder-net",
- "multiversx-sc",
- "multiversx-sc-snippets",
- "serde",
- "tokio",
- "toml",
-]
-
-[[package]]
-name = "forwarder-net-meta"
-version = "0.0.0"
-dependencies = [
- "forwarder-net",
  "multiversx-sc-meta-lib",
 ]
 
@@ -2990,6 +2960,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "mesh-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "mesh-node",
+ "multiversx-sc",
+ "multiversx-sc-snippets",
+ "serde",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "mesh-node"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
+name = "mesh-node-meta"
+version = "0.0.0"
+dependencies = [
+ "mesh-node",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]

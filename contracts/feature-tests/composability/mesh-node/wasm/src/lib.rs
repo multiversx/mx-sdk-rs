@@ -16,7 +16,7 @@ multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    forwarder_net
+    mesh_node
     (
         init => init
         id => id
@@ -28,4 +28,4 @@ multiversx_sc_wasm_adapter::endpoints! {
     )
 }
 
-multiversx_sc_wasm_adapter::async_callback! { forwarder_net }
+multiversx_sc_wasm_adapter::async_callback! { mesh_node }

@@ -1,8 +1,0 @@
-[contracts.main]
-name = "forwarder-net"
-
-[[proxy]]
-path = "src/forwarder_net_proxy.rs"
-[[proxy.path-rename]]
-from = "forwarder_net"
-to = "crate"

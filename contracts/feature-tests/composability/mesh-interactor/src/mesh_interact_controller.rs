@@ -1,11 +1,9 @@
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
-    comp_interact_state::State,
+    mesh_interact_state::State,
 };
 
 use multiversx_sc_snippets::imports::*;
-
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "comp_interact_trace.scen.json";
 
 pub struct ComposabilityInteract {
     pub interactor: Interactor,
@@ -21,9 +19,7 @@ impl ComposabilityInteract {
         let gateway_config = &tree_config.gateway;
         let mut interactor = Interactor::new(&gateway_config.uri)
             .await
-            .use_chain_simulator(tree_config.gateway.use_chain_simulator())
-            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
-            .await;
+            .use_chain_simulator(tree_config.gateway.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/feature-tests/composability/interact");
         let shard_wallet_addresses = [
             interactor.register_wallet(test_wallets::for_shard(0)).await,
@@ -31,7 +27,7 @@ impl ComposabilityInteract {
             interactor.register_wallet(test_wallets::for_shard(2)).await,
         ];
         let forw_queue_code = BytesValue::interpret_from(
-            "mxsc:../forwarder-net/output/forwarder-net.mxsc.json",
+            "mxsc:../mesh-node/output/mesh-node.mxsc.json",
             &InterpreterContext::default(),
         );
 

@@ -1,9 +1,9 @@
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
-    comp_interact_controller::ComposabilityInteract,
+    mesh_interact_controller::ComposabilityInteract,
 };
 
-use forwarder_net::forwarder_net_proxy;
+use mesh_node::mesh_node_proxy;
 use multiversx_sc_snippets::imports::*;
 
 const DEPLOY_GAS_LIMIT: NumExpr = NumExpr("80,000,000");
@@ -38,7 +38,7 @@ impl ComposabilityInteract {
             let wallet = wallets.wallet_for_shard(contract.shard);
             buffer.push_tx(|tx: Tx<ScenarioTxEnvData, (), (), (), (), (), ()>| {
                 tx.from(wallet)
-                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
                     .code_metadata(CodeMetadata::PAYABLE)

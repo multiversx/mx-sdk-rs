@@ -11,7 +11,7 @@ const STATE_FILE: &str = "state.toml";
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     vault_address: Option<String>,
-    forwarder_net_address: Option<String>,
+    mesh_node_address: Option<String>,
     promises_address: Option<String>,
 }
 

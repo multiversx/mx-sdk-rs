@@ -1,10 +1,10 @@
 [package]
-name = "forwarder-net-meta"
+name = "mesh-node-meta"
 version = "0.0.0"
 edition = "2024"
 publish = false
 
-[dependencies.forwarder-net]
+[dependencies.mesh-node]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use forwarder_net::{ProgrammedCall, ProgrammedCallType, forwarder_net_proxy};
+use mesh_node::{ProgrammedCall, ProgrammedCallType, mesh_node_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig, ProgrammedCallTypeConfig},
-    comp_interact_controller::ComposabilityInteract,
+    mesh_interact_controller::ComposabilityInteract,
 };
 
 impl ComposabilityInteract {
@@ -85,7 +85,7 @@ impl ComposabilityInteract {
                 tx.from(wallet)
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
-                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .set_queued_calls(calls)
                     .returns(ReturnsStatus)
             });
@@ -151,7 +151,7 @@ impl ComposabilityInteract {
                 tx.from(wallet)
                     .to(to_addr)
                     .gas(gas_limit)
-                    .typed(forwarder_net_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .bump(IgnoreValue)
                     .returns(ReturnsStatus)
             });

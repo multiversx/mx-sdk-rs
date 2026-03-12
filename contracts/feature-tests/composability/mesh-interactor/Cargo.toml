@@ -1,5 +1,5 @@
 [package]
-name = "forwarder-net-interactor"
+name = "mesh-interactor"
 version = "0.0.0"
 authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
 edition = "2024"
@@ -7,7 +7,7 @@ publish = false
 
 [[bin]]
 name = "interact"
-path = "src/comp_interact_main.rs"
+path = "src/mesh_interact_main.rs"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -23,5 +23,5 @@ path = "../../../../framework/base"
 version = "0.65.0"
 path = "../../../../framework/snippets"
 
-[dependencies.forwarder-net]
-path = "../forwarder-net"
+[dependencies.mesh-node]
+path = "../mesh-node"

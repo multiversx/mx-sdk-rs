@@ -1,10 +1,10 @@
-use forwarder_net::{Trace, TraceName, forwarder_net_proxy};
+use mesh_node::{Trace, TraceName, mesh_node_proxy};
 use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
     call_tree_config::{CALL_TREE_FILE, CallTreeConfig},
-    comp_interact_controller::ComposabilityInteract,
+    mesh_interact_controller::ComposabilityInteract,
 };
 
 fn fmt_gas(v: u64) -> String {
@@ -49,7 +49,7 @@ impl ComposabilityInteract {
                 .interactor
                 .query()
                 .to(addr)
-                .typed(forwarder_net_proxy::ForwarderQueueProxy)
+                .typed(mesh_node_proxy::ForwarderQueueProxy)
                 .trace()
                 .returns(ReturnsResultUnmanaged)
                 .run()
