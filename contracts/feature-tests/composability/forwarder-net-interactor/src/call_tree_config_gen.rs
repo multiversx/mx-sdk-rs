@@ -5,158 +5,129 @@ use crate::call_tree_config::{
     StartCall,
 };
 
-/// Scenario 1: three root forwarders (async-v1, async-v2, sync) each calling one target,
-/// plus a direct call with no further children.
+/// Scenario 1: async-v1, async-v2 and transfer-execute each tested in three shard layouts,
+/// plus a sync call entirely within shard 2.
 ///
-/// ```toml
-/// [gateway]
-/// uri = "https://testnet-gateway.multiversx.com"
-/// chain_type = "real"
+/// The three shard variants (sender → root → target) are:
+/// - `_s222`:  2 → 2 → 2  (all in shard 2)
+/// - `_s022`:  0 → 2 → 2  (sender in shard 0, root and target in shard 2)
+/// - `_s012`:  0 → 1 → 2  (sender shard 0, root shard 1, target shard 2)
 ///
-/// [[start]]
-/// to = "async_v1_root"
-///
-/// [[start]]
-/// to = "async_v2_root"
-///
-/// [[start]]
-/// to = "sync_root"
-///
-/// [[start]]
-/// to = "direct"
-///
-/// [contracts.async_v1_root]
-///
-/// [[contracts.async_v1_root.calls]]
-/// to = "async_v1_target"
-/// call_type = "legacy_async"
-///
-/// [contracts.async_v1_target]
-///
-/// [contracts.async_v2_root]
-///
-/// [[contracts.async_v2_root.calls]]
-/// to = "async_v2_target"
-/// call_type = "promise"
-///
-/// [contracts.async_v2_target]
-///
-/// [contracts.direct]
-///
-/// [contracts.sync_root]
-///
-/// [[contracts.sync_root.calls]]
-/// to = "sync_target"
-/// call_type = "sync"
-///
-/// [contracts.sync_target]
-/// ```
+/// Call types covered: `async_v1` (legacy_async), `async_v2` (promise),
+/// `transfer_execute`, and `sync` (shard 2 only).
 pub fn scenario_1() -> CallTreeConfig {
+    struct ShardVariant {
+        suffix: &'static str,
+        sender_shard: u32,
+        root_shard: u32,
+        target_shard: u32,
+    }
+
+    let variants = [
+        ShardVariant {
+            suffix: "s222",
+            sender_shard: 2,
+            root_shard: 2,
+            target_shard: 2,
+        },
+        ShardVariant {
+            suffix: "s022",
+            sender_shard: 0,
+            root_shard: 2,
+            target_shard: 2,
+        },
+        ShardVariant {
+            suffix: "s012",
+            sender_shard: 0,
+            root_shard: 1,
+            target_shard: 2,
+        },
+    ];
+
+    let async_call_types: &[(&str, ProgrammedCallTypeConfig)] = &[
+        ("async_v1", ProgrammedCallTypeConfig::LegacyAsync),
+        ("async_v2", ProgrammedCallTypeConfig::Promise),
+        (
+            "transfer_execute",
+            ProgrammedCallTypeConfig::TransferExecute,
+        ),
+    ];
+
+    let mut start = Vec::new();
+    let mut contracts = BTreeMap::new();
+
+    for (type_name, call_type) in async_call_types {
+        for v in &variants {
+            let root_name = format!("{}_root_{}", type_name, v.suffix);
+            let target_name = format!("{}_target_{}", type_name, v.suffix);
+
+            start.push(StartCall {
+                to: root_name.clone(),
+                shard: Some(v.sender_shard.into()),
+                gas_limit: None,
+                args: Vec::new(),
+                payments: Vec::new(),
+            });
+
+            contracts.insert(
+                root_name,
+                ContractConfig {
+                    shard: Some(v.root_shard.into()),
+                    address: None,
+                    calls: vec![ProgrammedCallConfig {
+                        to: target_name.clone(),
+                        call_type: call_type.clone(),
+                        gas_limit: None,
+                        payments: Vec::new(),
+                    }],
+                },
+            );
+
+            contracts.insert(
+                target_name,
+                ContractConfig {
+                    shard: Some(v.target_shard.into()),
+                    address: None,
+                    calls: Vec::new(),
+                },
+            );
+        }
+    }
+
+    // Sync call: all in shard 2
+    start.push(StartCall {
+        to: "sync_root".to_string(),
+        shard: Some(2u32.into()),
+        gas_limit: None,
+        args: Vec::new(),
+        payments: Vec::new(),
+    });
+    contracts.insert(
+        "sync_root".to_string(),
+        ContractConfig {
+            shard: Some(2u32.into()),
+            address: None,
+            calls: vec![ProgrammedCallConfig {
+                to: "sync_target".to_string(),
+                call_type: ProgrammedCallTypeConfig::Sync,
+                gas_limit: None,
+                payments: Vec::new(),
+            }],
+        },
+    );
+    contracts.insert(
+        "sync_target".to_string(),
+        ContractConfig {
+            shard: Some(2u32.into()),
+            address: None,
+            calls: Vec::new(),
+        },
+    );
+
     CallTreeConfig {
         gateway: GatewayConfig::default(),
-        start: vec![
-            StartCall {
-                to: "async_v1_root".to_string(),
-                shard: None,
-                gas_limit: None,
-                args: Vec::new(),
-                payments: Vec::new(),
-            },
-            StartCall {
-                to: "async_v2_root".to_string(),
-                shard: None,
-                gas_limit: None,
-                args: Vec::new(),
-                payments: Vec::new(),
-            },
-            StartCall {
-                to: "sync_root".to_string(),
-                shard: None,
-                gas_limit: None,
-                args: Vec::new(),
-                payments: Vec::new(),
-            },
-            StartCall {
-                to: "direct".to_string(),
-                shard: None,
-                gas_limit: None,
-                args: Vec::new(),
-                payments: Vec::new(),
-            },
-        ],
-        contracts: BTreeMap::from([
-            (
-                "async_v1_root".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: vec![ProgrammedCallConfig {
-                        to: "async_v1_target".to_string(),
-                        call_type: ProgrammedCallTypeConfig::LegacyAsync,
-                        gas_limit: None,
-                        payments: Vec::new(),
-                    }],
-                },
-            ),
-            (
-                "async_v1_target".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: Vec::new(),
-                },
-            ),
-            (
-                "async_v2_root".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: vec![ProgrammedCallConfig {
-                        to: "async_v2_target".to_string(),
-                        call_type: ProgrammedCallTypeConfig::Promise,
-                        gas_limit: None,
-                        payments: Vec::new(),
-                    }],
-                },
-            ),
-            (
-                "async_v2_target".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: Vec::new(),
-                },
-            ),
-            (
-                "direct".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: Vec::new(),
-                },
-            ),
-            (
-                "sync_root".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: vec![ProgrammedCallConfig {
-                        to: "sync_target".to_string(),
-                        call_type: ProgrammedCallTypeConfig::Sync,
-                        gas_limit: None,
-                        payments: Vec::new(),
-                    }],
-                },
-            ),
-            (
-                "sync_target".to_string(),
-                ContractConfig {
-                    shard: None,
-                    address: None,
-                    calls: Vec::new(),
-                },
-            ),
-        ]),
+        start,
+        contracts,
     }
 }
 

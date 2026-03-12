@@ -15,6 +15,8 @@ impl ComposabilityInteract {
     pub async fn set_programmed_calls(&mut self) {
         let config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
+        println!("Setting up programmed calls from config...");
+
         // Build name → bech32 address map.
         let addr_map: HashMap<String, Bech32Address> = config
             .contracts

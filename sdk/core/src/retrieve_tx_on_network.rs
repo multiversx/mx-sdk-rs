@@ -1,3 +1,5 @@
+use core::panic;
+
 use crate::{
     data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
@@ -32,7 +34,9 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let transaction_info_with_results = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
-                            .unwrap();
+                            .unwrap_or_else(|err| {
+                                panic!("Failed to retrieve transaction {tx_hash}: {err}")
+                            });
 
                         log::info!("Transaction retrieved successfully, with status {status}",);
                         return (transaction_info_with_results, ReturnCode::Success);
@@ -48,7 +52,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         replace_with_error_message(&mut failed_transaction, &reason);
 
                         log::error!(
-                            "Transaction failed with error code: {} and message: {reason}",
+                            "Transaction {tx_hash} failed with error code: {} and message: {reason}",
                             error_code.as_u64()
                         );
 

@@ -14,6 +14,11 @@ impl ComposabilityInteract {
     pub async fn deploy_call_tree(&mut self) {
         let mut config = CallTreeConfig::load_from_file(CALL_TREE_FILE);
 
+        println!(
+            "Deploying {} call tree contracts...",
+            config.contracts.len()
+        );
+
         // Deploy all contracts in a single batch.
         let name_address_pairs = self.deploy_all(&config).await;
 
@@ -36,6 +41,7 @@ impl ComposabilityInteract {
                     .typed(forwarder_net_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
+                    .code_metadata(CodeMetadata::PAYABLE)
                     .gas(DEPLOY_GAS_LIMIT)
                     .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)

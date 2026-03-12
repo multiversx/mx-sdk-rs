@@ -3,53 +3,181 @@ uri = "https://testnet-gateway.multiversx.com"
 chain_type = "real"
 
 [[start]]
-to = "async_v1_root"
-gas_limit = 20000000
+to = "async_v1_root_s222"
+shard = 2
+gas_limit = 17000000
 
 [[start]]
-to = "async_v2_root"
-gas_limit = 20000000
+to = "async_v1_root_s022"
+shard = 0
+gas_limit = 17000000
+
+[[start]]
+to = "async_v1_root_s012"
+shard = 0
+gas_limit = 17000000
+
+[[start]]
+to = "async_v2_root_s222"
+shard = 2
+gas_limit = 17000000
+
+[[start]]
+to = "async_v2_root_s022"
+shard = 0
+gas_limit = 17000000
+
+[[start]]
+to = "async_v2_root_s012"
+shard = 0
+gas_limit = 17000000
+
+[[start]]
+to = "transfer_execute_root_s222"
+shard = 2
+gas_limit = 17000000
+
+[[start]]
+to = "transfer_execute_root_s022"
+shard = 0
+gas_limit = 17000000
+
+[[start]]
+to = "transfer_execute_root_s012"
+shard = 0
+gas_limit = 17000000
 
 [[start]]
 to = "sync_root"
-gas_limit = 20000000
+shard = 2
+gas_limit = 17000000
 
-[[start]]
-to = "direct"
-gas_limit = 5000000
+[contracts.async_v1_root_s012]
+shard = 1
+address = "erd1qqqqqqqqqqqqqpgqzd029n3yzvfqv04303rcytqgvnnaf94jqqqs0mew4e"
 
-[contracts.async_v1_root]
-address = "erd1qqqqqqqqqqqqqpgqlvg05cz7gcguczze6e58aqahg4va9z3xn54qzxn5ze"
-
-[[contracts.async_v1_root.calls]]
-to = "async_v1_target"
+[[contracts.async_v1_root_s012.calls]]
+to = "async_v1_target_s012"
 call_type = "legacy_async"
-gas_limit = 5000000
+gas_limit = 7000000
 
-[contracts.async_v1_target]
-address = "erd1qqqqqqqqqqqqqpgqx2leud6uzgsa8frxwn04py0gmdmz5nr4n54qwr87ld"
+[contracts.async_v1_root_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqwqkw6fp4z53dxj25wlpf20nn9ph7pctgqqpqqqghag"
 
-[contracts.async_v2_root]
-address = "erd1qqqqqqqqqqqqqpgqt6srgw6sknhvhnyggku9pqxnhgsa4585n54q67u678"
+[[contracts.async_v1_root_s022.calls]]
+to = "async_v1_target_s022"
+call_type = "legacy_async"
+gas_limit = 7000000
 
-[[contracts.async_v2_root.calls]]
-to = "async_v2_target"
+[contracts.async_v1_root_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqz225ttm07p4pds82jjd9meuuylmgpazlqqpqkqup4n"
+
+[[contracts.async_v1_root_s222.calls]]
+to = "async_v1_target_s222"
+call_type = "legacy_async"
+gas_limit = 7000000
+
+[contracts.async_v1_target_s012]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqthvkqk3wlvcujfazy0u5qcd2t52e97k6qqpqp568ax"
+
+[contracts.async_v1_target_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqqgc6694hykn2u3m8r00lxphgl4fvzca2qqpq5l550l"
+
+[contracts.async_v1_target_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgq9cvjxagc33aq9v4clp74qqu3vnzxg029qqpqqfptnx"
+
+[contracts.async_v2_root_s012]
+shard = 1
+address = "erd1qqqqqqqqqqqqqpgql99wmtzhr8rt3cvq3375kfu986k8m2wgqqqs2emumf"
+
+[[contracts.async_v2_root_s012.calls]]
+to = "async_v2_target_s012"
 call_type = "promise"
-gas_limit = 5000000
+gas_limit = 7000000
 
-[contracts.async_v2_target]
-address = "erd1qqqqqqqqqqqqqpgqsfehy0jwvuncuvxye7j9fxe8dv0v4qu6n54q38vk35"
+[contracts.async_v2_root_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgq5wt89yvu6fqwq967racwe0ywy8w7a4e6qqpqak64md"
 
-[contracts.direct]
-address = "erd1qqqqqqqqqqqqqpgqfrc0q33gyel046r4zfu5xvest222yygxn54qjcjgv7"
+[[contracts.async_v2_root_s022.calls]]
+to = "async_v2_target_s022"
+call_type = "promise"
+gas_limit = 7000000
+
+[contracts.async_v2_root_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgql7avssjxd5pzmq4qlpyc7qjkaqkjjwwvqqpq3yczdx"
+
+[[contracts.async_v2_root_s222.calls]]
+to = "async_v2_target_s222"
+call_type = "promise"
+gas_limit = 7000000
+
+[contracts.async_v2_target_s012]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqa3e2zpactexpfcsm0uuuyw9wwc6uunawqqpqc72r6u"
+
+[contracts.async_v2_target_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgq9nm73s5g58p8j74nurrdkzfa3c2225rgqqpqshpyed"
+
+[contracts.async_v2_target_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqmzlk0l87ytpgy4r0tr74qxaphz8dg232qqpq2cfarc"
 
 [contracts.sync_root]
-address = "erd1qqqqqqqqqqqqqpgqwk5035yev8xffcx4st79qzhdpx0ysnf6n54q7ngq59"
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqj6krx7qkc8ld7yxzaxf5ralajd2pk9fjqqpqacds49"
 
 [[contracts.sync_root.calls]]
 to = "sync_target"
 call_type = "sync"
-gas_limit = 5000000
+gas_limit = 7000000
 
 [contracts.sync_target]
-address = "erd1qqqqqqqqqqqqqpgq83spwuuh4c20qgl5au99jhhu7cylfhrmn54q3ss75h"
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqtkvlhs5u5xtpyxjl4yfsqfqvusc4kyljqqpqdm4kfy"
+
+[contracts.transfer_execute_root_s012]
+shard = 1
+address = "erd1qqqqqqqqqqqqqpgqkkvkck450akjkr6lpmhpw5yvr4hw3u2nqqqs25q83z"
+
+[[contracts.transfer_execute_root_s012.calls]]
+to = "transfer_execute_target_s012"
+call_type = "transfer_execute"
+gas_limit = 7000000
+
+[contracts.transfer_execute_root_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqse9jhnhvq8772c4t0x7fkdgw8c5yrxdjqqpq7ng97d"
+
+[[contracts.transfer_execute_root_s022.calls]]
+to = "transfer_execute_target_s022"
+call_type = "transfer_execute"
+gas_limit = 7000000
+
+[contracts.transfer_execute_root_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqp2rehs4ysjkh38pultvk772wj9gd5yjjqqpqs2y2jt"
+
+[[contracts.transfer_execute_root_s222.calls]]
+to = "transfer_execute_target_s222"
+call_type = "transfer_execute"
+gas_limit = 7000000
+
+[contracts.transfer_execute_target_s012]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqy5zjq9c2yg0m2za79s5fsfydzf9lpwncqqpqg5f4nh"
+
+[contracts.transfer_execute_target_s022]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqw750ns04hqsgmy67nm00h4ut5ndach0yqqpqtvupp3"
+
+[contracts.transfer_execute_target_s222]
+shard = 2
+address = "erd1qqqqqqqqqqqqqpgqjyxw3t8gy300hvvu8cd6d2nz0pnsuc3fqqpqer5ysm"

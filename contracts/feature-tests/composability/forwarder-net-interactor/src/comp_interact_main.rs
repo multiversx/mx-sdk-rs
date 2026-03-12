@@ -44,9 +44,7 @@ async fn main() {
         }
         Some(comp_interact_cli::InteractCliCommand::Setup) => {
             let mut interact = ComposabilityInteract::init().await;
-            println!("Deploying call tree contracts...");
             interact.deploy_call_tree().await;
-            println!("Setting up programmed calls from config...");
             interact.set_programmed_calls().await;
         }
         Some(comp_interact_cli::InteractCliCommand::Bump) => {
