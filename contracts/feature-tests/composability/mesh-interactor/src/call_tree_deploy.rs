@@ -35,12 +35,17 @@ impl ComposabilityInteract {
         let mut buffer = self.interactor.homogenous_call_buffer();
         for (name, contract) in &layout.contracts {
             let wallet = wallets.wallet_for_shard(contract.shard);
+            let code_metadata = if contract.payable.unwrap_or(false) {
+                CodeMetadata::PAYABLE
+            } else {
+                CodeMetadata::DEFAULT
+            };
             buffer.push_tx(|tx| {
                 tx.from(wallet)
                     .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
-                    .code_metadata(CodeMetadata::PAYABLE)
+                    .code_metadata(code_metadata)
                     .gas(DEPLOY_GAS_LIMIT)
                     .returns(PassValue(name.clone()))
                     .returns(ReturnsNewBech32Address)
