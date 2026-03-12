@@ -40,7 +40,7 @@
                         "value": "200"
                     }
                 ],
-                "function": "blind_async_v2",
+                "function": "blindAsyncV2",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

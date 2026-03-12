@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindTransferExecute: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindTransfExec)]
     #[payable]
     fn blind_transf_exec(
         &self,

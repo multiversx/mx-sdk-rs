@@ -1,16 +1,18 @@
 {
+    "name": "Owner drains all funds (EGLD, ESDT, NFT) from forwarder blind",
     "steps": [
         {
             "step": "setState",
             "accounts": {
-                "address:a_user": {
+                "address:owner": {
                     "nonce": "0",
                     "balance": "0"
                 },
-                "sc:vault": {
+                "sc:forwarder": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "esdt": {
+                        "str:TEST-TOKENA": "1000",
                         "str:NFT-COLLEC": {
                             "instances": [
                                 {
@@ -20,36 +22,70 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
+                    "owner": "address:owner",
                     "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
                 }
             }
         },
         {
             "step": "scCall",
-            "id": "blind_async_v1 retrieve NFT back to caller",
+            "id": "drain EGLD",
             "tx": {
-                "from": "address:a_user",
+                "from": "address:owner",
                 "to": "sc:forwarder",
-                "function": "blindAsyncV1",
+                "function": "drain",
                 "arguments": [
-                    "sc:vault",
-                    "str:retrieve_funds",
-                    "str:NFT-COLLEC",
-                    "1",
-                    "5"
+                    "str:EGLD-000000",
+                    "0"
                 ],
-                "gasLimit": "50,000,000",
+                "gasLimit": "10,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0",
-                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "drain ESDT",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:forwarder",
+                "function": "drain",
+                "arguments": [
+                    "str:TEST-TOKENA",
+                    "0"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "drain NFT",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:forwarder",
+                "function": "drain",
+                "arguments": [
+                    "str:NFT-COLLEC",
+                    "1"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -57,10 +93,11 @@
         {
             "step": "checkState",
             "accounts": {
-                "address:a_user": {
+                "address:owner": {
                     "nonce": "*",
-                    "balance": "0",
+                    "balance": "1000",
                     "esdt": {
+                        "str:TEST-TOKENA": "1000",
                         "str:NFT-COLLEC": {
                             "instances": [
                                 {
@@ -71,10 +108,11 @@
                         }
                     }
                 },
-                "sc:vault": {
+                "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
+                        "str:TEST-TOKENA": "0",
                         "str:NFT-COLLEC": {
                             "instances": [
                                 {
@@ -84,11 +122,6 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
                     "storage": {},
                     "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
                 }

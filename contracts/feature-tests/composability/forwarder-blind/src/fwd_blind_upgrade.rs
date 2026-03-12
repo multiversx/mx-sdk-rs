@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ForwarderBlindUpgrade: super::fwd_blind_common::ForwarderBlindCommon {
-    #[endpoint]
+    #[endpoint(blindUpgrade)]
     fn blind_upgrade(
         &self,
         to: ManagedAddress,
@@ -20,7 +20,7 @@ pub trait ForwarderBlindUpgrade: super::fwd_blind_common::ForwarderBlindCommon {
             .upgrade_async_call_and_exit();
     }
 
-    #[endpoint]
+    #[endpoint(blindUpgradeFromSource)]
     fn blind_upgrade_from_source(
         &self,
         sc_address: ManagedAddress,
