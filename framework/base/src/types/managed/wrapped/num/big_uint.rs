@@ -480,7 +480,7 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
-    /// Creates to a managed buffer containing the textual representation of the number.
+    /// Creates a managed buffer containing the textual representation of the number.
     pub fn to_display(&self) -> ManagedBuffer<M> {
         self.value.to_display()
     }
@@ -496,6 +496,7 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<M: ManagedTypeApi> core::fmt::Display for BigUint<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         core::fmt::Display::fmt(&self.to_display(), f)

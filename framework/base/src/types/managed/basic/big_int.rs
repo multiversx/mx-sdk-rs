@@ -401,7 +401,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
         self.clone().into_proportion(part, total)
     }
 
-    /// Creates to a managed buffer containing the textual representation of the number.
+    /// Creates a managed buffer containing the textual representation of the number.
     pub fn to_display(&self) -> ManagedBuffer<M> {
         unsafe {
             let result = ManagedBuffer::<M>::new_uninit();
@@ -421,6 +421,7 @@ impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl<M: ManagedTypeApi> core::fmt::Display for BigInt<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         core::fmt::Display::fmt(&self.to_display(), f)
