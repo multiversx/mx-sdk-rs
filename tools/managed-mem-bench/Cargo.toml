@@ -1,0 +1,12 @@
+[package]
+name = "managed-mem-bench"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies.multiversx-sc]
+version = "0.64.1"
+path = "../../framework/base"
+
+[dependencies.multiversx-sc-scenario]
+version = "0.64.1"
+path = "../../framework/scenario"
