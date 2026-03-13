@@ -44,8 +44,9 @@
                 "from": "address:digital_cash_owner_address",
                 "contractCode": "mxsc:../output/digital-cash.mxsc.json",
                 "arguments": [
-                    "10",
-                    "str:EGLD"
+                    "false",
+                    "str:EGLD-000000",
+                    "10"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
@@ -64,13 +65,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:fee|nested:str:EGLD": "10",
-                        "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
+                        "str:feesDisabled": "false",
+                        "str:baseFee|nested:str:EGLD-000000": "10"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },

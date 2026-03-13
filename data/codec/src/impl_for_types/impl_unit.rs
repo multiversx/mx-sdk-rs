@@ -15,6 +15,7 @@ impl NestedEncode for () {
 }
 
 impl NestedDecode for () {
+    #[inline]
     fn dep_decode_or_handle_err<I, H>(_input: &mut I, _h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,

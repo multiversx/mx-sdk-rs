@@ -21,7 +21,10 @@ pub trait ZombieHelper: storage::Storage {
     fn level_up(&self, zombie_id: usize) {
         let payment_amount = self.call_value().egld();
         let fee = self.level_up_fee().get();
-        require!(*payment_amount == fee, "Payment must be must be 0.001 EGLD");
+        require!(
+            *payment_amount == fee,
+            "Payment must be equal to the level up fee"
+        );
         self.zombies(&zombie_id)
             .update(|my_zombie| my_zombie.level += 1);
     }

@@ -190,7 +190,7 @@ pub trait ForwarderSyncCallModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         self.tx()
             .to(&to)

@@ -66,7 +66,7 @@ impl CrowdfundingTestState {
             .typed(crowdfunding_proxy::CrowdfundingProxy)
             .fund()
             .payment(Payment::new(
-                CF_TOKEN_ID.as_str().into(),
+                CF_TOKEN_ID,
                 0u64,
                 NonZeroBigUint::try_from(amount as u128).unwrap(),
             ))
@@ -146,7 +146,7 @@ fn test_sc_error_esdt() {
         .typed(crowdfunding_proxy::CrowdfundingProxy)
         .fund()
         .payment(Payment::new(
-            OTHER_TOKEN_ID.as_str().into(),
+            OTHER_TOKEN_ID,
             0,
             NonZeroBigUint::try_from(1000u128).unwrap(),
         ))

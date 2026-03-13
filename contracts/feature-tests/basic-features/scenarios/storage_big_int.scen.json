@@ -137,6 +137,67 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "store-negative",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "store_big_int",
+                "arguments": [
+                    "-456"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:big_int": "-456"
+                    },
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "load-negative",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "load_big_int",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-456"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

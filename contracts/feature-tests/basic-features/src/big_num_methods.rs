@@ -109,7 +109,7 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
-    fn bigint_overwrite_i64(&self, bi: BigInt, small: i64) -> BigInt {
+    fn bigint_overwrite_i64(&self, mut bi: BigInt, small: i64) -> BigInt {
         bi.overwrite_i64(small);
         bi
     }

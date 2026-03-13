@@ -590,10 +590,24 @@ where
         self.writeln("");
         self.writeln("#[type_abi]");
 
-        if macro_attributes.is_empty() {
+        // Emit standalone attributes (e.g. `#[rustfmt::skip]`) that are stored
+        // as path strings containing "::" rather than as derive trait names.
+        for attr in macro_attributes {
+            if attr.contains("::") {
+                self.writeln(format!("#[{attr}]"));
+            }
+        }
+
+        let derive_attrs: Vec<&str> = macro_attributes
+            .iter()
+            .filter(|a| !a.contains("::"))
+            .map(String::as_str)
+            .collect();
+
+        if derive_attrs.is_empty() {
             self.writeln("#[derive(TopEncode, TopDecode)]");
         } else {
-            self.writeln(format!("#[derive({})]", macro_attributes.join(", ")));
+            self.writeln(format!("#[derive({})]", derive_attrs.join(", ")));
         }
     }
 

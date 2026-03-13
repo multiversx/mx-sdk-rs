@@ -1,7 +1,7 @@
 ##############################################################################
 ### LLDB support for displaying MultiversX SpaceCraft SDK types in debug mode
 ##############################################################################
-### Version: 0.64.1
+### Version: 0.65.0
 ##############################################################################
 
 import re
@@ -74,7 +74,7 @@ INTERACTION_EXPR_PATH = "multiversx_sc::types::interaction::expr"
 TEST_SC_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_sc_address::TestSCAddress"
 TEST_ADDRESS_TYPE = f"{INTERACTION_EXPR_PATH}::test_address::TestAddress"
 TEST_TOKEN_IDENTIFIER_TYPE = (
-    f"{INTERACTION_EXPR_PATH}::test_token_identifier::TestTokenIdentifier"
+    f"{INTERACTION_EXPR_PATH}::test_token_id::TestTokenId"
 )
 
 # 7. MultiversX codec - Multi-types
@@ -597,7 +597,7 @@ class TestAddress(Handler):
         return interaction_type_as_string(buffer, "address")
 
 
-class TestTokenIdentifier(Handler):
+class TestTokenId(Handler):
     def summary(self, test_address: lldb.value) -> str:
         buffer = lldb.value(test_address.sbvalue.GetChildAtIndex(0))
         return interaction_type_as_string(buffer, "str")
@@ -641,7 +641,7 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     # 6. MultiversX interaction expression
     (TEST_SC_ADDRESS_TYPE, TestSCAddress),
     (TEST_ADDRESS_TYPE, TestAddress),
-    (TEST_TOKEN_IDENTIFIER_TYPE, TestTokenIdentifier),
+    (TEST_TOKEN_IDENTIFIER_TYPE, TestTokenId),
     # 7. MultiversX codec - Multi-types
     (OPTIONAL_VALUE_TYPE, OptionalValue),
 ]

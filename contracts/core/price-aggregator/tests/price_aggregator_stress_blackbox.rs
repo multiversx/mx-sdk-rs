@@ -34,7 +34,7 @@ fn world() -> ScenarioWorld {
 
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
-    oracles: Vec<AddressValue>,
+    oracles: Vec<Address>,
 }
 
 impl PriceAggregatorTestState {
@@ -53,23 +53,17 @@ impl PriceAggregatorTestState {
         for i in 1..=NR_ORACLES {
             let address_expr = format!("oracle{}", i);
             let address: TestAddress = TestAddress::new(address_expr.as_str());
-            let address_value = AddressValue::from(address.eval_to_expr().as_str());
 
             world.account(address).nonce(1).balance(STAKE_AMOUNT);
 
-            oracles.push(address_value);
+            oracles.push(address.to_address());
         }
 
         Self { world, oracles }
     }
 
     fn deploy(&mut self) -> &mut Self {
-        let oracles = MultiValueVec::from(
-            self.oracles
-                .iter()
-                .map(|oracle| oracle.to_address())
-                .collect::<Vec<_>>(),
-        );
+        let oracles = MultiValueVec::from(self.oracles.clone());
 
         self.world
             .tx()
@@ -90,7 +84,7 @@ impl PriceAggregatorTestState {
         for address in self.oracles.iter() {
             self.world
                 .tx()
-                .from(&address.to_address())
+                .from(address)
                 .to(PRICE_AGGREGATOR_ADDRESS)
                 .gas(5_000_000u64)
                 .typed(price_aggregator_proxy::PriceAggregatorProxy)
@@ -123,10 +117,10 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn submit(&mut self, from: &AddressValue, submission_timestamp: TimestampSeconds, price: u64) {
+    fn submit(&mut self, from: &Address, submission_timestamp: TimestampSeconds, price: u64) {
         self.world
             .tx()
-            .from(&from.to_address())
+            .from(from)
             .to(PRICE_AGGREGATOR_ADDRESS)
             .gas(7_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
@@ -198,7 +192,7 @@ fn test_price_aggregator_submit() {
             for index in 0..SUBMISSION_COUNT - 1 {
                 assert_eq!(
                     sc.oracle_status()
-                        .get(&managed_address!(&state.oracles[index].to_address()))
+                        .get(&managed_address!(&state.oracles[index]))
                         .unwrap(),
                     OracleStatus {
                         total_submissions: 1,

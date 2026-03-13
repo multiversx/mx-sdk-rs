@@ -12,7 +12,7 @@ use multiversx_chain_vm::{
         vm_hooks::VMHooksContext,
     },
     schedule::GasSchedule,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
 };
 
 use crate::executor::debug::ContractDebugInstanceState;
@@ -22,14 +22,14 @@ const ZERO_GAS_SCHEDULE: GasSchedule = GasSchedule::zeroed();
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
     pub tx_input_box: Box<TxInput>,
-    pub accounts: Mutex<HashMap<VMAddress, AccountData>>,
+    pub accounts: Mutex<HashMap<Address, AccountData>>,
     pub managed_types: Mutex<ManagedTypeContainer>,
     pub tx_result_cell: Mutex<TxResult>,
     pub block_config: BlockConfig,
 }
 
 impl SingleTxApiData {
-    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -91,7 +91,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         self.0.tx_result_cell.lock().unwrap()
     }
 
-    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
         self.0.with_account_mut(address, |account| {
             account.storage.get(key).cloned().unwrap_or_default()
         })
@@ -112,17 +112,17 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         panic!("cannot access back transfers in the SingleTxApi")
     }
 
-    fn account_data(&self, address: &VMAddress) -> Option<AccountData> {
+    fn account_data(&self, address: &Address) -> Option<AccountData> {
         Some(self.0.with_account_mut(address, |account| account.clone()))
     }
 
-    fn account_code(&self, _address: &VMAddress) -> Vec<u8> {
+    fn account_code(&self, _address: &Address) -> Vec<u8> {
         vec![]
     }
 
     fn perform_async_call(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -132,7 +132,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
 
     fn perform_execute_on_dest_context(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -142,7 +142,7 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
@@ -155,13 +155,13 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
         _contract_code: Vec<u8>,
         _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
+    ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         panic!("cannot launch contract calls in the SingleTxApi")
     }
 
     fn perform_transfer_execute(
         &mut self,
-        _to: VMAddress,
+        _to: Address,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,

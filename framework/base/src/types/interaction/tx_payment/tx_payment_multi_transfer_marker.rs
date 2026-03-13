@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env, P> TxPayment<Env> for MultiTransfer<P>
 where
@@ -73,11 +73,11 @@ where
         })
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
         let pv = self.0.as_ref();
-        FullPaymentData {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: pv.as_multi_egld_or_esdt_payment().clone(),
+            multi_esdt: pv.clone(),
         }
     }
 }

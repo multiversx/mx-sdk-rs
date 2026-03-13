@@ -2,11 +2,13 @@ use crate::{
     api::ManagedTypeApi,
     contract_base::TransferExecuteFailed,
     types::{
-        BigUint, EsdtTokenPayment, FullPaymentData, FunctionCall, ManagedAddress,
+        BigUint, EsdtTokenPayment, FunctionCall, ManagedAddress, ScenarioPayments,
         TestTokenIdentifier, TxEnv, TxFrom, TxPayment, TxToSpecified,
     },
 };
 
+/// **Deprecated:** Use [`Payment::try_new(token, nonce, amount).unwrap()`] instead.
+///
 /// Syntactic sugar for quickly writing ESDT transfers in tests.
 ///
 /// The fields are:
@@ -15,6 +17,10 @@ use crate::{
 /// 3. amount
 ///
 /// The amount is represented as u64, since for most tests it is enough.
+#[deprecated(
+    since = "0.65.0",
+    note = "Use Payment::try_new(token, nonce, amount).unwrap() instead"
+)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TestEsdtTransfer<'a>(pub TestTokenIdentifier<'a>, pub u64, pub u64);
 
@@ -23,7 +29,7 @@ where
     Api: ManagedTypeApi,
 {
     fn from(value: TestEsdtTransfer<'a>) -> Self {
-        EsdtTokenPayment::new(value.0.to_token_identifier(), value.1, value.2.into())
+        EsdtTokenPayment::new(value.0.to_esdt_token_identifier(), value.1, value.2.into())
     }
 }
 
@@ -75,7 +81,7 @@ where
         EsdtTokenPayment::from(self).with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        EsdtTokenPayment::from(self).into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        EsdtTokenPayment::from(self).into_scenario_payments(env)
     }
 }

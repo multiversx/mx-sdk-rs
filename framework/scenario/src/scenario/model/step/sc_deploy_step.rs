@@ -9,7 +9,6 @@ use crate::multiversx_sc::types::CodeMetadata;
 
 #[derive(Debug, Clone)]
 pub struct ScDeployStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
@@ -21,7 +20,6 @@ pub struct ScDeployStep {
 impl Default for ScDeployStep {
     fn default() -> Self {
         Self {
-            id: Default::default(),
             tx_id: Default::default(),
             explicit_tx_hash: Default::default(),
             comment: Default::default(),
@@ -35,6 +33,14 @@ impl Default for ScDeployStep {
 impl ScDeployStep {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn get_tx_id(&self) -> &str {
+        if let Some(tx_id) = &self.tx_id {
+            tx_id
+        } else {
+            ""
+        }
     }
 
     pub fn from<V>(mut self, expr: V) -> Self

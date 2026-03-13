@@ -32,6 +32,14 @@ pub enum Step {
     DumpState(DumpStateStep),
 }
 
+fn interpret_tx_id(id: Option<String>, tx_id: Option<String>) -> Option<String> {
+    if let Some(tx_id) = tx_id {
+        Some(tx_id)
+    } else {
+        id
+    }
+}
+
 impl InterpretableFrom<StepRaw> for Step {
     fn interpret_from(from: StepRaw, context: &InterpreterContext) -> Self {
         match from {
@@ -83,8 +91,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 tx,
                 expect,
             } => Step::ScCall(ScCallStep {
-                id,
-                tx_id,
+                tx_id: interpret_tx_id(id, tx_id),
                 comment,
                 tx: Box::new(TxCall::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
@@ -98,8 +105,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 tx,
                 expect,
             } => Step::ScQuery(ScQueryStep {
-                id,
-                tx_id,
+                tx_id: interpret_tx_id(id, tx_id),
                 comment,
                 tx: Box::new(TxQuery::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
@@ -113,8 +119,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 tx,
                 expect,
             } => Step::ScDeploy(ScDeployStep {
-                id,
-                tx_id,
+                tx_id: interpret_tx_id(id, tx_id),
                 comment,
                 tx: Box::new(TxDeploy::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
@@ -126,8 +131,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx,
             } => Step::Transfer(TransferStep {
-                id,
-                tx_id,
+                tx_id: interpret_tx_id(id, tx_id),
                 comment,
                 tx: Box::new(TxTransfer::interpret_from(tx, context)),
             }),
@@ -137,8 +141,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx,
             } => Step::ValidatorReward(ValidatorRewardStep {
-                id,
-                tx_id,
+                tx_id: interpret_tx_id(id, tx_id),
                 comment,
                 tx: Box::new(TxValidatorReward::interpret_from(tx, context)),
             }),
@@ -176,7 +179,7 @@ impl IntoRaw<StepRaw> for Step {
                 current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
             },
             Step::ScCall(s) => StepRaw::ScCall {
-                id: s.id,
+                id: None, // legacy
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -184,7 +187,7 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::ScQuery(s) => StepRaw::ScQuery {
-                id: s.id,
+                id: None, // legacy
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -192,7 +195,7 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::ScDeploy(s) => StepRaw::ScDeploy {
-                id: s.id,
+                id: None, // legacy
                 tx_id: s.tx_id,
                 comment: s.comment,
                 display_logs: None,
@@ -200,13 +203,13 @@ impl IntoRaw<StepRaw> for Step {
                 expect: s.expect.map(|expect| expect.into_raw()),
             },
             Step::Transfer(s) => StepRaw::Transfer {
-                id: s.id,
+                id: None, // legacy
                 tx_id: s.tx_id,
                 comment: s.comment,
                 tx: s.tx.into_raw(),
             },
             Step::ValidatorReward(s) => StepRaw::ValidatorReward {
-                id: s.id,
+                id: None, // legacy
                 tx_id: s.tx_id,
                 comment: s.comment,
                 tx: s.tx.into_raw(),

@@ -7,7 +7,6 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct ScQueryStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
@@ -19,7 +18,6 @@ pub struct ScQueryStep {
 impl Default for ScQueryStep {
     fn default() -> Self {
         Self {
-            id: Default::default(),
             tx_id: Default::default(),
             explicit_tx_hash: Default::default(),
             comment: Default::default(),
@@ -35,9 +33,17 @@ impl ScQueryStep {
         Self::default()
     }
 
+    pub fn get_tx_id(&self) -> &str {
+        if let Some(tx_id) = &self.tx_id {
+            tx_id
+        } else {
+            ""
+        }
+    }
+
     /// Sets the tx id for mandos.
     pub fn id(mut self, id: impl ToString) -> Self {
-        self.id = id.to_string();
+        self.tx_id = Some(id.to_string());
         self
     }
 

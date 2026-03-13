@@ -23,7 +23,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:cannot deposit funds without covering the fee cost first",
+                "message": "str:forward deposit needs to exist in advance, with fees paid",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -117,7 +117,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:invalid depositor address",
+                "message": "str:forward deposit needs to exist in advance, with fees paid",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -162,64 +162,35 @@
                     "storage": {
                         "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
                             "0-depositor_address": "address:acc2",
-                            "1-funds": "u32:1|nested:str:EGLD|u64:0|biguint:1,000",
-                            "2-valability": "u64:60",
-                            "3-expiration_round": "u64:10",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:1",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "1-funds": "u32:1|nested:str:EGLD-000000|u64:0|biguint:1,000",
+                            "2-expiration": "u64:86399_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
                             "1-funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:1",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1,000"
                         },
                         "str:deposit|0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee": {
                             "0-depositor_address": "address:acc2",
                             "1-funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
-                            "2-valability": "u64:100",
-                            "3-expiration_round": "u64:16",
-                            "4-fees": {
-                                "0-num_token_to_transfer": "u32:3",
-                                "1-value": {
-                                    "0-tokenIdentifier": "nested:str:EGLD",
-                                    "1-nonce": "u64:0",
-                                    "2-amount": "biguint:1,000"
-                                }
-                            }
+                            "2-expiration": "u64:86400_000",
+                            "3-fees": "0x01|nested:str:EGLD-000000|biguint:1000"
                         },
-                        "str:fee|nested:str:EGLD": "10",
-                        "str:whitelistedFeeTokens|str:.len": "1",
-                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:allTimeFeeTokens|str:.len": "1",
-                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
-                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1",
-                        "str:collectedFees|nested:str:EGLD": "40"
+                        "str:feesDisabled": "false",
+                        "str:baseFee|nested:str:EGLD-000000": "10",
+                        "str:collectedFees": "nested:str:EGLD-000000|biguint:40"
                     },
                     "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "998,990",
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "9",
+                    "nonce": "*",
                     "balance": "997,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
@@ -227,7 +198,7 @@
                     "storage": {}
                 },
                 "address:acc3": {
-                    "nonce": "3",
+                    "nonce": "*",
                     "balance": "999,970",
                     "esdt": {
                         "str:CASHTOKEN-112233": "50",

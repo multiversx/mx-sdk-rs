@@ -52,7 +52,7 @@ impl ScenarioVMRunner {
     {
         let tx_result = self.perform_sc_call_lambda(sc_call_step, f);
         if let Some(tx_expect) = &sc_call_step.expect {
-            check_tx_output(&sc_call_step.id, tx_expect, &tx_result);
+            check_tx_output(sc_call_step.get_tx_id(), tx_expect, &tx_result);
         }
         tx_result
     }
@@ -76,7 +76,7 @@ fn tx_input_from_call(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash(&sc_call_step.id, &sc_call_step.explicit_tx_hash),
+        tx_hash: generate_tx_hash(sc_call_step.get_tx_id(), &sc_call_step.explicit_tx_hash),
         ..Default::default()
     }
 }

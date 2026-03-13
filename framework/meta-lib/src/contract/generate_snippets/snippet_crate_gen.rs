@@ -90,7 +90,7 @@ version = "{last_release_version}"
 version = "{last_release_version}"
 
 [dependencies]
-clap = {{ version = "4.4.7", features = ["derive"] }}
+clap = {{ version = "4.4", features = ["derive"] }}
 serde = {{ version = "1.0", features = ["derive"] }}
 toml = "0.9"
 

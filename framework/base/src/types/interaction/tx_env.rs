@@ -5,6 +5,8 @@ use crate::{
 
 use super::{AnnotatedValue, TxFromSpecified};
 
+pub type TxId = alloc::string::String;
+
 pub trait TxEnv: Sized {
     type Api: CallTypeApi;
 
@@ -26,6 +28,11 @@ pub trait TxEnvMockDeployAddress: TxEnv {
 }
 
 pub trait TxEnvWithTxHash: TxEnv {
+    fn set_tx_id(&mut self, tx_id: TxId);
+
+    /// Retrieves current tx id, while resetting it in self.
+    fn take_tx_id(&mut self) -> Option<TxId>;
+
     fn set_tx_hash(&mut self, tx_hash: H256);
 
     /// Retrieves current tx hash, while resetting it in self.

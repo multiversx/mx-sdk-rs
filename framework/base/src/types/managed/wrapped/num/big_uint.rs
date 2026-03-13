@@ -4,13 +4,14 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
-        RawHandle, const_handles, use_raw_handle,
+        RawHandle, const_handles, quick_signal_error, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     contract_base::ErrorHelper,
+    err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{
         BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedBufferCachedBuilder, ManagedDecimal,
@@ -77,17 +78,22 @@ impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates a new BigUint from a BigInt without checking invariants.
+    ///
+    /// ## Safety
+    ///
+    /// The value needs to be >= 0, otherwise the invariant is broken and subtle bugs can appear.
+    pub unsafe fn new_unchecked(bi: BigInt<M>) -> Self {
+        BigUint { value: bi }
+    }
+
     /// Creates a new object, without initializing it.
     ///
     /// ## Safety
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        unsafe {
-            BigUint {
-                value: BigInt::new_uninit(),
-            }
-        }
+        unsafe { Self::new_unchecked(BigInt::new_uninit()) }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
@@ -125,8 +131,35 @@ impl<M: ManagedTypeApi> BigUint<M> {
         self.value
     }
 
+    /// Converts this `BigUint` into a `NonZeroBigUint`, returning `Some` if the value is non-zero, or `None` if it is zero.
+    ///
+    /// # Returns
+    /// - `Some(NonZeroBigUint)` if the value is non-zero.
+    /// - `None` if the value is zero.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let big = BigUint::from(5u32);
+    /// let non_zero = big.into_non_zero();
+    /// assert!(non_zero.is_some());
+    /// ```
     pub fn into_non_zero(self) -> Option<NonZeroBigUint<M>> {
         NonZeroBigUint::new(self)
+    }
+
+    /// Converts this `BigUint` into a `NonZeroBigUint`, panicking if the value is zero.
+    ///
+    /// # Panics
+    /// Panics if the value is zero.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let big = BigUint::from(5u32);
+    /// let non_zero = big.into_non_zero_or_panic();
+    /// // Succeeds if value is non-zero, panics otherwise
+    /// ```
+    pub fn into_non_zero_or_panic(self) -> NonZeroBigUint<M> {
+        NonZeroBigUint::new_or_panic(self)
     }
 }
 
@@ -294,6 +327,61 @@ impl<M: ManagedTypeApi> BigUint<M> {
         } else {
             Some(result as u32)
         }
+    }
+
+    /// Calculates proportion of this value, consuming self.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as BigUint (self * part / total)
+    ///
+    /// # Notes
+    /// Both `part` and `total` must be at most `i64::MAX`. Values exceeding this limit will cause an error.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let amount = BigUint::from(1000u32);
+    /// let result = amount.into_proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn into_proportion(self, part: u64, total: u64) -> Self {
+        let part_signed: i64 = part
+            .try_into()
+            .unwrap_or_else(|_| quick_signal_error::<M>(err_msg::PROPORTION_OVERFLOW_ERR));
+        let total_signed: i64 = total
+            .try_into()
+            .unwrap_or_else(|_| quick_signal_error::<M>(err_msg::PROPORTION_OVERFLOW_ERR));
+
+        // mathematically, the result of this operation cannot be negative, so it is safe to skip sign check
+        unsafe {
+            Self::new_unchecked(
+                self.into_big_int()
+                    .into_proportion(part_signed, total_signed),
+            )
+        }
+    }
+
+    /// Calculates proportion of this value.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (e.g., 1000 for 1% when total is 100000)
+    /// * `total` - The denominator value for the ratio calculation (e.g., 100 for percentage, 100000 for basis points)
+    ///
+    /// # Returns
+    /// The proportional amount as BigUint (self * part / total)
+    ///
+    /// # Notes
+    /// Both `part` and `total` must be at most `i64::MAX`. Values exceeding this limit will cause an error.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let amount = BigUint::from(1000u32);
+    /// let result = amount.proportion(5u32, 100u32); // 5/100 of 1000 = 50
+    /// ```
+    pub fn proportion(&self, part: u64, total: u64) -> Self {
+        self.clone().into_proportion(part, total)
     }
 
     /// Natural logarithm of a number.

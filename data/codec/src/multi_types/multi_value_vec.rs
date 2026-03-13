@@ -113,3 +113,95 @@ where
         Ok(Self(result_vec))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloc::vec;
+
+    #[test]
+    fn new_is_empty() {
+        let mv: MultiValueVec<u32> = MultiValueVec::new();
+        assert!(mv.is_empty());
+        assert_eq!(mv.len(), 0);
+    }
+
+    #[test]
+    fn from_vec() {
+        let mv = MultiValueVec::from(vec![1u32, 2, 3]);
+        assert_eq!(mv.len(), 3);
+        assert_eq!(mv.as_slice(), &[1, 2, 3]);
+    }
+
+    #[test]
+    fn from_array() {
+        let mv = MultiValueVec::from([10u64, 20, 30]);
+        assert_eq!(mv.len(), 3);
+        assert_eq!(mv.as_slice(), &[10, 20, 30]);
+    }
+
+    #[test]
+    fn into_vec_round_trip() {
+        let original = vec![5u8, 10, 15, 20];
+        let mv = MultiValueVec::from(original.clone());
+        assert_eq!(mv.into_vec(), original);
+    }
+
+    #[test]
+    fn push_and_len() {
+        let mut mv = MultiValueVec::new();
+        mv.push(1u32);
+        mv.push(2);
+        mv.push(3);
+        assert_eq!(mv.len(), 3);
+        assert!(!mv.is_empty());
+        assert_eq!(mv.as_slice(), &[1, 2, 3]);
+    }
+
+    #[test]
+    fn iter() {
+        let mv = MultiValueVec::from(vec![10u32, 20, 30]);
+        let sum: u32 = mv.iter().sum();
+        assert_eq!(sum, 60);
+    }
+
+    #[test]
+    fn from_iterator() {
+        let mv: MultiValueVec<u32> = (1..=5).collect();
+        assert_eq!(mv.as_slice(), &[1, 2, 3, 4, 5]);
+    }
+
+    #[test]
+    fn clone_and_eq() {
+        let mv = MultiValueVec::from(vec![1u32, 2, 3]);
+        let mv_clone = mv.clone();
+        assert_eq!(mv, mv_clone);
+    }
+
+    #[test]
+    fn ne() {
+        let mv1 = MultiValueVec::from(vec![1u32, 2]);
+        let mv2 = MultiValueVec::from(vec![1u32, 3]);
+        assert_ne!(mv1, mv2);
+    }
+
+    #[test]
+    fn debug_format() {
+        let mv = MultiValueVec::from(vec![42u32]);
+        let debug_str = alloc::format!("{:?}", mv);
+        assert!(debug_str.contains("42"));
+    }
+
+    #[test]
+    fn default_is_empty() {
+        let mv: MultiValueVec<i64> = MultiValueVec::default();
+        assert!(mv.is_empty());
+        assert_eq!(mv.into_vec(), Vec::<i64>::new());
+    }
+
+    #[test]
+    fn from_empty_array() {
+        let mv = MultiValueVec::from([0u8; 0]);
+        assert!(mv.is_empty());
+    }
+}

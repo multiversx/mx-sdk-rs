@@ -73,7 +73,7 @@ fn test_staking_module() {
             whitelist.push(SALLY_ADDRESS.to_managed_address());
 
             sc.init_staking_module(
-                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID.to_token_identifier()),
+                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID.to_esdt_token_identifier()),
                 &BigUint::from(REQUIRED_STAKE_AMOUNT),
                 &BigUint::from(SLASH_AMOUNT),
                 QUORUM,
@@ -88,7 +88,7 @@ fn test_staking_module() {
         .tx()
         .from(EVE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .returns(ExpectError(4u64, "Only whitelisted members can stake"))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
@@ -99,11 +99,7 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(
-            STAKING_TOKEN_ID,
-            0,
-            REQUIRED_STAKE_AMOUNT / 2,
-        ))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT / 2).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -122,7 +118,7 @@ fn test_staking_module() {
         .tx()
         .from(BOB_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -131,7 +127,7 @@ fn test_staking_module() {
         .tx()
         .from(CAROL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -140,7 +136,7 @@ fn test_staking_module() {
         .tx()
         .from(PAUL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -149,7 +145,7 @@ fn test_staking_module() {
         .tx()
         .from(SALLY_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -179,7 +175,7 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
             let alice_staked_amount = sc.staked_amount(&ALICE_ADDRESS.to_managed_address()).get();
