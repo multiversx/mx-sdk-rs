@@ -55,7 +55,10 @@ fn main() {
     println!(
         "After creating {NUM_BUFFERS} x {BUFFER_SIZE}-byte ManagedBuffers: {after_create} bytes"
     );
-    println!("  Net increase:              {} bytes", after_create - baseline);
+    println!(
+        "  Net increase:              {} bytes",
+        after_create - baseline
+    );
 
     // --- Phase 2: drop the Rust-side handles ---
     // The actual data remains inside the ManagedTypeContainer (VM-managed).
