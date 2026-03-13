@@ -16,6 +16,28 @@ fn assert_big_int_proportion(total: i64, part: i64, denom: i64, expected: i64) {
 }
 
 #[test]
+fn test_big_int_display() {
+    assert_eq!(BigInt::<StaticApi>::from(0).to_string(), "0");
+    assert_eq!(BigInt::<StaticApi>::from(1).to_string(), "1");
+    assert_eq!(BigInt::<StaticApi>::from(-1).to_string(), "-1");
+    assert_eq!(BigInt::<StaticApi>::from(42).to_string(), "42");
+    assert_eq!(BigInt::<StaticApi>::from(-42).to_string(), "-42");
+    assert_eq!(BigInt::<StaticApi>::from(1000000).to_string(), "1000000");
+    assert_eq!(BigInt::<StaticApi>::from(-1000000).to_string(), "-1000000");
+    assert_eq!(
+        BigInt::<StaticApi>::from(i64::MAX).to_string(),
+        i64::MAX.to_string()
+    );
+    assert_eq!(
+        BigInt::<StaticApi>::from(i64::MIN).to_string(),
+        i64::MIN.to_string()
+    );
+    // format! also uses Display
+    assert_eq!(format!("{}", BigInt::<StaticApi>::from(123)), "123");
+    assert_eq!(format!("{}", BigInt::<StaticApi>::from(-123)), "-123");
+}
+
+#[test]
 fn test_big_int_proportion_all() {
     assert_big_int_proportion(1000, 0, 100, 0);
     assert_big_int_proportion(1000, 25, 100, 250);
