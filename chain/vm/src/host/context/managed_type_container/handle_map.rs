@@ -197,7 +197,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = "attempting to remove non-existing handle 42, this is a memory managedment issue"
+        expected = "attempting to remove non-existing handle 42, this is a memory management issue"
     )]
     fn test_remove_non_existent_handle_panics() {
         let mut map: HandleMap<i32> = HandleMap::new();
@@ -206,7 +206,7 @@ mod tests {
 
     #[test]
     #[should_panic(
-        expected = "attempting to remove non-existing handle 0, this is a memory managedment issue"
+        expected = "attempting to remove non-existing handle 0, this is a memory management issue"
     )]
     fn test_remove_already_removed_handle_panics() {
         let mut map = HandleMap::new();
