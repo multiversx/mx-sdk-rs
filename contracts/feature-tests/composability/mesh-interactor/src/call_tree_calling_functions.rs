@@ -72,8 +72,6 @@ impl ComposabilityInteract {
                     call_type,
                     to: ManagedAddress::from(child_addr),
                     gas_limit,
-                    endpoint_name: ManagedBuffer::from(b"bump"),
-                    args: ManagedArgBuffer::new(),
                     payments: ManagedVec::new(),
                 });
             }

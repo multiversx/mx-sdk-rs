@@ -23,8 +23,6 @@ pub struct ProgrammedCall<M: ManagedTypeApi> {
     pub call_type: ProgrammedCallType,
     pub to: ManagedAddress<M>,
     pub gas_limit: u64,
-    pub endpoint_name: ManagedBuffer<M>,
-    pub args: ManagedArgBuffer<M>,
     pub payments: PaymentVec<M>,
 }
 
@@ -129,7 +127,6 @@ pub trait ForwarderQueue {
             ProgrammedCallType::AsyncV2 => {
                 contract_call
                     .gas(call.gas_limit)
-                    .arguments_raw(call.args)
                     .callback(self.callbacks().async_v2_callback(&child_call_trace))
                     .register_promise();
             }
