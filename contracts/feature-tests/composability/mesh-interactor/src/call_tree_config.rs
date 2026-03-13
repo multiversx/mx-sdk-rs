@@ -97,9 +97,9 @@ impl InteractConfig {
 pub enum ProgrammedCallTypeConfig {
     #[default]
     Sync,
-    LegacyAsync,
+    AsyncV1,
+    AsyncV2,
     TransfExec,
-    Promise,
 }
 
 /// A token payment attached to a call.
@@ -151,12 +151,12 @@ pub struct StartCall {
 }
 
 impl StartCall {
-    pub fn new(to: impl Into<String>, shard: u32) -> Self {
+    pub fn new(to: impl Into<String>, shard: u32, payments: Vec<PaymentConfig>) -> Self {
         StartCall {
             to: to.into(),
             shard: Some(ShardId::from(shard)),
             gas_limit: None,
-            payments: Vec::new(),
+            payments,
             wallet: None,
         }
     }

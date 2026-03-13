@@ -14,9 +14,6 @@ use mesh_interact_controller::ComposabilityInteract;
 mod mesh_interact_controller;
 use multiversx_sc_snippets::imports::*;
 
-const ASYNC_SHARDED_LAYOUT: &str = "layouts/async_sharded.toml";
-const TRANSF_EXEC_SHARDED_LAYOUT: &str = "layouts/transf_exec_sharded.toml";
-const SYNC_CHAIN_LAYOUT: &str = "layouts/sync_chain.toml";
 
 #[tokio::main]
 async fn main() {
@@ -26,22 +23,7 @@ async fn main() {
 
     match &cli.command {
         Some(mesh_interact_cli::InteractCliCommand::Generate { n }) => {
-            std::fs::create_dir_all("layouts").expect("failed to create layouts/ directory");
-
-            let mut async_sharded = call_tree_config_gen::async_sharded();
-            async_sharded.fill_gas_estimates();
-            async_sharded.save_to_file(ASYNC_SHARDED_LAYOUT);
-            println!("Async sharded layout saved to {ASYNC_SHARDED_LAYOUT}");
-
-            let mut transf_exec_sharded = call_tree_config_gen::transf_exec_sharded();
-            transf_exec_sharded.fill_gas_estimates();
-            transf_exec_sharded.save_to_file(TRANSF_EXEC_SHARDED_LAYOUT);
-            println!("Transfer-execute sharded layout saved to {TRANSF_EXEC_SHARDED_LAYOUT}");
-
-            let mut sync_chain = call_tree_config_gen::sync_chain(*n);
-            sync_chain.fill_gas_estimates();
-            sync_chain.save_to_file(SYNC_CHAIN_LAYOUT);
-            println!("Sync chain layout (n={n}) saved to {SYNC_CHAIN_LAYOUT}");
+            call_tree_config_gen::generate_layouts(*n);
         }
         Some(mesh_interact_cli::InteractCliCommand::UpdateGas) => {
             let mut interact = ComposabilityInteract::init().await;

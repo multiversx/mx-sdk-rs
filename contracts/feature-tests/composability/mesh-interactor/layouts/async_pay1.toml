@@ -4,7 +4,6 @@
 to = "async_v1_root_s222"
 shard = 2
 gas_limit = 19000000
-wallet = "erd1t63lx7924204rnhhvzfmvtssg8ysks2szm06f9mq675yd2xeqqpqrcqe86"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -15,7 +14,6 @@ amount = "23000000"
 to = "async_v1_root_s022"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -26,7 +24,6 @@ amount = "23000000"
 to = "async_v1_root_s012"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -37,7 +34,6 @@ amount = "23000000"
 to = "async_v1_root_s010"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -48,7 +44,6 @@ amount = "23000000"
 to = "async_v2_root_s222"
 shard = 2
 gas_limit = 19000000
-wallet = "erd1t63lx7924204rnhhvzfmvtssg8ysks2szm06f9mq675yd2xeqqpqrcqe86"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -59,7 +54,6 @@ amount = "23000000"
 to = "async_v2_root_s022"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -70,7 +64,6 @@ amount = "23000000"
 to = "async_v2_root_s012"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -81,7 +74,6 @@ amount = "23000000"
 to = "async_v2_root_s010"
 shard = 0
 gas_limit = 19000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
 
 [[start.payments]]
 token_id = "EGLD-000000"
@@ -90,7 +82,6 @@ amount = "23000000"
 
 [contracts.async_v1_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq294ah8fm63aszg8fmqcrdy56r47ttf2nqqqsplp08y"
 
 [[contracts.async_v1_root_s010.calls]]
 to = "async_v1_target_s010"
@@ -104,7 +95,6 @@ amount = "12000000"
 
 [contracts.async_v1_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq239l9f384ew9hp3utt4l46yzhqszvr6zqqqsgpwmcy"
 
 [[contracts.async_v1_root_s012.calls]]
 to = "async_v1_target_s012"
@@ -118,7 +108,6 @@ amount = "12000000"
 
 [contracts.async_v1_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqquxg503ztgenmsu2zukhulvc8te2jhc3qqpq272vgn"
 
 [[contracts.async_v1_root_s022.calls]]
 to = "async_v1_target_s022"
@@ -132,7 +121,6 @@ amount = "12000000"
 
 [contracts.async_v1_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqgp5uhhsgxw2938k2h6ejf8g8xg5kxmylqqpqfxvsr4"
 
 [[contracts.async_v1_root_s222.calls]]
 to = "async_v1_target_s222"
@@ -146,23 +134,18 @@ amount = "12000000"
 
 [contracts.async_v1_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqz993elnktpnj8eqtfrhenlkh62dc5mnhqqpqexf647"
 
 [contracts.async_v1_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqavgfj3p9wge0h595tdqsrzjwg5dex63nqqpq69vgqf"
 
 [contracts.async_v1_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqqcjk3gsmnndsjnefftg4l5ysmkr2ut60qqpqa5pfjm"
 
 [contracts.async_v1_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqkcamn53s38ann7mg998s9xl9kansjd6qqqpqydn9jr"
 
 [contracts.async_v2_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgql9ywtp0guuzfewn9kwjfd269n5x5chtuqqqsfumdfg"
 
 [[contracts.async_v2_root_s010.calls]]
 to = "async_v2_target_s010"
@@ -176,7 +159,6 @@ amount = "12000000"
 
 [contracts.async_v2_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqu0d50xylf6rnrzkl3krmln8wacs0lztxqqqsk83286"
 
 [[contracts.async_v2_root_s012.calls]]
 to = "async_v2_target_s012"
@@ -190,7 +172,6 @@ amount = "12000000"
 
 [contracts.async_v2_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqp9gngwxd4l04wa32t7u98eh29y3rcfldqqpqgv5w8n"
 
 [[contracts.async_v2_root_s022.calls]]
 to = "async_v2_target_s022"
@@ -204,7 +185,6 @@ amount = "12000000"
 
 [contracts.async_v2_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq2fhghc7p7u2aj8kvcllp8u4ss8pcedjqqqpqm56rg2"
 
 [[contracts.async_v2_root_s222.calls]]
 to = "async_v2_target_s222"
@@ -218,16 +198,12 @@ amount = "12000000"
 
 [contracts.async_v2_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq69hgl30e0zfka57geduwsmez3n8uljjaqqpq072x4t"
 
 [contracts.async_v2_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqqhhedx3pqc2z6h7lr6uypk906lt6g22nqqpq9xrkst"
 
 [contracts.async_v2_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqrqrfchdqn0j8x7hhpmwf46l4sg0qlcqwqqpquyl0ut"
 
 [contracts.async_v2_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqhreljfzvzpvugx802pjyzn2sujfwp5f7qqpqmtx0qc"

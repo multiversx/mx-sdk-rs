@@ -7,6 +7,18 @@ use crate::{
     mesh_interact_controller::ComposabilityInteract,
 };
 
+fn fmt_payments(payments: &multiversx_sc_snippets::imports::PaymentVec<StaticApi>) -> String {
+    let mut out = String::from("[");
+    for (i, p) in payments.iter().enumerate() {
+        if i > 0 {
+            out.push_str(", ");
+        }
+        out.push_str(&format!("{}:{}:{}", p.token_identifier, p.token_nonce, p.amount));
+    }
+    out.push(']');
+    out
+}
+
 fn fmt_gas(v: u64) -> String {
     let s = v.to_string();
     let mut out = String::new();
@@ -47,6 +59,26 @@ impl ComposabilityInteract {
 
         for (name, addr) in contracts_with_addresses {
             println!("\n=== Contract '{name}' @ {addr} ===");
+
+            let account = self.interactor.get_account(&addr.to_address()).await;
+            let esdts = self
+                .interactor
+                .get_account_esdt(&addr.to_address())
+                .await;
+            let mut balances: Vec<String> = Vec::new();
+            if account.balance != "0" {
+                balances.push(format!("EGLD={}", account.balance));
+            }
+            let mut esdt_list: Vec<_> = esdts.into_values().collect();
+            esdt_list.sort_by(|a, b| a.token_identifier.cmp(&b.token_identifier));
+            for esdt in &esdt_list {
+                if esdt.balance != "0" {
+                    balances.push(format!("{}={}", esdt.token_identifier, esdt.balance));
+                }
+            }
+            if !balances.is_empty() {
+                println!("  balance: {}", balances.join(" "));
+            }
 
             let trace: MultiValueVec<Trace<StaticApi>> = self
                 .interactor
@@ -95,6 +127,12 @@ impl ComposabilityInteract {
                             }
                         }
                         print!("]");
+                    }
+                    if !entry.call_value.is_empty() {
+                        print!(" cv: {}", fmt_payments(&entry.call_value));
+                    }
+                    if !entry.back_transfers.is_empty() {
+                        print!(" bt: {}", fmt_payments(&entry.back_transfers));
                     }
                     println!();
                 }

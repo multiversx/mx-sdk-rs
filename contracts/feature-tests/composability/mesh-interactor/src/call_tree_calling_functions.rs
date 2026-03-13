@@ -4,7 +4,7 @@ use mesh_node::{ProgrammedCall, ProgrammedCallType, mesh_node_proxy};
 use multiversx_sc_snippets::imports::*;
 
 use crate::{
-    call_tree_config::{CallTreeLayout, ProgrammedCallTypeConfig, STATE_FILE},
+    call_tree_config::{CallTreeLayout, PaymentConfig, ProgrammedCallTypeConfig, STATE_FILE},
     mesh_interact_controller::ComposabilityInteract,
 };
 
@@ -72,7 +72,7 @@ impl ComposabilityInteract {
                     call_type,
                     to: ManagedAddress::from(child_addr),
                     gas_limit,
-                    payments: ManagedVec::new(),
+                    payments: to_payment_vec(&child_call.payments),
                 });
             }
 
@@ -155,12 +155,14 @@ impl ComposabilityInteract {
                 start_call.to, to_addr,
             );
 
+            let start_payments = to_payment_vec(&start_call.payments);
             buffer.push_tx(|tx| {
                 tx.from(wallet)
                     .to(to_addr)
                     .gas(gas_limit)
                     .typed(mesh_node_proxy::ForwarderQueueProxy)
                     .bump(IgnoreValue)
+                    .payment(start_payments)
                     .returns(ReturnsStatus)
             });
         }
@@ -176,11 +178,24 @@ impl ComposabilityInteract {
     }
 }
 
+fn to_payment_vec(configs: &[PaymentConfig]) -> PaymentVec<StaticApi> {
+    use multiversx_sc::codec::num_bigint::BigUint as RustBigUint;
+    let mut vec = ManagedVec::new();
+    for p in configs {
+        let rust_amount: RustBigUint = p.amount.parse().expect("invalid payment amount");
+        let amount = BigUint::<StaticApi>::from(rust_amount);
+        let payment =
+            Payment::try_new(p.token_id.as_str(), p.nonce, amount).expect("payment amount is zero");
+        vec.push(payment);
+    }
+    vec
+}
+
 fn to_queued_call_type(call_type: &ProgrammedCallTypeConfig) -> ProgrammedCallType {
     match call_type {
         ProgrammedCallTypeConfig::Sync => ProgrammedCallType::Sync,
-        ProgrammedCallTypeConfig::LegacyAsync => ProgrammedCallType::AsyncV1,
+        ProgrammedCallTypeConfig::AsyncV1 => ProgrammedCallType::AsyncV1,
+        ProgrammedCallTypeConfig::AsyncV2 => ProgrammedCallType::AsyncV2,
         ProgrammedCallTypeConfig::TransfExec => ProgrammedCallType::TransferExecute,
-        ProgrammedCallTypeConfig::Promise => ProgrammedCallType::AsyncV2,
     }
 }

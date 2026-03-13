@@ -4,7 +4,7 @@ use crate::call_tree_config::CallTreeLayout;
 const PER_EXECUTION_GAS: u64 = 7_000_000;
 
 /// Additional gas reserved by the caller for each outgoing call it makes.
-const PER_CALL_GAS: u64 = 3_000_000;
+const PER_CALL_GAS: u64 = 5_000_000;
 
 impl CallTreeLayout {
     /// Recursively computes the gas needed when calling contract `name`.

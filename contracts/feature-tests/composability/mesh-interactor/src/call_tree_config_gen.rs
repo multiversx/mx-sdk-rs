@@ -3,8 +3,39 @@ use std::collections::BTreeMap;
 use multiversx_sc::types::ShardId;
 
 use crate::call_tree_config::{
-    CallTreeLayout, ContractConfig, ProgrammedCallConfig, ProgrammedCallTypeConfig, StartCall,
+    CallTreeLayout, ContractConfig, PaymentConfig, ProgrammedCallConfig, ProgrammedCallTypeConfig,
+    StartCall,
 };
+
+const LAYOUTS: &str = "layouts";
+const ASYNC_LAYOUT: &str = "layouts/async.toml";
+const ASYNC_PAY_LAYOUT: &str = "layouts/async_pay1.toml";
+const TRANSF_EXEC_SHARDED_LAYOUT: &str = "layouts/transf_exec_sharded.toml";
+const SYNC_CHAIN_LAYOUT: &str = "layouts/sync_chain.toml";
+
+pub fn generate_layouts(n: usize) {
+    std::fs::create_dir_all(LAYOUTS).expect("failed to create layouts/ directory");
+
+    let mut async_sharded = async_no_payment();
+    async_sharded.fill_gas_estimates();
+    async_sharded.save_to_file(ASYNC_LAYOUT);
+    println!("Async sharded layout saved to {ASYNC_LAYOUT}");
+
+    let mut async_pay = async_with_payments();
+    async_pay.fill_gas_estimates();
+    async_pay.save_to_file(ASYNC_PAY_LAYOUT);
+    println!("Async sharded layout with payments saved to {ASYNC_PAY_LAYOUT}");
+
+    let mut transf_exec_sharded = transf_exec();
+    transf_exec_sharded.fill_gas_estimates();
+    transf_exec_sharded.save_to_file(TRANSF_EXEC_SHARDED_LAYOUT);
+    println!("Transfer-execute sharded layout saved to {TRANSF_EXEC_SHARDED_LAYOUT}");
+
+    let mut sync_chain = sync_chain(n);
+    sync_chain.fill_gas_estimates();
+    sync_chain.save_to_file(SYNC_CHAIN_LAYOUT);
+    println!("Sync chain layout (n={n}) saved to {SYNC_CHAIN_LAYOUT}");
+}
 
 struct ShardVariant {
     suffix: &'static str,
@@ -42,21 +73,22 @@ fn three_shard_variants() -> [ShardVariant; 4] {
     ]
 }
 
-/// Scenario 1: async-v1 and async-v2 each tested in three shard layouts,
-/// plus a sync call entirely within shard 2.
+/// Scenario 1: async-v1 and async-v2 each tested in three shard layouts.
 ///
 /// The three shard variants (sender → root → target) are:
 /// - `_s222`:  2 → 2 → 2  (all in shard 2)
 /// - `_s022`:  0 → 2 → 2  (sender in shard 0, root and target in shard 2)
 /// - `_s012`:  0 → 1 → 2  (sender shard 0, root shard 1, target shard 2)
 ///
-/// Call types covered: `async_v1` (legacy_async), `async_v2` (promise),
-/// and `sync` (shard 2 only).
-pub fn async_sharded() -> CallTreeLayout {
+/// Call types covered: `async_v1` (legacy_async) and `async_v2` (promise).
+fn async_impl(
+    start_payments: Vec<PaymentConfig>,
+    call_payments: Vec<PaymentConfig>,
+) -> CallTreeLayout {
     let variants = three_shard_variants();
     let async_call_types: &[(&str, ProgrammedCallTypeConfig)] = &[
-        ("async_v1", ProgrammedCallTypeConfig::LegacyAsync),
-        ("async_v2", ProgrammedCallTypeConfig::Promise),
+        ("async_v1", ProgrammedCallTypeConfig::AsyncV1),
+        ("async_v2", ProgrammedCallTypeConfig::AsyncV2),
     ];
 
     let mut start = Vec::new();
@@ -67,7 +99,11 @@ pub fn async_sharded() -> CallTreeLayout {
             let root_name = format!("{}_root_{}", type_name, v.suffix);
             let target_name = format!("{}_target_{}", type_name, v.suffix);
 
-            start.push(StartCall::new(root_name.clone(), v.sender_shard));
+            start.push(StartCall::new(
+                root_name.clone(),
+                v.sender_shard,
+                start_payments.clone(),
+            ));
 
             contracts.insert(
                 root_name,
@@ -79,7 +115,7 @@ pub fn async_sharded() -> CallTreeLayout {
                         to: target_name.clone(),
                         call_type: call_type.clone(),
                         gas_limit: None,
-                        payments: Vec::new(),
+                        payments: call_payments.clone(),
                     }],
                 },
             );
@@ -99,13 +135,34 @@ pub fn async_sharded() -> CallTreeLayout {
     CallTreeLayout { start, contracts }
 }
 
+/// Async-v1 and async-v2, three shard layouts, no payments.
+pub fn async_no_payment() -> CallTreeLayout {
+    async_impl(Vec::new(), Vec::new())
+}
+
+/// Async-v1 and async-v2, three shard layouts, with an EGLD payment forwarded on each async call.
+pub fn async_with_payments() -> CallTreeLayout {
+    async_impl(
+        vec![PaymentConfig {
+            token_id: "EGLD-000000".to_string(),
+            nonce: 0,
+            amount: "23000000".to_string(),
+        }],
+        vec![PaymentConfig {
+            token_id: "EGLD-000000".to_string(),
+            nonce: 0,
+            amount: "12000000".to_string(),
+        }],
+    )
+}
+
 /// Transfer-execute tested in three shard layouts.
 ///
 /// The three shard variants (sender → root → target) are:
 /// - `_s222`:  2 → 2 → 2  (all in shard 2)
 /// - `_s022`:  0 → 2 → 2  (sender in shard 0, root and target in shard 2)
 /// - `_s012`:  0 → 1 → 2  (sender shard 0, root shard 1, target shard 2)
-pub fn transf_exec_sharded() -> CallTreeLayout {
+pub fn transf_exec() -> CallTreeLayout {
     let variants = three_shard_variants();
 
     let mut start = Vec::new();
@@ -115,7 +172,7 @@ pub fn transf_exec_sharded() -> CallTreeLayout {
         let root_name = format!("transf_exec_root_{}", v.suffix);
         let target_name = format!("transf_exec_target_{}", v.suffix);
 
-        start.push(StartCall::new(root_name.clone(), v.sender_shard));
+        start.push(StartCall::new(root_name.clone(), v.sender_shard, Vec::new()));
 
         contracts.insert(
             root_name,
@@ -154,7 +211,7 @@ pub fn transf_exec_sharded() -> CallTreeLayout {
 pub fn sync_chain(n: usize) -> CallTreeLayout {
     assert!(n >= 1, "chain length must be at least 1");
 
-    let start = vec![StartCall::new(format!("s2_{}", n - 1), 2)];
+    let start = vec![StartCall::new(format!("s2_{}", n - 1), 2, Vec::new())];
 
     let mut contracts = BTreeMap::new();
     for i in 0..n {

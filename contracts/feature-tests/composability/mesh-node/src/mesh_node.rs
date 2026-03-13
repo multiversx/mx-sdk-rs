@@ -49,6 +49,8 @@ pub struct Trace<M: ManagedTypeApi> {
     pub initial_gas: u64,
     pub final_gas: u64,
     pub input: ManagedVec<M, TraceItem<M>>,
+    pub call_value: PaymentVec<M>,
+    pub back_transfers: PaymentVec<M>,
     pub results: ManagedVec<M, ManagedBuffer<M>>,
 }
 
@@ -82,12 +84,15 @@ pub trait ForwarderQueue {
     #[payable]
     fn bump(&self, call_trace: MultiValueManagedVec<TraceItem<Self::Api>>) {
         let initial_gas = self.blockchain().get_gas_left();
+        let call_value = self.call_value().all();
         let trace_index = self.trace().push(&Trace {
             location: TraceName::Bump,
             block_nonce: self.blockchain().get_block_nonce(),
             initial_gas,
             final_gas: 0,
             input: call_trace.as_vec().clone(),
+            call_value: call_value.clone(),
+            back_transfers: PaymentVec::new(),
             results: ManagedVec::new(),
         });
         let calls = self.programmed_calls().get();
@@ -142,37 +147,27 @@ pub trait ForwarderQueue {
     fn callback_body(
         &self,
         call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>,
-        result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
+        result: MultiValueEncoded<ManagedBuffer>,
     ) {
-        match result {
-            ManagedAsyncCallResult::Ok(result) => {
-                self.trace().push(&Trace {
-                    location: TraceName::AsyncV1CallbackOk,
-                    block_nonce: self.blockchain().get_block_nonce(),
-                    initial_gas: 0,
-                    final_gas: 0,
-                    input: call_trace.as_vec().clone(),
-                    results: result.into_vec_of_buffers(),
-                });
-            }
-            ManagedAsyncCallResult::Err(err) => {
-                self.trace().push(&Trace {
-                    location: TraceName::AsyncV1CallbackErr,
-                    block_nonce: self.blockchain().get_block_nonce(),
-                    initial_gas: 0,
-                    final_gas: 0,
-                    input: call_trace.as_vec().clone(),
-                    results: [err.err_code.to_be_bytes().into(), err.err_msg].into(),
-                });
-            }
-        }
+        let call_value = self.call_value().all();
+        let back_payments = self.blockchain().get_back_transfers();
+        self.trace().push(&Trace {
+            location: TraceName::AsyncV1CallbackOk,
+            block_nonce: self.blockchain().get_block_nonce(),
+            initial_gas: 0,
+            final_gas: 0,
+            input: call_trace.as_vec().clone(),
+            call_value: call_value.clone(),
+            back_transfers: back_payments.into_payment_vec(),
+            results: result.into_vec_of_buffers(),
+        });
     }
 
     #[callback]
     fn async_v1_callback(
         &self,
         call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>,
-        #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
+        #[call_result] result: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.callback_body(call_trace, result);
     }
@@ -181,7 +176,7 @@ pub trait ForwarderQueue {
     fn async_v2_callback(
         &self,
         call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>,
-        #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
+        #[call_result] result: MultiValueEncoded<ManagedBuffer>,
     ) {
         self.callback_body(call_trace, result);
     }
