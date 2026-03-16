@@ -90,7 +90,7 @@ amount = "23000000"
 
 [contracts.async_v1_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq294ah8fm63aszg8fmqcrdy56r47ttf2nqqqsplp08y"
+address = "erd1qqqqqqqqqqqqqpgqugpnxdjdk2ffaj5cqq4f2xtjtwkrze5wqqqs0uy465"
 
 [[contracts.async_v1_root_s010.calls]]
 to = "async_v1_target_s010"
@@ -104,7 +104,7 @@ amount = "12000000"
 
 [contracts.async_v1_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq239l9f384ew9hp3utt4l46yzhqszvr6zqqqsgpwmcy"
+address = "erd1qqqqqqqqqqqqqpgqksrvxzlgqt0zyx3mhhar2jpv9t3tn85xqqqslvxvc3"
 
 [[contracts.async_v1_root_s012.calls]]
 to = "async_v1_target_s012"
@@ -118,7 +118,7 @@ amount = "12000000"
 
 [contracts.async_v1_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqquxg503ztgenmsu2zukhulvc8te2jhc3qqpq272vgn"
+address = "erd1qqqqqqqqqqqqqpgqe69grxm36gjz3c2xsxqenkuwj2n2789yqqpqlh5q8t"
 
 [[contracts.async_v1_root_s022.calls]]
 to = "async_v1_target_s022"
@@ -132,7 +132,7 @@ amount = "12000000"
 
 [contracts.async_v1_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqgp5uhhsgxw2938k2h6ejf8g8xg5kxmylqqpqfxvsr4"
+address = "erd1qqqqqqqqqqqqqpgqa94m86xw0zd0yn8tsm4qagzham0g6wk6qqpq2eqaa9"
 
 [[contracts.async_v1_root_s222.calls]]
 to = "async_v1_target_s222"
@@ -146,23 +146,23 @@ amount = "12000000"
 
 [contracts.async_v1_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqz993elnktpnj8eqtfrhenlkh62dc5mnhqqpqexf647"
+address = "erd1qqqqqqqqqqqqqpgqca8yrzyd8xdcp9mg4m2eu85g03sqfyl4qqpqkwa33g"
 
 [contracts.async_v1_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqavgfj3p9wge0h595tdqsrzjwg5dex63nqqpq69vgqf"
+address = "erd1qqqqqqqqqqqqqpgqmksjvkjyalekjpxyz5ehapa73c595zdlqqpqscpwau"
 
 [contracts.async_v1_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqqcjk3gsmnndsjnefftg4l5ysmkr2ut60qqpqa5pfjm"
+address = "erd1qqqqqqqqqqqqqpgqrjyn3agxnw25t4gz8ftdj25csaahajnrqqpq5497j3"
 
 [contracts.async_v1_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqkcamn53s38ann7mg998s9xl9kansjd6qqqpqydn9jr"
+address = "erd1qqqqqqqqqqqqqpgq8vk47fnvs9xyle62ujws2hx59laqzn3cqqpqutfxj6"
 
 [contracts.async_v2_root_s010]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgql9ywtp0guuzfewn9kwjfd269n5x5chtuqqqsfumdfg"
+address = "erd1qqqqqqqqqqqqqpgq3wyjvvw8lqlcusvlgy78fchcaec2spv4qqqsnm6jy6"
 
 [[contracts.async_v2_root_s010.calls]]
 to = "async_v2_target_s010"
@@ -176,7 +176,7 @@ amount = "12000000"
 
 [contracts.async_v2_root_s012]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqu0d50xylf6rnrzkl3krmln8wacs0lztxqqqsk83286"
+address = "erd1qqqqqqqqqqqqqpgqjc2s0vy8698zqf6g08vdr4vv53sjt8y7qqqs0p6hj5"
 
 [[contracts.async_v2_root_s012.calls]]
 to = "async_v2_target_s012"
@@ -190,7 +190,7 @@ amount = "12000000"
 
 [contracts.async_v2_root_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqp9gngwxd4l04wa32t7u98eh29y3rcfldqqpqgv5w8n"
+address = "erd1qqqqqqqqqqqqqpgq3xx6rwp4upllt799a23dnjt849qw9xanqqpqz6fd0n"
 
 [[contracts.async_v2_root_s022.calls]]
 to = "async_v2_target_s022"
@@ -204,7 +204,7 @@ amount = "12000000"
 
 [contracts.async_v2_root_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq2fhghc7p7u2aj8kvcllp8u4ss8pcedjqqqpqm56rg2"
+address = "erd1qqqqqqqqqqqqqpgqtx0h4ch8rphw3nxuwy9tz5psterxrzzfqqpqflmnpx"
 
 [[contracts.async_v2_root_s222.calls]]
 to = "async_v2_target_s222"
@@ -218,16 +218,16 @@ amount = "12000000"
 
 [contracts.async_v2_target_s010]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq69hgl30e0zfka57geduwsmez3n8uljjaqqpq072x4t"
+address = "erd1qqqqqqqqqqqqqpgqpqhcumc9pcljnxq2y2hculwj5vtaq2eeqqpqq5qa7h"
 
 [contracts.async_v2_target_s012]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqqhhedx3pqc2z6h7lr6uypk906lt6g22nqqpq9xrkst"
+address = "erd1qqqqqqqqqqqqqpgqp2klekelnh7rql2ueww98mamcyh6xpnmqqpq73y003"
 
 [contracts.async_v2_target_s022]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqrqrfchdqn0j8x7hhpmwf46l4sg0qlcqwqqpquyl0ut"
+address = "erd1qqqqqqqqqqqqqpgq487dcsp2cg26akeyprkzr0v0l7exjrk8qqpqdc6893"
 
 [contracts.async_v2_target_s222]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqhreljfzvzpvugx802pjyzn2sujfwp5f7qqpqmtx0qc"
+address = "erd1qqqqqqqqqqqqqpgq3ecdj9rwsv07x890j20edvwdxkaux9w5qqpqc5yrfz"

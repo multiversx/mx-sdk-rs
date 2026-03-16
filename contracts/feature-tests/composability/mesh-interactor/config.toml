@@ -1,5 +1,9 @@
 call_tree_path = "layouts/async_pay1.toml"
 
+# [gateway]
+# uri = "https://testnet-gateway.multiversx.com"
+# chain_type = "real"
+
 [gateway]
-uri = "https://testnet-gateway.multiversx.com"
+uri = "https://gateway.battleofnodes.com"
 chain_type = "real"

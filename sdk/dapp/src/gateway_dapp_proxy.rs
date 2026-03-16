@@ -18,6 +18,8 @@ impl GatewayDappProxy {
     where
         G: GatewayRequest,
     {
+        assert!(!self.proxy_url.ends_with('/'), "Proxy URL should not end with a slash");
+        
         let url = format!("{}/{}", self.proxy_url, request.get_endpoint());
         let request_builder = match request.request_type() {
             GatewayRequestType::Get => Request::get(&url),
