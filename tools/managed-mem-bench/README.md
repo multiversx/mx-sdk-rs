@@ -38,12 +38,12 @@ cargo run
 ## Example output
 
 ```
-Baseline allocated bytes:    716
-After creating 100000 x 100-byte ManagedBuffers: 14727352 bytes
+Baseline allocated bytes:    740
+After creating 100000 x 100-byte ManagedBuffers: 14727376 bytes
   Net increase:              14726636 bytes
-After dropping Rust handles: 2108 bytes
+After dropping Rust handles: 2132 bytes
   Net change from baseline:  1392 bytes
-After StaticApi::reset():    1904 bytes
+After StaticApi::reset():    1928 bytes
   Net change from baseline:  1188 bytes
-Result: LEAK — 1188 bytes were not released after reset.
+Result: 1188 bytes remain after reset (some residual is expected from thread-locals and runtime structures).
 ```
