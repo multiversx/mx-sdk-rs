@@ -436,7 +436,7 @@ where
         F: FnMut(&T, &T) -> Ordering,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice.sort_by(|a, b| compare(a.decode().borrow(), b.decode().borrow()));
             slice
         });
     }
@@ -452,7 +452,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by_key(|a| f(&a.decode()));
+            slice.sort_by_key(|a| f(a.decode().borrow()));
             slice
         });
     }
@@ -465,7 +465,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by_cached_key(|a| f(&a.decode()));
+            slice.sort_by_cached_key(|a| f(a.decode().borrow()));
             slice
         });
     }
@@ -482,7 +482,7 @@ where
         F: FnMut(&T, &T) -> Ordering,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_unstable_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice.sort_unstable_by(|a, b| compare(a.decode().borrow(), b.decode().borrow()));
             slice
         })
     }
@@ -493,7 +493,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_unstable_by_key(|a| f(&a.decode()));
+            slice.sort_unstable_by_key(|a| f(a.decode().borrow()));
             slice
         })
     }
