@@ -214,7 +214,11 @@ fn transf_exec_impl(variants: Vec<ShardVariant>) -> CallTreeLayout {
         let root_name = format!("transf_exec_root_{}", v.suffix);
         let target_name = format!("transf_exec_target_{}", v.suffix);
 
-        start.push(StartCall::new(root_name.clone(), v.sender_shard, Vec::new()));
+        start.push(StartCall::new(
+            root_name.clone(),
+            v.sender_shard,
+            Vec::new(),
+        ));
 
         contracts.insert(
             root_name,

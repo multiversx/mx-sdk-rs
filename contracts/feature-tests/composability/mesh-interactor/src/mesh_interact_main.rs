@@ -14,7 +14,6 @@ use mesh_interact_controller::ComposabilityInteract;
 mod mesh_interact_controller;
 use multiversx_sc_snippets::imports::*;
 
-
 #[tokio::main]
 async fn main() {
     env_logger::init();

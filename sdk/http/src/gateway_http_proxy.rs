@@ -37,7 +37,10 @@ impl GatewayHttpProxy {
     where
         G: GatewayRequest,
     {
-        assert!(!self.proxy_uri.ends_with('/'), "Proxy URL should not end with a slash");
+        assert!(
+            !self.proxy_uri.ends_with('/'),
+            "Proxy URL should not end with a slash"
+        );
 
         let url = format!("{}/{}", self.proxy_uri, request.get_endpoint());
         let method = request.request_type();

@@ -13,7 +13,10 @@ fn fmt_payments(payments: &multiversx_sc_snippets::imports::PaymentVec<StaticApi
         if i > 0 {
             out.push_str(", ");
         }
-        out.push_str(&format!("{}:{}:{}", p.token_identifier, p.token_nonce, p.amount));
+        out.push_str(&format!(
+            "{}:{}:{}",
+            p.token_identifier, p.token_nonce, p.amount
+        ));
     }
     out.push(']');
     out
@@ -61,10 +64,7 @@ impl ComposabilityInteract {
             println!("\n=== Contract '{name}' @ {addr} ===");
 
             let account = self.interactor.get_account(&addr.to_address()).await;
-            let esdts = self
-                .interactor
-                .get_account_esdt(&addr.to_address())
-                .await;
+            let esdts = self.interactor.get_account_esdt(&addr.to_address()).await;
             let mut balances: Vec<String> = Vec::new();
             if account.balance != "0" {
                 balances.push(format!("EGLD={}", account.balance));
