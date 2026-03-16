@@ -602,15 +602,12 @@ where
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());
             unsafe {
-                // ok because of the forget below
-                let self_item = T::read_from_payload(&self_payload);
-                let other_item = T::read_from_payload(&other_payload);
+                let self_item = T::borrow_from_payload(&self_payload);
+                let other_item = T::borrow_from_payload(&other_payload);
 
-                if self_item != other_item {
+                if self_item.borrow() != other_item.borrow() {
                     return false;
                 }
-                core::mem::forget(self_item);
-                core::mem::forget(other_item);
             }
 
             byte_index += T::payload_size();

@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use multiversx_sc::types::{BigUint, ManagedRef, ManagedVec};
+use multiversx_sc::types::{BigUint, ManagedBuffer, ManagedRef, ManagedVec};
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
@@ -594,6 +594,52 @@ fn test_managed_vec_get_mut() {
 
     assert_eq!(*managed_vec.get(0), 200u32);
     assert_eq!(*managed_vec.get(1), 300u32);
+}
+
+#[test]
+fn test_eq_managed_buffer() {
+    let make_vec = |items: &[&[u8]]| -> ManagedVec<StaticApi, ManagedBuffer<StaticApi>> {
+        let mut v = ManagedVec::new();
+        for &item in items {
+            v.push(ManagedBuffer::new_from_bytes(item));
+        }
+        v
+    };
+
+    // equal vecs
+    assert_eq!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo", b"bar"]));
+
+    // different content
+    assert_ne!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo", b"baz"]));
+
+    // different length
+    assert_ne!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo"]));
+
+    // both empty
+    assert_eq!(make_vec(&[]), make_vec(&[]));
+}
+
+#[test]
+fn test_eq_u32() {
+    let make_vec = |items: &[u32]| -> ManagedVec<StaticApi, u32> {
+        let mut v = ManagedVec::new();
+        for &item in items {
+            v.push(item);
+        }
+        v
+    };
+
+    // equal vecs
+    assert_eq!(make_vec(&[1, 2, 3]), make_vec(&[1, 2, 3]));
+
+    // different content
+    assert_ne!(make_vec(&[1, 2, 3]), make_vec(&[1, 2, 4]));
+
+    // different length
+    assert_ne!(make_vec(&[1, 2, 3]), make_vec(&[1, 2]));
+
+    // both empty
+    assert_eq!(make_vec(&[]), make_vec(&[]));
 }
 
 #[test]
