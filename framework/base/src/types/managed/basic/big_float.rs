@@ -380,6 +380,12 @@ impl<M: ManagedTypeApi> Clone for BigFloat<M> {
     }
 }
 
+impl<M: ManagedTypeApi> Drop for BigFloat<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_big_float(self.handle.clone());
+    }
+}
+
 impl<M: ManagedTypeApi> TryStaticCast for BigFloat<M> {}
 
 impl<M: ManagedTypeApi> TopEncode for BigFloat<M> {
