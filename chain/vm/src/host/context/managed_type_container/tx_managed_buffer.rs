@@ -182,7 +182,6 @@ impl ManagedTypeContainer {
     }
 
     pub fn mb_remove(&mut self, handle: RawHandle) {
-        // println!("removing MB: {handle}");
         self.managed_buffer_map.remove_handle(handle);
     }
 }
