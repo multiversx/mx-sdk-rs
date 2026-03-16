@@ -9,7 +9,8 @@ use crate::{
     },
     types::{
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem,
-        ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded, MultiValueManagedVec,
+        ManagedVecPayloadIterator, ManagedVecRefIterator, ManagedVecRefMut, MultiValueEncoded,
+        MultiValueManagedVec,
     },
 };
 use alloc::{format, vec::Vec};
@@ -55,7 +56,11 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        unsafe { self.buffer.forget_into_handle() }
+        unsafe {
+            let handle = core::ptr::read(&self.buffer.handle);
+            core::mem::forget(self);
+            handle
+        }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -238,7 +243,7 @@ where
     pub(super) unsafe fn get_unsafe(&self, index: usize) -> T {
         let mut payload = T::PAYLOAD::new_buffer();
         if self.load_item_payload(index, &mut payload) {
-            T::read_from_payload(&payload)
+            unsafe { T::read_from_payload(&payload) }
         } else {
             M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
@@ -431,7 +436,7 @@ where
         F: FnMut(&T, &T) -> Ordering,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice.sort_by(|a, b| compare(a.decode().borrow(), b.decode().borrow()));
             slice
         });
     }
@@ -447,7 +452,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by_key(|a| f(&a.decode()));
+            slice.sort_by_key(|a| f(a.decode().borrow()));
             slice
         });
     }
@@ -460,7 +465,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_by_cached_key(|a| f(&a.decode()));
+            slice.sort_by_cached_key(|a| f(a.decode().borrow()));
             slice
         });
     }
@@ -477,7 +482,7 @@ where
         F: FnMut(&T, &T) -> Ordering,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_unstable_by(|a, b| compare(&a.decode(), &b.decode()));
+            slice.sort_unstable_by(|a, b| compare(a.decode().borrow(), b.decode().borrow()));
             slice
         })
     }
@@ -488,7 +493,7 @@ where
         K: Ord,
     {
         self.with_self_as_slice_mut(|slice| {
-            slice.sort_unstable_by_key(|a| f(&a.decode()));
+            slice.sort_unstable_by_key(|a| f(a.decode().borrow()));
             slice
         })
     }
@@ -596,11 +601,15 @@ where
             other
                 .buffer
                 .load_slice(byte_index, other_payload.payload_slice_mut());
-            let self_item = T::read_from_payload(&self_payload);
-            let other_item = T::read_from_payload(&other_payload);
-            if self_item != other_item {
-                return false;
+            unsafe {
+                let self_item = T::borrow_from_payload(&self_payload);
+                let other_item = T::borrow_from_payload(&other_payload);
+
+                if self_item.borrow() != other_item.borrow() {
+                    return false;
+                }
             }
+
             byte_index += T::payload_size();
         }
         true
@@ -636,6 +645,24 @@ where
     #[inline]
     pub fn contains(&self, item: &T) -> bool {
         self.find(item).is_some()
+    }
+}
+
+impl<M, T> Drop for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    fn drop(&mut self) {
+        unsafe {
+            if T::requires_drop() {
+                let iter = ManagedVecPayloadIterator::<M, T::PAYLOAD>::new(self.get_handle());
+                for payload in iter {
+                    let item = T::read_from_payload(&payload);
+                    core::mem::drop(item);
+                }
+            }
+        }
     }
 }
 

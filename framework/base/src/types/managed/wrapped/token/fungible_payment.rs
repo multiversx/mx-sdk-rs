@@ -56,7 +56,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for FungiblePayment<M> {
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             FungiblePayment {

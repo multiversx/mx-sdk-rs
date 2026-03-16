@@ -61,9 +61,10 @@ fn managed_struct_from_bytes_reader() {
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let arr: [u8; 8] = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];
 
-    let struct_from_bytes =
-        <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
-            &arr.into()
-        );
-    assert_eq!(s, struct_from_bytes);
+    <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &arr.into(),
+        |struct_from_bytes| {
+            assert_eq!(&s, struct_from_bytes);
+        },
+    );
 }
