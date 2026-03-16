@@ -73,7 +73,7 @@ call_type = "async_v1"
 gas_limit = 7000000
 
 [contracts.async_v1_target_s010]
-shard = 2
+shard = 0
 
 [contracts.async_v1_target_s012]
 shard = 2
@@ -117,7 +117,7 @@ call_type = "async_v2"
 gas_limit = 7000000
 
 [contracts.async_v2_target_s010]
-shard = 2
+shard = 0
 
 [contracts.async_v2_target_s012]
 shard = 2

@@ -133,7 +133,7 @@ nonce = 0
 amount = "12000000"
 
 [contracts.async_v1_target_s010]
-shard = 2
+shard = 0
 
 [contracts.async_v1_target_s012]
 shard = 2
@@ -197,7 +197,7 @@ nonce = 0
 amount = "12000000"
 
 [contracts.async_v2_target_s010]
-shard = 2
+shard = 0
 
 [contracts.async_v2_target_s012]
 shard = 2

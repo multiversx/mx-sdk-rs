@@ -57,7 +57,7 @@ call_type = "transf_exec"
 gas_limit = 7000000
 
 [contracts.transf_exec_target_s010]
-shard = 2
+shard = 0
 
 [contracts.transf_exec_target_s012]
 shard = 2
