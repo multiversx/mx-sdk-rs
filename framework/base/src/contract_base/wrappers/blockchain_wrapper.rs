@@ -499,7 +499,7 @@ where
                 big_int_temp_handle.clone(),
             );
 
-            let bu = ManagedRef::<A, BigUint<A>>::wrap_handle(big_int_temp_handle); //  BigUint::<A>::from_handle(big_int_temp_handle);
+            let bu = ManagedRef::<A, BigUint<A>>::wrap_handle(big_int_temp_handle);
             bu.to_u64().unwrap_or(255)
         }
     }
