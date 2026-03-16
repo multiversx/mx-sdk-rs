@@ -53,7 +53,7 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        // This drop saves the item back into the p-arent ManagedVec.
+        // This drop saves the item back into the parent ManagedVec.
         //
         // The `set` method also handles soft deallocation
         // (freeing of the handle, without deallocating the underlying resource).
