@@ -110,7 +110,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     fn neg(self) -> Self::Output {
         unsafe {
             let result = BigInt::new_uninit();
-            M::managed_type_impl().bi_neg(result.get_handle(), self.handle);
+            M::managed_type_impl().bi_neg(result.get_handle(), self.handle.clone());
             result
         }
     }

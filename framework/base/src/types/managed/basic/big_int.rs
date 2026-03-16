@@ -250,6 +250,12 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
     }
 }
 
+impl<M: ManagedTypeApi> Drop for BigInt<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_big_int(self.handle.clone());
+    }
+}
+
 impl<M: ManagedTypeApi> BigInt<M> {
     pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
         let result = unsigned.into_big_int();
