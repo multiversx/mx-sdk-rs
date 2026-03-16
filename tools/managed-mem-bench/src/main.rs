@@ -18,8 +18,8 @@ use std::{
 
 use multiversx_sc::types::{
     BigFloat, BigInt, BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-    ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedDecimal, ManagedVec, ManagedVecItem,
-    NumDecimals, TokenIdentifier,
+    ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedDecimal, ManagedMap, ManagedVec,
+    ManagedVecItem, NumDecimals, TokenIdentifier,
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -175,6 +175,14 @@ fn main() {
             0,
             BigUint::from(1000u64),
         )
+    });
+
+    bench_type("ManagedMap (1 entry)", || {
+        let key = ManagedBuffer::<StaticApi>::new_from_bytes(b"key");
+        let val = ManagedBuffer::<StaticApi>::new_from_bytes(&data);
+        let mut m = ManagedMap::<StaticApi>::new();
+        m.put(&key, &val);
+        m
     });
 
     // -------------------------------------------------------------------------
