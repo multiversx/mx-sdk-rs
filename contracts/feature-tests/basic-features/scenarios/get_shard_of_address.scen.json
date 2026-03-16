@@ -24,7 +24,7 @@
                 "to": "sc:basic-features",
                 "function": "get_shard_of_address",
                 "arguments": [
-                    "sc:basic-features"
+                    "sc:contract#02"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -46,12 +46,12 @@
                 "to": "sc:basic-features",
                 "function": "get_shard_of_address",
                 "arguments": [
-                    "sc:basic-features"
+                    "address:user#01"
                 ]
             },
             "expect": {
                 "out": [
-                    "2"
+                    "1"
                 ],
                 "status": "",
                 "logs": "*",

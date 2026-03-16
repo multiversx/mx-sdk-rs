@@ -12,10 +12,10 @@ use crate::{
     },
     contract_base::ErrorHelper,
     err_msg,
-    formatter::{FormatBuffer, FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
+    formatter::{FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{
-        BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedBufferCachedBuilder, ManagedDecimal,
-        ManagedRef, ManagedType, NonZeroBigUint, heap::BoxedBytes,
+        BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedDecimal, ManagedRef, ManagedType,
+        NonZeroBigUint, heap::BoxedBytes,
     },
 };
 
@@ -479,6 +479,13 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
     }
 }
 
+impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates a managed buffer containing the textual representation of the number.
+    pub fn to_display(&self) -> ManagedBuffer<M> {
+        self.value.to_display()
+    }
+}
+
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
@@ -489,12 +496,10 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> BigUint<M> {
-    /// Creates to a managed buffer containing the textual representation of the number.
-    pub fn to_display(&self) -> ManagedBuffer<M> {
-        let mut result = ManagedBufferCachedBuilder::new_from_slice(&[]);
-        result.append_display(self);
-        result.into_managed_buffer()
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for BigUint<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Display::fmt(&self.to_display(), f)
     }
 }
 
