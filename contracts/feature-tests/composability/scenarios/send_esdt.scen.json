@@ -1,6 +1,5 @@
 {
     "name": "send_esdt",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",

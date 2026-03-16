@@ -145,6 +145,8 @@ members = [
   "contracts/feature-tests/composability/forwarder-legacy/meta",
   "contracts/feature-tests/composability/forwarder-queue",
   "contracts/feature-tests/composability/forwarder-queue/meta",
+  "contracts/feature-tests/composability/forwarder-blind",
+  "contracts/feature-tests/composability/forwarder-blind/meta",
   "contracts/feature-tests/composability/forwarder-raw",
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",
