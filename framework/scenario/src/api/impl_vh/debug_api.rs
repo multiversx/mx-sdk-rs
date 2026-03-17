@@ -2,7 +2,7 @@ use multiversx_chain_vm::{
     executor::VMHooksEarlyExit,
     host::vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
-use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
+use multiversx_sc::{api::HandleConstraints, chain_core::types::ReturnCode, err_msg};
 
 use crate::executor::debug::{
     ContractDebugInstance, ContractDebugInstanceState, ContractDebugStack, StaticVarData,
@@ -34,7 +34,14 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        let tx_context_ref = handle.to_tx_context_ref();
+        let tx_context_ref = handle.to_opt_tx_context_ref().unwrap_or_else(|| {
+            panic!(
+                "TxContext is no longer valid for handle {}.
+The object was created on a VM execution stack frame that has already been popped.
+This can sometimes happen during whitebox testing if the objects are mixed between execution contexts.",
+                handle.get_raw_handle()
+            )
+        });
         let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(vh_context);
         let result = f(&mut dispatcher);
@@ -64,6 +71,20 @@ impl VMHooksApiBackend for DebugApiBackend {
         Self::with_vm_hooks_ctx_1(handle1, f)
     }
 
+    fn with_vm_hooks_ctx_if_active<F>(handle: Self::HandleType, f: F)
+    where
+        F: FnOnce(&mut dyn VMHooksDebugger),
+    {
+        let Some(tx_context_ref) = handle.to_opt_tx_context_ref() else {
+            // context is not live, skip the call
+            return;
+        };
+        let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
+        let mut dispatcher = VMHooksDispatcher::new(vh_context);
+        f(&mut dispatcher);
+        std::mem::drop(dispatcher);
+    }
+
     fn assert_live_handle(handle: &Self::HandleType) {
         if !handle.is_on_current_context() {
             ContractDebugInstanceState::early_exit_panic(
@@ -72,6 +93,7 @@ impl VMHooksApiBackend for DebugApiBackend {
             );
         }
     }
+
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,

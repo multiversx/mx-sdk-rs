@@ -49,22 +49,9 @@ impl DebugHandle {
     /// to a strong reference. This is necessary when you need to access the
     /// underlying `TxContext` for operations.
     ///
-    /// # Panics
-    ///
-    /// Panics if the `TxContext` is no longer valid (has been dropped). This can
-    /// happen if the object was created on a VM execution stack frame that has
-    /// already been popped, or if objects are mixed between different execution
-    /// contexts during whitebox testing.
-    pub fn to_tx_context_ref(&self) -> TxContextRef {
-        let tx_context_arc = self.context.upgrade().unwrap_or_else(|| {
-            panic!(
-                "TxContext is no longer valid for handle {}.
-The object was created on a VM execution stack frame that has already been popped.
-This can sometimes happen during whitebox testing if the objects are mixed between execution contexts.",
-                self.raw_handle
-            )
-        });
-        TxContextRef::new(tx_context_arc)
+    /// Returns `None` if the `TxContext` is no longer valid (has been dropped).
+    pub fn to_opt_tx_context_ref(&self) -> Option<TxContextRef> {
+        self.context.upgrade().map(TxContextRef::new)
     }
 }
 
