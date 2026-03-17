@@ -91,9 +91,37 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// ## Safety
     ///
-    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time
+    /// the value is attempted to be read.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If the caller unwinds (panics) before the returned value is fully initialized, the
+    /// `BigUint` is dropped normally — which issues a `drop_big_int` call for an uninitialized
+    /// handle. This may corrupt the VM handle table. Callers must ensure initialization
+    /// completes before any panic can occur.
     pub unsafe fn new_uninit() -> Self {
         unsafe { Self::new_unchecked(BigInt::new_uninit()) }
+    }
+
+    /// Creates a new object and initializes it via a closure that receives the raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The closure `init_fn` must fully initialize the value behind the handle before returning.
+    /// The initialized value must also be non-negative, otherwise the `BigUint` invariant is broken.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If `init_fn` unwinds (panics), the partially-constructed `BigUint` is leaked — its
+    /// destructor is **not** called. This means no `drop_big_int` call will be issued for the
+    /// allocated handle, which may leave the VM handle table in an inconsistent state.
+    /// Callers must ensure that `init_fn` does not panic.
+    pub unsafe fn new_init_handle<F>(init_fn: F) -> Self
+    where
+        F: FnOnce(M::BigIntHandle),
+    {
+        unsafe { Self::new_unchecked(BigInt::new_init_handle(init_fn)) }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
@@ -107,17 +135,25 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
-        use crate::types::cast_to_i64::cast_to_i64;
-        // Convert before allocating the handle. If the cast fails (signals error
-        // and panics), no handle is allocated, so Drop won't panic trying to
-        // remove a non-existent handle from the map.
-        let i64_value = cast_to_i64::<M, _>(value);
+        // use crate::types::cast_to_i64::cast_to_i64;
         unsafe {
-            let result = Self::new_uninit();
-            // Self::set_value(result.get_handle(), value);
-            M::managed_type_impl().bi_set_int64(result.get_handle(), i64_value);
-            result
+            Self::new_init_handle(|handle| {
+                Self::set_value(handle, value);
+                // let i64_value = cast_to_i64::<M, _>(value);
+                // M::managed_type_impl().bi_set_int64(handle, i64_value);
+            })
         }
+        // use crate::types::cast_to_i64::cast_to_i64;
+        // // Convert before allocating the handle. If the cast fails (signals error
+        // // and panics), no handle is allocated, so Drop won't panic trying to
+        // // remove a non-existent handle from the map.
+        // let i64_value = cast_to_i64::<M, _>(value);
+        // unsafe {
+        //     let result = Self::new_uninit();
+        //     // Self::set_value(result.get_handle(), value);
+        //     M::managed_type_impl().bi_set_int64(result.get_handle(), i64_value);
+        //     result
+        // }
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle

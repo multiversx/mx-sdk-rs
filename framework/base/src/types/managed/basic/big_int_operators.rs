@@ -51,13 +51,13 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {
                 // both arguments are references, so a new BigInt needs to be created
                 unsafe {
-                    let result_handle = BigInt::<M>::new_handle();
-                    M::managed_type_impl().$api_func(
-                        result_handle.clone(),
-                        self.handle.clone(),
-                        other.handle.clone(),
-                    );
-                    BigInt::from_handle(result_handle)
+                    BigInt::new_init_handle(|result_handle| {
+                        M::managed_type_impl().$api_func(
+                            result_handle,
+                            self.handle.clone(),
+                            other.handle.clone(),
+                        );
+                    })
                 }
             }
         }
