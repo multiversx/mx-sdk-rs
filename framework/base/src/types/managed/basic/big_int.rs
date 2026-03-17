@@ -77,6 +77,10 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
+    pub fn new_handle() -> M::BigIntHandle {
+        use_raw_handle(M::static_var_api_impl().next_handle())
+    }
+
     /// Creates a new object, without initializing it.
     ///
     /// ## Safety
@@ -84,8 +88,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
         unsafe {
-            let new_handle: M::BigIntHandle =
-                use_raw_handle(M::static_var_api_impl().next_handle());
+            let new_handle = Self::new_handle();
             BigInt::from_handle(new_handle)
         }
     }

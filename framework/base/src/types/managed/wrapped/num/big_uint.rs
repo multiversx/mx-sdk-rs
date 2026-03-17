@@ -107,9 +107,15 @@ impl<M: ManagedTypeApi> BigUint<M> {
     where
         T: TryInto<i64> + num_traits::Unsigned,
     {
+        use crate::types::cast_to_i64::cast_to_i64;
+        // Convert before allocating the handle. If the cast fails (signals error
+        // and panics), no handle is allocated, so Drop won't panic trying to
+        // remove a non-existent handle from the map.
+        let i64_value = cast_to_i64::<M, _>(value);
         unsafe {
             let result = Self::new_uninit();
-            Self::set_value(result.get_handle(), value);
+            // Self::set_value(result.get_handle(), value);
+            M::managed_type_impl().bi_set_int64(result.get_handle(), i64_value);
             result
         }
     }

@@ -1,6 +1,6 @@
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi, const_handles},
-    types::{BigUint, ManagedType},
+    types::{BigInt, BigUint, ManagedType},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -52,13 +52,13 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 // both arguments are references, so a new BigUint needs to be created
                 unsafe {
-                    let result = BigUint::new_uninit();
+                    let result_handle = BigInt::<M>::new_handle();
                     M::managed_type_impl().$api_func(
-                        result.get_handle(),
+                        result_handle.clone(),
                         self.get_handle(),
                         other.get_handle(),
                     );
-                    result
+                    BigUint::from_handle(result_handle)
                 }
             }
         }
@@ -84,13 +84,13 @@ macro_rules! binary_operator {
                 let big_int_temp_1 =
                     BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 unsafe {
-                    let result = BigUint::new_uninit();
+                    let result_handle = BigInt::<M>::new_handle();
                     M::managed_type_impl().$api_func(
-                        result.get_handle(),
+                        result_handle.clone(),
                         self.get_handle(),
                         big_int_temp_1,
                     );
-                    result
+                    BigUint::from_handle(result_handle)
                 }
             }
         }
@@ -116,13 +116,13 @@ macro_rules! binary_operator {
                 let big_int_temp_1 =
                     BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 unsafe {
-                    let result = BigUint::new_uninit();
+                    let result_handle = BigInt::<M>::new_handle();
                     M::managed_type_impl().$api_func(
-                        result.get_handle(),
+                        result_handle.clone(),
                         self.get_handle(),
                         big_int_temp_1,
                     );
-                    result
+                    BigUint::from_handle(result_handle)
                 }
             }
         }
