@@ -137,15 +137,16 @@ fn main() {
 
     bench_type("BigFloat", || BigFloat::<StaticApi>::from_frac(1, 2));
 
-    bench_type("ManagedAddress", || ManagedAddress::<StaticApi>::zero());
+    bench_type("ManagedAddress", ManagedAddress::<StaticApi>::zero);
 
     bench_type("TokenIdentifier (EsdtTokenIdentifier)", || {
         TokenIdentifier::<StaticApi>::from("MYTOKEN-123456")
     });
 
-    bench_type("EgldOrEsdtTokenIdentifier (EGLD)", || {
-        EgldOrEsdtTokenIdentifier::<StaticApi>::egld()
-    });
+    bench_type(
+        "EgldOrEsdtTokenIdentifier (EGLD)",
+        EgldOrEsdtTokenIdentifier::<StaticApi>::egld,
+    );
 
     bench_type("EgldOrEsdtTokenIdentifier (ESDT)", || {
         EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenIdentifier::from("MYTOKEN-123456"))
