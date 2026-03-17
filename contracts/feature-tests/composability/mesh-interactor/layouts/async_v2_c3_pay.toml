@@ -4,109 +4,154 @@
 to = "async_v2_c3_root_s00"
 shard = 0
 gas_limit = 43000000
-wallet = "erd1zjhj3nna0ygh76yj9zc6lzw3d69sc94r6dsx9g4ka6u0h2mvqqqqa506l6"
+
+[[start.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "23000000"
 
 [[start]]
 to = "async_v2_c3_root_s11"
 shard = 1
 gas_limit = 43000000
-wallet = "erd1fwdty5j20525zmah34xcsfyacvp890twuxu2ql2rgtpn5s9qqqqsajtqv5"
+
+[[start.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "23000000"
 
 [[start]]
 to = "async_v2_c3_root_s22"
 shard = 2
 gas_limit = 43000000
-wallet = "erd1t63lx7924204rnhhvzfmvtssg8ysks2szm06f9mq675yd2xeqqpqrcqe86"
+
+[[start.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "23000000"
 
 [contracts.async_v2_c3_root_s00]
 shard = 0
-address = "erd1qqqqqqqqqqqqqpgqmhymn7rl3r50d3ks265c3respzmtd0xrqqqqy7rkud"
 
 [[contracts.async_v2_c3_root_s00.calls]]
 to = "async_v2_c3_target_s0_s00"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s00.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [[contracts.async_v2_c3_root_s00.calls]]
 to = "async_v2_c3_target_s1_s00"
 call_type = "async_v2"
 gas_limit = 7000000
+
+[[contracts.async_v2_c3_root_s00.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
 
 [[contracts.async_v2_c3_root_s00.calls]]
 to = "async_v2_c3_target_s2_s00"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s00.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [contracts.async_v2_c3_root_s11]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq4r6ex8qf9zmre99c9eq94x7d26hesysjqqqsxr52lv"
 
 [[contracts.async_v2_c3_root_s11.calls]]
 to = "async_v2_c3_target_s0_s11"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s11.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [[contracts.async_v2_c3_root_s11.calls]]
 to = "async_v2_c3_target_s1_s11"
 call_type = "async_v2"
 gas_limit = 7000000
+
+[[contracts.async_v2_c3_root_s11.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
 
 [[contracts.async_v2_c3_root_s11.calls]]
 to = "async_v2_c3_target_s2_s11"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s11.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [contracts.async_v2_c3_root_s22]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqlqfaez0z4c92qg83d8tmrwguctc370hpqqpqr4d2lc"
 
 [[contracts.async_v2_c3_root_s22.calls]]
 to = "async_v2_c3_target_s0_s22"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s22.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [[contracts.async_v2_c3_root_s22.calls]]
 to = "async_v2_c3_target_s1_s22"
 call_type = "async_v2"
 gas_limit = 7000000
+
+[[contracts.async_v2_c3_root_s22.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
 
 [[contracts.async_v2_c3_root_s22.calls]]
 to = "async_v2_c3_target_s2_s22"
 call_type = "async_v2"
 gas_limit = 7000000
 
+[[contracts.async_v2_c3_root_s22.calls.payments]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "12000000"
+
 [contracts.async_v2_c3_target_s0_s00]
 shard = 0
-address = "erd1qqqqqqqqqqqqqpgqdzavswk6xcmspe498t9xp5yy5q22dpc8qqqqwl50fu"
 
 [contracts.async_v2_c3_target_s0_s11]
 shard = 0
-address = "erd1qqqqqqqqqqqqqpgqfr5qu7g6tvpwmevwatanhxx7zpg6uackqqqqm0pwd4"
 
 [contracts.async_v2_c3_target_s0_s22]
 shard = 0
-address = "erd1qqqqqqqqqqqqqpgqlsa0eg3l32q6l727kcwqv8azmgav5km0qqqq3x465f"
 
 [contracts.async_v2_c3_target_s1_s00]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgq9k4snax7fn42kyzlsp0mqvqs6xg8al37qqqskg473r"
 
 [contracts.async_v2_c3_target_s1_s11]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqzuqnjhar0ugqcq2qjuf2eejc4w20wtgsqqqsgaqf0x"
 
 [contracts.async_v2_c3_target_s1_s22]
 shard = 1
-address = "erd1qqqqqqqqqqqqqpgqh0zekkw94w5pucw05zxucwmmx83m3grvqqqsnwz95r"
 
 [contracts.async_v2_c3_target_s2_s00]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgq2cr89vume0wpy93lynfq84u88jghy863qqpqfytl6j"
 
 [contracts.async_v2_c3_target_s2_s11]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgquplxaefdz65enwff2pdlkfz3u6hmclzrqqpqd8fjl2"
 
 [contracts.async_v2_c3_target_s2_s22]
 shard = 2
-address = "erd1qqqqqqqqqqqqqpgqfx39pf2avcy6v38azse77uy6v83t8ycrqqpqefc5x8"
