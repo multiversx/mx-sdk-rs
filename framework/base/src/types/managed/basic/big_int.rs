@@ -77,7 +77,7 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
-    pub fn new_handle() -> M::BigIntHandle {
+    pub(crate) fn new_handle() -> M::BigIntHandle {
         use_raw_handle(M::static_var_api_impl().next_handle())
     }
 

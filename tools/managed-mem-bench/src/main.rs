@@ -152,7 +152,7 @@ fn main() {
         EgldOrEsdtTokenIdentifier::<StaticApi>::esdt(TokenIdentifier::from("MYTOKEN-123456"))
     });
 
-    bench_type("ManagedByteArray<32>", || {
+    bench_type("ManagedByteArray<100>", || {
         ManagedByteArray::<StaticApi, BUFFER_SIZE>::new_from_bytes(&data)
     });
 
