@@ -94,9 +94,9 @@ macro_rules! big_float_conv_num {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 unsafe {
-                    let result = BigFloat::new_uninit();
-                    M::managed_type_impl().bf_set_i64(result.get_handle(), value as i64);
-                    result
+                    BigFloat::new_init_handle(|result_handle| {
+                        M::managed_type_impl().bf_set_i64(result_handle, value as i64);
+                    })
                 }
             }
         }
@@ -112,25 +112,25 @@ big_float_conv_num! {i8}
 impl<M: ManagedTypeApi> BigFloat<M> {
     pub fn neg(&self) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_neg(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_neg(result_handle, self.handle.clone());
+            })
         }
     }
 
     pub fn abs(&self) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_abs(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_abs(result_handle, self.handle.clone());
+            })
         }
     }
 
     pub fn from_big_int(big_int: &BigInt<M>) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_set_bi(result.get_handle(), big_int.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_set_bi(result_handle, big_int.handle.clone());
+            })
         }
     }
 
@@ -271,10 +271,10 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
     pub fn from_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl()
-                .mb_to_big_float(managed_buffer.handle.clone(), result.get_handle());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl()
+                    .mb_to_big_float(managed_buffer.handle.clone(), result_handle);
+            })
         }
     }
 
@@ -286,15 +286,26 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         }
     }
 
-    /// Creates a new object, without initializing it.
+    /// Creates a new object and initializes it via a closure that receives the raw handle.
     ///
     /// ## Safety
     ///
-    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
-    pub unsafe fn new_uninit() -> Self {
+    /// The closure `init_fn` must fully initialize the value behind the handle before returning.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If `init_fn` unwinds (panics), the partially-constructed `BigFloat` is leaked — its
+    /// destructor is **not** called. This means no `drop_big_float` call will be issued for the
+    /// allocated handle, which may leave the VM handle table in an inconsistent state.
+    /// Callers must ensure that `init_fn` does not panic.
+    pub unsafe fn new_init_handle<F>(init_fn: F) -> Self
+    where
+        F: FnOnce(M::BigFloatHandle),
+    {
         unsafe {
             let new_handle: M::BigFloatHandle =
                 use_raw_handle(M::static_var_api_impl().next_handle());
+            init_fn(new_handle.clone());
             BigFloat::from_handle(new_handle)
         }
     }
@@ -303,17 +314,17 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 impl<M: ManagedTypeApi> BigFloat<M> {
     pub fn sqrt(&self) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_sqrt(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_sqrt(result_handle, self.handle.clone());
+            })
         }
     }
 
     pub fn pow(&self, exp: i32) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_pow(result.get_handle(), self.handle.clone(), exp);
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_pow(result_handle, self.handle.clone(), exp);
+            })
         }
     }
 
@@ -329,9 +340,9 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     /// Returns the magnitude of the `BigFloat`
     pub fn magnitude(&self) -> BigFloat<M> {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_abs(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_abs(result_handle, self.handle.clone());
+            })
         }
     }
 
@@ -373,9 +384,9 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 impl<M: ManagedTypeApi> Clone for BigFloat<M> {
     fn clone(&self) -> Self {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_clone(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_clone(result_handle, self.handle.clone());
+            })
         }
     }
 }
