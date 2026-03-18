@@ -38,6 +38,16 @@ pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
         Self::with_vm_hooks(f)
     }
 
+    fn with_vm_hooks_ctx_if_active<F>(_handle: Self::HandleType, f: F)
+    where
+        F: FnOnce(&mut dyn VMHooksDebugger),
+    {
+        Self::with_vm_hooks(|vh| {
+            f(vh);
+            Ok(())
+        })
+    }
+
     fn assert_live_handle(_handle: &Self::HandleType) {
         // by default, no check
     }

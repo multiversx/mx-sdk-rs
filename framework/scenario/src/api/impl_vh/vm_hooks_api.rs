@@ -63,6 +63,16 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         VHB::with_vm_hooks_ctx_3(handle1.clone(), handle2.clone(), handle3.clone(), f)
     }
 
+    /// Works with the VM hooks given by the context of 1 handle, but only if the handle is active.
+    ///
+    /// Used for drop operations, which should be a no-op if the handle does not refer to an active context.
+    pub fn with_vm_hooks_ctx_if_active<F>(&self, handle: &VHB::HandleType, f: F)
+    where
+        F: FnOnce(&mut dyn VMHooksDebugger),
+    {
+        VHB::with_vm_hooks_ctx_if_active(handle.clone(), f);
+    }
+
     /// Checks that the handle refers to the current active context (if possible).
     ///
     /// This is to prevent working with handles pointing to the wrong context, when debugging.
