@@ -77,6 +77,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
+    /// Creates a new, empty `ManagedVec`.
     #[inline]
     pub fn new() -> Self {
         ManagedVec {
@@ -162,6 +163,7 @@ where
         self.byte_len() / T::payload_size()
     }
 
+    /// Returns `true` if the vec contains no elements.
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.byte_len() == 0
@@ -183,6 +185,7 @@ where
         true
     }
 
+    /// Retrieves the element at `index`, or `None` if the index is out of range.
     pub fn try_get(&self, index: usize) -> Option<T::Ref<'_>> {
         let mut payload = T::PAYLOAD::new_buffer();
         if self.load_item_payload(index, &mut payload) {
@@ -236,6 +239,9 @@ where
         }
     }
 
+    /// Returns a mutable guard for the element at `index`, allowing in-place modification.
+    ///
+    /// Signals an error and terminates execution if the index is out of range.
     pub fn get_mut(&mut self, index: usize) -> ManagedVecRefMut<'_, M, T> {
         ManagedVecRefMut::new(self.get_handle(), index)
     }
@@ -260,6 +266,9 @@ where
         self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
+    /// Replaces the element at `index` with `item`, returning the displaced element.
+    ///
+    /// Returns `Err` (an `InvalidSliceError`) if the index is out of range.
     pub fn set(&mut self, index: usize, item: T) -> Result<T, InvalidSliceError> {
         let old_item = unsafe { self.get_unsafe(index) };
         unsafe {
@@ -313,6 +322,7 @@ where
         opt_buffer.map(ManagedVec::new_from_raw_buffer)
     }
 
+    /// Appends `item` to the back of the vec.
     pub fn push(&mut self, item: T) {
         let mut payload = T::PAYLOAD::new_buffer();
         item.save_to_payload(&mut payload);
@@ -353,6 +363,9 @@ where
         self.buffer = new_buffer;
     }
 
+    /// Removes and returns the element at `index`, shifting the remaining elements.
+    ///
+    /// Signals an error and terminates execution if the index is out of range.
     pub fn take(&mut self, index: usize) -> T {
         let len = self.len();
         if index >= len {
@@ -365,6 +378,9 @@ where
         item
     }
 
+    /// Removes and drops the element at `index`, shifting the remaining elements.
+    ///
+    /// Signals an error and terminates execution if the index is out of range.
     pub fn remove(&mut self, index: usize) {
         let _ = self.take(index);
     }
@@ -376,6 +392,7 @@ where
         result
     }
 
+    /// Replaces all contents of the vec with a single item, dropping all previous elements.
     pub fn overwrite_with_single_item(&mut self, item: T) {
         unsafe {
             self.drop_items();
@@ -407,6 +424,7 @@ where
         self.buffer.overwrite(&[]);
     }
 
+    /// Converts the `ManagedVec` into a standard `Vec<T>`, consuming the vec in the process.
     #[cfg(feature = "alloc")]
     pub fn into_vec(self) -> Vec<T> {
         let mut v = Vec::new();
@@ -436,6 +454,7 @@ where
         result
     }
 
+    /// Returns an iterator over shared references to the elements of the vec.
     pub fn iter(&self) -> ManagedVecRefIterator<'_, M, T> {
         ManagedVecRefIterator::new(self)
     }
