@@ -16,11 +16,8 @@ use std::{
     sync::atomic::{AtomicI64, Ordering},
 };
 
-use multiversx_sc::types::{
-    BigFloat, BigInt, BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-    ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedDecimal, ManagedMap, ManagedVec,
-    ManagedVecItem, NumDecimals, TokenIdentifier,
-};
+use multiversx_sc::derive_imports::*;
+use multiversx_sc::imports::*;
 use multiversx_sc_scenario::api::StaticApi;
 
 /// Global allocator wrapper that tracks net allocated heap bytes.
@@ -186,6 +183,15 @@ fn main() {
         m
     });
 
+    bench_type("EnumWithFields", || EnumWithFields::Variant1(42u32));
+
+    bench_type("ManagedStructWithBigUint", || ManagedStructWithBigUint::<
+        StaticApi,
+    > {
+        big_uint: BigUint::from(42u64),
+        num: 42u32,
+    });
+
     // -------------------------------------------------------------------------
     // ManagedVec of managed types
     // -------------------------------------------------------------------------
@@ -248,5 +254,33 @@ fn main() {
         Some(ManagedBuffer::<StaticApi>::new_from_bytes(&data))
     });
 
+    bench_managed_vec("ManagedVec<EnumWithFields>", || {
+        EnumWithFields::Variant1(42u32)
+    });
+
+    bench_managed_vec("ManagedVec<ManagedStructWithBigUint>", || {
+        ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        }
+    });
+
     println!();
+}
+
+#[derive(
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
+)]
+enum EnumWithFields {
+    Variant1(u32),
+    Variant2,
+    Variant3(i64),
+}
+
+#[derive(
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
+)]
+pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
+    pub big_uint: multiversx_sc::types::BigUint<M>,
+    pub num: u32,
 }
