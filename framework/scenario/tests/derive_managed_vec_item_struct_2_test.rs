@@ -26,6 +26,7 @@ fn struct_2_static() {
         22
     );
     assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 #[test]

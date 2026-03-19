@@ -37,6 +37,7 @@ fn struct_with_decimal_static() {
     assert!(
         !<ManagedStructWithDecimal<StaticApi> as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
+    assert!(<ManagedStructWithDecimal<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 #[test]

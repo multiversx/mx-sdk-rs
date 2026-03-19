@@ -37,6 +37,10 @@ fn struct_with_numbers_static() {
     assert!(
         !<ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
+    assert!(
+        <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop(
+        )
+    );
 }
 
 #[test]
