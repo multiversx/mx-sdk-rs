@@ -61,7 +61,7 @@ where
         unsafe {
             let mut parent_ref =
                 ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone());
-            let _ = parent_ref.set(self.item_index, item);
+            let _ = parent_ref.set_unchecked_no_drop(self.item_index, item);
         }
     }
 }

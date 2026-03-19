@@ -74,9 +74,7 @@ pub trait ManagedVecItem: Sized + 'static {
     /// Signals that vec should drop all items one by one when being itself dropped.
     ///
     /// If false, iterating over all items on drop makes no sense.
-    fn requires_drop() -> bool {
-        false
-    }
+    fn requires_drop() -> bool;
 
     fn temp_decode<F, R>(payload: &Self::PAYLOAD, f: F) -> R
     where
@@ -145,6 +143,10 @@ macro_rules! impl_int {
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 payload.buffer = GenericArray::from_array(self.to_be_bytes());
             }
+
+            fn requires_drop() -> bool {
+                false
+            }
         }
     };
 }
@@ -171,6 +173,10 @@ impl ManagedVecItem for usize {
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         (self as u32).save_to_payload(payload);
     }
+
+    fn requires_drop() -> bool {
+        false
+    }
 }
 
 impl ManagedVecItem for bool {
@@ -190,6 +196,10 @@ impl ManagedVecItem for bool {
         // true -> 1u8
         // false -> 0u8
         u8::from(self).save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -258,6 +268,10 @@ macro_rules! impl_managed_type {
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 let handle = unsafe { self.forget_into_handle() };
                 handle.get_raw_handle().save_to_payload(payload);
+            }
+
+            fn requires_drop() -> bool {
+                M::managed_type_impl().requires_managed_type_drop()
             }
         }
     };
@@ -350,6 +364,10 @@ impl ManagedVecItem for EsdtTokenType {
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.as_u8().save_to_payload(payload);
     }
+
+    fn requires_drop() -> bool {
+        false
+    }
 }
 
 impl ManagedVecItem for EsdtLocalRole {
@@ -367,6 +385,10 @@ impl ManagedVecItem for EsdtLocalRole {
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.as_u16().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -403,6 +425,10 @@ where
             managed_vec_item_save_to_payload_index(tuple.0, payload, &mut index);
             managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
         }
+    }
+
+    fn requires_drop() -> bool {
+        T1::requires_drop() || T2::requires_drop()
     }
 }
 
@@ -442,5 +468,9 @@ where
             managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
             managed_vec_item_save_to_payload_index(tuple.2, payload, &mut index);
         }
+    }
+
+    fn requires_drop() -> bool {
+        T1::requires_drop() || T2::requires_drop() || T3::requires_drop()
     }
 }

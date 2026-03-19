@@ -44,6 +44,10 @@ impl VMHooksApiBackend for StaticApiBackend {
             f(&data)
         })
     }
+
+    fn backend_requires_managed_type_drop() -> bool {
+        true
+    }
 }
 
 pub type StaticApi = VMHooksApi<StaticApiBackend>;

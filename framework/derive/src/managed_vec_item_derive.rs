@@ -186,6 +186,10 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                     };
                 }
             }
+
+            fn requires_drop() -> bool {
+                false // TODO: generate based on items
+            }
         }
     };
     result.into()
@@ -244,6 +248,10 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 unsafe {
                     #(#save_to_payload_snippets)*
                 }
+            }
+
+            fn requires_drop() -> bool {
+                false // TODO: generate based on items
             }
         }
     };

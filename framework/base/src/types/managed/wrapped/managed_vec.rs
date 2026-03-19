@@ -249,16 +249,64 @@ where
         }
     }
 
-    pub fn set(&mut self, index: usize, item: T) -> Result<(), InvalidSliceError> {
+    pub(crate) unsafe fn set_unchecked_no_drop(
+        &mut self,
+        index: usize,
+        item: T,
+    ) -> Result<(), InvalidSliceError> {
         let byte_index = index * T::payload_size();
         let mut payload = T::PAYLOAD::new_buffer();
         item.save_to_payload(&mut payload);
         self.buffer.set_slice(byte_index, payload.payload_slice())
     }
 
+    pub fn set(&mut self, index: usize, item: T) -> Result<T, InvalidSliceError> {
+        let old_item = unsafe { self.get_unsafe(index) };
+        unsafe {
+            self.set_unchecked_no_drop(index, item)?;
+        }
+        Ok(old_item)
+    }
+
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
-    /// Returns `None` if any index is out of range
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
+    /// Returns `None` if any index is out of range.
+    ///
+    /// Note: for managed types that require handle-level drop (e.g. under `StaticApi`),
+    /// this performs a deep copy of each item so that both the original and the slice
+    /// hold independently owned handles.
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    where
+        T: Clone,
+    {
+        if T::requires_drop() {
+            // Copying raw bytes would alias the handle integers, causing double-frees on drop.
+            // Build the slice by cloning individual items instead.
+            if start_index > end_index || end_index > self.len() {
+                return None;
+            }
+            let mut result = ManagedVec::new();
+            for i in start_index..end_index {
+                // self.get(i) is a borrow (non-owning ManagedRef), .borrow() yields &T.
+                // .clone() allocates a fresh VM object with an independent handle,
+                // so both the original vec and the return value own distinct handles.
+                result.push(self.get(i).borrow().clone());
+            }
+            Some(result)
+        } else {
+            unsafe { self.slice_no_copy(start_index, end_index) }
+        }
+    }
+
+    /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
+    /// Returns `None` if any index is out of range.
+    ///
+    /// # Safety
+    ///
+    /// Only safe when `T::requires_drop() == false` (e.g. all non-`StaticApi` backends).
+    /// In all other cases, both the original vec and the returned slice will hold aliased
+    /// handle integers, and both will attempt to free those handles on drop — causing a
+    /// double-free. Use the safe [`slice`] method instead.
+    unsafe fn slice_no_copy(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::payload_size();
         let byte_end = end_index * T::payload_size();
         let opt_buffer = self.buffer.copy_slice(byte_start, byte_end - byte_start);
@@ -271,37 +319,54 @@ where
         self.buffer.append_bytes(payload.payload_slice());
     }
 
-    pub fn remove(&mut self, index: usize) {
+    /// Removes the slot at `index` from the buffer without dropping the item stored there.
+    ///
+    /// Callers must ensure the item has already been extracted (and will be dropped separately).
+    fn strip_index(&mut self, index: usize, len: usize) {
+        // Rebuild the buffer at the raw ManagedBuffer level. Creating intermediate
+        // ManagedVec slices would alias the surviving item handles and cause double-drops
+        // when those slices are dropped.
+        let payload_size = T::payload_size();
+        let byte_index = index * payload_size;
+        let byte_after = (index + 1) * payload_size;
+        let byte_total = len * payload_size;
+
+        let mut new_buffer = if byte_index > 0 {
+            self.buffer
+                .copy_slice(0, byte_index)
+                .unwrap_or_else(|| M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG))
+        } else {
+            ManagedBuffer::new()
+        };
+        if byte_after < byte_total {
+            let after = self
+                .buffer
+                .copy_slice(byte_after, byte_total - byte_after)
+                .unwrap_or_else(|| M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG));
+            new_buffer.append(&after);
+        }
+
+        // Assigning self.buffer only invokes ManagedBuffer::drop for the old byte array
+        // (freeing the buffer handle itself), not the item handles stored inside.
+        // The surviving item handles are now in new_buffer and will be freed exactly once
+        // when self is eventually dropped via ManagedVec::drop.
+        self.buffer = new_buffer;
+    }
+
+    pub fn take(&mut self, index: usize) -> T {
         let len = self.len();
         if index >= len {
             M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG);
         }
-
-        let part_before = if index > 0 {
-            match self.slice(0, index) {
-                Some(s) => s,
-                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
-            }
-        } else {
-            ManagedVec::new()
-        };
-        let part_after = if index < len {
-            match self.slice(index + 1, len) {
-                Some(s) => s,
-                None => M::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_MSG),
-            }
-        } else {
-            ManagedVec::new()
-        };
-
-        *self = part_before;
-        self.buffer.append(&part_after.buffer);
+        let item = unsafe { self.get_unsafe(index) };
+        // strip_index, not remove: the item is already extracted above and must not be
+        // dropped a second time.
+        self.strip_index(index, len);
+        item
     }
 
-    pub fn take(&mut self, index: usize) -> T {
-        let item = unsafe { self.get_unsafe(index) };
-        self.remove(index);
-        item
+    pub fn remove(&mut self, index: usize) {
+        let _ = self.take(index);
     }
 
     /// New `ManagedVec` instance with 1 element in it.
@@ -312,6 +377,10 @@ where
     }
 
     pub fn overwrite_with_single_item(&mut self, item: T) {
+        unsafe {
+            self.drop_items();
+        }
+
         let mut payload = T::PAYLOAD::new_buffer();
         item.save_to_payload(&mut payload);
         self.buffer.overwrite(payload.payload_slice());
@@ -319,12 +388,22 @@ where
 
     /// Appends all the contents of another managed vec at the end of the current one.
     /// Consumes the other vec in the process.
-    pub fn append_vec(&mut self, item: ManagedVec<M, T>) {
-        self.buffer.append(&item.buffer);
+    pub fn append_vec(&mut self, v: ManagedVec<M, T>) {
+        self.buffer.append(&v.buffer);
+        // The items are now owned by self, so we must not drop them again.
+        // We do need to drop the buffer handle itself, so we extract it and forget the vec.
+        unsafe {
+            let buffer = core::ptr::read(&v.buffer);
+            core::mem::forget(v);
+            core::mem::drop(buffer);
+        }
     }
 
     /// Removes all items while retaining the handle.
     pub fn clear(&mut self) {
+        unsafe {
+            self.drop_items();
+        }
         self.buffer.overwrite(&[]);
     }
 
@@ -557,7 +636,17 @@ where
                 }
             }
 
-            let (dedup, _) = slice.split_at_mut(next_write);
+            let (dedup, tail) = slice.split_at_mut(next_write);
+            // Drop the duplicate items moved into the tail, so their handles are freed
+            // before the buffer is truncated to the dedup length.
+            if T::requires_drop() {
+                for tail_item in tail.iter() {
+                    unsafe {
+                        let item = T::read_from_payload(&tail_item.encoded);
+                        core::mem::drop(item);
+                    }
+                }
+            }
             dedup
         })
     }
@@ -648,12 +737,12 @@ where
     }
 }
 
-impl<M, T> Drop for ManagedVec<M, T>
+impl<M, T> ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    fn drop(&mut self) {
+    unsafe fn drop_items(&mut self) {
         unsafe {
             if T::requires_drop() {
                 let iter = ManagedVecPayloadIterator::<M, T::PAYLOAD>::new(self.get_handle());
@@ -662,6 +751,20 @@ where
                     core::mem::drop(item);
                 }
             }
+        }
+    }
+}
+
+impl<M, T> Drop for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    fn drop(&mut self) {
+        // We need to drop each item, to allow for proper cleanup of resources.
+        // After that, the buffer itself can be dropped, which will free the handle and the underlying resource if needed.
+        unsafe {
+            self.drop_items();
         }
     }
 }

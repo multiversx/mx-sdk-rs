@@ -101,6 +101,10 @@ This can sometimes happen during whitebox testing if the objects are mixed betwe
         let top_static_vars = ContractDebugStack::static_peek().static_var_ref;
         f(&top_static_vars)
     }
+
+    fn backend_requires_managed_type_drop() -> bool {
+        false
+    }
 }
 
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
