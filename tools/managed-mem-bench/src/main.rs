@@ -235,5 +235,18 @@ fn main() {
         )
     });
 
+    bench_managed_vec("ManagedVec<u8>", || 42u8);
+    bench_managed_vec("ManagedVec<u16>", || 42u16);
+    bench_managed_vec("ManagedVec<u32>", || 42u32);
+    bench_managed_vec("ManagedVec<u64>", || 42u64);
+    bench_managed_vec("ManagedVec<i32>", || 42i32);
+    bench_managed_vec("ManagedVec<i64>", || 42i64);
+    bench_managed_vec("ManagedVec<usize>", || 42usize);
+    bench_managed_vec("ManagedVec<bool>", || true);
+    bench_managed_vec("ManagedVec<Option<i32>>", || Some(42i32));
+    bench_managed_vec("ManagedVec<Option<ManagedBuffer>>", || {
+        Some(ManagedBuffer::<StaticApi>::new_from_bytes(&data))
+    });
+
     println!();
 }
