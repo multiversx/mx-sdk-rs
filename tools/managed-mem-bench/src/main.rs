@@ -175,6 +175,16 @@ fn main() {
         )
     });
 
+    bench_type("TokenId (native EGLD-000000)", TokenId::<StaticApi>::native);
+
+    bench_type("TokenId (ESDT)", || {
+        TokenId::<StaticApi>::from("MYTOKEN-123456")
+    });
+
+    bench_type("Payment (fungible ESDT)", || {
+        Payment::<StaticApi>::new("MYTOKEN-123456", 0, NonZeroBigUint::one())
+    });
+
     bench_type("ManagedMap (1 entry)", || {
         let key = ManagedBuffer::<StaticApi>::new_from_bytes(b"key");
         let val = ManagedBuffer::<StaticApi>::new_from_bytes(&data);
@@ -239,6 +249,10 @@ fn main() {
             0,
             BigUint::from(1000u64),
         )
+    });
+
+    bench_managed_vec("ManagedVec<Payment> (= PaymentVec)", || {
+        Payment::<StaticApi>::new("MYTOKEN-123456", 0, NonZeroBigUint::one())
     });
 
     bench_managed_vec("ManagedVec<u8>", || 42u8);
