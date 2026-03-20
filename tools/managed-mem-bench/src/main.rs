@@ -265,6 +265,32 @@ fn main() {
         }
     });
 
+    bench_managed_vec("ManagedVec<Option<EnumWithFields>>", || {
+        Some(EnumWithFields::Variant1(42u32))
+    });
+
+    bench_managed_vec("ManagedVec<Option<ManagedStructWithBigUint>>", || {
+        Some(ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        })
+    });
+
+    bench_managed_vec("ManagedVec<ManagedVec<EnumWithFields>>", || {
+        let mut inner = ManagedVec::<StaticApi, EnumWithFields>::new();
+        inner.push(EnumWithFields::Variant1(42u32));
+        inner
+    });
+
+    bench_managed_vec("ManagedVec<ManagedVec<ManagedStructWithBigUint>>", || {
+        let mut inner = ManagedVec::<StaticApi, ManagedStructWithBigUint<StaticApi>>::new();
+        inner.push(ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        });
+        inner
+    });
+
     println!();
 }
 
