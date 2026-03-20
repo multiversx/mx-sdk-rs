@@ -1,0 +1,8 @@
+
+# chain_type = 'simulator'
+# gateway_uri = 'http://localhost:8085'
+
+chain_type = 'real'
+gateway_uri = 'https://gateway.battleofnodes.com'
+# wegld_address = 'erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782'
+wegld_address = 'erd1qqqqqqqqqqqqqpgqmuk0q2saj0mgutxm4teywre6dl8wqf58xamqdrukln'
