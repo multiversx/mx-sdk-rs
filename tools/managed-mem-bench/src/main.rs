@@ -291,6 +291,34 @@ fn main() {
         inner
     });
 
+    // -------------------------------------------------------------------------
+    // Tx objects (contract call style, mirroring adder tests)
+    // -------------------------------------------------------------------------
+    println!("\n=== Tx objects - contract call style ({NUM_ITEMS} instances each) ===\n");
+    println!(
+        "  {:<45} {:>16}  {:>14}  {:>12}",
+        "type", "create (bytes)", "hold (bytes)", "residual"
+    );
+    println!("  {}", "-".repeat(95));
+
+    bench_type("Tx<from, to, add(u64)>", || {
+        Tx::new_tx_from_sc()
+            .from(ManagedAddress::<StaticApi>::zero())
+            .to(ManagedAddress::<StaticApi>::zero())
+            .raw_call("bench")
+            .argument(&42u64)
+            .argument(&BigUint::<StaticApi>::from(42u64))
+            .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 100u32).unwrap())
+            .payment(
+                Payment::try_new(
+                    TokenId::<StaticApi>::from("MYTOKEN-123456"),
+                    0,
+                    BigUint::<StaticApi>::from(200u64),
+                )
+                .unwrap(),
+            )
+    });
+
     println!();
 }
 
