@@ -268,7 +268,7 @@ where
 
     /// Replaces the element at `index` with `item`, returning the displaced element.
     ///
-    /// Returns `Err` (an `InvalidSliceError`) if the index is out of range.
+    /// Signals an error and terminates execution if the index is out of range.
     pub fn set(&mut self, index: usize, item: T) -> Result<T, InvalidSliceError> {
         let old_item = unsafe { self.get_unsafe(index) };
         unsafe {
@@ -459,7 +459,7 @@ where
         ManagedVecRefIterator::new(self)
     }
 
-    /// Creates a reference to and identical object, but one which behaves like a multi-value-vec.
+    /// Creates a reference to an identical object, but one which behaves like a multi-value-vec.
     pub fn as_multi(&self) -> &MultiValueManagedVec<M, T> {
         MultiValueManagedVec::transmute_from_handle_ref(&self.buffer.handle)
     }
