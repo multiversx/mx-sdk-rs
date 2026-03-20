@@ -287,12 +287,14 @@ where
     where
         T: Clone,
     {
+        if start_index > end_index || end_index > self.len() {
+            return None;
+        }
+
         if T::requires_drop() {
             // Copying raw bytes would alias the handle integers, causing double-frees on drop.
             // Build the slice by cloning individual items instead.
-            if start_index > end_index || end_index > self.len() {
-                return None;
-            }
+
             let mut result = ManagedVec::new();
             for i in start_index..end_index {
                 // self.get(i) is a borrow (non-owning ManagedRef), .borrow() yields &T.
@@ -302,7 +304,7 @@ where
             }
             Some(result)
         } else {
-            unsafe { self.slice_no_copy(start_index, end_index) }
+            unsafe { self.slice_no_copy_unchecked(start_index, end_index) }
         }
     }
 
@@ -315,7 +317,7 @@ where
     /// In all other cases, both the original vec and the returned slice will hold aliased
     /// handle integers, and both will attempt to free those handles on drop — causing a
     /// double-free. Use the safe [`slice`] method instead.
-    unsafe fn slice_no_copy(&self, start_index: usize, end_index: usize) -> Option<Self> {
+    unsafe fn slice_no_copy_unchecked(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::payload_size();
         let byte_end = end_index * T::payload_size();
         let opt_buffer = self.buffer.copy_slice(byte_start, byte_end - byte_start);

@@ -785,6 +785,68 @@ fn test_slice_biguint() {
 }
 
 #[test]
+fn test_slice_out_of_bounds_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    for i in 1u32..=5u32 {
+        vec.push(i);
+    }
+
+    // end > len
+    assert!(vec.slice(0, 6).is_none());
+    assert!(vec.slice(3, 6).is_none());
+
+    // start > end
+    assert!(vec.slice(3, 2).is_none());
+    assert!(vec.slice(5, 1).is_none());
+
+    // start == end == len is a valid empty slice, not out of bounds
+    assert!(vec.slice(5, 5).is_some());
+    assert!(vec.slice(5, 5).unwrap().is_empty());
+
+    // start > len
+    assert!(vec.slice(6, 6).is_none());
+
+    // empty vec
+    let empty = ManagedVec::<StaticApi, u32>::new();
+    assert!(empty.slice(0, 1).is_none());
+    assert!(empty.slice(1, 0).is_none());
+    // empty slice from empty vec is valid
+    assert!(empty.slice(0, 0).is_some());
+    assert!(empty.slice(0, 0).unwrap().is_empty());
+}
+
+#[test]
+fn test_slice_out_of_bounds_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    // end > len
+    assert!(vec.slice(0, 6).is_none());
+    assert!(vec.slice(3, 6).is_none());
+
+    // start > end
+    assert!(vec.slice(3, 2).is_none());
+    assert!(vec.slice(5, 1).is_none());
+
+    // start == end == len is a valid empty slice, not out of bounds
+    assert!(vec.slice(5, 5).is_some());
+    assert!(vec.slice(5, 5).unwrap().is_empty());
+
+    // start > len
+    assert!(vec.slice(6, 6).is_none());
+
+    // empty vec
+    let empty = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    assert!(empty.slice(0, 1).is_none());
+    assert!(empty.slice(1, 0).is_none());
+    // empty slice from empty vec is valid
+    assert!(empty.slice(0, 0).is_some());
+    assert!(empty.slice(0, 0).unwrap().is_empty());
+}
+
+#[test]
 fn test_remove_u32() {
     let mut vec = ManagedVec::<StaticApi, u32>::new();
     vec.push(10u32);
