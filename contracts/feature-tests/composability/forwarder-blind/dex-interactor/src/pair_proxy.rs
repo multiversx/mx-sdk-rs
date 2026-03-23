@@ -239,7 +239,7 @@ where
 
     pub fn get_trusted_swap_pairs(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, (common_structs::wrapper_types::TokenPair<Env::Api>, ManagedAddress<Env::Api>)>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, MultiValue2<MultiValue2<EsdtTokenIdentifier<Env::Api>, EsdtTokenIdentifier<Env::Api>>, ManagedAddress<Env::Api>>>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getTrustedSwapPairs")
@@ -759,7 +759,7 @@ where
 
     pub fn state(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, pausable::State> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u8> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getState")

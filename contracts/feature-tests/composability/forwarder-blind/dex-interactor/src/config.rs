@@ -18,6 +18,9 @@ pub struct Config {
     pub gateway_uri: String,
     pub chain_type: ChainType,
     pub wegld_address: Bech32Address,
+    pub pair_address: Bech32Address,
+    pub wegld_token_id: String,
+    pub usdc_token_id: String,
 }
 
 impl Config {
@@ -36,6 +39,11 @@ impl Config {
             wegld_address: Bech32Address::from_bech32_string(
                 "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782".to_owned(),
             ),
+            pair_address: Bech32Address::from_bech32_string(
+                "erd1qqqqqqqqqqqqqpgqeel2kumf0r8ffyhth7pqdujjat9nx0862jpsg2pqaq".to_owned(),
+            ),
+            wegld_token_id: "WEGLD-bd4d79".to_owned(),
+            usdc_token_id: "USDC-350c4e".to_owned(),
         }
     }
 
