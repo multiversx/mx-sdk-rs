@@ -2,7 +2,7 @@ use core::borrow::Borrow;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::ManagedTypeApi,
+    api::{ManagedTypeApi, ManagedTypeApiImpl},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
@@ -110,6 +110,10 @@ where
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.contents.save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }
 

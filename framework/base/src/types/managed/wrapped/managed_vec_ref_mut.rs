@@ -55,13 +55,14 @@ where
     fn drop(&mut self) {
         // This drop saves the item back into the parent ManagedVec.
         //
-        // The `set` method also handles soft deallocation
-        // (freeing of the handle, without deallocating the underlying resource).
+        // Using `set_unchecked_no_drop` ensures the item's data is written back
+        // without running Drop on the item itself, so the handle is transferred
+        // to the buffer rather than freed.
         let item = unsafe { ManuallyDrop::take(&mut self.item) };
         unsafe {
             let mut parent_ref =
                 ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone());
-            let _ = parent_ref.set(self.item_index, item);
+            let _ = parent_ref.set_unchecked_no_drop(self.item_index, item);
         }
     }
 }

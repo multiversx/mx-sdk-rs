@@ -56,4 +56,6 @@ pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R;
+
+    fn backend_requires_managed_type_drop() -> bool;
 }

@@ -27,6 +27,7 @@ fn enum_static() {
         9
     );
     assert!(!<EnumWithFields as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(!<EnumWithFields as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 #[test]

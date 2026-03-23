@@ -16,11 +16,8 @@ use std::{
     sync::atomic::{AtomicI64, Ordering},
 };
 
-use multiversx_sc::types::{
-    BigFloat, BigInt, BigUint, EgldDecimals, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-    ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedDecimal, ManagedMap, ManagedVec,
-    ManagedVecItem, NumDecimals, TokenIdentifier,
-};
+use multiversx_sc::derive_imports::*;
+use multiversx_sc::imports::*;
 use multiversx_sc_scenario::api::StaticApi;
 
 /// Global allocator wrapper that tracks net allocated heap bytes.
@@ -178,12 +175,31 @@ fn main() {
         )
     });
 
+    bench_type("TokenId (native EGLD-000000)", TokenId::<StaticApi>::native);
+
+    bench_type("TokenId (ESDT)", || {
+        TokenId::<StaticApi>::from("MYTOKEN-123456")
+    });
+
+    bench_type("Payment (fungible ESDT)", || {
+        Payment::<StaticApi>::new("MYTOKEN-123456", 0, NonZeroBigUint::one())
+    });
+
     bench_type("ManagedMap (1 entry)", || {
         let key = ManagedBuffer::<StaticApi>::new_from_bytes(b"key");
         let val = ManagedBuffer::<StaticApi>::new_from_bytes(&data);
         let mut m = ManagedMap::<StaticApi>::new();
         m.put(&key, &val);
         m
+    });
+
+    bench_type("EnumWithFields", || EnumWithFields::Variant1(42u32));
+
+    bench_type("ManagedStructWithBigUint", || ManagedStructWithBigUint::<
+        StaticApi,
+    > {
+        big_uint: BigUint::from(42u64),
+        num: 42u32,
     });
 
     // -------------------------------------------------------------------------
@@ -235,5 +251,104 @@ fn main() {
         )
     });
 
+    bench_managed_vec("ManagedVec<Payment> (= PaymentVec)", || {
+        Payment::<StaticApi>::new("MYTOKEN-123456", 0, NonZeroBigUint::one())
+    });
+
+    bench_managed_vec("ManagedVec<u8>", || 42u8);
+    bench_managed_vec("ManagedVec<u16>", || 42u16);
+    bench_managed_vec("ManagedVec<u32>", || 42u32);
+    bench_managed_vec("ManagedVec<u64>", || 42u64);
+    bench_managed_vec("ManagedVec<i32>", || 42i32);
+    bench_managed_vec("ManagedVec<i64>", || 42i64);
+    bench_managed_vec("ManagedVec<usize>", || 42usize);
+    bench_managed_vec("ManagedVec<bool>", || true);
+    bench_managed_vec("ManagedVec<Option<i32>>", || Some(42i32));
+    bench_managed_vec("ManagedVec<Option<ManagedBuffer>>", || {
+        Some(ManagedBuffer::<StaticApi>::new_from_bytes(&data))
+    });
+
+    bench_managed_vec("ManagedVec<EnumWithFields>", || {
+        EnumWithFields::Variant1(42u32)
+    });
+
+    bench_managed_vec("ManagedVec<ManagedStructWithBigUint>", || {
+        ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        }
+    });
+
+    bench_managed_vec("ManagedVec<Option<EnumWithFields>>", || {
+        Some(EnumWithFields::Variant1(42u32))
+    });
+
+    bench_managed_vec("ManagedVec<Option<ManagedStructWithBigUint>>", || {
+        Some(ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        })
+    });
+
+    bench_managed_vec("ManagedVec<ManagedVec<EnumWithFields>>", || {
+        let mut inner = ManagedVec::<StaticApi, EnumWithFields>::new();
+        inner.push(EnumWithFields::Variant1(42u32));
+        inner
+    });
+
+    bench_managed_vec("ManagedVec<ManagedVec<ManagedStructWithBigUint>>", || {
+        let mut inner = ManagedVec::<StaticApi, ManagedStructWithBigUint<StaticApi>>::new();
+        inner.push(ManagedStructWithBigUint::<StaticApi> {
+            big_uint: BigUint::from(42u64),
+            num: 42u32,
+        });
+        inner
+    });
+
+    // -------------------------------------------------------------------------
+    // Tx objects (contract call style, mirroring adder tests)
+    // -------------------------------------------------------------------------
+    println!("\n=== Tx objects - contract call style ({NUM_ITEMS} instances each) ===\n");
+    println!(
+        "  {:<45} {:>16}  {:>14}  {:>12}",
+        "type", "create (bytes)", "hold (bytes)", "residual"
+    );
+    println!("  {}", "-".repeat(95));
+
+    bench_type("Tx<from, to, add(u64)>", || {
+        Tx::new_tx_from_sc()
+            .from(ManagedAddress::<StaticApi>::zero())
+            .to(ManagedAddress::<StaticApi>::zero())
+            .raw_call("bench")
+            .argument(&42u64)
+            .argument(&BigUint::<StaticApi>::from(42u64))
+            .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 100u32).unwrap())
+            .payment(
+                Payment::try_new(
+                    TokenId::<StaticApi>::from("MYTOKEN-123456"),
+                    0,
+                    BigUint::<StaticApi>::from(200u64),
+                )
+                .unwrap(),
+            )
+    });
+
     println!();
+}
+
+#[derive(
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
+)]
+enum EnumWithFields {
+    Variant1(u32),
+    Variant2,
+    Variant3(i64),
+}
+
+#[derive(
+    ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
+)]
+pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
+    pub big_uint: multiversx_sc::types::BigUint<M>,
+    pub num: u32,
 }

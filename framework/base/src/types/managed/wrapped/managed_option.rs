@@ -4,7 +4,7 @@ use generic_array::typenum::U4;
 
 use crate::{
     abi::TypeAbiFrom,
-    api::HandleConstraints,
+    api::{HandleConstraints, ManagedTypeApiImpl},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -220,6 +220,10 @@ where
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.handle.get_raw_handle().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }
 

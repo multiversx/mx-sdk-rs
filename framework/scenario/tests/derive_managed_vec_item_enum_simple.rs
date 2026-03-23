@@ -26,6 +26,7 @@ fn enum_static() {
         1
     );
     assert!(<SimpleEnum as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(!<SimpleEnum as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 #[test]

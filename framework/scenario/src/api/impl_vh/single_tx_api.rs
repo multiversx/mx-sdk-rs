@@ -41,6 +41,10 @@ impl VMHooksApiBackend for SingleTxApiBackend {
     {
         SINGLE_TX_API_STATIC_CELL.with(|data| f(data))
     }
+
+    fn backend_requires_managed_type_drop() -> bool {
+        false
+    }
 }
 
 /// Similar to the `StaticApi`, but offers allows calls to storage, input, and even creating results.

@@ -128,6 +128,10 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
         i32_to_bool(result)
     }
 
+    fn requires_managed_type_drop(&self) -> bool {
+        VHB::backend_requires_managed_type_drop()
+    }
+
     fn drop_managed_buffer(&self, handle: Self::ManagedBufferHandle) {
         self.with_vm_hooks_ctx_if_active(&handle, |vh| {
             vh.drop_managed_buffer(handle.get_raw_handle_unchecked())

@@ -34,6 +34,9 @@ fn enum_static() {
     assert!(
         !<EnumWithFieldsManaged<StaticApi> as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
+    assert!(
+        <EnumWithFieldsManaged<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop()
+    );
 }
 
 #[test]
