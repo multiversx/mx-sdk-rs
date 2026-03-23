@@ -233,6 +233,21 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for Payment<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if self.token_nonce == 0 {
+            write!(f, "{}: {}", self.token_identifier, self.amount)
+        } else {
+            write!(
+                f,
+                "{} (nonce {}): {}",
+                self.token_identifier, self.token_nonce, self.amount
+            )
+        }
+    }
+}
+
 impl<M> AsRef<Payment<M>> for &Payment<M>
 where
     M: ManagedTypeApi,
