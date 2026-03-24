@@ -728,8 +728,8 @@ dependencies = [
  "forwarder",
  "forwarder-blind",
  "forwarder-legacy",
- "forwarder-queue",
  "forwarder-raw",
+ "mesh-node",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "proxy-test-first",
@@ -1683,23 +1683,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "forwarder-queue"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
-name = "forwarder-queue-meta"
-version = "0.0.0"
-dependencies = [
- "forwarder-queue",
- "multiversx-sc-meta-lib",
-]
-
-[[package]]
 name = "forwarder-raw"
 version = "0.0.0"
 dependencies = [
@@ -2540,18 +2523,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "interact"
-version = "0.0.0"
-dependencies = [
- "clap",
- "multiversx-sc",
- "multiversx-sc-snippets",
- "serde",
- "tokio",
- "toml",
-]
-
-[[package]]
 name = "ipnet"
 version = "2.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2989,6 +2960,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "488016bfae457b036d996092f6cb448677611ce4449e970ceaf42695203f218a"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "mesh-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "mesh-node",
+ "multiversx-sc",
+ "multiversx-sc-snippets",
+ "serde",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "mesh-node"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
+name = "mesh-node-meta"
+version = "0.0.0"
+dependencies = [
+ "mesh-node",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]

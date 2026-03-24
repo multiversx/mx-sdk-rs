@@ -118,6 +118,21 @@ where
     }
 }
 
+impl<M, T, I, const N: usize> From<[I; N]> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+    I: Into<T>,
+{
+    fn from(arr: [I; N]) -> Self {
+        let mut result = Self::new();
+        for item in arr {
+            result.push(item.into());
+        }
+        result
+    }
+}
+
 impl<M, T> Default for ManagedVec<M, T>
 where
     M: ManagedTypeApi,

@@ -52,6 +52,7 @@ pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
     pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfig,
+    pub verbose: bool,
 }
 
 impl<'a> ProxyGenerator<'a> {
@@ -59,11 +60,13 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut dyn std::io::Write,
         proxy_config: &'a ProxyConfig,
+        verbose: bool,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
+            verbose,
         }
     }
 
@@ -156,15 +159,81 @@ where
         }
     }
 
-    fn write_types(&mut self) {
+    fn print_types_info(&self) {
+        let crate_name = self.proxy_config.abi.get_crate_name_for_code();
+        let mut local_types: Vec<&str> = Vec::new();
+        let mut skipped_types: Vec<&str> = Vec::new();
+        let mut external_types: Vec<&str> = Vec::new();
+
         for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
-            if self.proxy_config.abi.get_crate_name_for_code()
-                != extract_struct_crate(type_description.names.rust.as_str())
-            {
+            let rust_name = type_description.names.rust.as_str();
+            let type_short_name = rust_name.split("::").last().unwrap_or(rust_name);
+
+            if TYPES_FROM_FRAMEWORK.contains(&type_short_name) {
                 continue;
             }
 
-            let type_name = self.adjust_type_name_with_api(&type_description.names.rust);
+            if crate_name == extract_struct_crate(rust_name) {
+                match &type_description.contents {
+                    TypeContents::Struct(_) | TypeContents::Enum(_) => {
+                        if self.has_path_rename_for_crate(rust_name) {
+                            skipped_types.push(rust_name);
+                        } else {
+                            local_types.push(rust_name);
+                        }
+                    }
+                    _ => {}
+                }
+            } else if rust_name.contains("::") {
+                external_types.push(rust_name);
+            }
+        }
+
+        if !local_types.is_empty() || !skipped_types.is_empty() || !external_types.is_empty() {
+            println!(
+                "\nProxy types summary for {}:",
+                self.proxy_config.path.display()
+            );
+        }
+
+        if !local_types.is_empty() {
+            println!("  Types defined in proxy:");
+            for type_name in &local_types {
+                println!("    {type_name}");
+            }
+        }
+
+        if !skipped_types.is_empty() {
+            println!("  Types not generated (path-rename configured):");
+            for type_name in &skipped_types {
+                println!("    {type_name}");
+            }
+        }
+
+        if !external_types.is_empty() {
+            println!("  External type dependencies (configure [[proxy.path-rename]] to adjust):");
+            for type_name in &external_types {
+                println!("    {type_name}");
+            }
+        }
+    }
+
+    fn write_types(&mut self) {
+        if self.verbose {
+            self.print_types_info();
+        }
+
+        for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
+            let rust_name = type_description.names.rust.as_str();
+            if self.proxy_config.abi.get_crate_name_for_code() != extract_struct_crate(rust_name) {
+                continue;
+            }
+
+            if self.has_path_rename_for_crate(rust_name) {
+                continue;
+            }
+
+            let type_name = self.adjust_type_name_with_api(rust_name);
             if TYPES_FROM_FRAMEWORK.contains(&type_name.as_str()) {
                 continue;
             }
@@ -180,6 +249,16 @@ where
                 TypeContents::ExplicitEnum(_) => {}
             }
         }
+    }
+
+    /// Checks if a path-rename rule applies to this type's crate prefix,
+    /// meaning the type should not be generated in the proxy (it's accessible via the renamed path).
+    fn has_path_rename_for_crate(&self, rust_name: &str) -> bool {
+        let crate_prefix = extract_struct_crate(rust_name);
+        self.proxy_config
+            .path_rename
+            .iter()
+            .any(|pr| pr.from == crate_prefix)
     }
 
     fn write_constructors(&mut self) {
@@ -650,10 +729,15 @@ where
 
         for path in paths {
             let type_rust_name = path.split("::").last().unwrap();
-            if crate_name == extract_struct_crate(path)
-                || TYPES_FROM_FRAMEWORK.contains(&type_rust_name)
-            {
+            if TYPES_FROM_FRAMEWORK.contains(&type_rust_name) {
                 processed_paths.push(type_rust_name.to_string());
+            } else if crate_name == extract_struct_crate(path) {
+                if self.has_path_rename_for_crate(path) {
+                    // Keep full path so rename_path_with_custom_config can apply the rename.
+                    processed_paths.push(path.to_string());
+                } else {
+                    processed_paths.push(type_rust_name.to_string());
+                }
             } else {
                 processed_paths.push(path.to_string());
             }
@@ -703,6 +787,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
@@ -735,6 +820,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(

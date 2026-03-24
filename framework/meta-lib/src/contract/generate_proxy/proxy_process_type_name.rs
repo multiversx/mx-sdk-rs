@@ -8,6 +8,17 @@ pub(super) fn proxy_methods_type_name(contract_trait_name: &str) -> String {
     format!("{contract_trait_name}ProxyMethods")
 }
 
+/// Extracts the crate name from a fully qualified Rust type path.
+///
+/// Returns the first segment before `::`. If the path contains no `::`,
+/// the entire input is returned (e.g. a bare type name like `"MyStruct"`).
+///
+/// # Examples
+///
+/// ```ignore
+/// assert_eq!(extract_struct_crate("my_crate::module::MyStruct"), "my_crate");
+/// assert_eq!(extract_struct_crate("MyStruct"), "MyStruct");
+/// ```
 pub(super) fn extract_struct_crate(struct_path: &str) -> String {
     let crate_name = struct_path.split("::").next().unwrap_or(struct_path);
     crate_name.to_string()
@@ -87,4 +98,50 @@ fn max_discriminant(enum_variants: &[EnumVariantDescription]) -> Option<usize> {
         .filter(|variant| !variant.fields.is_empty())
         .map(|variant| variant.discriminant)
         .max()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::extract_struct_crate;
+
+    #[test]
+    fn extract_crate_from_full_path() {
+        assert_eq!(
+            extract_struct_crate("my_crate::module::MyStruct"),
+            "my_crate"
+        );
+    }
+
+    #[test]
+    fn extract_crate_from_two_segments() {
+        assert_eq!(extract_struct_crate("my_crate::MyStruct"), "my_crate");
+    }
+
+    #[test]
+    fn extract_crate_bare_type_name() {
+        assert_eq!(extract_struct_crate("MyStruct"), "MyStruct");
+    }
+
+    #[test]
+    fn extract_crate_empty_string() {
+        assert_eq!(extract_struct_crate(""), "");
+    }
+
+    #[test]
+    fn extract_crate_with_generic() {
+        assert_eq!(
+            extract_struct_crate(
+                "forwarder_net::QueuedCall<multiversx_sc::api::uncallable::UncallableApi>"
+            ),
+            "forwarder_net",
+        );
+    }
+
+    #[test]
+    fn extract_crate_deeply_nested() {
+        assert_eq!(
+            extract_struct_crate("benchmark_common::example_struct::ExampleStruct"),
+            "benchmark_common",
+        );
+    }
 }
