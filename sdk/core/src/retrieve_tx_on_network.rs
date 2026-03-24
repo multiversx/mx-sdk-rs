@@ -1,5 +1,3 @@
-use core::panic;
-
 use crate::{
     data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
