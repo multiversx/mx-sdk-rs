@@ -9,7 +9,9 @@ pub struct GatewayDappProxy {
 
 impl GatewayDappProxy {
     pub fn new(proxy_url: String) -> Self {
-        Self { proxy_url }
+        Self {
+            proxy_url: proxy_url.trim_end_matches('/').to_owned(),
+        }
     }
 
     /// Performs a request to the gateway.
@@ -18,11 +20,6 @@ impl GatewayDappProxy {
     where
         G: GatewayRequest,
     {
-        assert!(
-            !self.proxy_url.ends_with('/'),
-            "Proxy URL should not end with a slash"
-        );
-
         let url = format!("{}/{}", self.proxy_url, request.get_endpoint());
         let request_builder = match request.request_type() {
             GatewayRequestType::Get => Request::get(&url),

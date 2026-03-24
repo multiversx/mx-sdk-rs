@@ -26,7 +26,7 @@ fn reqwest_method(request_type: GatewayRequestType) -> Method {
 impl GatewayHttpProxy {
     pub fn new(proxy_uri: String) -> Self {
         Self {
-            proxy_uri,
+            proxy_uri: proxy_uri.trim_end_matches('/').to_owned(),
             client: reqwest::Client::new(),
         }
     }
@@ -37,11 +37,6 @@ impl GatewayHttpProxy {
     where
         G: GatewayRequest,
     {
-        assert!(
-            !self.proxy_uri.ends_with('/'),
-            "Proxy URL should not end with a slash"
-        );
-
         let url = format!("{}/{}", self.proxy_uri, request.get_endpoint());
         let method = request.request_type();
         log::info!("{method} request: {url}");
