@@ -4,11 +4,7 @@ multiversx_sc::imports!();
 pub trait ForwarderBlindTransferExecute: super::fwd_blind_common::ForwarderBlindCommon {
     #[endpoint(blindTransfExec)]
     #[payable]
-    fn blind_transf_exec(
-        &self,
-        to: ManagedAddress,
-        function_call: FunctionCall,
-    ) {
+    fn blind_transf_exec(&self, to: ManagedAddress, function_call: FunctionCall) {
         let payment = self.call_value().all();
         self.tx()
             .to(to)

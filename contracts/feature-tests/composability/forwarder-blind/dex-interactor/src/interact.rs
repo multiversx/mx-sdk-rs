@@ -25,21 +25,60 @@ pub async fn forwarder_blind_cli() {
         Some(interact_cli::InteractCliCommand::WrapEgld(args)) => {
             interact.wrap_egld(args.amount).await;
         }
-        Some(interact_cli::InteractCliCommand::SwapWegldForUsdc(args)) => {
-            interact
-                .swap_wegld_for_usdc(args.wegld_amount, args.usdc_amount_min)
-                .await;
-        }
-        Some(interact_cli::InteractCliCommand::SwapWegldForUsdcViaForwarder(args)) => {
-            interact
-                .swap_wegld_for_usdc_via_forwarder(args.wegld_amount, args.usdc_amount_min)
-                .await;
-        }
-        Some(interact_cli::InteractCliCommand::SwapUsdcForWegld(args)) => {
-            interact
-                .swap_usdc_for_wegld(args.usdc_amount, args.wegld_amount_min)
-                .await;
-        }
+        Some(interact_cli::InteractCliCommand::Swap1(args)) => match &args.method {
+            interact_cli::SwapWegldForUsdcMethod::Direct(args) => {
+                interact
+                    .swap1_direct(args.wegld_amount, args.usdc_amount_min)
+                    .await;
+            }
+            interact_cli::SwapWegldForUsdcMethod::Sync(args) => {
+                interact
+                    .swap1_sync(args.wegld_amount, args.usdc_amount_min)
+                    .await;
+            }
+            interact_cli::SwapWegldForUsdcMethod::Async1(args) => {
+                interact
+                    .swap1_async1(args.wegld_amount, args.usdc_amount_min)
+                    .await;
+            }
+            interact_cli::SwapWegldForUsdcMethod::Async2(args) => {
+                interact
+                    .swap1_async2(args.wegld_amount, args.usdc_amount_min)
+                    .await;
+            }
+            interact_cli::SwapWegldForUsdcMethod::Te(args) => {
+                interact
+                    .swap1_te(args.wegld_amount, args.usdc_amount_min)
+                    .await;
+            }
+        },
+        Some(interact_cli::InteractCliCommand::Swap2(args)) => match &args.method {
+            interact_cli::SwapUsdcForWegldMethod::Direct(args) => {
+                interact
+                    .swap2_direct(args.usdc_amount, args.wegld_amount_min)
+                    .await;
+            }
+            interact_cli::SwapUsdcForWegldMethod::Sync(args) => {
+                interact
+                    .swap2_sync(args.usdc_amount, args.wegld_amount_min)
+                    .await;
+            }
+            interact_cli::SwapUsdcForWegldMethod::Async1(args) => {
+                interact
+                    .swap2_async1(args.usdc_amount, args.wegld_amount_min)
+                    .await;
+            }
+            interact_cli::SwapUsdcForWegldMethod::Async2(args) => {
+                interact
+                    .swap2_async2(args.usdc_amount, args.wegld_amount_min)
+                    .await;
+            }
+            interact_cli::SwapUsdcForWegldMethod::Te(args) => {
+                interact
+                    .swap2_te(args.usdc_amount, args.wegld_amount_min)
+                    .await;
+            }
+        },
         Some(interact_cli::InteractCliCommand::GetRate(args)) => {
             interact.get_rate(args.wegld_amount).await;
         }
@@ -110,25 +149,37 @@ impl ContractInteract {
             .run()
             .await;
 
-        println!("WEGLD received: status={status:?}, gas_used={gas_used:?}");
+        println!("Wrapping complete: status={status:?}, gas_used={gas_used:?}");
     }
 
-    pub async fn swap_wegld_for_usdc(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+    fn build_swap_function_call(
+        &mut self,
+        token_id: &str,
+        amount_min: u64,
+    ) -> FunctionCall<StaticApi> {
+        self.interactor
+            .tx()
+            .typed(pair_proxy::PairProxy)
+            .swap_tokens_fixed_input(EsdtTokenIdentifier::from(token_id), amount_min)
+            .into_function_call()
+    }
+
+    pub async fn swap1_direct(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.usdc_token_id.clone(), usdc_amount_min);
+
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(&self.config.pair_address)
             .gas(50_000_000u64)
-            .typed(pair_proxy::PairProxy)
-            .swap_tokens_fixed_input(
-                EsdtTokenIdentifier::from(self.config.usdc_token_id.as_str()),
-                usdc_amount_min,
-            )
+            .raw_data(swap_function_call)
             .payment(
                 Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
                     .expect("Amount must be > 0"),
             )
+            .original_result::<EsdtTokenPayment<StaticApi>>()
             .returns(ReturnsResult)
             .run()
             .await;
@@ -136,44 +187,33 @@ impl ContractInteract {
         println!("USDC received: {response}");
     }
 
-    pub async fn swap_usdc_for_wegld(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+    pub async fn swap2_direct(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.wegld_token_id.clone(), wegld_amount_min);
+
         let response = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .to(&self.config.pair_address)
             .gas(50_000_000u64)
-            .typed(pair_proxy::PairProxy)
-            .swap_tokens_fixed_input(
-                EsdtTokenIdentifier::from(self.config.wegld_token_id.as_str()),
-                wegld_amount_min,
-            )
+            .raw_data(swap_function_call)
             .payment(
                 Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
                     .expect("Amount must be > 0"),
             )
-            .returns(ReturnsResult)
+            .returns(ReturnsRawResult)
             .run()
             .await;
 
-        println!("WEGLD received: {response}");
+        let first = response.get(0).clone();
+        let payment = Payment::<StaticApi>::top_decode(first).unwrap();
+        println!("WEGLD received: {payment:?}");
     }
 
-    pub async fn swap_wegld_for_usdc_via_forwarder(
-        &mut self,
-        wegld_amount: u64,
-        usdc_amount_min: u64,
-    ) {
-        let swap_function_call = self
-            .interactor
-            .tx()
-            .to(&self.config.pair_address)
-            .typed(pair_proxy::PairProxy)
-            .swap_tokens_fixed_input(
-                EsdtTokenIdentifier::from(self.config.usdc_token_id.as_str()),
-                usdc_amount_min,
-            )
-            .into_function_call();
+    pub async fn swap1_sync(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.usdc_token_id.clone(), usdc_amount_min);
 
         let (status, gas_used) = self
             .interactor
@@ -185,6 +225,174 @@ impl ContractInteract {
             .blind_sync(&self.config.pair_address, swap_function_call)
             .payment(
                 Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap2_sync(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.wegld_token_id.clone(), wegld_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_sync(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap1_async1(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.usdc_token_id.clone(), usdc_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_async_v1(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap1_async2(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.usdc_token_id.clone(), usdc_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_async_v2(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap1_te(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.usdc_token_id.clone(), usdc_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_transf_exec(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap2_async1(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.wegld_token_id.clone(), wegld_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_async_v1(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap2_async2(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.wegld_token_id.clone(), wegld_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_async_v2(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn swap2_te(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
+        let swap_function_call =
+            self.build_swap_function_call(&self.config.wegld_token_id.clone(), wegld_amount_min);
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_transf_exec(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
                     .expect("Amount must be > 0"),
             )
             .returns(ReturnsStatus)

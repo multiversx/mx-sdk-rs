@@ -4,11 +4,7 @@ multiversx_sc::imports!();
 pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
     #[endpoint(blindSync)]
     #[payable]
-    fn blind_sync(
-        &self,
-        to: ManagedAddress,
-        function_call: FunctionCall,
-    ) {
+    fn blind_sync(&self, to: ManagedAddress, function_call: FunctionCall) {
         let payment = self.call_value().all();
         let (back_transfers, raw_results) = self
             .tx()
@@ -32,11 +28,7 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
 
     #[endpoint(blindSyncFallible)]
     #[payable]
-    fn blind_sync_fallible(
-        &self,
-        to: ManagedAddress,
-        function_call: FunctionCall,
-    ) {
+    fn blind_sync_fallible(&self, to: ManagedAddress, function_call: FunctionCall) {
         let payment = self.call_value().all();
         let result = self
             .tx()

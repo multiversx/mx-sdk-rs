@@ -16,21 +16,10 @@ pub enum InteractCliCommand {
     Deploy,
     #[command(name = "wrap", about = "Wrap EGLD into WEGLD")]
     WrapEgld(WrapEgldArgs),
-    #[command(
-        name = "swap1",
-        about = "Swap WEGLD for USDC via the DEX pair contract"
-    )]
-    SwapWegldForUsdc(SwapWegldForUsdcArgs),
-    #[command(
-        name = "swap2",
-        about = "Swap USDC for WEGLD via the DEX pair contract"
-    )]
-    SwapUsdcForWegld(SwapUsdcForWegldArgs),
-    #[command(
-        name = "swap1-fwd",
-        about = "Swap WEGLD for USDC via forwarder-blind (blind_sync)"
-    )]
-    SwapWegldForUsdcViaForwarder(SwapWegldForUsdcArgs),
+    #[command(name = "swap1", about = "Swap WEGLD for USDC")]
+    Swap1(Swap1Args),
+    #[command(name = "swap2", about = "Swap USDC for WEGLD")]
+    Swap2(Swap2Args),
     #[command(
         name = "get-rate",
         about = "Get the approximate WEGLD -> USDC conversion rate"
@@ -41,6 +30,64 @@ pub enum InteractCliCommand {
         about = "Show the liquidity reserves in the WEGLD/USDC pair"
     )]
     GetLiquidity,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct Swap1Args {
+    #[command(subcommand)]
+    pub method: SwapWegldForUsdcMethod,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct Swap2Args {
+    #[command(subcommand)]
+    pub method: SwapUsdcForWegldMethod,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum SwapWegldForUsdcMethod {
+    #[command(name = "direct", about = "Swap directly on the DEX pair")]
+    Direct(SwapWegldForUsdcArgs),
+    #[command(name = "sync", about = "Swap via forwarder-blind using blind_sync")]
+    Sync(SwapWegldForUsdcArgs),
+    #[command(
+        name = "async1",
+        about = "Swap via forwarder-blind using blind_async_v1"
+    )]
+    Async1(SwapWegldForUsdcArgs),
+    #[command(
+        name = "async2",
+        about = "Swap via forwarder-blind using blind_async_v2"
+    )]
+    Async2(SwapWegldForUsdcArgs),
+    #[command(
+        name = "te",
+        about = "Swap via forwarder-blind using blind_transf_exec"
+    )]
+    Te(SwapWegldForUsdcArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum SwapUsdcForWegldMethod {
+    #[command(name = "direct", about = "Swap directly on the DEX pair")]
+    Direct(SwapUsdcForWegldArgs),
+    #[command(name = "sync", about = "Swap via forwarder-blind using blind_sync")]
+    Sync(SwapUsdcForWegldArgs),
+    #[command(
+        name = "async1",
+        about = "Swap via forwarder-blind using blind_async_v1"
+    )]
+    Async1(SwapUsdcForWegldArgs),
+    #[command(
+        name = "async2",
+        about = "Swap via forwarder-blind using blind_async_v2"
+    )]
+    Async2(SwapUsdcForWegldArgs),
+    #[command(
+        name = "te",
+        about = "Swap via forwarder-blind using blind_transf_exec"
+    )]
+    Te(SwapUsdcForWegldArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
