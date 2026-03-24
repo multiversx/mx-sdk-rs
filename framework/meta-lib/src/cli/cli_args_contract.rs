@@ -134,6 +134,10 @@ pub struct GenerateProxyArgs {
     /// Runs proxy comparison (newly generated vs already present on disk).
     #[arg(long, verbatim_doc_comment)]
     pub compare: bool,
+
+    /// Prints a summary of types defined, skipped, and external in the proxy.
+    #[arg(long, verbatim_doc_comment)]
+    pub verbose: bool,
 }
 
 impl CliArgsToRaw for GenerateProxyArgs {
@@ -141,6 +145,9 @@ impl CliArgsToRaw for GenerateProxyArgs {
         let mut raw = Vec::new();
         if self.compare {
             raw.push("--compare".to_string());
+        }
+        if self.verbose {
+            raw.push("--verbose".to_string());
         }
         raw
     }

@@ -17,8 +17,8 @@ fn world() -> ScenarioWorld {
         forwarder_legacy::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
-        forwarder_queue::ContractBuilder,
+        "mxsc:mesh-node/output/mesh-node.mxsc.json",
+        mesh_node::ContractBuilder,
     );
     blockchain.register_contract(
         "mxsc:forwarder-blind/output/forwarder-blind.mxsc.json",
@@ -172,11 +172,6 @@ fn forw_blind_transf_exec_accept_egld_rs() {
 #[test]
 fn forw_blind_upgrade_rs() {
     world().run("scenarios/forw_blind_upgrade.scen.json");
-}
-
-#[test]
-fn forw_queue_async_rs() {
-    world().run("scenarios/forw_queue_async.scen.json");
 }
 
 #[test]

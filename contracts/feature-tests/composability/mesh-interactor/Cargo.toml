@@ -1,0 +1,27 @@
+[package]
+name = "mesh-interactor"
+version = "0.0.0"
+authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "interact"
+path = "src/mesh_interact_main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.24" }
+toml = "1.0"
+
+[dependencies.multiversx-sc]
+version = "0.65.0"
+path = "../../../../framework/base"
+
+[dependencies.multiversx-sc-snippets]
+version = "0.65.0"
+path = "../../../../framework/snippets"
+
+[dependencies.mesh-node]
+path = "../mesh-node"

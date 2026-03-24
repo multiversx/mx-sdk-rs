@@ -14,14 +14,14 @@ path = "forwarder"
 [dev-dependencies.forwarder-legacy]
 path = "forwarder-legacy"
 
-[dev-dependencies.forwarder-queue]
-path = "forwarder-queue"
-
 [dev-dependencies.forwarder-blind]
 path = "forwarder-blind"
 
 [dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
+
+[dev-dependencies.mesh-node]
+path = "mesh-node"
 
 [dev-dependencies.proxy-test-first]
 path = "proxy-test-first"
