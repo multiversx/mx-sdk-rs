@@ -45,4 +45,6 @@ pub enum InteractCliCommand {
         about = "Query the trace view for all deployed contracts and print the results"
     )]
     Info,
+    #[command(name = "full", about = "Run setup, bump, and info in sequence")]
+    Full,
 }

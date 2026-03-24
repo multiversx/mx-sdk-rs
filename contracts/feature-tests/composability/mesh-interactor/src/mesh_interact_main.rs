@@ -14,6 +14,43 @@ use mesh_interact_controller::ComposabilityInteract;
 mod mesh_interact_controller;
 use multiversx_sc_snippets::imports::*;
 
+impl ComposabilityInteract {
+    fn load_layout(&self) -> CallTreeLayout {
+        CallTreeLayout::load_from_file(&self.config.call_tree_path)
+    }
+
+    async fn cmd_update_gas(&mut self) {
+        println!("Updating gas estimates...");
+        let layout_path = self.config.call_tree_path.clone();
+        let mut layout = self.load_layout();
+        layout.fill_gas_estimates();
+        layout.save_to_file(&layout_path);
+        println!("Gas estimates updated in {layout_path}");
+        self.program_calls(&layout).await;
+    }
+
+    async fn cmd_setup(&mut self) {
+        println!("Setting up contracts...");
+        let layout = self.load_layout();
+        self.deploy_call_tree(&layout).await;
+        self.program_calls(&layout).await;
+        self.program_returns(&layout).await;
+    }
+
+    async fn cmd_bump(&mut self) {
+        println!("Bumping...");
+        let layout = self.load_layout();
+        self.bump(&layout).await;
+    }
+
+    async fn cmd_full(&mut self) {
+        println!("Running full sequence: setup + bump + info...");
+        self.cmd_setup().await;
+        self.cmd_bump().await;
+        self.query_trace_info().await;
+    }
+}
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -25,31 +62,19 @@ async fn main() {
             call_tree_config_gen::generate_layouts(*n);
         }
         Some(mesh_interact_cli::InteractCliCommand::UpdateGas) => {
-            let mut interact = ComposabilityInteract::init().await;
-            let layout_path = interact.config.call_tree_path.clone();
-            let mut layout = CallTreeLayout::load_from_file(&layout_path);
-            layout.fill_gas_estimates();
-            layout.save_to_file(&layout_path);
-            println!("Gas estimates updated in {layout_path}");
-            interact.program_calls(&layout).await;
+            ComposabilityInteract::init().await.cmd_update_gas().await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Setup) => {
-            let mut interact = ComposabilityInteract::init().await;
-            let layout_path = interact.config.call_tree_path.clone();
-            let layout = CallTreeLayout::load_from_file(&layout_path);
-            interact.deploy_call_tree(&layout).await;
-            interact.program_calls(&layout).await;
-            interact.program_returns(&layout).await;
+            ComposabilityInteract::init().await.cmd_setup().await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Bump) => {
-            let mut interact = ComposabilityInteract::init().await;
-            let layout_path = interact.config.call_tree_path.clone();
-            let layout = CallTreeLayout::load_from_file(&layout_path);
-            interact.bump(&layout).await;
+            ComposabilityInteract::init().await.cmd_bump().await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Info) => {
-            let mut interact = ComposabilityInteract::init().await;
-            interact.query_trace_info().await;
+            ComposabilityInteract::init().await.query_trace_info().await;
+        }
+        Some(mesh_interact_cli::InteractCliCommand::Full) => {
+            ComposabilityInteract::init().await.cmd_full().await;
         }
         None => {}
     }
