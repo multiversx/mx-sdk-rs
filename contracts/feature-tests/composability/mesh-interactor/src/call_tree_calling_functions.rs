@@ -85,7 +85,7 @@ impl ComposabilityInteract {
                 tx.from(wallet)
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
-                    .typed(mesh_node_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::MeshNodeProxy)
                     .program_calls(calls)
                     .returns(ReturnsStatus)
             });
@@ -151,7 +151,7 @@ impl ComposabilityInteract {
                 tx.from(wallet)
                     .to(fwd_addr)
                     .gas(NumExpr("70,000,000"))
-                    .typed(mesh_node_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::MeshNodeProxy)
                     .program_returns(returns)
                     .returns(ReturnsStatus)
             });
@@ -226,7 +226,7 @@ impl ComposabilityInteract {
                 tx.from(wallet)
                     .to(to_addr)
                     .gas(gas_limit)
-                    .typed(mesh_node_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::MeshNodeProxy)
                     .bump(IgnoreValue)
                     .payment(start_payments)
                     .returns(ReturnsStatus)

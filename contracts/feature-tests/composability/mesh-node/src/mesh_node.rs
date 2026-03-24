@@ -56,7 +56,7 @@ pub struct Trace<M: ManagedTypeApi> {
 
 /// Testing multiple calls per transaction.
 #[multiversx_sc::contract]
-pub trait ForwarderQueue {
+pub trait MeshNode {
     #[view]
     #[storage_mapper("id")]
     fn id(&self) -> SingleValueMapper<NodeName<Self::Api>>;
@@ -136,7 +136,7 @@ pub trait ForwarderQueue {
         let contract_call = self
             .tx()
             .to(&call.to)
-            .typed(mesh_node_proxy::ForwarderQueueProxy)
+            .typed(mesh_node_proxy::MeshNodeProxy)
             .bump(&child_call_trace)
             .payment(&call.payments);
 

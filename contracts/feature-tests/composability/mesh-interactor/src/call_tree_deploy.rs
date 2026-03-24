@@ -48,7 +48,7 @@ impl ComposabilityInteract {
             };
             buffer.push_tx(|tx| {
                 tx.from(wallet)
-                    .typed(mesh_node_proxy::ForwarderQueueProxy)
+                    .typed(mesh_node_proxy::MeshNodeProxy)
                     .init(name)
                     .code(&self.forw_queue_code)
                     .code_metadata(code_metadata)

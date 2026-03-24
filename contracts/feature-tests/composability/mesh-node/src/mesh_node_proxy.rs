@@ -9,23 +9,23 @@
 
 use multiversx_sc::proxy_imports::*;
 
-pub struct ForwarderQueueProxy;
+pub struct MeshNodeProxy;
 
-impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for ForwarderQueueProxy
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for MeshNodeProxy
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    type TxProxyMethods = ForwarderQueueProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = MeshNodeProxyMethods<Env, From, To, Gas>;
 
     fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        ForwarderQueueProxyMethods { wrapped_tx: tx }
+        MeshNodeProxyMethods { wrapped_tx: tx }
     }
 }
 
-pub struct ForwarderQueueProxyMethods<Env, From, To, Gas>
+pub struct MeshNodeProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -36,7 +36,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, Gas> ForwarderQueueProxyMethods<Env, From, (), Gas>
+impl<Env, From, Gas> MeshNodeProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -58,7 +58,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, To, Gas> ForwarderQueueProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> MeshNodeProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,

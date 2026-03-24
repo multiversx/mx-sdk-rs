@@ -84,7 +84,7 @@ impl ComposabilityInteract {
                 .interactor
                 .query()
                 .to(addr)
-                .typed(mesh_node_proxy::ForwarderQueueProxy)
+                .typed(mesh_node_proxy::MeshNodeProxy)
                 .trace()
                 .returns(ReturnsResultUnmanaged)
                 .run()
