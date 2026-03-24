@@ -52,6 +52,7 @@ pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
     pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfig,
+    pub verbose: bool,
 }
 
 impl<'a> ProxyGenerator<'a> {
@@ -59,11 +60,13 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut dyn std::io::Write,
         proxy_config: &'a ProxyConfig,
+        verbose: bool,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
+            verbose,
         }
     }
 
@@ -216,7 +219,9 @@ where
     }
 
     fn write_types(&mut self) {
-        self.print_types_info();
+        if self.verbose {
+            self.print_types_info();
+        }
 
         for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
             let rust_name = type_description.names.rust.as_str();
@@ -782,6 +787,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
@@ -814,6 +820,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(
