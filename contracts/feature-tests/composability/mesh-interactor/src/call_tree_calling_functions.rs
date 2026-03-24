@@ -61,10 +61,7 @@ impl ComposabilityInteract {
                     .to_address();
 
                 let gas_limit = child_call.gas_limit.unwrap_or_else(|| {
-                    panic!(
-                        "gas_limit not set for call to '{}'; run `s1` first",
-                        child_call.to,
-                    )
+                    panic!("gas_limit not set for call to '{}'", child_call.to,)
                 });
 
                 let call_type = to_queued_call_type(&child_call.call_type);
@@ -212,7 +209,7 @@ impl ComposabilityInteract {
 
             assert!(
                 start_call.gas_limit.is_some(),
-                "gas_limit not set for start call to '{}'; run `s1` first",
+                "gas_limit not set for start call to '{}'",
                 start_call.to,
             );
             let gas_limit = start_call.gas_limit.unwrap();
