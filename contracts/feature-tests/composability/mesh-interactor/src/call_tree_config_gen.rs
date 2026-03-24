@@ -10,24 +10,24 @@ use crate::call_tree_config::{
 const LAYOUTS: &str = "layouts";
 
 // async_v1, 1 child
-const ASYNC_V1_C1_SM_LAYOUT: &str = "layouts/async_v1_c1_sm.toml";
-const ASYNC_V1_C1_PAY_SM_LAYOUT: &str = "layouts/async_v1_c1_pay_sm.toml";
-const ASYNC_V1_C1_SX_LAYOUT: &str = "layouts/async_v1_c1_sx.toml";
-const ASYNC_V1_C1_PAY_SX_LAYOUT: &str = "layouts/async_v1_c1_pay_sx.toml";
+const ASYNC_V1_C1_SM_LAYOUT: &str = "layouts/async_v1_c1_smin.toml";
+const ASYNC_V1_C1_PAY_SM_LAYOUT: &str = "layouts/async_v1_c1_smin_pay.toml";
+const ASYNC_V1_C1_SX_LAYOUT: &str = "layouts/async_v1_c1_sall.toml";
+const ASYNC_V1_C1_PAY_SX_LAYOUT: &str = "layouts/async_v1_c1_sall_pay.toml";
 
 // async_v2, 1 child
-const ASYNC_V2_C1_SM_LAYOUT: &str = "layouts/async_v2_c1_sm.toml";
-const ASYNC_V2_C1_PAY_SM_LAYOUT: &str = "layouts/async_v2_c1_pay_sm.toml";
-const ASYNC_V2_C1_SX_LAYOUT: &str = "layouts/async_v2_c1_sx.toml";
-const ASYNC_V2_C1_PAY_SX_LAYOUT: &str = "layouts/async_v2_c1_pay_sx.toml";
+const ASYNC_V2_C1_SM_LAYOUT: &str = "layouts/async_v2_c1_smin.toml";
+const ASYNC_V2_C1_PAY_SM_LAYOUT: &str = "layouts/async_v2_c1_smin_pay.toml";
+const ASYNC_V2_C1_SX_LAYOUT: &str = "layouts/async_v2_c1_sall.toml";
+const ASYNC_V2_C1_PAY_SX_LAYOUT: &str = "layouts/async_v2_c1_sall_pay.toml";
 
 // async_v2, 3 children
 const ASYNC_V2_C3_LAYOUT: &str = "layouts/async_v2_c3.toml";
 const ASYNC_V2_C3_PAY_LAYOUT: &str = "layouts/async_v2_c3_pay.toml";
 
 // transf_exec, 1 child
-const TRANSF_EXEC_C1_SM_LAYOUT: &str = "layouts/transf_exec_c1_sm.toml";
-const TRANSF_EXEC_C1_SX_LAYOUT: &str = "layouts/transf_exec_c1_sx.toml";
+const TRANSF_EXEC_C1_SM_LAYOUT: &str = "layouts/transf_exec_c1_smin.toml";
+const TRANSF_EXEC_C1_SX_LAYOUT: &str = "layouts/transf_exec_c1_sall.toml";
 
 // transf_exec, 3 children
 const TRANSF_EXEC_C3_LAYOUT: &str = "layouts/transf_exec_c3.toml";
@@ -155,6 +155,14 @@ fn egld_start_payment() -> PaymentConfig {
     }
 }
 
+fn egld_return_payment() -> PaymentConfig {
+    PaymentConfig {
+        token_id: "EGLD-000000".to_string(),
+        nonce: 0,
+        amount: "1".to_string(),
+    }
+}
+
 /// Generic async scenario: one root contract calls `num_children` children via `call_type`.
 ///
 /// Contract names follow the pattern `{label}_root_{suffix}` for the root and
@@ -169,6 +177,7 @@ fn async_impl(
     variants: Vec<ShardVariant>,
     start_payments: Vec<PaymentConfig>,
     call_payments: Vec<PaymentConfig>,
+    target_returns: Vec<PaymentConfig>,
 ) -> CallTreeLayout {
     assert!(num_children >= 1, "num_children must be at least 1");
 
@@ -203,6 +212,7 @@ fn async_impl(
                 payable: None,
                 address: None,
                 calls,
+                returns: Vec::new(),
             },
         );
 
@@ -215,6 +225,7 @@ fn async_impl(
                     payable: None,
                     address: None,
                     calls: Vec::new(),
+                    returns: target_returns.clone(),
                 },
             );
         }
@@ -235,6 +246,7 @@ pub fn async_v1_c1() -> CallTreeLayout {
         three_shard_variants(),
         Vec::new(),
         Vec::new(),
+        Vec::new(),
     )
 }
 
@@ -247,6 +259,7 @@ pub fn async_v1_c1_pay() -> CallTreeLayout {
         three_shard_variants(),
         vec![egld_start_payment()],
         vec![egld_payment()],
+        vec![egld_return_payment()],
     )
 }
 
@@ -257,6 +270,7 @@ pub fn async_v1_c1_all_shards() -> CallTreeLayout {
         ProgrammedCallTypeConfig::AsyncV1,
         1,
         all_shard_variants(),
+        Vec::new(),
         Vec::new(),
         Vec::new(),
     )
@@ -271,6 +285,7 @@ pub fn async_v1_c1_pay_all_shards() -> CallTreeLayout {
         all_shard_variants(),
         vec![egld_start_payment()],
         vec![egld_payment()],
+        vec![egld_return_payment()],
     )
 }
 
@@ -285,6 +300,7 @@ pub fn async_v2_c1() -> CallTreeLayout {
         three_shard_variants(),
         Vec::new(),
         Vec::new(),
+        Vec::new(),
     )
 }
 
@@ -297,6 +313,7 @@ pub fn async_v2_c1_pay() -> CallTreeLayout {
         three_shard_variants(),
         vec![egld_start_payment()],
         vec![egld_payment()],
+        vec![egld_return_payment()],
     )
 }
 
@@ -307,6 +324,7 @@ pub fn async_v2_c1_all_shards() -> CallTreeLayout {
         ProgrammedCallTypeConfig::AsyncV2,
         1,
         all_shard_variants(),
+        Vec::new(),
         Vec::new(),
         Vec::new(),
     )
@@ -321,6 +339,7 @@ pub fn async_v2_c1_pay_all_shards() -> CallTreeLayout {
         all_shard_variants(),
         vec![egld_start_payment()],
         vec![egld_payment()],
+        vec![egld_return_payment()],
     )
 }
 
@@ -333,6 +352,7 @@ fn async_c3_impl(
     variants: Vec<C3ShardVariant>,
     start_payments: Vec<PaymentConfig>,
     call_payments: Vec<PaymentConfig>,
+    target_returns: Vec<PaymentConfig>,
 ) -> CallTreeLayout {
     let mut start = Vec::new();
     let mut contracts = BTreeMap::new();
@@ -365,6 +385,7 @@ fn async_c3_impl(
                 payable: None,
                 address: None,
                 calls,
+                returns: Vec::new(),
             },
         );
 
@@ -377,6 +398,7 @@ fn async_c3_impl(
                     payable: None,
                     address: None,
                     calls: Vec::new(),
+                    returns: target_returns.clone(),
                 },
             );
         }
@@ -393,6 +415,7 @@ pub fn async_v2_c3() -> CallTreeLayout {
         c3_shard_variants(),
         Vec::new(),
         Vec::new(),
+        Vec::new(),
     )
 }
 
@@ -404,13 +427,18 @@ pub fn async_v2_c3_pay() -> CallTreeLayout {
         c3_shard_variants(),
         vec![egld_start_payment()],
         vec![egld_payment()],
+        vec![egld_return_payment()],
     )
 }
 
 // --- transf_exec ---
 // Transfer-execute does not forward payments, but supports multiple children.
 
-fn transf_exec_impl(label: &str, num_children: usize, variants: Vec<ShardVariant>) -> CallTreeLayout {
+fn transf_exec_impl(
+    label: &str,
+    num_children: usize,
+    variants: Vec<ShardVariant>,
+) -> CallTreeLayout {
     assert!(num_children >= 1, "num_children must be at least 1");
 
     let mut start = Vec::new();
@@ -444,6 +472,7 @@ fn transf_exec_impl(label: &str, num_children: usize, variants: Vec<ShardVariant
                 payable: Some(true),
                 address: None,
                 calls,
+                returns: Vec::new(),
             },
         );
 
@@ -456,6 +485,7 @@ fn transf_exec_impl(label: &str, num_children: usize, variants: Vec<ShardVariant
                     payable: None,
                     address: None,
                     calls: Vec::new(),
+                    returns: Vec::new(),
                 },
             );
         }
@@ -511,6 +541,7 @@ fn transf_exec_c3_impl(label: &str, variants: Vec<C3ShardVariant>) -> CallTreeLa
                 payable: Some(true),
                 address: None,
                 calls,
+                returns: Vec::new(),
             },
         );
 
@@ -523,6 +554,7 @@ fn transf_exec_c3_impl(label: &str, variants: Vec<C3ShardVariant>) -> CallTreeLa
                     payable: None,
                     address: None,
                     calls: Vec::new(),
+                    returns: Vec::new(),
                 },
             );
         }
@@ -561,6 +593,7 @@ pub fn sync_chain(n: usize) -> CallTreeLayout {
                 payable: None,
                 address: None,
                 calls,
+                returns: Vec::new(),
             },
         );
     }

@@ -179,6 +179,10 @@ pub struct ContractConfig {
     pub address: Option<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub calls: Vec<ProgrammedCallConfig>,
+    /// Payments the contract should send back to its caller upon `bump`.
+    /// Only sent when the contract has sufficient balance to cover all of them.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub returns: Vec<PaymentConfig>,
 }
 
 /// Serializable description of the whole call tree layout (no addresses).

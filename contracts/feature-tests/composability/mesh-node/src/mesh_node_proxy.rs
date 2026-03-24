@@ -84,6 +84,15 @@ where
             .original_result()
     }
 
+    pub fn programmed_returns(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, Payment<Env::Api>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("programmed_returns")
+            .original_result()
+    }
+
     pub fn trace(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, crate::Trace<Env::Api>>> {
@@ -101,8 +110,21 @@ where
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
-            .raw_call("program_calls")
+            .raw_call("programCalls")
             .argument(&calls)
+            .original_result()
+    }
+
+    pub fn program_returns<
+        Arg0: ProxyArg<MultiValueManagedVec<Env::Api, Payment<Env::Api>>>,
+    >(
+        self,
+        returns: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("programReturns")
+            .argument(&returns)
             .original_result()
     }
 

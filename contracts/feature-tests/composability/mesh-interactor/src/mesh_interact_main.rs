@@ -39,6 +39,7 @@ async fn main() {
             let layout = CallTreeLayout::load_from_file(&layout_path);
             interact.deploy_call_tree(&layout).await;
             interact.program_calls(&layout).await;
+            interact.program_returns(&layout).await;
         }
         Some(mesh_interact_cli::InteractCliCommand::Bump) => {
             let mut interact = ComposabilityInteract::init().await;

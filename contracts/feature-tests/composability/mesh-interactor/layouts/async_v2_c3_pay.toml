@@ -132,26 +132,71 @@ amount = "12000000"
 [contracts.async_v2_c3_target_s0_s00]
 shard = 0
 
+[[contracts.async_v2_c3_target_s0_s00.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
+
 [contracts.async_v2_c3_target_s0_s11]
 shard = 0
+
+[[contracts.async_v2_c3_target_s0_s11.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
 
 [contracts.async_v2_c3_target_s0_s22]
 shard = 0
 
+[[contracts.async_v2_c3_target_s0_s22.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
+
 [contracts.async_v2_c3_target_s1_s00]
 shard = 1
+
+[[contracts.async_v2_c3_target_s1_s00.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
 
 [contracts.async_v2_c3_target_s1_s11]
 shard = 1
 
+[[contracts.async_v2_c3_target_s1_s11.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
+
 [contracts.async_v2_c3_target_s1_s22]
 shard = 1
+
+[[contracts.async_v2_c3_target_s1_s22.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
 
 [contracts.async_v2_c3_target_s2_s00]
 shard = 2
 
+[[contracts.async_v2_c3_target_s2_s00.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
+
 [contracts.async_v2_c3_target_s2_s11]
 shard = 2
 
+[[contracts.async_v2_c3_target_s2_s11.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"
+
 [contracts.async_v2_c3_target_s2_s22]
 shard = 2
+
+[[contracts.async_v2_c3_target_s2_s22.returns]]
+token_id = "EGLD-000000"
+nonce = 0
+amount = "1"

@@ -5,10 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            5
+// Endpoints:                            7
 // Async Callback:                       1
 // Promise callbacks:                    1
-// Total number of exported functions:   8
+// Total number of exported functions:  10
 
 #![no_std]
 
@@ -21,8 +21,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         id => id
         programmed_calls => programmed_calls
+        programmed_returns => programmed_returns
         trace => trace
-        program_calls => program_calls
+        programCalls => program_calls
+        programReturns => program_returns
         bump => bump
         async_v2_callback => async_v2_callback
     )

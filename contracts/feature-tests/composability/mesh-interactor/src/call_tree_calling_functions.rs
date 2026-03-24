@@ -101,6 +101,72 @@ impl ComposabilityInteract {
         }
     }
 
+    /// For every contract in the layout that has programmed returns, call the
+    /// `program_returns` endpoint on-chain to configure them.
+    pub async fn program_returns(&mut self, layout: &CallTreeLayout) {
+        let has_returns = layout.contracts.values().any(|c| !c.returns.is_empty());
+        if !has_returns {
+            return;
+        }
+
+        let state = CallTreeLayout::load_from_file(STATE_FILE);
+        println!("Setting up programmed returns from config...");
+
+        let addr_map: HashMap<String, Bech32Address> = state
+            .contracts
+            .iter()
+            .map(|(name, c)| {
+                let addr = c
+                    .address
+                    .clone()
+                    .unwrap_or_else(|| panic!("no address in state for '{name}'"));
+                (name.clone(), Bech32Address::from_bech32_string(addr))
+            })
+            .collect();
+
+        let wallet_map: HashMap<&String, Address> = layout
+            .contracts
+            .iter()
+            .map(|(name, c)| (name, self.wallets.wallet_for_shard(c.shard)))
+            .collect();
+
+        let mut buffer = self.interactor.homogenous_call_buffer();
+
+        for (name, contract) in &layout.contracts {
+            if contract.returns.is_empty() {
+                continue;
+            }
+            let fwd_addr = addr_map
+                .get(name)
+                .unwrap_or_else(|| panic!("no address for contract '{name}'"))
+                .clone();
+            let returns: MultiValueManagedVec<StaticApi, Payment<StaticApi>> =
+                to_payment_vec(&contract.returns).into();
+            let wallet = &wallet_map[name];
+            println!(
+                "Setting {} programmed return(s) on contract '{name}'",
+                contract.returns.len(),
+            );
+            buffer.push_tx(|tx| {
+                tx.from(wallet)
+                    .to(fwd_addr)
+                    .gas(NumExpr("70,000,000"))
+                    .typed(mesh_node_proxy::ForwarderQueueProxy)
+                    .program_returns(returns)
+                    .returns(ReturnsStatus)
+            });
+        }
+
+        let results = buffer.run().await;
+        for (i, status) in results.iter().enumerate() {
+            if *status == 0u64 {
+                println!("program_returns #{i}: ok");
+            } else {
+                println!("program_returns #{i}: failed with status {status}");
+            }
+        }
+    }
+
     /// Send all `[[start]]` transactions from the layout in a single batch.
     pub async fn bump(&mut self, layout: &CallTreeLayout) {
         let state = CallTreeLayout::load_from_file(STATE_FILE);

@@ -66,6 +66,10 @@ pub trait ForwarderQueue {
     fn programmed_calls(&self) -> SingleValueMapper<ManagedVec<ProgrammedCall<Self::Api>>>;
 
     #[view]
+    #[storage_mapper("programmed_returns")]
+    fn programmed_returns(&self) -> SingleValueMapper<PaymentVec>;
+
+    #[view]
     #[storage_mapper("trace")]
     fn trace(&self) -> VecMapper<Trace<Self::Api>>;
 
@@ -74,9 +78,14 @@ pub trait ForwarderQueue {
         self.id().set(id);
     }
 
-    #[endpoint]
+    #[endpoint(programCalls)]
     fn program_calls(&self, calls: MultiValueManagedVec<ProgrammedCall<Self::Api>>) {
         self.programmed_calls().set(calls.into_vec());
+    }
+
+    #[endpoint(programReturns)]
+    fn program_returns(&self, returns: MultiValueManagedVec<Payment>) {
+        self.programmed_returns().set(returns.into_vec());
     }
 
     /// Records the call, then calls all programmed calls.
@@ -95,13 +104,21 @@ pub trait ForwarderQueue {
             back_transfers: PaymentVec::new(),
             results: ManagedVec::new(),
         });
-        let calls = self.programmed_calls().get();
-        for (call_index, call) in calls.into_iter().enumerate() {
-            self.forward_programmed_call(call, call_index, &call_trace);
-        }
+
+        self.forward_programmed_calls(&call_trace);
+
+        self.send_programmed_returns();
+
         self.trace().update(trace_index, |trace| {
             trace.final_gas = self.blockchain().get_gas_left();
         });
+    }
+
+    fn forward_programmed_calls(&self, call_trace: &MultiValueManagedVec<TraceItem<Self::Api>>) {
+        let calls = self.programmed_calls().get();
+        for (call_index, call) in calls.into_iter().enumerate() {
+            self.forward_programmed_call(call, call_index, call_trace);
+        }
     }
 
     fn forward_programmed_call(
@@ -141,6 +158,23 @@ pub trait ForwarderQueue {
             ProgrammedCallType::Sync => {
                 contract_call.gas(call.gas_limit).sync_call();
             }
+        }
+    }
+
+    fn send_programmed_returns(&self) {
+        let returns = self.programmed_returns().get();
+        if returns.is_empty() {
+            return;
+        }
+        let all_sufficient = returns.iter().all(|payment| {
+            let balance = self
+                .blockchain()
+                .get_sc_balance(&payment.token_identifier, payment.token_nonce);
+            payment.amount <= balance
+        });
+        if all_sufficient {
+            let caller = self.blockchain().get_caller();
+            self.tx().to(&caller).payment(returns).transfer();
         }
     }
 

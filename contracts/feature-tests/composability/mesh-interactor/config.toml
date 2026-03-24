@@ -1,4 +1,4 @@
-call_tree_path = "layouts/async_v2_c3.toml"
+call_tree_path = "layouts/async_v1_c1_smin_pay.toml"
 
 [gateway]
 uri = "https://testnet-gateway.multiversx.com"
