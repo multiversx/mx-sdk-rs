@@ -6,5 +6,5 @@
 !alice.pem
 !bob.pem
 
-# Trace file of interactor tooling
-comp_interact_trace.scen.json
+# Current state
+current.toml
