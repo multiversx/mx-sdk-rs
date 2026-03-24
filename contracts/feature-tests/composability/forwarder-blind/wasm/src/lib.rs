@@ -6,10 +6,10 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                            8
+// Endpoints:                            9
 // Async Callback:                       1
 // Promise callbacks:                    1
-// Total number of exported functions:  12
+// Total number of exported functions:  13
 
 #![no_std]
 
@@ -21,6 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         upgrade => upgrade
+        drain => drain
         blindAsyncV1 => blind_async_v1
         blindAsyncV2 => blind_async_v2
         blindDeploy => blind_deploy

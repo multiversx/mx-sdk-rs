@@ -2,4 +2,4 @@
 path = "../../examples/multisig/interact/src/wegld_proxy.rs"
 
 [[proxy]]
-path = "../../feature-tests/composability/forwarder-blind/interactor/src/wegld_proxy.rs"
+path = "../../feature-tests/composability/forwarder-blind/dex-interactor/src/proxies/wegld_proxy.rs"

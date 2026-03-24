@@ -7,15 +7,14 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
     fn blind_sync(
         &self,
         to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
+        function_call: FunctionCall,
     ) {
         let payment = self.call_value().all();
         let (back_transfers, raw_results) = self
             .tx()
             .to(to)
-            .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .raw_call(function_call.function_name)
+            .arguments_raw(function_call.arg_buffer)
             .payment(payment)
             .gas(self.tx_gas())
             .returns(ReturnsBackTransfers)
@@ -36,15 +35,14 @@ pub trait ForwarderBlindSync: super::fwd_blind_common::ForwarderBlindCommon {
     fn blind_sync_fallible(
         &self,
         to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
+        function_call: FunctionCall,
     ) {
         let payment = self.call_value().all();
         let result = self
             .tx()
             .to(to)
-            .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .raw_call(function_call.function_name)
+            .arguments_raw(function_call.arg_buffer)
             .payment(&payment)
             .gas(self.tx_gas())
             .returns(

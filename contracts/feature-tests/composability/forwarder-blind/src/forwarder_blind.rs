@@ -1,7 +1,5 @@
 #![no_std]
 
-pub mod forwarder_blind_proxy;
-
 mod fwd_blind_async_v1;
 mod fwd_blind_async_v2;
 mod fwd_blind_common;

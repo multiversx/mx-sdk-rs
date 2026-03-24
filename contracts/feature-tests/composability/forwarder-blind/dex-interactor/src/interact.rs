@@ -1,13 +1,12 @@
 mod config;
 mod interact_cli;
-pub mod pair_proxy;
+pub mod proxies;
 mod state;
-pub mod wegld_proxy;
 
 use clap::Parser;
 pub use config::Config;
-use forwarder_blind::forwarder_blind_proxy;
 use multiversx_sc_snippets::imports::*;
+use proxies::*;
 use state::State;
 
 const FORWARDER_BLIND_CODE_PATH: MxscPath = MxscPath::new("../output/forwarder-blind.mxsc.json");
@@ -29,6 +28,11 @@ pub async fn forwarder_blind_cli() {
         Some(interact_cli::InteractCliCommand::SwapWegldForUsdc(args)) => {
             interact
                 .swap_wegld_for_usdc(args.wegld_amount, args.usdc_amount_min)
+                .await;
+        }
+        Some(interact_cli::InteractCliCommand::SwapWegldForUsdcViaForwarder(args)) => {
+            interact
+                .swap_wegld_for_usdc_via_forwarder(args.wegld_amount, args.usdc_amount_min)
                 .await;
         }
         Some(interact_cli::InteractCliCommand::SwapUsdcForWegld(args)) => {
@@ -62,7 +66,7 @@ impl ContractInteract {
             "contracts/feature-tests/composability/forwarder-blind/interactor",
         );
 
-        let wallet_address = interactor.register_wallet(test_wallets::judy()).await;
+        let wallet_address = interactor.register_wallet(test_wallets::simon()).await;
 
         interactor.generate_blocks_until_all_activations().await;
 
@@ -79,7 +83,7 @@ impl ContractInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .gas(30_000_000u64)
+            .gas(SimulateGas)
             .typed(forwarder_blind_proxy::ForwarderBlindProxy)
             .init()
             .code(FORWARDER_BLIND_CODE_PATH)
@@ -118,14 +122,13 @@ impl ContractInteract {
             .gas(50_000_000u64)
             .typed(pair_proxy::PairProxy)
             .swap_tokens_fixed_input(
-                TokenIdentifier::from(self.config.usdc_token_id.as_str()),
-                BigUint::from(usdc_amount_min),
+                EsdtTokenIdentifier::from(self.config.usdc_token_id.as_str()),
+                usdc_amount_min,
             )
-            .payment(Payment::new(
-                TokenId::from(self.config.wegld_token_id.as_str()),
-                0,
-                NonZeroBigUint::new(BigUint::from(wegld_amount)).expect("Amount must be > 0"),
-            ))
+            .payment(
+                Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
             .returns(ReturnsResult)
             .run()
             .await;
@@ -142,19 +145,54 @@ impl ContractInteract {
             .gas(50_000_000u64)
             .typed(pair_proxy::PairProxy)
             .swap_tokens_fixed_input(
-                TokenIdentifier::from(self.config.wegld_token_id.as_str()),
-                BigUint::from(wegld_amount_min),
+                EsdtTokenIdentifier::from(self.config.wegld_token_id.as_str()),
+                wegld_amount_min,
             )
-            .payment(Payment::new(
-                TokenId::from(self.config.usdc_token_id.as_str()),
-                0,
-                NonZeroBigUint::new(BigUint::from(usdc_amount)).expect("Amount must be > 0"),
-            ))
+            .payment(
+                Payment::try_new(&self.config.usdc_token_id, 0, usdc_amount)
+                    .expect("Amount must be > 0"),
+            )
             .returns(ReturnsResult)
             .run()
             .await;
 
         println!("WEGLD received: {response}");
+    }
+
+    pub async fn swap_wegld_for_usdc_via_forwarder(
+        &mut self,
+        wegld_amount: u64,
+        usdc_amount_min: u64,
+    ) {
+        let swap_function_call = self
+            .interactor
+            .tx()
+            .to(&self.config.pair_address)
+            .typed(pair_proxy::PairProxy)
+            .swap_tokens_fixed_input(
+                EsdtTokenIdentifier::from(self.config.usdc_token_id.as_str()),
+                usdc_amount_min,
+            )
+            .into_function_call();
+
+        let (status, gas_used) = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .gas(70_000_000u64)
+            .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+            .blind_sync(&self.config.pair_address, swap_function_call)
+            .payment(
+                Payment::try_new(&self.config.wegld_token_id, 0, wegld_amount)
+                    .expect("Amount must be > 0"),
+            )
+            .returns(ReturnsStatus)
+            .returns(ReturnsGasUsed)
+            .run()
+            .await;
+
+        println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
     }
 
     pub async fn get_rate(&mut self, wegld_amount: u64) {
@@ -164,7 +202,7 @@ impl ContractInteract {
             .to(&self.config.pair_address)
             .typed(pair_proxy::PairProxy)
             .get_amount_out_view(
-                TokenIdentifier::from(self.config.wegld_token_id.as_str()),
+                EsdtTokenIdentifier::from(self.config.wegld_token_id.as_str()),
                 BigUint::from(wegld_amount),
             )
             .returns(ReturnsResultUnmanaged)

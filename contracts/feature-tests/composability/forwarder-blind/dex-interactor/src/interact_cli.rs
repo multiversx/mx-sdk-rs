@@ -27,6 +27,11 @@ pub enum InteractCliCommand {
     )]
     SwapUsdcForWegld(SwapUsdcForWegldArgs),
     #[command(
+        name = "swap1-fwd",
+        about = "Swap WEGLD for USDC via forwarder-blind (blind_sync)"
+    )]
+    SwapWegldForUsdcViaForwarder(SwapWegldForUsdcArgs),
+    #[command(
         name = "get-rate",
         about = "Get the approximate WEGLD -> USDC conversion rate"
     )]
