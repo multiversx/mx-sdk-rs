@@ -13,9 +13,12 @@ contracts/**/output*/
 data/**/Cargo.lock
 framework/**/Cargo.lock
 sdk/**/Cargo.lock
-tools/**/Cargo.lock
 vm/**/Cargo.lock
 chain/wasmer-prod/Cargo.lock
+
+# Their own workspaces, need their Cargo.lock
+!contracts/feature-tests/gas-tests/Cargo.lock
+!chain/wasmer-prod/Cargo.lock
 
 # Coverage outputs
 *.profraw
