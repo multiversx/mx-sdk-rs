@@ -9,7 +9,7 @@ use multiversx_sc_snippets::imports::*;
 use proxies::*;
 use state::State;
 
-const FORWARDER_BLIND_CODE_PATH: MxscPath = MxscPath::new("../output/forwarder-blind.mxsc.json");
+const FORWARDER_BLIND_CODE_PATH: FilePath = FilePath("forwarder-blind-bon.wasm");
 
 pub async fn forwarder_blind_cli() {
     env_logger::init();
