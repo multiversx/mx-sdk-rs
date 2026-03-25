@@ -1,0 +1,338 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.93.1",
+            "commitHash": "01f6ddf7588f42ae2d7eb0a2f21d44e8e96674cf",
+            "commitDate": "2026-02-11",
+            "channel": "Stable",
+            "host": "aarch64-apple-darwin",
+            "short": "rustc 1.93.1 (01f6ddf75 2026-02-11)",
+            "llvmVersion": "21.1"
+        },
+        "contractCrate": {
+            "name": "forwarder-blind",
+            "version": "0.0.0",
+            "gitVersion": "v0.65.1-1-gb94cabe23"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.65.1"
+        }
+    },
+    "docs": [
+        "Contract that blindly forwards calls and payments, one endpoint per call type."
+    ],
+    "name": "ForwarderBlind",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "upgradeConstructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "drain",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenId"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindAsyncV1",
+            "rustMethodName": "blind_async_v1",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_call",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindAsyncV2",
+            "rustMethodName": "blind_async_v2",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_call",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindDeploy",
+            "rustMethodName": "blind_deploy",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "code",
+                    "type": "bytes"
+                },
+                {
+                    "name": "code_metadata",
+                    "type": "CodeMetadata"
+                },
+                {
+                    "name": "args",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "blindSync",
+            "rustMethodName": "blind_sync",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_call",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindSyncFallible",
+            "rustMethodName": "blind_sync_fallible",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_call",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindTransfExec",
+            "rustMethodName": "blind_transf_exec",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_call",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindUpgrade",
+            "rustMethodName": "blind_upgrade",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "code",
+                    "type": "bytes"
+                },
+                {
+                    "name": "code_metadata",
+                    "type": "CodeMetadata"
+                },
+                {
+                    "name": "args",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "blindUpgradeFromSource",
+            "rustMethodName": "blind_upgrade_from_source",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "sc_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "source_contract_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "code_metadata",
+                    "type": "CodeMetadata"
+                },
+                {
+                    "name": "args",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "promisesCallbackNames": [
+        "blind_async_v2_callback"
+    ],
+    "events": [
+        {
+            "identifier": "blindAsyncV1CallbackOk",
+            "inputs": [
+                {
+                    "name": "results",
+                    "type": "variadic<bytes>",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "blindAsyncV1CallbackError",
+            "inputs": [
+                {
+                    "name": "err_code",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "err_msg",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "identifier": "blindAsyncV2CallbackOk",
+            "inputs": [
+                {
+                    "name": "results",
+                    "type": "variadic<bytes>",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "blindAsyncV2CallbackError",
+            "inputs": [
+                {
+                    "name": "err_code",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "err_msg",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "identifier": "blindBackPayments",
+            "inputs": [
+                {
+                    "name": "scenario",
+                    "type": "utf-8 string",
+                    "indexed": true
+                },
+                {
+                    "name": "original_caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "payments",
+                    "type": "variadic<multi<TokenIdentifier,u64,NonZeroBigUint>>",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "blindDeployOk",
+            "inputs": [
+                {
+                    "name": "new_address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "results",
+                    "type": "variadic<bytes>",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "blindSyncOk",
+            "inputs": [
+                {
+                    "name": "results",
+                    "type": "variadic<bytes>",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "blindSyncError",
+            "inputs": [
+                {
+                    "name": "err_code",
+                    "type": "u32",
+                    "indexed": true
+                }
+            ]
+        }
+    ],
+    "esdtAttributes": [],
+    "hasCallback": true,
+    "types": {}
+}
