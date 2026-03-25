@@ -146,3 +146,40 @@ Show the liquidity reserves in the WEGLD/USDC pair.
 ```bash
 cargo run -- get-liquidity
 ```
+
+---
+
+### `drain`
+
+Drain all WEGLD and USDC balances held by the deployed forwarder-blind contract back to the owner.
+Useful to recover tokens left in the contract after transfer-execute swaps (which have no callback).
+
+```bash
+cargo run -- drain
+```
+
+---
+
+## Configuration
+
+The interactor reads `config.toml` from the current directory. Example:
+
+```toml
+chain_type = 'real'
+gateway_uri = 'https://gateway.battleofnodes.com'
+wegld_address  = 'erd1...'   # WEGLD swap contract
+pair_address   = 'erd1...'   # WEGLD/USDC DEX pair contract
+wegld_token_id = 'WEGLD-bd4d79'
+usdc_token_id  = 'USDC-c76f1f'
+```
+
+| Field | Description |
+|-------|-------------|
+| `chain_type` | `real` for mainnet/testnet or `simulator` for the chain simulator |
+| `gateway_uri` | Gateway endpoint URL |
+| `wegld_address` | Address of the WEGLD swap contract |
+| `pair_address` | Address of the WEGLD/USDC DEX pair contract |
+| `wegld_token_id` | ESDT identifier for WEGLD |
+| `usdc_token_id` | ESDT identifier for USDC |
+
+The deployed contract address is persisted automatically in `state.toml` after a successful `deploy`.
