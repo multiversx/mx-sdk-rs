@@ -85,6 +85,9 @@ pub async fn forwarder_blind_cli() {
         Some(interact_cli::InteractCliCommand::GetLiquidity) => {
             interact.get_liquidity().await;
         }
+        Some(interact_cli::InteractCliCommand::Drain) => {
+            interact.drain().await;
+        }
         None => {}
     }
 }
@@ -401,6 +404,45 @@ impl ContractInteract {
             .await;
 
         println!("swap via forwarder: status={status:?}, gas_used={gas_used:?}");
+    }
+
+    pub async fn drain(&mut self) {
+        let contract_esdt = self
+            .interactor
+            .get_account_esdt(&self.state.current_address().to_address())
+            .await;
+
+        for token_id in [
+            self.config.wegld_token_id.clone(),
+            self.config.usdc_token_id.clone(),
+        ] {
+            let balance = contract_esdt
+                .get(&token_id)
+                .map(|b| b.balance.parse::<u128>().unwrap_or(0))
+                .unwrap_or(0);
+
+            if balance == 0 {
+                println!("Drain {token_id}: no balance, skipping");
+                continue;
+            }
+
+            println!("Drain {token_id}: balance={balance}");
+
+            let (status, gas_used) = self
+                .interactor
+                .tx()
+                .from(&self.wallet_address)
+                .to(self.state.current_address())
+                .gas(10_000_000u64)
+                .typed(forwarder_blind_proxy::ForwarderBlindProxy)
+                .drain(token_id.as_str(), 0u64)
+                .returns(ReturnsStatus)
+                .returns(ReturnsGasUsed)
+                .run()
+                .await;
+
+            println!("Drain {token_id}: status={status:?}, gas_used={gas_used:?}");
+        }
     }
 
     pub async fn get_rate(&mut self, wegld_amount: u64) {

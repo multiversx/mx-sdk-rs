@@ -30,6 +30,11 @@ pub enum InteractCliCommand {
         about = "Show the liquidity reserves in the WEGLD/USDC pair"
     )]
     GetLiquidity,
+    #[command(
+        name = "drain",
+        about = "Drain WEGLD and USDC balances from the forwarder contract back to the owner"
+    )]
+    Drain,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
