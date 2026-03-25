@@ -22,7 +22,7 @@ pub struct Config {
     pub wegld_token_id: String,
     pub usdc_token_id: String,
     /// Optional list of PEM file paths, one per wallet.
-    /// If absent or empty, the built-in test wallets (sophie/simon/szonja) are used.
+    /// If absent or empty, all operations are skipped with a warning.
     #[serde(default)]
     pub wallet_pem_paths: Vec<String>,
     /// Forwarder contract addresses to target for all swap transactions.
