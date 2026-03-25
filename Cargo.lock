@@ -1638,6 +1638,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "forwarder-blind-dex-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "forwarder-blind",
+ "multiversx-sc",
+ "multiversx-sc-snippets",
+ "serde",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "forwarder-blind-meta"
 version = "0.0.0"
 dependencies = [

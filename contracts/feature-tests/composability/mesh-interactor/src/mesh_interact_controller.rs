@@ -20,9 +20,15 @@ impl ComposabilityInteract {
             "contracts/feature-tests/composability/mesh-interactor",
         );
         let shard_wallet_addresses = [
-            interactor.register_wallet(test_wallets::for_shard(0)).await,
-            interactor.register_wallet(test_wallets::for_shard(1)).await,
-            interactor.register_wallet(test_wallets::for_shard(2)).await,
+            interactor
+                .register_wallet(test_wallets::for_shard(0u32.into()))
+                .await,
+            interactor
+                .register_wallet(test_wallets::for_shard(1u32.into()))
+                .await,
+            interactor
+                .register_wallet(test_wallets::for_shard(2u32.into()))
+                .await,
         ];
         let forw_queue_code = BytesValue::interpret_from(
             "mxsc:../mesh-node/output/mesh-node.mxsc.json",

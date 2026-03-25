@@ -1,3 +1,5 @@
+use multiversx_chain_core::types::ShardId;
+
 use crate::wallet::Wallet;
 
 fn test_wallet(pem_file_contents: &str) -> Wallet {
@@ -94,11 +96,12 @@ pub fn szonja() -> Wallet {
 /// Test wallets. Do not use on mainnet.
 ///
 /// Yields a wallet for the given shard id. Only shard ids 0, 1, and 2 are supported.
-pub fn for_shard(shard_id: u32) -> Wallet {
-    match shard_id {
+pub fn for_shard(shard_id: ShardId) -> Wallet {
+    let shard_id_num = shard_id.as_u32();
+    match shard_id_num {
         0 => sophie(),
         1 => simon(),
         2 => szonja(),
-        _ => panic!("No test wallet for shard id {shard_id}"),
+        _ => panic!("No test wallet for shard id {shard_id_num}"),
     }
 }

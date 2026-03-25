@@ -5,10 +5,11 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            6
-// Async Callback (empty):               1
+// Upgrade:                              1
+// Endpoints:                            9
+// Async Callback:                       1
 // Promise callbacks:                    1
-// Total number of exported functions:   9
+// Total number of exported functions:  13
 
 #![no_std]
 
@@ -16,17 +17,21 @@ multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    mesh_node
+    forwarder_blind
     (
         init => init
-        id => id
-        queued_calls => queued_calls
-        set_queued_calls => set_queued_calls
-        bump => bump
-        callback_count => callback_count
-        callback_payments => callback_payments
-        promises_callback_method => promises_callback_method
+        upgrade => upgrade
+        drain => drain
+        blindAsyncV1 => blind_async_v1
+        blindAsyncV2 => blind_async_v2
+        blindDeploy => blind_deploy
+        blindSync => blind_sync
+        blindSyncFallible => blind_sync_fallible
+        blindTransfExec => blind_transf_exec
+        blindUpgrade => blind_upgrade
+        blindUpgradeFromSource => blind_upgrade_from_source
+        blind_async_v2_callback => blind_async_v2_callback
     )
 }
 
-multiversx_sc_wasm_adapter::async_callback_empty! {}
+multiversx_sc_wasm_adapter::async_callback! { forwarder_blind }

@@ -1,0 +1,6 @@
+chain_type = 'real'
+gateway_uri = 'https://gateway.battleofnodes.com'
+wegld_address = 'erd1qqqqqqqqqqqqqpgqmuk0q2saj0mgutxm4teywre6dl8wqf58xamqdrukln'
+pair_address = 'erd1qqqqqqqqqqqqqpgqeel2kumf0r8ffyhth7pqdujjat9nx0862jpsg2pqaq'
+wegld_token_id = 'WEGLD-bd4d79'
+usdc_token_id = 'USDC-c76f1f'
