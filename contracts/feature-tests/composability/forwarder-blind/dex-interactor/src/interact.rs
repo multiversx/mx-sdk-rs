@@ -105,7 +105,7 @@ impl ContractInteract {
             .await
             .use_chain_simulator(config.use_chain_simulator());
         interactor.set_current_dir_from_workspace(
-            "contracts/feature-tests/composability/forwarder-blind/interactor",
+            "contracts/feature-tests/composability/forwarder-blind/dex-interactor",
         );
 
         let wallet_address = interactor.register_wallet(test_wallets::simon()).await;
