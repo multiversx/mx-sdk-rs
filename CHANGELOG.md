@@ -71,7 +71,8 @@ And crate group being released requires all crate groups downstream to be releas
 - Chain core: new `ShardId` type and `ShardConfig` infrastructure:
 	- `ShardId` represents a shard identifier, with special values for metachain;
 	- `ShardConfig` encodes the shard structure of the network (number of shards, address distribution);
-	- Utility for checking whether an address belongs to a system SC.
+	- Functionality to get the shard of an `Address`;
+	- Utility for checking whether an address is of a system SC.
 - Base framework improvements:
 	- `ManagedArgBuffer` implements `ManagedVecItem`.
 	- `Display` trait implemented by `BigInt`, `BigUint`, `NonZeroBigUint`, `Payment` and `EsdtTokenPayment`.

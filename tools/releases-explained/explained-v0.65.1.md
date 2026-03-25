@@ -21,7 +21,7 @@ A new ShardId type has been introduced in the chain-core crate to represent a sh
 
 Alongside ShardId, a new ShardConfig struct encodes the shard topology of the network, including the number of shards and how addresses are distributed across them.
 
-These types lay the groundwork for tooling and testing code that needs to reason about which shard a wallet or contract belongs to.
+Added functionality for reasoning which shard a wallet or contract belongs to.
 
 
 ### sc-meta improvements
