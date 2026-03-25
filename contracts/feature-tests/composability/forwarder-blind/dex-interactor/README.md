@@ -11,21 +11,47 @@ cargo run -- <COMMAND> [OPTIONS]
 
 ---
 
+## Typical workflow
+
+1. Fill in `config.toml` with the gateway, token IDs, contract addresses, and wallet PEM paths.
+2. **Deploy** — creates one forwarder-blind contract per wallet and records the addresses in `deploy.toml`:
+   ```bash
+   cargo run -- deploy
+   ```
+3. **Copy addresses** — open `deploy.toml` and paste the `contract_addresses` list into `config.toml`.
+4. **Wrap** — give each wallet WEGLD to spend:
+   ```bash
+   cargo run -- wrap -a <AMOUNT>
+   ```
+5. **Swap** — run any combination of swap commands to exercise the different call types.
+6. **Drain** (optional) — recover tokens left in the contracts after `te` swaps:
+   ```bash
+   cargo run -- drain
+   ```
+
+---
+
 ## Commands
 
 ### `deploy`
 
-Deploy a new instance of the forwarder-blind contract.
+Deploy one forwarder-blind contract instance per configured wallet.
 
 ```bash
 cargo run -- deploy
 ```
 
+Each wallet in `wallet_pem_paths` deploys its own contract instance. The resulting addresses
+are written to `deploy.toml`.
+
+> **After deploying**, copy the addresses from `deploy.toml` into the `contract_addresses`
+> list in `config.toml` so that subsequent swap and drain commands can target them.
+
 ---
 
 ### `wrap`
 
-Wrap EGLD into WEGLD via the WEGLD swap contract.
+Wrap EGLD into WEGLD via the WEGLD swap contract. Runs once per wallet in parallel.
 
 ```bash
 cargo run -- wrap -a <AMOUNT>
@@ -47,11 +73,11 @@ cargo run -- swap1 <METHOD> [OPTIONS]
 
 | Method | Description |
 |--------|-------------|
-| `direct` | Swap directly on the DEX pair |
-| `sync` | Swap via forwarder-blind using `blind_sync` |
-| `async1` | Swap via forwarder-blind using `blind_async_v1` |
-| `async2` | Swap via forwarder-blind using `blind_async_v2` |
-| `te` | Swap via forwarder-blind using `blind_transf_exec` |
+| `direct` | Each wallet swaps directly on the DEX pair |
+| `sync` | Each wallet × each contract calls `blind_sync` (same-shard only) |
+| `async1` | Each wallet × each contract calls `blind_async_v1` |
+| `async2` | Each wallet × each contract calls `blind_async_v2` |
+| `te` | Each wallet × each contract calls `blind_transf_exec` |
 
 #### Options (all methods)
 
@@ -91,11 +117,11 @@ cargo run -- swap2 <METHOD> [OPTIONS]
 
 | Method | Description |
 |--------|-------------|
-| `direct` | Swap directly on the DEX pair |
-| `sync` | Swap via forwarder-blind using `blind_sync` |
-| `async1` | Swap via forwarder-blind using `blind_async_v1` |
-| `async2` | Swap via forwarder-blind using `blind_async_v2` |
-| `te` | Swap via forwarder-blind using `blind_transf_exec` |
+| `direct` | Each wallet swaps directly on the DEX pair |
+| `sync` | Each wallet × each contract calls `blind_sync` (same-shard only) |
+| `async1` | Each wallet × each contract calls `blind_async_v1` |
+| `async2` | Each wallet × each contract calls `blind_async_v2` |
+| `te` | Each wallet × each contract calls `blind_transf_exec` |
 
 #### Options (all methods)
 
@@ -151,18 +177,22 @@ cargo run -- get-liquidity
 
 ### `drain`
 
-Drain all WEGLD and USDC balances held by the deployed forwarder-blind contract back to the owner.
-Useful to recover tokens left in the contract after transfer-execute swaps (which have no callback).
+Drain all WEGLD and USDC balances held by the forwarder-blind contracts back to their owners.
+Useful to recover tokens left in the contracts after transfer-execute swaps (which have no callback).
 
 ```bash
 cargo run -- drain
 ```
 
+For each contract address in `config.toml` (`contract_addresses`), the interactor looks up the
+on-chain owner. If that owner is one of the registered wallets, it sends a drain transaction.
+Contracts whose owner is not a registered wallet are skipped.
+
 ---
 
 ## Configuration
 
-The interactor reads `config.toml` from the current directory. Example:
+The interactor reads `config.toml` from the current directory:
 
 ```toml
 chain_type = 'real'
@@ -171,15 +201,79 @@ wegld_address  = 'erd1...'   # WEGLD swap contract
 pair_address   = 'erd1...'   # WEGLD/USDC DEX pair contract
 wegld_token_id = 'WEGLD-bd4d79'
 usdc_token_id  = 'USDC-c76f1f'
+
+wallet_pem_paths = [
+    'path/to/wallet1.pem',
+    'path/to/wallet2.pem',
+]
+
+contract_addresses = [
+    'erd1...',
+    'erd1...',
+]
 ```
 
 | Field | Description |
 |-------|-------------|
-| `chain_type` | `real` for mainnet/testnet or `simulator` for the chain simulator |
+| `chain_type` | `real` for mainnet/testnet, or `simulator` for the chain simulator |
 | `gateway_uri` | Gateway endpoint URL |
 | `wegld_address` | Address of the WEGLD swap contract |
 | `pair_address` | Address of the WEGLD/USDC DEX pair contract |
 | `wegld_token_id` | ESDT identifier for WEGLD |
 | `usdc_token_id` | ESDT identifier for USDC |
+| `wallet_pem_paths` | List of PEM file paths, one per wallet. Paths are relative to the workspace root. If absent or empty, all operations are skipped with a warning. |
+| `contract_addresses` | List of forwarder-blind contract addresses to target for swap-via-forwarder commands. |
 
-The deployed contract address is persisted automatically in `state.toml` after a successful `deploy`.
+---
+
+## Deploy output
+
+`deploy.toml` is written automatically after every `deploy` run. Example contents:
+
+```toml
+# These are the last deployed addresses. Copy them to config.toml contract_addresses to use them.
+contract_addresses = [
+    "erd1...",
+    "erd1...",
+]
+```
+
+This file is **output-only** — no command reads it back. All commands (swap, drain, etc.) read
+contract addresses exclusively from `contract_addresses` in `config.toml`.
+
+> **After deploying**, copy the addresses from `deploy.toml` into `config.toml`
+> (`contract_addresses`) before running any other command.
+
+---
+
+## Multiple wallets and contracts
+
+The interactor is designed to exercise the same call paths from many wallets simultaneously,
+each going through its own contract instance. The relationship between wallets and contracts
+is many-to-many.
+
+### `deploy`
+One deploy transaction is submitted per wallet. The N resulting contract addresses are stored in
+`deploy.toml` in the same order as the wallets in `wallet_pem_paths`. Copy those addresses into
+`config.toml` (`contract_addresses`) before running any other command.
+
+### `wrap`
+One wrap transaction is submitted per wallet. All transactions are batched and sent in parallel.
+
+### `swap1` / `swap2` — `direct`
+One swap transaction is submitted per wallet, sent directly to the DEX pair.
+
+### `swap1` / `swap2` — `sync`, `async1`, `async2`, `te`
+One transaction is submitted for every **(wallet, contract)** pair — the full Cartesian product.
+For example, 3 wallets × 3 contracts = 9 transactions per command, all sent in a single batch.
+
+**Shard constraint for `sync`:** `blind_sync` uses a synchronous call, which requires the
+forwarder contract and the DEX pair to be on the same shard. Any (wallet, contract) pair where
+the contract's shard differs from the DEX pair's shard is skipped with a warning.
+
+### `drain`
+Reads contract addresses from `config.toml` (`contract_addresses`), exactly like swap commands.
+For each contract it fetches the on-chain owner and checks whether that address corresponds to
+one of the registered wallets. Only contracts whose owner is a registered wallet receive a drain
+transaction, so it is safe to run even when `config.toml` contains contracts deployed by other
+parties.

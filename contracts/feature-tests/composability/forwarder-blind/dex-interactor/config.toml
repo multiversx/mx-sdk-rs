@@ -15,7 +15,7 @@ wallet_pem_paths = [
 ]
 
 contract_addresses = [
-    "erd1qqqqqqqqqqqqqpgqe8jtrfmj5f6jcmn605r5t8950p3wu63gqqqqedcx6q",
-    "erd1qqqqqqqqqqqqqpgq5zrl4gg8mvhka724l88gst0r3csscqv6qqqsh8ljxe",
-    "erd1qqqqqqqqqqqqqpgqqkq5a4au3t5ydws4y7eq86wwxz8d8pe0qqpqcyl6cg",
+    "erd1qqqqqqqqqqqqqpgqwlqhw27xz6j2cqh8w8v53l5fdulfu4rqqqqqdt5qat",
+    "erd1qqqqqqqqqqqqqpgq62w4nut0gedtfysdgpajryeap0jptvthqqqs27tpsu",
+    "erd1qqqqqqqqqqqqqpgqmsxxxae3df5eylg23rapr4r4j8kevqjdqqpqq4uamr",
 ]

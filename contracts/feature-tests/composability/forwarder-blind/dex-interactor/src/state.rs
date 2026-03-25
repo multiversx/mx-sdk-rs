@@ -6,13 +6,13 @@ use std::{
 };
 
 /// State file
-const STATE_FILE: &str = "state.toml";
+const STATE_FILE: &str = "deploy.toml";
 
 /// ForwarderBlind Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     #[serde(default)]
-    contract_addresses: Vec<Bech32Address>,
+    last_deployed: Vec<Bech32Address>,
 }
 
 impl State {
@@ -29,11 +29,11 @@ impl State {
     }
 
     pub fn set_contract_addresses(&mut self, addresses: Vec<Bech32Address>) {
-        self.contract_addresses = addresses;
+        self.last_deployed = addresses;
     }
 
     pub fn contract_addresses(&self) -> &[Bech32Address] {
-        &self.contract_addresses
+        &self.last_deployed
     }
 }
 
@@ -41,8 +41,11 @@ impl Drop for State {
     // Serializes state to file
     fn drop(&mut self) {
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
-        let mut content = String::from("contract_addresses = [\n");
-        for addr in &self.contract_addresses {
+        let mut content = String::from(
+            "# These are the last deployed addresses. Copy them to config.toml contract_addresses to use them.\n\
+             last_deployed = [\n",
+        );
+        for addr in &self.last_deployed {
             content.push_str(&format!("    \"{addr}\",\n"));
         }
         content.push_str("]\n");

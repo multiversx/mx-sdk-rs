@@ -402,7 +402,7 @@ impl ContractInteract {
     }
 
     pub async fn drain(&mut self) {
-        let contract_addresses = self.state.contract_addresses().to_vec();
+        let contract_addresses = self.config.contract_addresses.clone();
         let wegld_token_id = self.config.wegld_token_id.clone();
         let usdc_token_id = self.config.usdc_token_id.clone();
 
