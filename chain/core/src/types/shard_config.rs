@@ -27,6 +27,16 @@ impl From<u32> for ShardId {
     }
 }
 
+impl core::fmt::Display for ShardId {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if *self == ShardId::METACHAIN_ID {
+            write!(f, "metachain")
+        } else {
+            write!(f, "{}", self.0)
+        }
+    }
+}
+
 /// Precomputed configuration for shard assignment.
 /// Mirrors the Go `multiShardCoordinator` struct.
 #[derive(Debug, Clone, PartialEq, Eq)]

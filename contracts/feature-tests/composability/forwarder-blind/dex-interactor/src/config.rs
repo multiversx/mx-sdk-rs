@@ -21,6 +21,13 @@ pub struct Config {
     pub pair_address: Bech32Address,
     pub wegld_token_id: String,
     pub usdc_token_id: String,
+    /// Optional list of PEM file paths, one per wallet.
+    /// If absent or empty, the built-in test wallets (sophie/simon/szonja) are used.
+    #[serde(default)]
+    pub wallet_pem_paths: Vec<String>,
+    /// Forwarder contract addresses to target for all swap transactions.
+    #[serde(default)]
+    pub contract_addresses: Vec<Bech32Address>,
 }
 
 impl Config {

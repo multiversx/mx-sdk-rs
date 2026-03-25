@@ -11,7 +11,8 @@ const STATE_FILE: &str = "state.toml";
 /// ForwarderBlind Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    contract_address: Option<Bech32Address>,
+    #[serde(default)]
+    contract_addresses: Vec<Bech32Address>,
 }
 
 impl State {
@@ -27,16 +28,12 @@ impl State {
         }
     }
 
-    /// Sets the contract address
-    pub fn set_contract_address(&mut self, address: Bech32Address) {
-        self.contract_address = Some(address);
+    pub fn set_contract_addresses(&mut self, addresses: Vec<Bech32Address>) {
+        self.contract_addresses = addresses;
     }
 
-    /// Returns the contract address
-    pub fn current_address(&self) -> &Bech32Address {
-        self.contract_address
-            .as_ref()
-            .expect("no known contract, deploy first")
+    pub fn contract_addresses(&self) -> &[Bech32Address] {
+        &self.contract_addresses
     }
 }
 
@@ -44,7 +41,11 @@ impl Drop for State {
     // Serializes state to file
     fn drop(&mut self) {
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
-        file.write_all(toml::to_string(self).unwrap().as_bytes())
-            .unwrap();
+        let mut content = String::from("contract_addresses = [\n");
+        for addr in &self.contract_addresses {
+            content.push_str(&format!("    \"{addr}\",\n"));
+        }
+        content.push_str("]\n");
+        file.write_all(content.as_bytes()).unwrap();
     }
 }

@@ -4,3 +4,18 @@ wegld_address = 'erd1qqqqqqqqqqqqqpgqmuk0q2saj0mgutxm4teywre6dl8wqf58xamqdrukln'
 pair_address = 'erd1qqqqqqqqqqqqqpgqeel2kumf0r8ffyhth7pqdujjat9nx0862jpsg2pqaq'
 wegld_token_id = 'WEGLD-bd4d79'
 usdc_token_id = 'USDC-c76f1f'
+
+# Optional: list of PEM file paths, one per wallet to use.
+# Relative paths are resolved from the workspace root.
+# If absent or empty, all operations are skipped with a warning.
+wallet_pem_paths = [
+    '../../../../../sdk/core/src/test_wallets/s0phie.pem',
+    '../../../../../sdk/core/src/test_wallets/s1mon.pem',
+    '../../../../../sdk/core/src/test_wallets/s2onja.pem',
+]
+
+contract_addresses = [
+    "erd1qqqqqqqqqqqqqpgqe8jtrfmj5f6jcmn605r5t8950p3wu63gqqqqedcx6q",
+    "erd1qqqqqqqqqqqqqpgq5zrl4gg8mvhka724l88gst0r3csscqv6qqqsh8ljxe",
+    "erd1qqqqqqqqqqqqqpgqqkq5a4au3t5ydws4y7eq86wwxz8d8pe0qqpqcyl6cg",
+]
