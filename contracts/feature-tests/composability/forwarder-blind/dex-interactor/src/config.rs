@@ -32,21 +32,6 @@ impl Config {
         toml::from_str(&content).unwrap()
     }
 
-    pub fn chain_simulator_config() -> Self {
-        Config {
-            gateway_uri: "http://localhost:8085".to_owned(),
-            chain_type: ChainType::Simulator,
-            wegld_address: Bech32Address::from_bech32_string(
-                "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782".to_owned(),
-            ),
-            pair_address: Bech32Address::from_bech32_string(
-                "erd1qqqqqqqqqqqqqpgqeel2kumf0r8ffyhth7pqdujjat9nx0862jpsg2pqaq".to_owned(),
-            ),
-            wegld_token_id: "WEGLD-bd4d79".to_owned(),
-            usdc_token_id: "USDC-350c4e".to_owned(),
-        }
-    }
-
     // Returns the gateway URI
     pub fn gateway_uri(&self) -> &str {
         &self.gateway_uri
