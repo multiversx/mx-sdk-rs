@@ -88,6 +88,9 @@ pub async fn forwarder_blind_cli() {
         Some(interact_cli::InteractCliCommand::Drain) => {
             interact.drain().await;
         }
+        Some(interact_cli::InteractCliCommand::Balances) => {
+            interact.balances().await;
+        }
         None => {}
     }
 }
@@ -499,5 +502,50 @@ impl ContractInteract {
         println!("{} reserve: {wegld_reserve}", self.config.wegld_token_id);
         println!("{} reserve: {usdc_reserve}", self.config.usdc_token_id);
         println!("LP token supply: {lp_supply}");
+    }
+
+    pub async fn balances(&mut self) {
+        let wegld_token_id = self.config.wegld_token_id.clone();
+        let usdc_token_id = self.config.usdc_token_id.clone();
+
+        println!("=== Wallet Balances ===");
+        for wallet in &self.wallet_addresses.clone() {
+            let account = self.interactor.get_account(wallet.as_address()).await;
+            let esdt = self.interactor.get_account_esdt(wallet.as_address()).await;
+            let wegld = esdt
+                .get(&wegld_token_id)
+                .map(|b| b.balance.as_str())
+                .unwrap_or("0");
+            let usdc = esdt
+                .get(&usdc_token_id)
+                .map(|b| b.balance.as_str())
+                .unwrap_or("0");
+            println!("  wallet: {wallet}");
+            println!("    EGLD:          {}", account.balance);
+            println!("    {wegld_token_id}: {wegld}");
+            println!("    {usdc_token_id}:          {usdc}");
+        }
+
+        let contract_addresses = self.config.contract_addresses.clone();
+        if !contract_addresses.is_empty() {
+            println!("=== Contract Balances ===");
+            for contract in &contract_addresses {
+                let esdt = self
+                    .interactor
+                    .get_account_esdt(contract.as_address())
+                    .await;
+                let wegld = esdt
+                    .get(&wegld_token_id)
+                    .map(|b| b.balance.as_str())
+                    .unwrap_or("0");
+                let usdc = esdt
+                    .get(&usdc_token_id)
+                    .map(|b| b.balance.as_str())
+                    .unwrap_or("0");
+                println!("  contract: {contract}");
+                println!("    {wegld_token_id}: {wegld}");
+                println!("    {usdc_token_id}:          {usdc}");
+            }
+        }
     }
 }

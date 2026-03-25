@@ -35,6 +35,11 @@ pub enum InteractCliCommand {
         about = "Drain WEGLD and USDC balances from the forwarder contract back to the owner"
     )]
     Drain,
+    #[command(
+        name = "balances",
+        about = "Display EGLD (wallets only), WEGLD, and USDC balances for all wallets and contracts"
+    )]
+    Balances,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
