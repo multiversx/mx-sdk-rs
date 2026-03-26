@@ -113,9 +113,8 @@ pub struct ContractInteract {
 
 impl ContractInteract {
     pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
+        let mut interactor = Interactor::new(config.gateway_uri()).await;
+        interactor.gas_price *= 25;
         interactor.set_current_dir_from_workspace(
             "contracts/feature-tests/composability/forwarder-blind/dex-interactor",
         );
