@@ -1,10 +1,11 @@
 mod config;
-mod interact_cli;
+mod dex_interactor_cli;
 pub mod proxies;
 mod state;
 
 use clap::Parser;
 pub use config::Config;
+use dex_interactor_cli as cli;
 use multiversx_sc_snippets::imports::*;
 use proxies::*;
 use state::State;
@@ -17,78 +18,78 @@ pub async fn forwarder_blind_cli() {
     let config = Config::load_config();
     let mut interact = ContractInteract::new(config).await;
 
-    let cli = interact_cli::InteractCli::parse();
+    let cli = cli::InteractCli::parse();
     match &cli.command {
-        Some(interact_cli::InteractCliCommand::Deploy) => {
+        Some(cli::InteractCliCommand::Deploy) => {
             interact.deploy().await;
         }
-        Some(interact_cli::InteractCliCommand::WrapEgld(args)) => {
+        Some(cli::InteractCliCommand::WrapEgld(args)) => {
             interact.wrap_egld(args.amount).await;
         }
-        Some(interact_cli::InteractCliCommand::Swap1(args)) => match &args.method {
-            interact_cli::SwapWegldForUsdcMethod::Direct(args) => {
+        Some(cli::InteractCliCommand::Swap1(args)) => match &args.method {
+            cli::SwapWegldForUsdcMethod::Direct(args) => {
                 interact
                     .swap1_direct(args.wegld_amount, args.usdc_amount_min)
                     .await;
             }
-            interact_cli::SwapWegldForUsdcMethod::Sync(args) => {
+            cli::SwapWegldForUsdcMethod::Sync(args) => {
                 interact
                     .swap1_sync(args.wegld_amount, args.usdc_amount_min)
                     .await;
             }
-            interact_cli::SwapWegldForUsdcMethod::Async1(args) => {
+            cli::SwapWegldForUsdcMethod::Async1(args) => {
                 interact
                     .swap1_async1(args.wegld_amount, args.usdc_amount_min)
                     .await;
             }
-            interact_cli::SwapWegldForUsdcMethod::Async2(args) => {
+            cli::SwapWegldForUsdcMethod::Async2(args) => {
                 interact
                     .swap1_async2(args.wegld_amount, args.usdc_amount_min)
                     .await;
             }
-            interact_cli::SwapWegldForUsdcMethod::Te(args) => {
+            cli::SwapWegldForUsdcMethod::Te(args) => {
                 interact
                     .swap1_te(args.wegld_amount, args.usdc_amount_min)
                     .await;
             }
         },
-        Some(interact_cli::InteractCliCommand::Swap2(args)) => match &args.method {
-            interact_cli::SwapUsdcForWegldMethod::Direct(args) => {
+        Some(cli::InteractCliCommand::Swap2(args)) => match &args.method {
+            cli::SwapUsdcForWegldMethod::Direct(args) => {
                 interact
                     .swap2_direct(args.usdc_amount, args.wegld_amount_min)
                     .await;
             }
-            interact_cli::SwapUsdcForWegldMethod::Sync(args) => {
+            cli::SwapUsdcForWegldMethod::Sync(args) => {
                 interact
                     .swap2_sync(args.usdc_amount, args.wegld_amount_min)
                     .await;
             }
-            interact_cli::SwapUsdcForWegldMethod::Async1(args) => {
+            cli::SwapUsdcForWegldMethod::Async1(args) => {
                 interact
                     .swap2_async1(args.usdc_amount, args.wegld_amount_min)
                     .await;
             }
-            interact_cli::SwapUsdcForWegldMethod::Async2(args) => {
+            cli::SwapUsdcForWegldMethod::Async2(args) => {
                 interact
                     .swap2_async2(args.usdc_amount, args.wegld_amount_min)
                     .await;
             }
-            interact_cli::SwapUsdcForWegldMethod::Te(args) => {
+            cli::SwapUsdcForWegldMethod::Te(args) => {
                 interact
                     .swap2_te(args.usdc_amount, args.wegld_amount_min)
                     .await;
             }
         },
-        Some(interact_cli::InteractCliCommand::GetRate(args)) => {
+        Some(cli::InteractCliCommand::GetRate(args)) => {
             interact.get_rate(args.wegld_amount).await;
         }
-        Some(interact_cli::InteractCliCommand::GetLiquidity) => {
+        Some(cli::InteractCliCommand::GetLiquidity) => {
             interact.get_liquidity().await;
         }
-        Some(interact_cli::InteractCliCommand::Drain) => {
+        Some(cli::InteractCliCommand::Drain) => {
             interact.drain().await;
         }
-        Some(interact_cli::InteractCliCommand::Balances) => {
+        Some(cli::InteractCliCommand::Balances) => {
             interact.balances().await;
         }
         None => {}
