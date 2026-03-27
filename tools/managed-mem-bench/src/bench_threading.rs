@@ -12,12 +12,11 @@
 //! 3. **Concurrent construction safety** – many threads can create managed types in
 //!    parallel without panics, deadlocks, or data corruption.
 //!
-//! 4. **Handle identity is thread-local** – `ManagedBuffer<StaticApi>` is `Send`
-//!    (it is just a wrapper around an `i32`), yet moving or copying the raw handle
-//!    integer to another thread gives meaningless results: each thread allocates
-//!    handles starting at 0, so the same i32 value on two threads refers to
-//!    completely different entries (or no entry at all) in the receiving thread's
-//!    container.
+//! 4. **Handle identity is thread-local** – `ManagedBuffer<StaticApi>` is `!Send`:
+//!    the compiler prevents moving managed values across threads, which is correct
+//!    because the underlying storage is thread-local.  Each thread allocates handles
+//!    starting at 0, so the same i32 value on two threads refers to completely
+//!    different entries in each thread's independent container.
 //!
 //! 5. **Correct cross-thread data transfer** – the safe pattern is to materialise
 //!    managed-type values into plain Rust types (`BoxedBytes`, `Vec<u8>`, `u64`, …)
@@ -199,25 +198,19 @@ fn test_concurrent_construction() {
 // ---------------------------------------------------------------------------
 // Test 4 – Handle identity is thread-local
 // ---------------------------------------------------------------------------
-// `ManagedBuffer<StaticApi>` is `Send` at the type level (it is just an i32),
-// but the integer is meaningless outside the thread that created it.
+// `ManagedBuffer<StaticApi>` is `!Send`: the compiler prevents moving managed
+// values across threads, which is correct because the underlying storage is
+// thread-local.
 //
 // Every fresh thread-local container assigns handles starting at 0, so two
 // independent threads both call their first allocation "handle 0", yet the
 // data stored at handle 0 is completely independent per thread.
 //
-// Consequence: copying (or moving) the raw handle number to another thread
-// does NOT give you access to the original data — you would silently read
-// whatever the receiving thread happens to have stored at that index, or
-// get a panic if its container is empty.
+// The safe way to observe this is to materialise only the raw i32 handle
+// number and the serialised bytes on the source thread, then compare on the
+// destination thread.
 fn test_handle_identity_is_thread_local() {
     use std::sync::mpsc;
-
-    // Compile-time proof that the types are Send (they wrap a plain i32).
-    fn assert_send<T: Send + 'static>() {}
-    assert_send::<ManagedBuffer<StaticApi>>();
-    assert_send::<BigUint<StaticApi>>();
-    assert_send::<BigInt<StaticApi>>();
 
     // Thread A stores "hello from A" and reports which handle number it was
     // assigned, along with the actual bytes it read back.
