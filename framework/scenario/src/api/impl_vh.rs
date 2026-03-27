@@ -1,5 +1,5 @@
 mod debug_api;
-mod debug_handle_vh;
+mod debug_handle;
 mod single_tx_api;
 mod static_api;
 mod static_api_handle;
@@ -9,7 +9,7 @@ mod vm_hooks_api;
 mod vm_hooks_backend;
 
 pub use debug_api::{DebugApi, DebugApiBackend};
-pub use debug_handle_vh::DebugHandle;
+pub use debug_handle::DebugHandle;
 pub use single_tx_api::SingleTxApi;
 pub use static_api::StaticApi;
 pub use static_api_handle::StaticApiHandle;
