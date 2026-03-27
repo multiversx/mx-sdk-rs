@@ -1,7 +1,7 @@
 //! Tests for `StaticApi` and managed types in a multi-threaded environment.
 //!
 //! `StaticApi` stores its `ManagedTypeContainer` in thread-local storage, so every OS
-//! thread owns a fully independent handle space.  These tests verify three properties:
+//! thread owns a fully independent handle space.  These tests verify five properties:
 //!
 //! 1. **Thread isolation** – handles with the same numeric value on different threads
 //!    hold independent data; writing to one thread's container leaves the other intact.
@@ -11,13 +11,27 @@
 //!
 //! 3. **Concurrent construction safety** – many threads can create managed types in
 //!    parallel without panics, deadlocks, or data corruption.
+//!
+//! 4. **Handle identity is thread-local** – `ManagedBuffer<StaticApi>` is `Send`
+//!    (it is just a wrapper around an `i32`), yet moving or copying the raw handle
+//!    integer to another thread gives meaningless results: each thread allocates
+//!    handles starting at 0, so the same i32 value on two threads refers to
+//!    completely different entries (or no entry at all) in the receiving thread's
+//!    container.
+//!
+//! 5. **Correct cross-thread data transfer** – the safe pattern is to materialise
+//!    managed-type values into plain Rust types (`BoxedBytes`, `Vec<u8>`, `u64`, …)
+//!    on the source thread, send those plain values across the thread boundary, and
+//!    reconstruct the managed types on the destination thread.
 
 use std::{
     sync::{Arc, Barrier},
     thread,
 };
 
+use multiversx_sc::api::HandleConstraints;
 use multiversx_sc::imports::*;
+use multiversx_sc::types::ManagedType;
 use multiversx_sc_scenario::api::StaticApi;
 
 // ---------------------------------------------------------------------------
@@ -182,10 +196,140 @@ fn test_concurrent_construction() {
     println!("[PASS] test_concurrent_construction");
 }
 
+// ---------------------------------------------------------------------------
+// Test 4 – Handle identity is thread-local
+// ---------------------------------------------------------------------------
+// `ManagedBuffer<StaticApi>` is `Send` at the type level (it is just an i32),
+// but the integer is meaningless outside the thread that created it.
+//
+// Every fresh thread-local container assigns handles starting at 0, so two
+// independent threads both call their first allocation "handle 0", yet the
+// data stored at handle 0 is completely independent per thread.
+//
+// Consequence: copying (or moving) the raw handle number to another thread
+// does NOT give you access to the original data — you would silently read
+// whatever the receiving thread happens to have stored at that index, or
+// get a panic if its container is empty.
+fn test_handle_identity_is_thread_local() {
+    use std::sync::mpsc;
+
+    // Compile-time proof that the types are Send (they wrap a plain i32).
+    fn assert_send<T: Send + 'static>() {}
+    assert_send::<ManagedBuffer<StaticApi>>();
+    assert_send::<BigUint<StaticApi>>();
+    assert_send::<BigInt<StaticApi>>();
+
+    // Thread A stores "hello from A" and reports which handle number it was
+    // assigned, along with the actual bytes it read back.
+    let (tx, rx) = mpsc::channel::<(i32, Vec<u8>)>();
+
+    let thread_a = thread::spawn(move || {
+        StaticApi::reset();
+        let buf = ManagedBuffer::<StaticApi>::new_from_bytes(b"hello from A");
+        // get_handle() returns i32 for StaticApi (HandleType = RawHandle = i32).
+        let raw: i32 = buf.get_handle().get_raw_handle();
+        let bytes = buf.to_boxed_bytes().as_slice().to_vec();
+        tx.send((raw, bytes)).unwrap();
+        // buf is dropped here, inside thread A's container – no cross-thread drop.
+    });
+    thread_a.join().unwrap();
+
+    let (handle_from_a, data_from_a) = rx.recv().unwrap();
+
+    // Main thread: fresh container, first allocation also gets handle 0.
+    StaticApi::reset();
+    let buf_main = ManagedBuffer::<StaticApi>::new_from_bytes(b"hello from main");
+    let raw_main: i32 = buf_main.get_handle().get_raw_handle();
+
+    // Both threads assigned the same handle number from their own containers.
+    assert_eq!(
+        handle_from_a, raw_main,
+        "fresh thread-local containers both start numbering handles at 0"
+    );
+
+    // The data at that handle on the main thread is NOT thread A's data.
+    let main_bytes = buf_main.to_boxed_bytes().as_slice().to_vec();
+    assert_ne!(
+        main_bytes, data_from_a,
+        "same handle number holds DIFFERENT data on main thread vs thread A"
+    );
+    assert_eq!(main_bytes, b"hello from main");
+
+    println!(
+        "[PASS] test_handle_identity_is_thread_local  \
+         (handle #{handle_from_a}: thread A had {:?}, main thread has {:?})",
+        String::from_utf8_lossy(&data_from_a),
+        String::from_utf8_lossy(&main_bytes),
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 5 – Correct cross-thread data transfer via serialisation
+// ---------------------------------------------------------------------------
+// Because handles are thread-local, you cannot move a managed-type *object*
+// across threads and expect it to work.  The correct pattern is:
+//
+//   1. Materialise the value into a plain Rust type on the source thread.
+//   2. Send that plain value (it is genuinely Send/Sync).
+//   3. Reconstruct the managed type from the plain value on the destination
+//      thread.
+//
+// This test runs a tiny "pipeline": a producer thread creates several managed
+// values, serialises them, and sends them through an `mpsc` channel.  The
+// consumer thread (main) deserialises them back into managed types and verifies
+// the round-trip.
+fn test_cross_thread_data_transfer() {
+    use std::sync::mpsc;
+
+    // The messages we send across the boundary are plain Rust types – no
+    // managed handles, no thread-local state.
+    struct Payload {
+        buffer_bytes: Vec<u8>,
+        biguint_bytes: Vec<u8>, // big-endian serialisation of a BigUint
+        native_u64: u64,
+    }
+
+    let (tx, rx) = mpsc::channel::<Payload>();
+
+    let producer = thread::spawn(move || {
+        StaticApi::reset();
+
+        let buf = ManagedBuffer::<StaticApi>::new_from_bytes(b"cross-thread payload");
+        let big = BigUint::<StaticApi>::from(0xDEAD_BEEF_u64);
+        let n: u64 = 42;
+
+        // Materialise before sending.
+        tx.send(Payload {
+            buffer_bytes: buf.to_boxed_bytes().as_slice().to_vec(),
+            biguint_bytes: big.to_bytes_be().as_slice().to_vec(),
+            native_u64: n,
+        })
+        .unwrap();
+    });
+    producer.join().unwrap();
+
+    let payload = rx.recv().unwrap();
+
+    // Consumer (main thread): reconstruct managed types from the plain values.
+    StaticApi::reset();
+
+    let buf = ManagedBuffer::<StaticApi>::new_from_bytes(&payload.buffer_bytes);
+    assert_eq!(buf.to_boxed_bytes().as_slice(), b"cross-thread payload");
+
+    let big = BigUint::<StaticApi>::from_bytes_be(&payload.biguint_bytes);
+    assert_eq!(big.to_u64(), Some(0xDEAD_BEEF_u64));
+
+    assert_eq!(payload.native_u64, 42u64);
+
+    println!("[PASS] test_cross_thread_data_transfer");
+}
+
 fn main() {
     println!("\n=== StaticApi multi-thread tests ===\n");
     test_thread_isolation();
     test_reset_isolation();
     test_concurrent_construction();
+    test_handle_identity_is_thread_local();
+    test_cross_thread_data_transfer();
     println!("\nAll tests passed.");
 }
