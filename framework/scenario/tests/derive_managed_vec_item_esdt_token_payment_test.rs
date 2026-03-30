@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::ManagedTypeApi,
+    api::{HandleConstraints, ManagedTypeApi},
     codec::{
         self,
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},

@@ -3322,6 +3322,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "simple-error",
+ "static_assertions",
  "unwrap-infallible",
 ]
 

@@ -4,6 +4,14 @@ version = "0.1.0"
 edition = "2024"
 publish = false
 
+[[bin]]
+name = "bench-leak"
+path = "src/bench_leak.rs"
+
+[[bin]]
+name = "bench-threading"
+path = "src/bench_threading.rs"
+
 [dependencies.multiversx-sc]
 version = "0.65.0"
 path = "../../framework/base"

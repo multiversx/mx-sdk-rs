@@ -1,6 +1,10 @@
 use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::api::StaticApi;
 
+// BigUint intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(BigUint::<StaticApi>: Send, Sync);
+
 fn assert_big_uint_ln(x: u32, ln_str: &str) {
     let x = BigUint::<StaticApi>::from(x);
     let ln_x = x.ln();

@@ -1,3 +1,4 @@
+use core::marker::PhantomData;
 use std::sync::Weak;
 
 use multiversx_chain_vm::host::context::{TxContext, TxContextRef};
@@ -14,6 +15,12 @@ pub struct DebugHandle {
     /// Using the pointer after the context is released will panic.
     pub(crate) context: Weak<TxContext>,
     raw_handle: RawHandle,
+
+    /// This field causes DebugHandle not to be `Send` or `Sync`,
+    /// which is desirable since the handle is only valid on the thread of the original context.
+    ///
+    /// This restriction is not enough to ensure safety (the context also helps), but it is an additional line of defense against misuse.
+    _phantom: PhantomData<*const ()>,
 }
 
 impl DebugHandle {
@@ -22,6 +29,7 @@ impl DebugHandle {
         Self {
             context,
             raw_handle,
+            _phantom: PhantomData,
         }
     }
 
@@ -101,3 +109,13 @@ impl From<i32> for DebugHandle {
 }
 
 impl TryStaticCast for DebugHandle {}
+
+#[cfg(test)]
+mod tests {
+    use super::DebugHandle;
+
+    // DebugHandle intentionally does not implement Send or Sync
+    // (enforced via PhantomData<*const ()>), since a handle is only valid
+    // on the thread that created the underlying context.
+    static_assertions::assert_not_impl_any!(DebugHandle: Send, Sync);
+}

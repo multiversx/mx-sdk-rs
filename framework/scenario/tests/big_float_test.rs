@@ -1,6 +1,10 @@
 use multiversx_sc::types::{BigFloat, BigInt, BigUint};
 use multiversx_sc_scenario::api::StaticApi;
 
+// BigFloat intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(BigFloat::<StaticApi>: Send, Sync);
+
 #[test]
 fn big_float_overflow_test_rs() {
     let exp = 1_080i32;
