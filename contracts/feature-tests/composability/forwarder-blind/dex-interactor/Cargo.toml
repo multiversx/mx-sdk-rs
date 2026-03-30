@@ -7,10 +7,10 @@ publish = false
 
 [[bin]]
 name = "forwarder-blind-dex-interactor"
-path = "src/interactor_main.rs"
+path = "src/dex_interactor_main.rs"
 
 [lib]
-path = "src/interact.rs"
+path = "src/dex_interactor.rs"
 
 [dependencies.forwarder-blind]
 path = ".."
