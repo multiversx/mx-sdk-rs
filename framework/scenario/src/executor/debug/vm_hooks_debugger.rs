@@ -11,15 +11,15 @@ pub trait VMHooksDebugger: VMHooks {
 
 impl<C: VMHooksContext> VMHooksDebugger for VMHooksDispatcher<C> {
     fn drop_managed_buffer(&self, handle: i32) {
-        self.handler.mb_drop(handle);
+        self.get_handler().mb_drop(handle);
     }
 
     fn drop_big_float(&self, handle: i32) {
-        self.handler.bf_drop(handle);
+        self.get_handler().bf_drop(handle);
     }
 
     fn drop_big_int(&self, handle: i32) {
-        self.handler.bi_drop(handle);
+        self.get_handler().bi_drop(handle);
     }
 
     fn drop_elliptic_curve(&self, _handle: i32) {
@@ -27,6 +27,6 @@ impl<C: VMHooksContext> VMHooksDebugger for VMHooksDispatcher<C> {
     }
 
     fn drop_managed_map(&self, handle: i32) {
-        self.handler.mm_drop(handle);
+        self.get_handler().mm_drop(handle);
     }
 }
