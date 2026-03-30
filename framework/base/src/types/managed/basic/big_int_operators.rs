@@ -4,7 +4,7 @@ use core::ops::{
 
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi},
-    types::{BigInt, ManagedType},
+    types::BigInt,
 };
 
 macro_rules! binary_operator {
@@ -108,10 +108,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     type Output = BigInt<M>;
 
     fn neg(self) -> Self::Output {
-        unsafe {
-            let result = BigInt::new_uninit();
-            M::managed_type_impl().bi_neg(result.get_handle(), self.handle.clone());
-            result
-        }
+        M::managed_type_impl().bi_neg(self.handle.clone(), self.handle.clone());
+        self
     }
 }

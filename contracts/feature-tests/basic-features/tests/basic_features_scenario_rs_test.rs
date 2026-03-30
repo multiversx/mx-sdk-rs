@@ -23,6 +23,11 @@ fn big_int_from_i_64_rs() {
 }
 
 #[test]
+fn big_int_neg_rs() {
+    world().run("scenarios/big_int_neg.scen.json");
+}
+
+#[test]
 fn big_int_to_i_64_rs() {
     world().run("scenarios/big_int_to_i64.scen.json");
 }
