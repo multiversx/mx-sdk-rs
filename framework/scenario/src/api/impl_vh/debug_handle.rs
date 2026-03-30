@@ -109,3 +109,13 @@ impl From<i32> for DebugHandle {
 }
 
 impl TryStaticCast for DebugHandle {}
+
+#[cfg(test)]
+mod tests {
+    use super::DebugHandle;
+
+    // DebugHandle intentionally does not implement Send or Sync
+    // (enforced via PhantomData<*const ()>), since a handle is only valid
+    // on the thread that created the underlying context.
+    static_assertions::assert_not_impl_any!(DebugHandle: Send, Sync);
+}

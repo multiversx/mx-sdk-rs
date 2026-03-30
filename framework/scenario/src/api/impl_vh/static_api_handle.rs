@@ -64,3 +64,13 @@ impl From<i32> for StaticApiHandle {
 }
 
 impl TryStaticCast for StaticApiHandle {}
+
+#[cfg(test)]
+mod tests {
+    use super::StaticApiHandle;
+
+    // StaticApiHandle intentionally does not implement Send or Sync
+    // (enforced via PhantomData<*const ()>), since a handle is only valid
+    // on the thread that created the underlying context.
+    static_assertions::assert_not_impl_any!(StaticApiHandle: Send, Sync);
+}

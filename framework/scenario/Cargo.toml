@@ -61,3 +61,6 @@ version = "=0.5.1"
 [dependencies.multiversx-chain-vm]
 version = "=0.22.0"
 path = "../../chain/vm"
+
+[dev-dependencies]
+static_assertions = "1.1"
