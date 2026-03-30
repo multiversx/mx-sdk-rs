@@ -113,6 +113,21 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for EsdtTokenPayment<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if self.token_nonce == 0 {
+            write!(f, "{}: {}", self.token_identifier, self.amount)
+        } else {
+            write!(
+                f,
+                "{} (nonce {}): {}",
+                self.token_identifier, self.token_nonce, self.amount
+            )
+        }
+    }
+}
+
 impl<M: ManagedTypeApi> From<(EsdtTokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
     #[inline]
     fn from(value: (EsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {

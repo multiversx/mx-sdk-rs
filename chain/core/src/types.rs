@@ -7,6 +7,7 @@ mod h256;
 mod heap_address;
 mod heap_h256;
 mod shard_config;
+mod shard_id;
 mod time;
 
 pub use address::Address;
@@ -17,5 +18,6 @@ pub use flags::*;
 pub use h256::H256;
 pub use heap_address::HeapAddress;
 pub use heap_h256::HeapH256;
-pub use shard_config::{ShardConfig, ShardId};
+pub use shard_config::ShardConfig;
+pub use shard_id::ShardId;
 pub use time::*;

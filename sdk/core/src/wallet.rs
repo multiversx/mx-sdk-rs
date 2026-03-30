@@ -119,7 +119,7 @@ impl Wallet {
     }
 
     pub fn from_pem_file(file_path: &str) -> Result<Self> {
-        let contents = std::fs::read_to_string(file_path).unwrap();
+        let contents = std::fs::read_to_string(file_path)?;
         Self::from_pem_file_contents(contents)
     }
 

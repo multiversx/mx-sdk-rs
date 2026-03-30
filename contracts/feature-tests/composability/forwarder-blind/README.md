@@ -75,6 +75,14 @@ Uses the async v2 mechanism (`register_promise`).
 
 ---
 
+## Top-level endpoints
+
+### `drain`
+`#[only_owner]`  
+Drains the contract's full balance of a given token (identified by `token` and `token_nonce`) to the caller. Used to recover funds left in the contract after forwarding operations.
+
+---
+
 ## Scenarios
 
 Scenario tests are located in [`../scenarios/`](../scenarios) and cover:
@@ -98,6 +106,10 @@ Scenario tests are located in [`../scenarios/`](../scenarios) and cover:
 | `forw_blind_sync_fallible_reject_egld` | Vault rejects payment; original EGLD returned to caller via sync fallible error path |
 | `forw_blind_sync_fallible_retrieve_egld` | Retrieve EGLD from vault back to caller via sync fallible back-transfers |
 | `forw_blind_sync_fallible_retrieve_esdt` | Retrieve ESDT from vault back to caller via sync fallible back-transfers |
+| `forw_blind_transf_exec_accept_egld` | Send EGLD to vault via transfer-execute (fire-and-forget) |
+| `forw_blind_deploy` | Deploy a new contract via `blind_deploy` |
+| `forw_blind_upgrade` | Upgrade an existing contract via `blind_upgrade_from_source` |
+| `forw_blind_drain` | Drain EGLD, ESDT, and NFT balances from the contract via `drain` |
 | `forw_blind_transf_exec_accept_egld` | Send EGLD to vault via transfer-execute |
 | `forw_blind_deploy` | Deploy a new contract |
 | `forw_blind_upgrade` | Upgrade an existing contract |
