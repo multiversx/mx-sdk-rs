@@ -371,6 +371,7 @@ where
     A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
+    #[inline(never)]
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);
@@ -378,6 +379,7 @@ where
         named_key
     }
 
+    #[inline(never)]
     fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
         let mut name_key = self.base_key.clone();
         name_key.append_bytes(name);

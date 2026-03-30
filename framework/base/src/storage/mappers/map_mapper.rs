@@ -205,6 +205,7 @@ where
         self.keys_set.contains(k)
     }
 
+    #[inline(never)]
     fn build_named_key(&self, name: &str, key: &K) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name.as_bytes());

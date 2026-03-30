@@ -128,6 +128,7 @@ where
     A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
+    #[inline(never)]
     fn item_index_key(&self, value: &T) -> StorageKey<SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ITEM_INDEX);

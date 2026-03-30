@@ -58,16 +58,17 @@ where
         }
     }
 
-    #[inline]
+    #[inline(never)]
     pub fn append_bytes(&mut self, bytes: &[u8]) {
         self.buffer.append_bytes(bytes);
     }
 
-    #[inline]
+    #[inline(never)]
     pub fn append_managed_buffer(&mut self, buffer: &ManagedBuffer<A>) {
         self.buffer.append(buffer);
     }
 
+    #[inline(never)]
     pub fn append_item<T>(&mut self, item: &T)
     where
         T: NestedEncode,

@@ -225,6 +225,7 @@ where
     A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
+    #[inline(never)]
     pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);

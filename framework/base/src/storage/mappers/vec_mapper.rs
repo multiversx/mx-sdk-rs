@@ -136,6 +136,7 @@ where
     A: StorageAddress<SA>,
     T: TopEncode + TopDecode,
 {
+    #[inline(never)]
     fn item_key(&self, index: usize) -> StorageKey<SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ITEM_SUFFIX.as_bytes());

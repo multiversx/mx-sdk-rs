@@ -207,6 +207,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
+    #[inline(never)]
     fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);

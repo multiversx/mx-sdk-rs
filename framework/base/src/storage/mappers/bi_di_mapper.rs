@@ -202,6 +202,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
+    #[inline(never)]
     fn get_id_key(&self, value: &V) -> StorageKey<SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(VALUE_TO_ID_SUFFIX);
@@ -209,6 +210,7 @@ where
         key
     }
 
+    #[inline(never)]
     fn get_value_key(&self, key: &K) -> StorageKey<SA> {
         let mut value = self.base_key.clone();
         value.append_bytes(ID_TO_VALUE_SUFFIX);

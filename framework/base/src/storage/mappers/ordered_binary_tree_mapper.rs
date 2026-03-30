@@ -536,6 +536,7 @@ where
         unsafe { opt_node.unwrap_unchecked() }
     }
 
+    #[inline(never)]
     fn build_root_id_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
         key.append_bytes(ROOT_ID_SUFFIX.as_bytes());
@@ -543,6 +544,7 @@ where
         key
     }
 
+    #[inline(never)]
     fn build_root_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
         key.append_bytes(ROOT_ID_SUFFIX.as_bytes());
@@ -552,6 +554,7 @@ where
         self.build_key_for_item(root_id)
     }
 
+    #[inline(never)]
     fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
         let mut item_key = self.key.clone();
         item_key.append_bytes(ID_SUFFIX.as_bytes());
@@ -560,6 +563,7 @@ where
         item_key
     }
 
+    #[inline(never)]
     fn build_last_id_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
         key.append_bytes(LAST_ID_KEY_SUFFIX.as_bytes());
