@@ -1,6 +1,6 @@
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi, const_handles},
-    types::{BigUint, ManagedType},
+    types::{BigUint, ManagedType, SaturatingSub, SaturatingSubAssign},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -131,6 +131,7 @@ macro_rules! binary_operator {
 
 binary_operator! {Add, add, bi_add}
 binary_operator! {Sub, sub, bi_sub_unsigned}
+binary_operator! {SaturatingSub, saturating_sub, bi_sub_unsigned_saturated}
 binary_operator! {Mul, mul, bi_mul}
 binary_operator! {Div, div, bi_t_div}
 binary_operator! {Rem, rem, bi_t_mod}
@@ -188,6 +189,7 @@ macro_rules! binary_assign_operator {
 
 binary_assign_operator! {AddAssign, add_assign, bi_add}
 binary_assign_operator! {SubAssign, sub_assign, bi_sub_unsigned}
+binary_assign_operator! {SaturatingSubAssign, saturating_sub_assign, bi_sub_unsigned_saturated}
 binary_assign_operator! {MulAssign, mul_assign, bi_mul}
 binary_assign_operator! {DivAssign, div_assign, bi_t_div}
 binary_assign_operator! {RemAssign, rem_assign, bi_t_mod}

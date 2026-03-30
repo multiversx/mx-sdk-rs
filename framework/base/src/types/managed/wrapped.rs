@@ -54,8 +54,4 @@ pub use managed_vec_ref_mut::ManagedVecRefMut;
 pub use num::*;
 pub use randomness_source::RandomnessSource;
 pub use token::*;
-
-pub use traits::{
-    fixed_token_supply::FixedSupplyToken,
-    mergeable::{ExternallyMergeable, Mergeable},
-};
+pub use traits::*;

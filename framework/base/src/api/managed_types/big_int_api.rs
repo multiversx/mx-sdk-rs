@@ -41,6 +41,18 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
         }
     }
 
+    fn bi_sub_unsigned_saturated(
+        &self,
+        dest: Self::BigIntHandle,
+        x: Self::BigIntHandle,
+        y: Self::BigIntHandle,
+    ) {
+        self.bi_sub(dest.clone(), x, y);
+        if self.bi_sign(dest.clone()) == Sign::Minus {
+            self.bi_set_int64(dest, 0);
+        }
+    }
+
     fn bi_mul(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_t_div(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_t_mod(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
