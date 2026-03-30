@@ -16,6 +16,42 @@ use crate::{
     },
 };
 
+#[inline(never)]
+#[cold]
+fn signal_non_payable_esdt<A>() -> !
+where
+    A: ErrorApi,
+{
+    A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes())
+}
+
+#[inline(never)]
+#[cold]
+fn signal_incorrect_num_transfers<A>() -> !
+where
+    A: ErrorApi,
+{
+    A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+}
+
+#[inline(never)]
+#[cold]
+fn signal_esdt_unexpected_egld<A>() -> !
+where
+    A: ErrorApi,
+{
+    A::error_api_impl().signal_error(err_msg::ESDT_UNEXPECTED_EGLD.as_bytes())
+}
+
+#[inline(never)]
+#[cold]
+fn signal_fungible_token_expected<A>() -> !
+where
+    A: ErrorApi,
+{
+    A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes())
+}
+
 #[derive(Default)]
 pub struct CallValueWrapper<A>
 where
@@ -79,11 +115,11 @@ where
             1 => {
                 let first = all_transfers.get(0);
                 if !first.token_identifier.is_native() {
-                    A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
+                    signal_non_payable_esdt::<A>();
                 }
                 unsafe { ManagedRef::wrap_handle(first.amount.get_handle()) }
             }
-            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+            _ => signal_incorrect_num_transfers::<A>(),
         }
     }
 
@@ -122,7 +158,7 @@ where
         let checked = A::static_var_api_impl()
             .flag_is_set_or_update(StaticVarApiFlags::CALL_VALUE_ESDT_INITIALIZED);
         if !checked && egld_000000_transfer_exists::<A>(multi_esdt_handle.clone()) {
-            A::error_api_impl().signal_error(err_msg::ESDT_UNEXPECTED_EGLD.as_bytes())
+            signal_esdt_unexpected_egld::<A>()
         }
 
         unsafe { ManagedRef::wrap_handle(multi_esdt_handle) }
@@ -169,7 +205,7 @@ where
     pub fn single(&self) -> Ref<'static, Payment<A>> {
         let esdt_transfers = self.all();
         if esdt_transfers.len() != 1 {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+            signal_incorrect_num_transfers::<A>()
         }
         let value = esdt_transfers.get(0);
         unsafe {
@@ -193,7 +229,7 @@ where
                 };
                 Some(lifetime_fix)
             }
-            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+            _ => signal_incorrect_num_transfers::<A>(),
         }
     }
 
@@ -205,7 +241,7 @@ where
     pub fn array<const N: usize>(&self) -> [Ref<'static, Payment<A>>; N] {
         let list = self.all();
         let array = list.to_array_of_refs::<N>().unwrap_or_else(|| {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+            signal_incorrect_num_transfers::<A>()
         });
         unsafe { core::mem::transmute(array) }
     }
@@ -220,7 +256,7 @@ where
     pub fn multi_esdt<const N: usize>(&self) -> [Ref<'static, EsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_esdt_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+            signal_incorrect_num_transfers::<A>()
         });
         unsafe { core::mem::transmute(array) }
     }
@@ -235,7 +271,7 @@ where
     ) -> [Ref<'static, EgldOrEsdtTokenPayment<A>>; N] {
         let esdt_transfers = self.all_transfers();
         let array = esdt_transfers.to_array_of_refs::<N>().unwrap_or_else(|| {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+            signal_incorrect_num_transfers::<A>()
         });
         unsafe { core::mem::transmute(array) }
     }
@@ -248,7 +284,7 @@ where
     pub fn single_esdt(&self) -> Ref<'static, EsdtTokenPayment<A>> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.len() != 1 {
-            A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes())
+            signal_incorrect_num_transfers::<A>()
         }
         let value = esdt_transfers.get(0);
         unsafe { core::mem::transmute(value) }
@@ -267,7 +303,7 @@ where
     ) {
         let payment = self.single_esdt();
         if payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
+            signal_fungible_token_expected::<A>();
         }
 
         unsafe {
@@ -294,7 +330,7 @@ where
                 amount: self.egld_direct_non_strict().clone(),
             },
             1 => esdt_transfers.get(0).clone(),
-            _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_TRANSFERS.as_bytes()),
+            _ => signal_incorrect_num_transfers::<A>(),
         }
     }
 
@@ -309,7 +345,7 @@ where
     pub fn egld_or_single_fungible_esdt(&self) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
         let payment = self.egld_or_single_esdt();
         if payment.token_nonce != 0 {
-            A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED.as_bytes());
+            signal_fungible_token_expected::<A>();
         }
 
         (payment.token_identifier, payment.amount)

@@ -23,6 +23,8 @@ impl<M: ManagedTypeApi> ErrorHelper<M> {
         ManagedSCError::new_empty()
     }
 
+    #[inline(never)]
+    #[cold]
     pub fn signal_error_with_message<T>(message: T) -> !
     where
         T: IntoSignalError<M>,
@@ -37,35 +39,40 @@ pub trait IntoSignalError<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> IntoSignalError<M> for &str {
-    #[inline]
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.as_bytes())
     }
 }
 
 impl<M: ManagedTypeApi> IntoSignalError<M> for &[u8] {
-    #[inline]
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self)
     }
 }
 
 impl<M: ManagedTypeApi> IntoSignalError<M> for BoxedBytes {
-    #[inline]
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.as_slice())
     }
 }
 
 impl<M: ManagedTypeApi> IntoSignalError<M> for EncodeError {
-    #[inline]
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.message_bytes())
     }
 }
 
 impl<M: ManagedTypeApi> IntoSignalError<M> for DecodeError {
-    #[inline]
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.message_bytes())
     }
@@ -77,6 +84,8 @@ where
     M: ManagedTypeApi,
     B: Borrow<ManagedBuffer<M>>,
 {
+    #[inline(never)]
+    #[cold]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error_from_buffer(self.borrow().get_handle())
     }

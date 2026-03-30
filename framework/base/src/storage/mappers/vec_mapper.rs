@@ -4,7 +4,7 @@ use super::{
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, StorageMapperApi},
+    api::{ErrorApi, ErrorApiImpl, StorageMapperApi},
     codec::{
         EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
         multi_encode_iter_or_handle_err,
@@ -18,6 +18,12 @@ const LEN_SUFFIX: &str = ".len";
 const ITEM_SUFFIX: &str = ".item";
 
 const INDEX_OUT_OF_RANGE_ERR_MSG: &str = "index out of range";
+
+#[inline(never)]
+#[cold]
+fn signal_index_out_of_range<SA: ErrorApi>() -> ! {
+    SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes())
+}
 
 /// A storage mapper for managing an ordered, indexable list of items with automatic length tracking.
 ///
@@ -157,7 +163,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn get(&self, index: usize) -> T {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
+            signal_index_out_of_range::<SA>();
         }
         self.get_unchecked(index)
     }
@@ -186,7 +192,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn item_is_empty(&self, index: usize) -> bool {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG.as_bytes());
+            signal_index_out_of_range::<SA>();
         }
         self.item_is_empty_unchecked(index)
     }
@@ -249,7 +255,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn set(&mut self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(&b"index out of range"[..]);
+            signal_index_out_of_range::<SA>();
         }
         self.set_unchecked(index, item);
     }
@@ -273,7 +279,7 @@ where
     /// Index must be valid (1 <= index <= count).
     pub fn clear_entry(&self, index: usize) {
         if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(&b"index out of range"[..]);
+            signal_index_out_of_range::<SA>();
         }
         self.clear_entry_unchecked(index)
     }
@@ -295,7 +301,7 @@ where
     pub(crate) fn swap_remove_and_get_old_last(&mut self, index: usize) -> Option<T> {
         let last_item_index = self.len();
         if index == 0 || index > last_item_index {
-            SA::error_api_impl().signal_error(&b"index out of range"[..]);
+            signal_index_out_of_range::<SA>();
         }
 
         let mut last_item_as_option = Option::None;

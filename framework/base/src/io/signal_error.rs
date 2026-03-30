@@ -6,6 +6,8 @@ use crate::{
     types::{ManagedBuffer, ManagedType},
 };
 
+#[inline(never)]
+#[cold]
 pub fn signal_arg_de_error<EA>(arg_id: ArgId, decode_err: DecodeError) -> !
 where
     EA: ManagedTypeApi + ErrorApi,

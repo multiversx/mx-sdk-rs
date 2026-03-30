@@ -193,6 +193,8 @@ where
 {
     type HandledErr = Infallible;
 
+    #[inline(never)]
+    #[cold]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer =
             ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR_1.as_bytes());
