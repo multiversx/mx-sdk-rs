@@ -57,6 +57,26 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+### [sc 0.65.1, chain 0.22.1, sdk 0.15.1] - 2026-03-25
+- `sc-meta` improvements:
+	- `sc-meta wallet new --shard <id>` flag: generates a new wallet whose address belongs to the given shard;
+	- `sc-meta all proxy`
+		- Better crate path handling;
+		- `--verbose` flag: prints each proxy file path as it is generated.
+	- `sc-meta test-gen` generates `.insert_ghost_accounts()` call in test setup (only used in internal tests).
+- SDK:
+	- Accept trailing slash in gateway URL (automatically normalized);
+	- Fixed a transaction decode issue in `sdk/core`;
+	- Test wallets provided for each shard, including a function that returns the wallet for that `ShardId`.
+- Chain core: new `ShardId` type and `ShardConfig` infrastructure:
+	- `ShardId` represents a shard identifier, with special values for metachain;
+	- `ShardConfig` encodes the shard structure of the network (number of shards, address distribution);
+	- Functionality to get the shard of an `Address`;
+	- Utility for checking whether an address is of a system SC.
+- Base framework improvements:
+	- `ManagedArgBuffer` implements `ManagedVecItem`.
+	- `Display` trait implemented by `BigInt`, `BigUint`, `NonZeroBigUint`, `Payment` and `EsdtTokenPayment`.
+
 
 ### [sc 0.65.0, codec 0.25.0, chain 0.22.0, sdk 0.15.0, scenario-format 0.26.0] - 2026-02-27
 - VM:
@@ -871,7 +891,7 @@ First pre-release of the unified syntax. Syntax not yet stabilized, should only 
 	- build post-processing: `wasm2wat`, imports via `wasm-objdump`.
 - Support for the new async call system (promises):
 	- new APIs;
-	- a new flavor of callbacks (`#[promises-callback]`);
+	- a new flavor of callbacks (`#[promises_callback]`);
 	- callback optimizations.
 - `elrond-codec` refactor: removed `TopEncodeNoErr`, `NestedEncodeNoErr` and `TypeInfo`
 - System SC proxy: added support for `controlChanges` endpoint and transfer create role (from community).

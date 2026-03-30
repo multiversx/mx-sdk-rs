@@ -15,6 +15,23 @@ fn assert_big_uint_proportion(x: u64, part: u64, total: u64, expected: u64) {
 }
 
 #[test]
+fn test_big_uint_display() {
+    assert_eq!(BigUint::<StaticApi>::from(0u32).to_string(), "0");
+    assert_eq!(BigUint::<StaticApi>::from(1u32).to_string(), "1");
+    assert_eq!(BigUint::<StaticApi>::from(42u32).to_string(), "42");
+    assert_eq!(
+        BigUint::<StaticApi>::from(1000000u32).to_string(),
+        "1000000"
+    );
+    assert_eq!(
+        BigUint::<StaticApi>::from(i64::MAX as u64).to_string(),
+        (i64::MAX as u64).to_string()
+    );
+    // format! also uses Display
+    assert_eq!(format!("{}", BigUint::<StaticApi>::from(123u32)), "123");
+}
+
+#[test]
 fn test_big_uint_ln() {
     // have tested this value during development
     assert_big_uint_ln(23, "3.135514649"); // vs. 3.1354942159291497 first 6 decimals are ok

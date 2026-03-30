@@ -108,6 +108,10 @@ where
         &self.network_config.address_hrp
     }
 
+    pub fn is_registered_wallet(&self, address: &Address) -> bool {
+        self.sender_map.contains_key(address)
+    }
+
     pub fn get_accounts_from_file(&self) -> Vec<SetStateAccount> {
         let file_path = self.get_state_file_path();
 

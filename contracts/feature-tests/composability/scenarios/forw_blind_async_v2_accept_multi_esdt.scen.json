@@ -1,0 +1,89 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "esdt": {
+                        "str:TEST-TOKENA": "200"
+                    }
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blind_async_v2 accept multi-ESDT including EGLD",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:EGLD-000000",
+                        "nonce": "0",
+                        "value": "500"
+                    },
+                    {
+                        "tokenIdentifier": "str:TEST-TOKENA",
+                        "nonce": "0",
+                        "value": "200"
+                    }
+                ],
+                "function": "blindAsyncV2",
+                "arguments": [
+                    "sc:vault",
+                    "str:accept_funds"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "0"
+                    }
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "esdt": {
+                        "str:TEST-TOKENA": "200"
+                    },
+                    "storage": {
+                        "str:call_counts|nested:str:accept_funds": "1"
+                    },
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                }
+            }
+        }
+    ]
+}

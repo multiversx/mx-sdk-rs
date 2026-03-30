@@ -1,0 +1,2 @@
+[[proxy]]
+path = "dex-interactor/src/proxies/forwarder_blind_proxy.rs"
