@@ -29,9 +29,7 @@ use std::{
 };
 
 use multiversx_sc::api::HandleConstraints;
-use multiversx_sc::imports::*;
-use multiversx_sc::types::ManagedType;
-use multiversx_sc_scenario::api::StaticApi;
+use multiversx_sc_scenario::imports::*;
 
 // ---------------------------------------------------------------------------
 // Test 1 – Thread isolation
