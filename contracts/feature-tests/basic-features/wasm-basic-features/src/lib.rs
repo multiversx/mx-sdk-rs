@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          660
+// Endpoints:                          672
 // Async Callback:                       1
-// Total number of exported functions: 662
+// Total number of exported functions: 674
 
 #![no_std]
 
@@ -332,6 +332,18 @@ multiversx_sc_wasm_adapter::endpoints! {
         le_non_zero_big_uint_i64 => le_non_zero_big_uint_i64
         le_non_zero_big_uint_u32 => le_non_zero_big_uint_u32
         le_non_zero_big_uint_u64 => le_non_zero_big_uint_u64
+        saturating_sub_big_uint_big_uint => saturating_sub_big_uint_big_uint
+        saturating_sub_big_uint_big_uint_ref => saturating_sub_big_uint_big_uint_ref
+        saturating_sub_big_uint_ref_big_uint => saturating_sub_big_uint_ref_big_uint
+        saturating_sub_big_uint_ref_big_uint_ref => saturating_sub_big_uint_ref_big_uint_ref
+        saturating_sub_big_uint_u32 => saturating_sub_big_uint_u32
+        saturating_sub_big_uint_ref_u32 => saturating_sub_big_uint_ref_u32
+        saturating_sub_big_uint_u64 => saturating_sub_big_uint_u64
+        saturating_sub_big_uint_ref_u64 => saturating_sub_big_uint_ref_u64
+        saturating_sub_assign_big_uint_big_uint => saturating_sub_assign_big_uint_big_uint
+        saturating_sub_assign_big_uint_big_uint_ref => saturating_sub_assign_big_uint_big_uint_ref
+        saturating_sub_assign_big_uint_u32 => saturating_sub_assign_big_uint_u32
+        saturating_sub_assign_big_uint_u64 => saturating_sub_assign_big_uint_u64
         get_block_timestamp => get_block_timestamp
         get_block_nonce => get_block_nonce
         get_block_round => get_block_round

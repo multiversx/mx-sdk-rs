@@ -2,6 +2,7 @@
 pub enum BaseOperator {
     Add,
     Sub,
+    SaturatingSub,
     Mul,
     Div,
     Rem,
@@ -22,6 +23,7 @@ impl BaseOperator {
         match self {
             BaseOperator::Add => "+",
             BaseOperator::Sub => "-",
+            BaseOperator::SaturatingSub => panic!("SaturatingSub has no symbol"),
             BaseOperator::Mul => "*",
             BaseOperator::Div => "/",
             BaseOperator::Rem => "%",
@@ -83,6 +85,18 @@ impl OperatorInfo {
             self.base_operator.symbol().to_string()
         }
     }
+
+    pub fn format_op(&self, a: &str, b: &str) -> String {
+        if matches!(self.base_operator, BaseOperator::SaturatingSub) {
+            if self.assign {
+                format!("{a}.saturating_sub_assign({b})")
+            } else {
+                format!("{a}.saturating_sub({b})")
+            }
+        } else {
+            format!("{a} {} {b}", self.symbol())
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,6 +105,7 @@ pub enum OperatorGroup {
     Bitwise,
     Shift,
     Cmp,
+    SaturatingSubMethods,
 }
 
 pub struct OperatorList(pub Vec<OperatorInfo>);
@@ -126,6 +141,18 @@ impl OperatorList {
             OperatorInfo::new("ge", BaseOperator::Ge, OperatorGroup::Cmp),
             OperatorInfo::new("lt", BaseOperator::Lt, OperatorGroup::Cmp),
             OperatorInfo::new("le", BaseOperator::Le, OperatorGroup::Cmp),
+            // Extra
+            OperatorInfo::new(
+                "saturating_sub",
+                BaseOperator::SaturatingSub,
+                OperatorGroup::SaturatingSubMethods,
+            ),
+            OperatorInfo::new(
+                "saturating_sub",
+                BaseOperator::SaturatingSub,
+                OperatorGroup::SaturatingSubMethods,
+            )
+            .assign(),
         ])
     }
 }
