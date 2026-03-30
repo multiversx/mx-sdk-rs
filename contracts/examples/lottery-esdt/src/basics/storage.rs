@@ -12,7 +12,7 @@ pub trait StorageModule {
         user_id: &u64,
     ) -> SingleValueMapper<BigUint>;
 
-    #[storage_mapper("totalWinning_tickets")]
+    #[storage_mapper("totalWinningTickets")]
     fn total_winning_tickets(&self, lottery_name: &ManagedBuffer) -> SingleValueMapper<usize>;
 
     #[storage_mapper("indexLastWinner")]
