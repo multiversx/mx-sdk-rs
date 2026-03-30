@@ -71,9 +71,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
 
         match opt_burn_percentage {
             OptionalValue::Some(burn_percentage) => {
-                let roles = self
-                    .blockchain()
-                    .get_esdt_local_roles(&token_identifier.clone());
+                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
                 require!(
                     roles.has_role(&EsdtLocalRole::Burn),
                     "The contract can't burn the selected token!"
