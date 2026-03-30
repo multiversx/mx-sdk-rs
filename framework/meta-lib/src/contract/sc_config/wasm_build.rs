@@ -97,6 +97,9 @@ impl ContractVariant {
         if build_args.emit_llvm_ir {
             rustflags.push_flag("--emit=llvm-ir");
         }
+
+        rustflags.push_flag("-C passes=mergefunc");
+
         rustflags
     }
 
