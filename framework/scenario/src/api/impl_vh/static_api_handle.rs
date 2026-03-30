@@ -8,6 +8,9 @@ use multiversx_sc::{
 #[derive(Clone)]
 pub struct StaticApiHandle {
     raw_handle: RawHandle,
+
+    /// This field causes StaticApiHandle not to be `Send` or `Sync`,
+    /// which is desirable since the handle is only valid on the thread of the original context.
     _phantom: PhantomData<*const ()>,
 }
 
