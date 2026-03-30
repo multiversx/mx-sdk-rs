@@ -26,7 +26,6 @@ pub fn generate_call_method(m: &Method) -> proc_macro2::TokenStream {
     let call_method_ident = generate_call_method_name(&m.name);
     let call_method_body = generate_endpoint_call_method_body(m);
     quote! {
-        #[inline]
         fn #call_method_ident (&mut self) {
             #call_method_body
         }
@@ -37,7 +36,6 @@ pub fn generate_promises_callback_call_method(m: &Method) -> proc_macro2::TokenS
     let call_method_ident = generate_call_method_name(&m.name);
     let call_method_body = generate_promises_callback_call_method_body(m);
     quote! {
-        #[inline]
         fn #call_method_ident (&self) {
             #call_method_body
         }
