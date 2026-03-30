@@ -2926,6 +2926,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "managed-mem-bench"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "map-repeat"
 version = "0.0.0"
 dependencies = [
@@ -3328,6 +3336,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "simple-error",
+ "static_assertions",
  "unwrap-infallible",
 ]
 

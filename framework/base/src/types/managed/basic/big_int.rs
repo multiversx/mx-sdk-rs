@@ -77,15 +77,49 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
+    pub(crate) fn new_handle() -> M::BigIntHandle {
+        use_raw_handle(M::static_var_api_impl().next_handle())
+    }
+
     /// Creates a new object, without initializing it.
     ///
     /// ## Safety
     ///
-    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time
+    /// the value is attempted to be read.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If the caller unwinds (panics) before the returned value is fully initialized, the
+    /// `BigInt` is dropped normally — which issues a `drop_big_int` call for an uninitialized
+    /// handle. This may corrupt the VM handle table. Callers must ensure initialization
+    /// completes before any panic can occur.
     pub unsafe fn new_uninit() -> Self {
         unsafe {
-            let new_handle: M::BigIntHandle =
-                use_raw_handle(M::static_var_api_impl().next_handle());
+            let new_handle = Self::new_handle();
+            BigInt::from_handle(new_handle)
+        }
+    }
+
+    /// Creates a new object and initializes it via a closure that receives the raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The closure `init_fn` must fully initialize the value behind the handle before returning.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If `init_fn` unwinds (panics), the partially-constructed `BigInt` is leaked — its
+    /// destructor is **not** called. This means no `drop_big_int` call will be issued for the
+    /// allocated handle, which may leave the VM handle table in an inconsistent state.
+    /// Callers must ensure that `init_fn` does not panic.
+    pub unsafe fn new_init_handle<F>(init_fn: F) -> Self
+    where
+        F: FnOnce(M::BigIntHandle),
+    {
+        unsafe {
+            let new_handle = Self::new_handle();
+            init_fn(new_handle.clone());
             BigInt::from_handle(new_handle)
         }
     }
@@ -247,6 +281,12 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
             BigInt::<M>::clone_to_handle(self.get_handle(), result.get_handle());
             result
         }
+    }
+}
+
+impl<M: ManagedTypeApi> Drop for BigInt<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_big_int(self.handle.clone());
     }
 }
 

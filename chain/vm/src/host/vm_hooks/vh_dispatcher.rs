@@ -19,6 +19,10 @@ impl<C: VMHooksContext> VMHooksDispatcher<C> {
             handler: VMHooksHandler::new(vh_context),
         }
     }
+
+    pub fn get_handler(&self) -> &VMHooksHandler<C> {
+        &self.handler
+    }
 }
 
 fn map_bool_to_i32(result: Result<bool, VMHooksEarlyExit>) -> Result<i32, VMHooksEarlyExit> {

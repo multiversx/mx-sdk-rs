@@ -17,7 +17,7 @@ use crate::{
     },
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
-    types::{ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, ManagedVecItem},
+    types::{ManagedArgBuffer, ManagedBuffer, ManagedVec, ManagedVecItem},
 };
 use core::{iter::FromIterator, marker::PhantomData};
 
@@ -106,8 +106,16 @@ impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
 {
+    /// Converts to a `ManagedArgBuffer` by cloning the underlying raw buffers.
+    ///
+    /// Use `into_arg_buffer` instead if `self` is no longer needed, to avoid the clone.
     pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        unsafe { ManagedArgBuffer::from_handle(self.raw_buffers.get_handle()) }
+        ManagedArgBuffer::from(self.raw_buffers.clone())
+    }
+
+    /// Converts into a `ManagedArgBuffer`, consuming `self` and moving the underlying raw buffers.
+    pub fn into_arg_buffer(self) -> ManagedArgBuffer<M> {
+        ManagedArgBuffer::from(self.raw_buffers)
     }
 }
 

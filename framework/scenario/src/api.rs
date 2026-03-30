@@ -6,5 +6,6 @@ mod vm_api_vh;
 
 pub(crate) use impl_vh::i32_to_bool;
 pub use impl_vh::{
-    DebugApi, DebugApiBackend, DebugHandle, SingleTxApi, StaticApi, VMHooksApi, VMHooksApiBackend,
+    DebugApi, DebugApiBackend, DebugHandle, SingleTxApi, StaticApi, StaticApiHandle, VMHooksApi,
+    VMHooksApiBackend,
 };
