@@ -4,7 +4,7 @@ use core::ops::{
 
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi},
-    types::{BigInt, ManagedType},
+    types::BigInt,
 };
 
 macro_rules! binary_operator {
