@@ -199,6 +199,17 @@ where
     }
 }
 
+/// Syntactic sugar only.
+impl<M, const N: usize> From<[u8; N]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(bytes: [u8; N]) -> Self {
+        Self::new_from_bytes(&bytes)
+    }
+}
+
 impl<M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,

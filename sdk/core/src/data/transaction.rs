@@ -69,7 +69,9 @@ pub struct TransactionOnNetwork {
     pub signature: String,
     pub source_shard: u32,
     pub destination_shard: u32,
+    #[serde(default)]
     pub block_nonce: u64,
+    #[serde(default)]
     pub block_hash: String,
     pub notarized_at_source_in_meta_nonce: Option<u64>,
     #[serde(rename = "NotarizedAtSourceInMetaHash")]
@@ -77,8 +79,11 @@ pub struct TransactionOnNetwork {
     pub notarized_at_destination_in_meta_nonce: Option<u64>,
     pub notarized_at_destination_in_meta_hash: Option<String>,
     pub processing_type_on_destination: String,
+    #[serde(default)]
     pub miniblock_type: String,
+    #[serde(default)]
     pub miniblock_hash: String,
+    #[serde(default)]
     pub timestamp: u64,
     pub data: Option<String>,
     pub status: String,

@@ -1,0 +1,33 @@
+[package]
+name = "forwarder-blind-dex-interactor"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "forwarder-blind-dex-interactor"
+path = "src/interactor_main.rs"
+
+[lib]
+path = "src/interact.rs"
+
+[dependencies.forwarder-blind]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.65.1"
+path = "../../../../../framework/snippets"
+
+[dependencies.multiversx-sc]
+version = "0.65.1"
+path = "../../../../../framework/base"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "1.0"
+tokio = { version = "1.24" }
+
+[features]
+chain-simulator-tests = []

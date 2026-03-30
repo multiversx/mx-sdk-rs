@@ -4,18 +4,13 @@ multiversx_sc::imports!();
 pub trait ForwarderBlindAsyncV1: super::fwd_blind_common::ForwarderBlindCommon {
     #[endpoint(blindAsyncV1)]
     #[payable]
-    fn blind_async_v1(
-        &self,
-        to: ManagedAddress,
-        endpoint_name: ManagedBuffer,
-        args: MultiValueEncoded<ManagedBuffer>,
-    ) {
+    fn blind_async_v1(&self, to: ManagedAddress, function_call: FunctionCall) {
         let original_caller = self.blockchain().get_caller();
         let payment = self.call_value().all();
         self.tx()
             .to(to)
-            .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .raw_call(function_call.function_name)
+            .arguments_raw(function_call.arg_buffer)
             .payment(&payment)
             .callback(
                 self.callbacks()

@@ -13,7 +13,7 @@ path = "src/tiny_interactor_main.rs"
 path = "src/tiny_interactor.rs"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.65.0"
+version = "0.65.1"
 path = "../../../../framework/snippets"
 
 [dependencies]

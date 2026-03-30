@@ -1,9 +1,0 @@
-[contracts.main]
-name = "forwarder-queue"
-
-[contracts.promises]
-name = "forwarder-queue-promises"
-add-labels = ["promises-callback"]
-
-[[proxy]]
-path = "../interact/src/forwarder_queue_proxy.rs"
