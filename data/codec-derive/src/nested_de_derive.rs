@@ -56,6 +56,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
             quote! {
                 impl #impl_generics codec::NestedDecode for #name #ty_generics #where_clause {
+                    #[inline(never)]
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, __h__: H) -> core::result::Result<Self, H::HandledErr>
                     where
                         I: codec::NestedDecodeInput,
@@ -74,6 +75,7 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
             quote! {
                 impl #impl_generics codec::NestedDecode for #name #ty_generics #where_clause {
+                    #[inline(never)]
                     fn dep_decode_or_handle_err<I, H>(input: &mut I, __h__: H) -> core::result::Result<Self, H::HandledErr>
                     where
                         I: codec::NestedDecodeInput,

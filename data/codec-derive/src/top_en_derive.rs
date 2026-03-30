@@ -81,6 +81,7 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let result = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
+            #[inline(never)]
             fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
                 O: codec::TopEncodeOutput,
@@ -100,6 +101,7 @@ pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let result = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
+            #[inline(never)]
             fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
                 O: codec::TopEncodeOutput,

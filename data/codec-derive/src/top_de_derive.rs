@@ -124,6 +124,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let result = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
+            #[inline(never)]
             fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
                 I: codec::TopDecodeInput,
@@ -145,6 +146,7 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let result = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
+            #[inline(never)]
             fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
                 I: codec::TopDecodeInput,
