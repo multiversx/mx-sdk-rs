@@ -1,5 +1,5 @@
-pub mod fixed_token_supply;
-pub mod mergeable;
+mod fixed_token_supply;
+mod mergeable;
 mod saturating_sub;
 mod saturating_sub_assign;
 
