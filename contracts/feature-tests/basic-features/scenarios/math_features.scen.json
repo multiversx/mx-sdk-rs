@@ -1,0 +1,192 @@
+{
+    "name": "math features",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_equal_weights",
+            "comment": "(10*1 + 20*1) / (1+1) = 15",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average",
+                "arguments": ["10", "1", "20", "1"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["15"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_unequal_weights",
+            "comment": "(0*3 + 30*7) / (3+7) = 21",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average",
+                "arguments": ["0", "3", "30", "7"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["21"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_truncates",
+            "comment": "(0*1 + 10*3) / (1+3) = 30/4 = 7 (truncated)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average",
+                "arguments": ["0", "1", "10", "3"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["7"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_round_up_equal_weights",
+            "comment": "(10*1 + 20*1) / (1+1) = 15 (exact, no rounding)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average_round_up",
+                "arguments": ["10", "1", "20", "1"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["15"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_round_up_rounds_up",
+            "comment": "(0*1 + 10*3 + 4 - 1) / (1+3) = 33/4 = 8 (rounded up from 7.5)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average_round_up",
+                "arguments": ["0", "1", "10", "3"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["8"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "weighted_average_round_up_exact",
+            "comment": "(1*1 + 4*2 + 3 - 1) / (1+2) = 11/3 = 3 (exact, no rounding)",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_weighted_average_round_up",
+                "arguments": ["1", "1", "4", "2"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["3"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "linear_interpolation_midpoint",
+            "comment": "(0*(100-50) + 200*(50-0)) / (100-0) = 10000/100 = 100",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_linear_interpolation",
+                "arguments": ["0", "100", "50", "0", "200"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["100"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "linear_interpolation_at_min",
+            "comment": "current_in == min_in => returns min_out = 5",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_linear_interpolation",
+                "arguments": ["0", "10", "0", "5", "15"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["5"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "linear_interpolation_at_max",
+            "comment": "current_in == max_in => returns max_out = 15",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_linear_interpolation",
+                "arguments": ["0", "10", "10", "5", "15"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["15"],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "linear_interpolation_out_of_range",
+            "comment": "current_in > max_in => sc_panic",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "math_linear_interpolation",
+                "arguments": ["0", "10", "11", "5", "15"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:current_in out of [min_in, max_in] range",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

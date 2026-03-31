@@ -364,6 +364,11 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn math_features_rs() {
+    world().run("scenarios/math_features.scen.json");
+}
+
+#[test]
 fn mmap_get_rs() {
     world().run("scenarios/mmap_get.scen.json");
 }
