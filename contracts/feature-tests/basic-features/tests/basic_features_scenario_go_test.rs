@@ -40,6 +40,11 @@ fn big_num_ops_cmp_go() {
 }
 
 #[test]
+fn big_num_ops_saturating_sub_go() {
+    world().run("scenarios/big_num_ops_saturating_sub.scen.json");
+}
+
+#[test]
 fn big_num_ops_shift_go() {
     world().run("scenarios/big_num_ops_shift.scen.json");
 }

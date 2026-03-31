@@ -50,8 +50,15 @@ fn big_num_ops_bitwise_rs() {
 }
 
 #[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_cmp_rs() {
     world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
+fn big_num_ops_saturating_sub_rs() {
+    world().run("scenarios/big_num_ops_saturating_sub.scen.json");
 }
 
 #[test]

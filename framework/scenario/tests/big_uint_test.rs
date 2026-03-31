@@ -1,4 +1,4 @@
-use multiversx_sc::types::BigUint;
+use multiversx_sc::types::{BigUint, SaturatingSub, SaturatingSubAssign};
 use multiversx_sc_scenario::api::StaticApi;
 
 // BigUint intentionally does not implement Send or Sync,
@@ -74,6 +74,41 @@ fn test_big_uint_proportion_all() {
     assert_big_uint_proportion(100, max_i64, max_i64, 100);
     // ~50% of 100, there are some rounding errors
     assert_big_uint_proportion(100, max_i64 / 2, max_i64, 49);
+}
+
+#[test]
+fn test_big_uint_saturating_sub() {
+    let sub = |a: u64, b: u64| -> u64 {
+        let result = BigUint::<StaticApi>::from(a).saturating_sub(&BigUint::<StaticApi>::from(b));
+        result.to_u64().unwrap()
+    };
+
+    assert_eq!(sub(10, 3), 7);
+    assert_eq!(sub(10, 10), 0);
+    assert_eq!(sub(10, 11), 0);
+    assert_eq!(sub(0, 0), 0);
+    assert_eq!(sub(0, 1), 0);
+    assert_eq!(sub(1000, 999), 1);
+    assert_eq!(sub(i64::MAX as u64, i64::MAX as u64), 0);
+    assert_eq!(sub(i64::MAX as u64, 1), i64::MAX as u64 - 1);
+}
+
+#[test]
+fn test_big_uint_saturating_sub_assign() {
+    let sub_assign = |a: u64, b: u64| -> u64 {
+        let mut result = BigUint::<StaticApi>::from(a);
+        result.saturating_sub_assign(&BigUint::<StaticApi>::from(b));
+        result.to_u64().unwrap()
+    };
+
+    assert_eq!(sub_assign(10, 3), 7);
+    assert_eq!(sub_assign(10, 10), 0);
+    assert_eq!(sub_assign(10, 11), 0);
+    assert_eq!(sub_assign(0, 0), 0);
+    assert_eq!(sub_assign(0, 1), 0);
+    assert_eq!(sub_assign(1000, 999), 1);
+    assert_eq!(sub_assign(i64::MAX as u64, i64::MAX as u64), 0);
+    assert_eq!(sub_assign(i64::MAX as u64, 1), i64::MAX as u64 - 1);
 }
 
 #[test]

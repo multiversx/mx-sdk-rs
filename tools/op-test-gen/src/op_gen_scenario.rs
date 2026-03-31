@@ -25,6 +25,9 @@ pub fn write_scenarios() {
     write_scenario_cmp(
         "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_cmp.scen.json",
     );
+    write_scenario_saturating_sub(
+        "../../contracts/feature-tests/basic-features/scenarios/big_num_ops_saturating_sub.scen.json",
+    );
 }
 
 pub fn write_scenario_arith(target_path: &str) {
@@ -306,6 +309,55 @@ fn eval_op_cmp(
         BaseOperator::Ge => tx_expect_bool_ok(a >= b),
         BaseOperator::Lt => tx_expect_bool_ok(a < b),
         BaseOperator::Le => tx_expect_bool_ok(a <= b),
+        _ => None,
+    }
+}
+
+pub fn write_scenario_saturating_sub(target_path: &str) {
+    let mut scenario = create_scenario();
+    let ops = OperatorList::create();
+    let endpoints = create_all_endpoints(&ops);
+
+    let numbers = vec![
+        num_bigint::BigInt::from(0),
+        num_bigint::BigInt::from(1),
+        num_bigint::BigInt::from(999),
+        num_bigint::BigInt::from(1000),
+    ];
+
+    for endpoint in endpoints {
+        for a in &numbers {
+            for b in &numbers {
+                if let Some(tx_expect) = eval_op_saturating_sub(a, b, &endpoint) {
+                    add_query(&mut scenario, &endpoint, a, b, tx_expect);
+                }
+            }
+        }
+    }
+
+    println!(
+        "Generated {} test queries for saturating sub operators.",
+        scenario.steps.len() - 1
+    );
+
+    save_scenario(scenario, target_path);
+}
+
+fn eval_op_saturating_sub(
+    a: &num_bigint::BigInt,
+    b: &num_bigint::BigInt,
+    endpoint: &BigNumOperatorTestEndpoint,
+) -> Option<TxExpect> {
+    discard_invalid_inputs(a, b, endpoint)?;
+    match endpoint.op_info.base_operator {
+        BaseOperator::SaturatingSub => {
+            let result = if a >= b {
+                a - b
+            } else {
+                num_bigint::BigInt::from(0)
+            };
+            tx_expect_big_num_ok(endpoint, result)
+        }
         _ => None,
     }
 }
