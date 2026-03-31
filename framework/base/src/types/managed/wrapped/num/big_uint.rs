@@ -431,8 +431,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
             .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
             as i64;
 
-        let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
-        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
+        let mut result = crate::math::internal_logarithm_i64::ln_polynomial(x);
+        crate::math::internal_logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
 
         debug_assert!(result > 0);
 
