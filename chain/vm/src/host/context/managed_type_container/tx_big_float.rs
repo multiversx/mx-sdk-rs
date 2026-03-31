@@ -10,4 +10,8 @@ impl ManagedTypeContainer {
     pub fn bf_overwrite(&mut self, handle: RawHandle, value: f64) {
         self.big_float_map.insert(handle, value);
     }
+
+    pub fn bf_remove(&mut self, handle: RawHandle) {
+        self.big_float_map.remove_handle(handle);
+    }
 }

@@ -37,6 +37,7 @@ fn struct_with_decimal_static() {
     assert!(
         !<ManagedStructWithDecimal<StaticApi> as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION
     );
+    assert!(<ManagedStructWithDecimal<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 #[test]
@@ -58,10 +59,11 @@ fn struct_with_decimal_read_write() {
         s.clone(),
         &mut payload,
     );
-    let struct_from_bytes =
+    let struct_from_bytes = unsafe {
         <ManagedStructWithDecimal<StaticApi> as multiversx_sc::types::ManagedVecItem>::read_from_payload(
             &payload
-        );
+        )
+    };
     assert_eq!(struct_from_bytes, s);
 
     // check payload

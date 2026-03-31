@@ -27,6 +27,7 @@ where
     pub use_chain_simulator: bool,
     pub network_config: NetworkConfig,
     pub sender_map: HashMap<Address, Sender>,
+    pub gas_price: u64,
 
     pub waiting_time_ms: u64,
     pub pre_runners: ScenarioRunnerList,
@@ -42,7 +43,11 @@ where
     /// Not yet changed for backwards compatibility.
     pub async fn new(gateway_uri: &str) -> Self {
         let proxy = GatewayProxy::from_uri(gateway_uri);
-        let network_config = proxy.request(NetworkConfigRequest).await.unwrap();
+        let network_config = proxy
+            .request(NetworkConfigRequest)
+            .await
+            .expect("could not get network config");
+        let gas_price = network_config.min_gas_price;
         Self {
             proxy,
             use_chain_simulator: false,
@@ -52,6 +57,7 @@ where
             pre_runners: ScenarioRunnerList::empty(),
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
+            gas_price,
         }
     }
 

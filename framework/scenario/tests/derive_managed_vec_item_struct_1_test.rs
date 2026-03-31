@@ -27,6 +27,7 @@ fn struct_1_static() {
         16
     );
     assert!(<Struct1 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(!<Struct1 as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }
 
 /// The reason we are including a codec test here is that because of the SKIPS_RESERIALIZATION flag,
@@ -89,7 +90,10 @@ fn struct_1_from_bytes_reader() {
         0x00,
     ];
 
-    let struct_from_bytes =
-        <Struct1 as multiversx_sc::types::ManagedVecItem>::read_from_payload(&arr.into());
-    assert_eq!(s, struct_from_bytes);
+    <Struct1 as multiversx_sc::types::ManagedVecItem>::temp_decode(
+        &arr.into(),
+        |struct_from_bytes| {
+            assert_eq!(&s, struct_from_bytes);
+        },
+    );
 }
