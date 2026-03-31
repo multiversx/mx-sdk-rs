@@ -9,7 +9,7 @@ pub use crate::{
     contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
     err_msg,
     io::*,
-    non_zero_usize,
+    math, non_zero_usize,
     non_zero_util::*,
     require, sc_format, sc_panic, sc_print,
     storage::mappers::*,
