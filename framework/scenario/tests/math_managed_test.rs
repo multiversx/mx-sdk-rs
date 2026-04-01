@@ -1,7 +1,7 @@
-use multiversx_sc::math::linear_interpolation::{
-    LinearInterpolationInvalidValuesError, linear_interpolation,
+use multiversx_sc::math::{
+    LinearInterpolationInvalidValuesError, linear_interpolation, weighted_average,
+    weighted_average_round_up,
 };
-use multiversx_sc::math::weighted_average::{weighted_average, weighted_average_round_up};
 use multiversx_sc::types::{BigUint, ManagedDecimal, NumDecimals};
 use multiversx_sc_scenario::api::StaticApi;
 
