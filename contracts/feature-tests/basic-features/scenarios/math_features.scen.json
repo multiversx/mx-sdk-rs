@@ -103,7 +103,7 @@
         {
             "step": "scCall",
             "id": "weighted_average_round_up_exact",
-            "comment": "(1*1 + 4*2 + 3 - 1) / (1+2) = 11/3 = 3 (exact, no rounding)",
+            "comment": "(1*1 + 4*2) / (1+2) = 9/3 = 3",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
