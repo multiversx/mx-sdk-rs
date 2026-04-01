@@ -1,6 +1,7 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+use crate::cmd::tx::tx_cli_args::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
 /// Parsed arguments of the meta crate CLI.
@@ -96,6 +97,12 @@ pub enum StandaloneCliAction {
         about = "Can install, start and stop a chain simulator configuration."
     )]
     ChainSimulator(ChainSimulatorArgs),
+
+    #[command(
+        name = "tx",
+        about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
+    )]
+    Tx(TxCliArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
