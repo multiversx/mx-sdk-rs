@@ -116,3 +116,62 @@ fn test_big_uint_saturating_sub_assign() {
 fn test_big_uint_proportion_overflow() {
     let _ = BigUint::<StaticApi>::from(100u64).proportion(100, i64::MAX as u64 + 1);
 }
+
+fn assert_nth_root(x: u64, k: u32, expected: u64) {
+    let big = BigUint::<StaticApi>::from(x);
+    let result = big.nth_root(k);
+    let expected_big = BigUint::<StaticApi>::from(expected);
+    assert_eq!(
+        result, expected_big,
+        "nth_root({x}, {k}) expected {expected}"
+    );
+}
+
+#[test]
+fn test_big_uint_nth_root() {
+    // k = 1: identity
+    assert_nth_root(0, 1, 0);
+    assert_nth_root(1, 1, 1);
+    assert_nth_root(42, 1, 42);
+
+    // zero base: always 0
+    assert_nth_root(0, 2, 0);
+    assert_nth_root(0, 3, 0);
+    assert_nth_root(0, 100, 0);
+
+    // perfect squares (agreeing with sqrt)
+    assert_nth_root(1, 2, 1);
+    assert_nth_root(4, 2, 2);
+    assert_nth_root(9, 2, 3);
+    assert_nth_root(100, 2, 10);
+    assert_nth_root(10000, 2, 100);
+
+    // perfect cubes
+    assert_nth_root(1, 3, 1);
+    assert_nth_root(8, 3, 2);
+    assert_nth_root(27, 3, 3);
+    assert_nth_root(125, 3, 5);
+    assert_nth_root(1000, 3, 10);
+
+    // floor (not an exact power)
+    assert_nth_root(2, 2, 1); // sqrt(2) ~ 1.41
+    assert_nth_root(10, 3, 2); // cbrt(10) ~ 2.154
+    assert_nth_root(100, 3, 4); // cbrt(100) ~ 4.641
+    assert_nth_root(255, 2, 15); // sqrt(255) ~ 15.96
+    assert_nth_root(1023, 10, 1); // 1023^(1/10) ~ 1.995
+
+    // higher roots
+    assert_nth_root(16, 4, 2); // 2^4 = 16
+    assert_nth_root(32, 5, 2); // 2^5 = 32
+    assert_nth_root(1024, 10, 2); // 2^10 = 1024
+    assert_nth_root(2_u64.pow(20), 20, 2); // 2^20
+
+    // large number
+    assert_nth_root(1_000_000_000, 3, 1000); // 1000^3 = 10^9
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: cannot compute 0th root"]
+fn test_big_uint_nth_root_zero_k() {
+    let _ = BigUint::<StaticApi>::from(10u64).nth_root(0);
+}

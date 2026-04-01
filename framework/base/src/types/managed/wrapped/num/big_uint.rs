@@ -332,13 +332,85 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    /// Assigns `self = base^exp`.
+    pub fn pow_assign(&mut self, base: &BigUint<M>, exp: u32) {
+        let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
+        M::managed_type_impl().bi_pow(self.get_handle(), base.get_handle(), exp_handle);
+    }
+
     pub fn pow(&self, exp: u32) -> Self {
-        let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         unsafe {
-            let result = BigUint::new_uninit();
-            M::managed_type_impl().bi_pow(result.get_handle(), self.get_handle(), big_int_temp_1);
+            let mut result = BigUint::new_uninit();
+            result.pow_assign(self, exp);
             result
         }
+    }
+
+    /// The integer part of the k-th root, computed via Newton's method.
+    ///
+    /// The initial guess is derived from the number of significant bits (`log2_floor`):
+    /// `x0 = 2^(floor(log2(self) / k) + 1)`, which is always an overestimate.
+    ///
+    /// Returns `0` when `self` is zero.
+    ///
+    /// # Panics
+    /// Panics if `k` is zero.
+    pub fn nth_root(&self, k: u32) -> Self {
+        if k == 0 {
+            quick_signal_error::<M>(err_msg::BIG_UINT_NTH_ROOT_ZERO);
+        }
+
+        if k == 1 {
+            return self.clone();
+        }
+
+        // log2 is None for the number zero,
+        // but in this case we can return early with the correct result of zero without doing any computation
+        let Some(log2) = self.log2_floor() else {
+            return BigUint::zero();
+        };
+
+        // Initial overestimate: 2^(floor(log2 / k) + 1)
+        let mut x = BigUint::from(1u64) << ((log2 / k + 1) as usize);
+
+        // Newton's iteration: x = ((k-1)*x + self / x^(k-1)) / k
+        // Converges from above; stop when the estimate stops decreasing.
+        let k_big = BigUint::<M>::from(k as u64);
+        let k_minus_1_big = BigUint::<M>::from((k - 1) as u64);
+
+        // Pre-allocate buffers reused across iterations to avoid per-iteration allocations.
+        // SAFETY: both are fully written before being read in every iteration.
+        let mut x_pow_k_minus_1 = unsafe { BigUint::new_uninit() };
+        let mut new_x = unsafe { BigUint::new_uninit() };
+        let api = M::managed_type_impl();
+        loop {
+            // x_pow_k_minus_1 = x^(k-1)
+            x_pow_k_minus_1.pow_assign(&x, k - 1);
+
+            // Reuse x_pow_k_minus_1's handle for self / x^(k-1).
+            // The VM reads both operands before writing, so dest == divisor is safe.
+            api.bi_t_div(
+                x_pow_k_minus_1.get_handle(),
+                self.get_handle(),
+                x_pow_k_minus_1.get_handle(),
+            );
+
+            // new_x = (k-1)*x + self/x^(k-1)
+            api.bi_mul(new_x.get_handle(), k_minus_1_big.get_handle(), x.get_handle());
+            new_x += &x_pow_k_minus_1;
+
+            // new_x /= k
+            new_x /= &k_big;
+
+            if new_x >= x {
+                break;
+            }
+            
+            // Swap handles instead of cloning: zero API calls, no allocation.
+            core::mem::swap(&mut x, &mut new_x);
+        }
+
+        x
     }
 
     /// The whole part of the base-2 logarithm.
@@ -446,6 +518,10 @@ impl<M: ManagedTypeApi> BigUint<M> {
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         unsafe { self.as_big_int().clone().into_big_uint_unchecked() }
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.value.clone_from(&source.value);
     }
 }
 

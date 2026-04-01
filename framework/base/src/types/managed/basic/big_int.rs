@@ -282,6 +282,10 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
             result
         }
     }
+
+    fn clone_from(&mut self, source: &Self) {
+        BigInt::<M>::clone_to_handle(source.get_handle(), self.get_handle());
+    }
 }
 
 impl<M: ManagedTypeApi> Drop for BigInt<M> {
