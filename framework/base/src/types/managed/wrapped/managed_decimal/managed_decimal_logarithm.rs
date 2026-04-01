@@ -28,12 +28,12 @@ fn compute_ln<M: ManagedTypeApi>(
         .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
         as i64;
 
-    let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
-    crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
+    let mut result = crate::math::internal_logarithm_i64::ln_polynomial(x);
+    crate::math::internal_logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
 
     debug_assert!(result > 0);
 
-    crate::types::math_util::logarithm_i64::ln_sub_decimals(&mut result, num_decimals);
+    crate::math::internal_logarithm_i64::ln_sub_decimals(&mut result, num_decimals);
 
     Some(ManagedDecimalSigned::from_raw_units(
         BigInt::from(result),
@@ -60,12 +60,12 @@ fn compute_log2<M: ManagedTypeApi>(
         .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("log2 internal error"))
         as i64;
 
-    let mut result = crate::types::math_util::logarithm_i64::log2_polynomial(x);
-    crate::types::math_util::logarithm_i64::log2_add_bit_log2(&mut result, log2_floor);
+    let mut result = crate::math::internal_logarithm_i64::log2_polynomial(x);
+    crate::math::internal_logarithm_i64::log2_add_bit_log2(&mut result, log2_floor);
 
     debug_assert!(result > 0);
 
-    crate::types::math_util::logarithm_i64::log2_sub_decimals(&mut result, num_decimals);
+    crate::math::internal_logarithm_i64::log2_sub_decimals(&mut result, num_decimals);
 
     Some(ManagedDecimalSigned::from_raw_units(
         BigInt::from(result),

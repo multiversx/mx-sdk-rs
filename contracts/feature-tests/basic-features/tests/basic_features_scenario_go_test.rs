@@ -342,6 +342,11 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn math_features_go() {
+    world().run("scenarios/math_features.scen.json");
+}
+
+#[test]
 fn mmap_get_go() {
     world().run("scenarios/mmap_get.scen.json");
 }
