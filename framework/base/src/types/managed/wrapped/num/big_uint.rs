@@ -364,6 +364,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
             return self.clone();
         }
 
+        self.nth_root_unchecked(k)
+    }
+
+    // Expects k > 1. Does not check this precondition, so it is the caller's responsibility to ensure it.
+    pub(crate) fn nth_root_unchecked(&self, k: u32) -> Self {
         // log2 is None for the number zero,
         // but in this case we can return early with the correct result of zero without doing any computation
         let Some(log2) = self.log2_floor() else {
