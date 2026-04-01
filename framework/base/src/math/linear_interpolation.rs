@@ -27,7 +27,7 @@ pub fn linear_interpolation<T>(
 where
     T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Div<Output = T> + PartialOrd + Clone,
 {
-    if current_in < min_in || current_in > max_in {
+    if min_in > max_in || current_in < min_in || current_in > max_in {
         return Err(LinearInterpolationInvalidValuesError);
     }
 

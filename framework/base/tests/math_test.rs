@@ -41,6 +41,14 @@ fn linear_interpolation_non_zero_based_ranges() {
 }
 
 #[test]
+fn linear_interpolation_reversed_output_range() {
+    // min_out > max_out is valid: output decreases as input increases
+    // Input range [0, 100], output range [1000, 0], current_in = 25 => output = 750
+    let result = linear_interpolation(0u32, 100u32, 25u32, 1000u32, 0u32).unwrap();
+    assert_eq!(result, 750u32);
+}
+
+#[test]
 fn linear_interpolation_below_range_returns_error() {
     let result = linear_interpolation(10u32, 100u32, 5u32, 0u32, 1000u32);
     assert!(matches!(result, Err(LinearInterpolationInvalidValuesError)));
