@@ -660,3 +660,54 @@ pub fn test_managed_decimal_div_mix_decimals_type_reverse() {
 
     assert_eq!(result, expected)
 }
+
+// d=4 ManagedDecimal helper: raw units / 10^4
+fn md4(v: u64) -> ManagedDecimal<StaticApi, NumDecimals> {
+    ManagedDecimal::from_raw_units(BigUint::from(v), 4usize)
+}
+
+fn assert_md4_nth_root(raw: u64, k: u32, expected_raw: u64) {
+    assert_eq!(
+        md4(raw).nth_root(k).into_raw_units(),
+        &BigUint::<StaticApi>::from(expected_raw)
+    );
+}
+
+#[test]
+fn test_managed_decimal_nth_root() {
+    // k=1: identity
+    assert_md4_nth_root(40000, 1, 40000);
+
+    // zero: any k≥2 root of 0.0000 is 0.0000
+    assert_md4_nth_root(0, 2, 0);
+
+    // sqrt(4.0000) = 2.0000
+    // scaled = 40000 * 10000^1 = 400_000_000, sqrt = 20000
+    assert_md4_nth_root(40000, 2, 20000);
+
+    // sqrt(9.0000) = 3.0000
+    // scaled = 90000 * 10000 = 900_000_000, sqrt = 30000
+    assert_md4_nth_root(90000, 2, 30000);
+
+    // cbrt(8.0000) = 2.0000
+    // scaled = 80000 * 10000^2 = 8_000_000_000_000, cbrt = 20000
+    assert_md4_nth_root(80000, 3, 20000);
+
+    // cbrt(27.0000) = 3.0000
+    // scaled = 270000 * 10000^2 = 27_000_000_000_000, cbrt = 30000
+    assert_md4_nth_root(270000, 3, 30000);
+
+    // sqrt(2.0000) ≈ 1.4142 (floor)
+    // scaled = 20000 * 10000 = 200_000_000, sqrt = 14142
+    assert_md4_nth_root(20000, 2, 14142);
+
+    // cbrt(2.0000) ≈ 1.2599 (floor)
+    // scaled = 20000 * 10000^2 = 2_000_000_000_000, cbrt = 12599
+    assert_md4_nth_root(20000, 3, 12599);
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: cannot compute 0th root"]
+fn test_managed_decimal_nth_root_zero_k() {
+    let _ = md4(40000).nth_root(0);
+}

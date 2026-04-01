@@ -396,7 +396,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
             );
 
             // new_x = (k-1)*x + self/x^(k-1)
-            api.bi_mul(new_x.get_handle(), k_minus_1_big.get_handle(), x.get_handle());
+            api.bi_mul(
+                new_x.get_handle(),
+                k_minus_1_big.get_handle(),
+                x.get_handle(),
+            );
             new_x += &x_pow_k_minus_1;
 
             // new_x /= k
@@ -405,7 +409,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             if new_x >= x {
                 break;
             }
-            
+
             // Swap handles instead of cloning: zero API calls, no allocation.
             core::mem::swap(&mut x, &mut new_x);
         }
