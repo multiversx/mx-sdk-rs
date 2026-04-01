@@ -524,6 +524,38 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 }
 
+/// Error returned when parsing a `BigUint` from a decimal string fails.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseBigUintError;
+
+impl core::fmt::Display for ParseBigUintError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(err_msg::BIG_UINT_PARSE_ERROR)
+    }
+}
+
+impl<M: ManagedTypeApi> core::str::FromStr for BigUint<M> {
+    type Err = ParseBigUintError;
+
+    /// Parses a decimal string into a `BigUint`.
+    ///
+    /// Returns `Err(ParseBigUintError)` if the string is empty or contains non-digit characters.
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.is_empty() {
+            return Err(ParseBigUintError);
+        }
+        let mut result = BigUint::zero();
+        for byte in s.bytes() {
+            if !byte.is_ascii_digit() {
+                return Err(ParseBigUintError);
+            }
+            result *= 10u64;
+            result += (byte - b'0') as u64;
+        }
+        Ok(result)
+    }
+}
+
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         unsafe { self.as_big_int().clone().into_big_uint_unchecked() }
