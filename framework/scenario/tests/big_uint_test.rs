@@ -1,4 +1,5 @@
-use multiversx_sc::types::{BigUint, SaturatingSub, SaturatingSubAssign};
+use core::str::FromStr;
+use multiversx_sc::types::{BigUint, ParseBigUintError, SaturatingSub, SaturatingSubAssign};
 use multiversx_sc_scenario::api::StaticApi;
 
 // BigUint intentionally does not implement Send or Sync,
@@ -174,4 +175,63 @@ fn test_big_uint_nth_root() {
 #[should_panic = "StaticApi signal error: cannot compute 0th root"]
 fn test_big_uint_nth_root_zero_k() {
     let _ = BigUint::<StaticApi>::from(10u64).nth_root(0);
+}
+
+#[test]
+fn test_big_uint_parse() {
+    let parse = |s: &str| -> u64 { BigUint::<StaticApi>::from_str(s).unwrap().to_u64().unwrap() };
+
+    // smaller values
+    assert_eq!(parse("0"), 0);
+    assert_eq!(parse("1"), 1);
+    assert_eq!(parse("42"), 42);
+    assert_eq!(parse("1000000"), 1_000_000);
+    assert_eq!(parse("9223372036854775807"), i64::MAX as u64); // largest i64
+
+    // larger values
+    let ten = BigUint::<StaticApi>::from(10u64);
+    assert_eq!(
+        "10000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(19)
+    ); // 10^19 > i64::MAX
+    assert_eq!(
+        "100000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(20)
+    ); // 10^20 > u64::MAX
+    assert_eq!(
+        "1000000000000000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(30)
+    );
+
+    // str::parse uses FromStr, so .parse() should also work
+    let big: BigUint<StaticApi> = "12345".parse().unwrap();
+    assert_eq!(big, BigUint::<StaticApi>::from(12345u64));
+}
+
+#[test]
+fn test_big_uint_parse_errors() {
+    assert_eq!(BigUint::<StaticApi>::from_str(""), Err(ParseBigUintError));
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("abc"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("12x4"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(BigUint::<StaticApi>::from_str("-1"), Err(ParseBigUintError));
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("1.0"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("123e4"),
+        Err(ParseBigUintError)
+    );
 }
