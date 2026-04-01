@@ -46,6 +46,7 @@ pub const VALUE_EXCEEDS_SLICE: &str = "value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &str = "cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &str = "big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &str = "cannot subtract because result would be negative";
+pub const BIG_UINT_NTH_ROOT_ZERO: &str = "cannot compute 0th root";
 pub const UNSIGNED_NEGATIVE: &str = "cannot convert to unsigned, number is negative";
 pub const ZERO_VALUE_NOT_ALLOWED: &str = "zero value not allowed";
 pub const PROPORTION_OVERFLOW_ERR: &str = "proportion overflow";

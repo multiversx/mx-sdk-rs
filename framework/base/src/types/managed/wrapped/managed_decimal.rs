@@ -17,7 +17,8 @@ pub use managed_decimal_signed::ManagedDecimalSigned;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::{ManagedTypeApi, ManagedTypeApiImpl, quick_signal_error},
+    err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     typenum::{U4, U8, Unsigned},
     types::BigUint,
@@ -136,6 +137,39 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<ManagedDecimal<M, ConstDecimals
 {
     fn from(value: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self {
         value.into_var_decimals()
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals + Clone> ManagedDecimal<M, D> {
+    /// Integer part of the k-th root, preserving the decimal scale.
+    ///
+    /// Internally pre-scales the raw data by `scaling_factor^(k-1)` so that after
+    /// taking the integer root the decimal point lands in the correct position:
+    ///
+    /// ```text
+    /// self.data = v * 10^d
+    ///   →  scaled = self.data * (10^d)^(k-1) = v * 10^(d*k)
+    ///   →  root   = floor(scaled^(1/k)) = floor(v^(1/k) * 10^d)
+    /// ```
+    ///
+    /// Returns `0` (with the same scale) when `self` is zero.
+    ///
+    /// # Panics
+    /// Panics if `k` is zero.
+    pub fn nth_root(&self, k: u32) -> Self {
+        if k == 0 {
+            quick_signal_error::<M>(err_msg::BIG_UINT_NTH_ROOT_ZERO);
+        }
+
+        if k == 1 {
+            return self.clone();
+        }
+
+        let sf = self.decimals.scaling_factor::<M>();
+        // Multiply by sf^(k-1) before rooting so the decimal position is preserved.
+        // For k==0, the check in BigUint::nth_root handles the error signal.
+        let scaled = &self.data * &sf.pow(k.saturating_sub(1));
+        ManagedDecimal::from_raw_units(scaled.nth_root_unchecked(k), self.decimals.clone())
     }
 }
 
