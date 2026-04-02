@@ -1,19 +1,9 @@
-mod decimals;
-mod managed_decimal_cmp;
-mod managed_decimal_cmp_signed;
-mod managed_decimal_logarithm;
-mod managed_decimal_op_add;
-mod managed_decimal_op_add_signed;
-mod managed_decimal_op_div;
-mod managed_decimal_op_div_signed;
-mod managed_decimal_op_mul;
-mod managed_decimal_op_mul_signed;
-mod managed_decimal_op_sub;
-mod managed_decimal_op_sub_signed;
-mod managed_decimal_signed;
-
-pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
-pub use managed_decimal_signed::ManagedDecimalSigned;
+use alloc::string::ToString;
+use core::{cmp::Ordering, ops::Deref};
+use multiversx_sc_codec::{
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -21,21 +11,14 @@ use crate::{
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     typenum::{U4, U8, Unsigned},
-    types::BigUint,
+    types::{
+        BigUint, ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem,
+        ManagedVecItemPayloadBuffer, Ref, managed_vec_item_read_from_payload_index,
+        managed_vec_item_save_to_payload_index,
+    },
 };
 
-use alloc::string::ToString;
-use multiversx_sc_codec::{
-    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-};
-
-use core::{cmp::Ordering, ops::Deref};
-
-use super::{
-    ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref,
-    managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
-};
+use super::{ConstDecimals, Decimals, ManagedDecimalSigned, NumDecimals};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -391,7 +374,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi for ManagedDecimal<M, ConstD
 }
 impl<M: ManagedTypeApi, D: Decimals> SCDisplay for ManagedDecimal<M, D> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        managed_decimal_signed::managed_decimal_fmt(
+        super::managed_decimal_signed::managed_decimal_fmt(
             &self.data.value,
             self.decimals.num_decimals(),
             f,

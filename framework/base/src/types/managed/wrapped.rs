@@ -1,9 +1,9 @@
 mod builder;
+mod decimal;
 mod encoded_managed_vec_item;
 mod managed_address;
 mod managed_buffer_read_to_end;
 mod managed_byte_array;
-mod managed_decimal;
 mod managed_map_encoded;
 mod managed_option;
 mod managed_ref;
@@ -24,15 +24,15 @@ mod token;
 mod traits;
 
 pub use builder::*;
+pub use decimal::{
+    ConstDecimals, Decimals, EgldDecimals, LnDecimals, ManagedDecimal, ManagedDecimalSigned,
+    NumDecimals,
+};
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use managed_address::ManagedAddress;
 pub use managed_buffer_read_to_end::*;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
-pub use managed_decimal::{
-    ConstDecimals, Decimals, EgldDecimals, LnDecimals, ManagedDecimal, ManagedDecimalSigned,
-    NumDecimals,
-};
 pub use managed_map_encoded::ManagedMapEncoded;
 pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
