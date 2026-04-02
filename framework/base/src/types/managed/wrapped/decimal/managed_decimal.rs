@@ -123,7 +123,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<ManagedDecimal<M, ConstDecimals
     }
 }
 
-impl<M: ManagedTypeApi, D: Decimals + Clone> ManagedDecimal<M, D> {
+impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     /// Integer part of the k-th root, preserving the decimal scale.
     ///
     /// Internally pre-scales the raw data by `scaling_factor^(k-1)` so that after

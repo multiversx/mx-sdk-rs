@@ -12,6 +12,7 @@ mod managed_decimal_op_mul_signed;
 mod managed_decimal_op_sub;
 mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
+mod managed_decimal_half_up;
 
 pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
 pub use managed_decimal::ManagedDecimal;

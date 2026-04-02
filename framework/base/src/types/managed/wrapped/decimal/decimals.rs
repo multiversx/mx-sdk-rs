@@ -13,7 +13,7 @@ use crate::{
 pub type NumDecimals = usize;
 
 /// Implemented by all decimal types usable in `ManagedDecimal`.
-pub trait Decimals {
+pub trait Decimals: Clone {
     /// Number of decimals as variable.
     fn num_decimals(&self) -> NumDecimals;
 
