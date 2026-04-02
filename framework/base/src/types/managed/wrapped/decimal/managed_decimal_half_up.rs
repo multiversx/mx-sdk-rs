@@ -3,9 +3,20 @@ use crate::{api::ManagedTypeApi, types::Sign};
 use super::{Decimals, ManagedDecimal, ManagedDecimalSigned};
 
 impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
-    /// Multiplies two decimals with half-up rounding at target precision.
-    /// Prevents precision loss in financial calculations using half-up rounding.
-    /// Returns product rounded to specified precision.
+    /// Multiplies two decimals with half-up rounding to a target precision.
+    ///
+    /// Both operands are first rescaled to `precision`. The rescaled raw values
+    /// are multiplied, producing a result with `2 * precision` implied decimal
+    /// places. That intermediate value is then rounded back to `precision` using
+    /// the standard pre-bias trick:
+    ///
+    /// ```text
+    /// rounded = (product + scale / 2) / scale
+    /// ```
+    ///
+    /// Adding `scale / 2` before the integer division means that any remainder
+    /// ≥ half the scale (i.e. the fractional part ≥ 0.5) causes the quotient
+    /// to increment by one — equivalent to round-half-up.
     pub fn mul_half_up<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimal<M, D2>,
@@ -28,9 +39,20 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
         ManagedDecimal::from_raw_units(rounded_product, precision)
     }
 
-    /// Divides two decimals with half-up rounding at target precision.
-    /// Prevents precision loss in financial calculations using half-up rounding.
-    /// Returns quotient rounded to specified precision.
+    /// Divides two decimals with half-up rounding to a target precision.
+    ///
+    /// Both operands are rescaled to `precision`. The numerator is then
+    /// multiplied by `scale` so the division produces a result with the correct
+    /// number of decimal places. The quotient is rounded using the pre-bias
+    /// trick:
+    ///
+    /// ```text
+    /// rounded = (numerator * scale + denominator / 2) / denominator
+    /// ```
+    ///
+    /// Adding `denominator / 2` means that once the true quotient's remainder
+    /// reaches half the denominator (i.e. fractional part ≥ 0.5), integer
+    /// division increments the result — equivalent to round-half-up.
     pub fn div_half_up<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimal<M, D2>,
@@ -53,9 +75,23 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
 }
 
 impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
-    /// Multiplies two signed decimals with half-up rounding away from zero.
-    /// Handles negative values correctly for financial calculations.
-    /// Returns signed product rounded to specified precision.
+    /// Multiplies two signed decimals with half-up (away-from-zero) rounding
+    /// to a target precision.
+    ///
+    /// The algorithm mirrors [`ManagedDecimal::mul_half_up`], but uses `BigInt`
+    /// arithmetic and adjusts the pre-bias direction based on the sign of the
+    /// intermediate product:
+    ///
+    /// ```text
+    /// if product < 0:  rounded = (product - scale / 2) / scale
+    /// else:            rounded = (product + scale / 2) / scale
+    /// ```
+    ///
+    /// The VM's integer division truncates toward zero. Subtracting the bias
+    /// for a negative product pushes it *further* from zero before truncation,
+    /// so the final result rounds away from zero in both directions — matching
+    /// the conventional financial definition of "round half up" for signed
+    /// numbers.
     pub fn mul_half_up_signed<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimalSigned<M, D2>,
@@ -81,9 +117,28 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
         ManagedDecimalSigned::from_raw_units(rounded_product, precision)
     }
 
-    /// Divides two signed decimals with half-up rounding away from zero.
-    /// Handles negative values correctly for financial calculations.
-    /// Returns signed quotient rounded to specified precision.
+    /// Divides two signed decimals with half-up (away-from-zero) rounding
+    /// to a target precision.
+    ///
+    /// The numerator is scaled up by `scale` (as in [`ManagedDecimal::div_half_up`])
+    /// and then pre-biased before T-division (truncates toward zero). The bias
+    /// direction depends solely on the sign of the numerator — **not** on the
+    /// sign of the denominator:
+    ///
+    /// ```text
+    /// half = |denominator| / 2
+    /// if numerator < 0:  rounded = (numerator - half) / denominator
+    /// else:              rounded = (numerator + half) / denominator
+    /// ```
+    ///
+    /// This is correct because `half` is always non-negative. When `numerator > 0`,
+    /// adding `half` increases the numerator's magnitude; when the denominator is
+    /// negative, dividing a larger positive numerator yields a more-negative
+    /// result — farther from zero. The rule therefore rounds away from zero for
+    /// all four sign combinations of `(numerator, denominator)`.
+    ///
+    /// Using `sign(denominator)` as the branch condition instead would produce
+    /// wrong results whenever the denominator is negative.
     pub fn div_half_up_signed<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimalSigned<M, D2>,
