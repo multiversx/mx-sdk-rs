@@ -98,9 +98,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
 
         // Half-up rounding
         let half_denominator = (denominator.magnitude() / 2u64).into_big_int();
-        let sign_neg = numerator.sign() != denominator.sign();
-
-        let rounded_quotient = if sign_neg {
+        let rounded_quotient = if numerator.sign() == Sign::Minus {
             (numerator - half_denominator) / denominator
         } else {
             (numerator + half_denominator) / denominator
