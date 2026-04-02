@@ -8,8 +8,9 @@ use crate::{
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     typenum::{U4, U8, Unsigned},
     types::{
-        BigFloat, BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref, Sign,
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
+        BigFloat, BigInt, BigUint, ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem,
+        ManagedVecItemPayloadBuffer, Ref, Sign, managed_vec_item_read_from_payload_index,
+        managed_vec_item_save_to_payload_index,
     },
 };
 
@@ -21,7 +22,6 @@ use multiversx_sc_codec::{
 
 use core::cmp::Ordering;
 
-use super::{ManagedBufferCachedBuilder, ManagedRef};
 use super::{
     ManagedDecimal,
     decimals::{ConstDecimals, Decimals, NumDecimals},
