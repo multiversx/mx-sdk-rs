@@ -41,8 +41,20 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         &self.data / self.decimals.scaling_factor().as_big_int()
     }
 
-    pub fn into_raw_units(&self) -> &BigInt<M> {
+    /// Returns a reference to the underlying raw fixed-point integer.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimalSigned` representing `-1.5` with 2 decimals has a raw value of `-150`.
+    pub fn as_raw_units(&self) -> &BigInt<M> {
         &self.data
+    }
+
+    /// Consumes the decimal and returns the underlying raw fixed-point integer.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimalSigned` representing `-1.5` with 2 decimals has a raw value of `-150`.
+    pub fn into_raw_units(self) -> BigInt<M> {
+        self.data
     }
 
     pub fn from_raw_units(data: BigInt<M>, decimals: D) -> Self {

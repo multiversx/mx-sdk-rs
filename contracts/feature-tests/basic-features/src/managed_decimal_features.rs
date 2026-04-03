@@ -38,7 +38,7 @@ pub trait ManagedDecimalFeatures {
     #[endpoint]
     fn managed_decimal_into_raw_units(&self) -> BigUint {
         let dec = ManagedDecimal::from_raw_units(BigUint::from(12345u64), 2usize);
-        dec.into_raw_units().clone()
+        dec.into_raw_units()
     }
 
     #[endpoint]

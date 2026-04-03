@@ -70,9 +70,10 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
         let scaled_b = other.rescale(precision.clone());
 
         // Perform division in BigUint
-        let scale = precision.scaling_factor();
-        let numerator = scaled_a.into_raw_units() * &*scale;
-        let denominator = scaled_b.into_raw_units();
+        let scale: crate::types::ManagedRef<'_, M, crate::types::BigUint<M>> =
+            precision.scaling_factor();
+        let numerator = scaled_a.data * &*scale;
+        let denominator = scaled_b.data;
 
         // Half-up rounding
         let half_denominator = denominator.clone() / 2u64;

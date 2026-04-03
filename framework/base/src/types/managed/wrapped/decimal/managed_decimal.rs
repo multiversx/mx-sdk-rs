@@ -35,8 +35,20 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         &self.data / self.decimals.scaling_factor().deref()
     }
 
-    pub fn into_raw_units(&self) -> &BigUint<M> {
+    /// Returns a reference to the underlying raw fixed-point integer.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    pub fn as_raw_units(&self) -> &BigUint<M> {
         &self.data
+    }
+
+    /// Consumes the decimal and returns the underlying raw fixed-point integer.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    pub fn into_raw_units(self) -> BigUint<M> {
+        self.data
     }
 
     pub fn from_raw_units(data: BigUint<M>, decimals: D) -> Self {
