@@ -53,12 +53,25 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         &self.data
     }
 
-    /// Consumes the decimal and returns the underlying raw fixed-point integer.
+    /// Was incorrectly named `into_raw_units` in versions prior to 0.66.0;
+    /// renamed to `as_raw_units` to clarify that it returns a reference and does not consume the decimal.
+    #[deprecated(
+        since = "0.66.0",
+        note = "Use `as_raw_units` to get a reference to the raw value, or `into_raw_parts` to consume the decimal and get the raw value."
+    )]
+    pub fn into_raw_units(&self) -> &BigInt<M> {
+        self.as_raw_units()
+    }
+
+    /// Consumes the decimal and returns the underlying raw fixed-point integer together with the
+    /// decimals specification.
     ///
     /// The value is stored as `real_value * 10^decimals`. For example,
-    /// a `ManagedDecimalSigned` representing `-1.5` with 2 decimals has a raw value of `-150`.
-    pub fn into_raw_units(self) -> BigInt<M> {
-        self.data
+    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    ///
+    /// This is the destructuring counterpart of [`from_raw_units`](Self::from_raw_units).
+    pub fn into_raw_parts(self) -> (BigInt<M>, D) {
+        (self.data, self.decimals)
     }
 
     /// Creates a `ManagedDecimalSigned` from a raw fixed-point integer and a decimals specification.
