@@ -67,7 +67,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     /// decimals specification.
     ///
     /// The value is stored as `real_value * 10^decimals`. For example,
-    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    /// a `ManagedDecimalSigned` representing `-1.5` with 2 decimals has a raw value of `-150`.
     ///
     /// This is the destructuring counterpart of [`from_raw_units`](Self::from_raw_units).
     pub fn into_raw_parts(self) -> (BigInt<M>, D) {
