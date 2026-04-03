@@ -10,6 +10,41 @@ use multiversx_sc::{
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
+fn test_managed_decimal_one_num_decimals() {
+    let one = ManagedDecimal::<StaticApi, NumDecimals>::one(2usize);
+    assert_eq!(one.scale(), 2);
+    assert_eq!(one.into_raw_units(), &BigUint::from(100u64)); // 10^2
+    assert_eq!(one.trunc(), BigUint::from(1u64));
+}
+
+#[test]
+fn test_managed_decimal_one_const_decimals() {
+    let one = ManagedDecimal::<StaticApi, ConstDecimals<U5>>::one(ConstDecimals::<U5>::new());
+    assert_eq!(one.scale(), 5);
+    assert_eq!(one.into_raw_units(), &BigUint::from(100_000u64)); // 10^5
+    assert_eq!(one.trunc(), BigUint::from(1u64));
+}
+
+#[test]
+fn test_managed_decimal_one_zero_decimals() {
+    // At 0 decimals, 10^0 = 1, so raw == 1
+    let one = ManagedDecimal::<StaticApi, NumDecimals>::one(0usize);
+    assert_eq!(one.scale(), 0);
+    assert_eq!(one.into_raw_units(), &BigUint::from(1u64));
+    assert_eq!(one.trunc(), BigUint::from(1u64));
+}
+
+#[test]
+fn test_managed_decimal_one_is_mul_identity() {
+    let one = ManagedDecimal::<StaticApi, NumDecimals>::one(4usize);
+    let val =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(12345u64), 4usize); // 1.2345
+    // 1.2345 * 1 at precision 4 should equal 1.2345
+    let result = val.mul_half_up(&one, 4usize);
+    assert_eq!(result.into_raw_units(), &BigUint::from(12345u64));
+}
+
+#[test]
 pub fn test_managed_decimal() {
     let fixed = ManagedDecimal::<StaticApi, ConstDecimals<U2>>::from(BigUint::from(1u64));
     let fixed_2 = ManagedDecimal::<StaticApi, ConstDecimals<U2>>::from(BigUint::from(5u64));

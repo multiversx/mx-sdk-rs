@@ -43,6 +43,15 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal { data, decimals }
     }
 
+    /// Returns the multiplicative identity `1` at the given `decimals` precision.
+    ///
+    /// The raw value is `10^decimals` (the scaling factor), so that
+    /// `self.trunc()` returns `1` and all arithmetic treats it as unity.
+    pub fn one(decimals: D) -> Self {
+        let data = (*decimals.scaling_factor::<M>()).clone();
+        ManagedDecimal { data, decimals }
+    }
+
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
@@ -123,7 +132,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<ManagedDecimal<M, ConstDecimals
     }
 }
 
-impl<M: ManagedTypeApi, D: Decimals + Clone> ManagedDecimal<M, D> {
+impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     /// Integer part of the k-th root, preserving the decimal scale.
     ///
     /// Internally pre-scales the raw data by `scaling_factor^(k-1)` so that after
@@ -153,6 +162,91 @@ impl<M: ManagedTypeApi, D: Decimals + Clone> ManagedDecimal<M, D> {
         // For k==0, the check in BigUint::nth_root handles the error signal.
         let scaled = &self.data * &sf.pow(k.saturating_sub(1));
         ManagedDecimal::from_raw_units(scaled.nth_root_unchecked(k), self.decimals.clone())
+    }
+
+    /// Approximates e^`self` using a 5th-order Taylor approximation.
+    ///
+    /// Treats `self` as the exponent `x` and computes:
+    ///
+    /// ```text
+    /// e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+    /// ```
+    ///
+    /// The result has the same precision as `self`; all intermediate steps use
+    /// [`mul_half_up`] / [`div_half_up`] to prevent rounding errors from
+    /// accumulating toward zero.
+    ///
+    /// Accurate for small `x` (i.e. when `x ≪ 1`). Error is O(x⁶/720).
+    pub fn exp_approx(&self) -> ManagedDecimal<M, D>
+    where
+        ManagedDecimal<M, D>: core::ops::Add<Output = ManagedDecimal<M, D>>,
+    {
+        let one = ManagedDecimal::<M, D>::one(self.decimals.clone());
+
+        // Higher powers of x (x = self)
+        let x_sq = self.mul_half_up(self, self.decimals.clone());
+        let x_cub = x_sq.mul_half_up(self, self.decimals.clone());
+        let x_pow4 = x_cub.mul_half_up(self, self.decimals.clone());
+        let x_pow5 = x_pow4.mul_half_up(self, self.decimals.clone());
+
+        // x^n / n! — reuse one ManagedDecimal, overwriting its data for each factorial
+        const FACT_2: u64 = 2;
+        const FACT_3: u64 = 6;
+        const FACT_4: u64 = 24;
+        const FACT_5: u64 = 120;
+        let mut factor =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(FACT_2), 0usize);
+        let term2 = x_sq.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_3);
+        let term3 = x_cub.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_4);
+        let term4 = x_pow4.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_5);
+        let term5 = x_pow5.div_half_up(&factor, self.decimals.clone());
+
+        // 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+        let mut result = one;
+        result += self; // using += allows us to avoid cloning self
+        result += term2;
+        result += term3;
+        result += term4;
+        result += term5;
+        result
+    }
+
+    /// Computes the continuous-compounding growth factor e^(`self` × `expiration`).
+    ///
+    /// Delegates to [`exp_approx`] after computing `x = rate * expiration`;
+    /// uses a 5-term Taylor series internally:
+    ///
+    /// ```text
+    /// e^(rate * t) ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!,  where x = rate * t
+    /// ```
+    ///
+    /// Multiply a principal amount by the returned factor to apply interest.
+    /// Returns `1` (at `precision`) when `expiration == 0`.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
+    pub fn compounded_interest_factor<Precision: Decimals>(
+        &self,
+        expiration: u64,
+        precision: Precision,
+    ) -> ManagedDecimal<M, Precision>
+    where
+        ManagedDecimal<M, Precision>: core::ops::Add<Output = ManagedDecimal<M, Precision>>,
+    {
+        if expiration == 0 {
+            return ManagedDecimal::<M, Precision>::one(precision.clone());
+        }
+
+        // Represent the time delta as an exact integer decimal (0 dp)
+        let expiration_decimal =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(expiration), 0usize);
+
+        // x = rate * time_delta
+        let x = self.mul_half_up(&expiration_decimal, precision.clone());
+        x.exp_approx()
     }
 }
 
