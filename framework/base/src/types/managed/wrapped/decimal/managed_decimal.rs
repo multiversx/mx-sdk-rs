@@ -164,20 +164,65 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal::from_raw_units(scaled.nth_root_unchecked(k), self.decimals.clone())
     }
 
+    /// Approximates e^`self` using a 5-term Taylor series.
+    ///
+    /// Treats `self` as the exponent `x` and computes:
+    ///
+    /// ```text
+    /// e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+    /// ```
+    ///
+    /// The result has the same precision as `self`; all intermediate steps use
+    /// [`mul_half_up`] / [`div_half_up`] to prevent rounding errors from
+    /// accumulating toward zero.
+    ///
+    /// Accurate for small `x` (i.e. when `x ≪ 1`). Error is O(x⁶/720).
+    pub fn exp_approx(&self) -> ManagedDecimal<M, D>
+    where
+        ManagedDecimal<M, D>: core::ops::Add<Output = ManagedDecimal<M, D>>,
+    {
+        let one = ManagedDecimal::<M, D>::one(self.decimals.clone());
+
+        // Higher powers of x (x = self)
+        let x_sq = self.mul_half_up(self, self.decimals.clone());
+        let x_cub = x_sq.mul_half_up(self, self.decimals.clone());
+        let x_pow4 = x_cub.mul_half_up(self, self.decimals.clone());
+        let x_pow5 = x_pow4.mul_half_up(self, self.decimals.clone());
+
+        // Factorial denominators as exact integer decimals (0 dp)
+        let factor_2 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(2u64), 0usize);
+        let factor_6 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(6u64), 0usize);
+        let factor_24 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(24u64), 0usize);
+        let factor_120 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(120u64), 0usize);
+
+        // x^n / n!
+        let term2 = x_sq.div_half_up(&factor_2, self.decimals.clone());
+        let term3 = x_cub.div_half_up(&factor_6, self.decimals.clone());
+        let term4 = x_pow4.div_half_up(&factor_24, self.decimals.clone());
+        let term5 = x_pow5.div_half_up(&factor_120, self.decimals.clone());
+
+        // 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+        let mut result = one;
+        result += self;
+        result += term2;
+        result += term3;
+        result += term4;
+        result += term5;
+        result
+    }
+
     /// Approximates e^(`self` × `expiration`) using a 5-term Taylor series.
     ///
     /// This is the standard compound-interest growth factor calculation used in
     /// continuous-compounding models (e.g. DeFi lending indices):
     ///
     /// ```text
-    /// e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+    /// e^(rate * t) ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!,  where x = rate * t
     /// ```
-    ///
-    /// where `x = self (rate) * expiration`.
-    ///
-    /// Both operands are first normalised to `precision` decimal places; all
-    /// intermediate multiplications and divisions use [`mul_half_up`] /
-    /// [`div_half_up`] so rounding errors do not accumulate toward zero.
     ///
     /// Returns `1` (at `precision`) when `expiration == 0`.
     ///
@@ -191,11 +236,8 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     where
         ManagedDecimal<M, Precision>: core::ops::Add<Output = ManagedDecimal<M, Precision>>,
     {
-        // "1" at target precision: raw = 10^precision
-        let one = ManagedDecimal::<M, Precision>::one(precision.clone());
-
         if expiration == 0 {
-            return one;
+            return ManagedDecimal::<M, Precision>::one(precision.clone());
         }
 
         // Represent the time delta as an exact integer decimal (0 dp)
@@ -204,31 +246,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
         // x = rate * time_delta
         let x = self.mul_half_up(&expiration_decimal, precision.clone());
-
-        // Higher powers of x
-        let x_sq = x.mul_half_up(&x, precision.clone());
-        let x_cub = x_sq.mul_half_up(&x, precision.clone());
-        let x_pow4 = x_cub.mul_half_up(&x, precision.clone());
-        let x_pow5 = x_pow4.mul_half_up(&x, precision.clone());
-
-        // Factorial denominators as exact integer decimals (0 dp)
-        let factor_2 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(2u64), 0usize);
-        let factor_6 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(6u64), 0usize);
-        let factor_24 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(24u64), 0usize);
-        let factor_120 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(120u64), 0usize);
-
-        // x^n / n!
-        let term2 = x_sq.div_half_up(&factor_2, precision.clone());
-        let term3 = x_cub.div_half_up(&factor_6, precision.clone());
-        let term4 = x_pow4.div_half_up(&factor_24, precision.clone());
-        let term5 = x_pow5.div_half_up(&factor_120, precision);
-
-        // 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
-        one + x + term2 + term3 + term4 + term5
+        x.exp_approx()
     }
 }
 

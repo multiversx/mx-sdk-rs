@@ -4,7 +4,6 @@ use multiversx_sc::{
 };
 use multiversx_sc_scenario::api::StaticApi;
 
-// ── compute_compounded_interest ───────────────────────────────────────────────
 // Uses a 5-term Taylor series: e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
 
 const RAY_PRECISION_NUM: usize = 27;
@@ -15,6 +14,52 @@ const RAY: u128 = 1_000_000_000_000_000_000_000_000_000;
 fn ray_dec(raw: u128) -> ManagedDecimal<StaticApi, NumDecimals> {
     ManagedDecimal::from_raw_units(BigUint::from(raw), RAY_PRECISION_NUM)
 }
+
+fn ray_dec_const(raw: u128) -> ManagedDecimal<StaticApi, ConstDecimals<U27>> {
+    ManagedDecimal::const_decimals_from_raw(BigUint::from(raw))
+}
+
+// ── exp_approx ────────────────────────────────────────────────────────────────
+
+#[test]
+fn test_exp_approx_zero() {
+    // e^0 = 1
+    let result = ray_dec(0).exp_approx();
+    assert_eq!(result.scale(), RAY_PRECISION_NUM);
+    assert_eq!(result.into_raw_units(), &BigUint::from(RAY));
+}
+
+#[test]
+fn test_exp_approx_small_x() {
+    // x = 0.05
+    // 5-term Taylor: 1 + 0.05 + 0.00125 + 0.000020833... + 0.000000260416... + ...
+    //              = 1.051271096354166... → at 27dp with half-up rounding
+    let result = ray_dec(50_000_000_000_000_000_000_000_000u128).exp_approx();
+    assert!(*result.into_raw_units() > BigUint::from(RAY));
+    let expected = BigUint::from(1_051_271_096_354_166_666_666_666_667u128);
+    assert_eq!(result.into_raw_units(), &expected);
+}
+
+#[test]
+fn test_exp_approx_one_percent() {
+    // x = 0.01
+    // 5-term Taylor: 1 + 0.01 + 0.00005 + 0.000000166... + 0.000000000416... + ...
+    //              = 1.010050167083... → at 27dp with half-up rounding
+    let result = ray_dec(10_000_000_000_000_000_000_000_000u128).exp_approx();
+    assert!(*result.into_raw_units() > BigUint::from(RAY));
+    let expected = BigUint::from(1_010_050_167_084_166_666_666_666_667u128);
+    assert_eq!(result.into_raw_units(), &expected);
+}
+
+#[test]
+fn test_exp_approx_const_matches_num() {
+    // ConstDecimals<U27> and NumDecimals=27 must produce identical results
+    let result_const = ray_dec_const(50_000_000_000_000_000_000_000_000u128).exp_approx();
+    let result_num = ray_dec(50_000_000_000_000_000_000_000_000u128).exp_approx();
+    assert_eq!(result_const.into_raw_units(), result_num.into_raw_units());
+}
+
+// ── compounded_interest ───────────────────────────────────────────────────────
 
 #[test]
 fn test_compounded_interest_zero_expiration() {
@@ -84,10 +129,6 @@ fn test_compounded_interest_expiration_scaling() {
     // x = 0.001 * 10 = 0.01 — same x as above, must give the same result
     let expected = BigUint::from(1_010_050_167_084_166_666_666_666_667u128);
     assert_eq!(result.into_raw_units(), &expected);
-}
-
-fn ray_dec_const(raw: u128) -> ManagedDecimal<StaticApi, ConstDecimals<U27>> {
-    ManagedDecimal::const_decimals_from_raw(BigUint::from(raw))
 }
 
 #[test]
