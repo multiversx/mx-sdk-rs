@@ -31,14 +31,47 @@ pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
 }
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
+    /// Returns the integer part (floor toward zero) of the decimal value.
+    ///
+    /// Divides the raw fixed-point integer by the scaling factor, discarding the fractional part.
+    /// For example, `1.75` with 2 decimals returns `1`.
     pub fn trunc(&self) -> BigUint<M> {
         &self.data / self.decimals.scaling_factor().deref()
     }
 
-    pub fn into_raw_units(&self) -> &BigUint<M> {
+    /// Returns a reference to the underlying raw fixed-point integer.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    pub fn as_raw_units(&self) -> &BigUint<M> {
         &self.data
     }
 
+    /// Was incorrectly named `into_raw_units` in versions prior to 0.66.0;
+    /// renamed to `as_raw_units` to clarify that it returns a reference and does not consume the decimal.
+    #[deprecated(
+        since = "0.66.0",
+        note = "Use `as_raw_units` to get a reference to the raw value, or `into_raw_parts` to consume the decimal and get the raw value."
+    )]
+    pub fn into_raw_units(&self) -> &BigUint<M> {
+        self.as_raw_units()
+    }
+
+    /// Consumes the decimal and returns the underlying raw fixed-point integer together with the
+    /// decimals specification.
+    ///
+    /// The value is stored as `real_value * 10^decimals`. For example,
+    /// a `ManagedDecimal` representing `1.5` with 2 decimals has a raw value of `150`.
+    ///
+    /// This is the destructuring counterpart of [`from_raw_units`](Self::from_raw_units).
+    pub fn into_raw_parts(self) -> (BigUint<M>, D) {
+        (self.data, self.decimals)
+    }
+
+    /// Creates a `ManagedDecimal` from a raw fixed-point integer and a decimals specification.
+    ///
+    /// The caller is responsible for ensuring `data` is already scaled by `10^decimals`.
+    /// For constructing from a human-readable integer value, use the `From` trait instead.
     pub fn from_raw_units(data: BigUint<M>, decimals: D) -> Self {
         ManagedDecimal { data, decimals }
     }
@@ -52,14 +85,20 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal { data, decimals }
     }
 
+    /// Returns the number of decimal places.
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
 
+    /// Returns the scaling factor `10^decimals` as a static reference.
     pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
         self.decimals.scaling_factor()
     }
 
+    /// Adjusts the raw integer to represent the same value at `scale_to_num_decimals` decimal places.
+    ///
+    /// Upscaling multiplies by the difference in scaling factors;
+    /// downscaling divides (truncating) by it.
     pub(crate) fn rescale_data(&self, scale_to_num_decimals: NumDecimals) -> BigUint<M> {
         let from_num_decimals = self.decimals.num_decimals();
 
@@ -78,6 +117,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         }
     }
 
+    /// Converts this decimal to a new scale, adjusting the raw value accordingly.
+    ///
+    /// Upscaling adds precision (appends trailing zeros to the raw integer);
+    /// downscaling truncates the least-significant digits.
     pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,
@@ -86,6 +129,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
+    /// Converts this unsigned decimal into a signed [`ManagedDecimalSigned`] with the same scale and value.
     pub fn into_signed(self) -> ManagedDecimalSigned<M, D> {
         ManagedDecimalSigned {
             data: self.data.into_big_int(),
@@ -108,6 +152,9 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigUint<M>>
 }
 
 impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
+    /// Creates a `ManagedDecimal` with a compile-time fixed number of decimals from a raw integer.
+    ///
+    /// The caller is responsible for ensuring `data` is already scaled by `10^DECIMALS`.
     pub fn const_decimals_from_raw(data: BigUint<M>) -> Self {
         ManagedDecimal {
             data,
