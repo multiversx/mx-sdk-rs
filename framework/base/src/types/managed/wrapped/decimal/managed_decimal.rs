@@ -31,6 +31,10 @@ pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
 }
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
+    /// Returns the integer part (floor toward zero) of the decimal value.
+    ///
+    /// Divides the raw fixed-point integer by the scaling factor, discarding the fractional part.
+    /// For example, `1.75` with 2 decimals returns `1`.
     pub fn trunc(&self) -> BigUint<M> {
         &self.data / self.decimals.scaling_factor().deref()
     }
@@ -51,6 +55,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.data
     }
 
+    /// Creates a `ManagedDecimal` from a raw fixed-point integer and a decimals specification.
+    ///
+    /// The caller is responsible for ensuring `data` is already scaled by `10^decimals`.
+    /// For constructing from a human-readable integer value, use the `From` trait instead.
     pub fn from_raw_units(data: BigUint<M>, decimals: D) -> Self {
         ManagedDecimal { data, decimals }
     }
@@ -64,14 +72,20 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal { data, decimals }
     }
 
+    /// Returns the number of decimal places.
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
 
+    /// Returns the scaling factor `10^decimals` as a static reference.
     pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
         self.decimals.scaling_factor()
     }
 
+    /// Adjusts the raw integer to represent the same value at `scale_to_num_decimals` decimal places.
+    ///
+    /// Upscaling multiplies by the difference in scaling factors;
+    /// downscaling divides (truncating) by it.
     pub(crate) fn rescale_data(&self, scale_to_num_decimals: NumDecimals) -> BigUint<M> {
         let from_num_decimals = self.decimals.num_decimals();
 
@@ -90,6 +104,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         }
     }
 
+    /// Converts this decimal to a new scale, adjusting the raw value accordingly.
+    ///
+    /// Upscaling adds precision (appends trailing zeros to the raw integer);
+    /// downscaling truncates the least-significant digits.
     pub fn rescale<T: Decimals>(&self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,
@@ -98,6 +116,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal::from_raw_units(self.rescale_data(scale_to_num_decimals), scale_to)
     }
 
+    /// Converts this unsigned decimal into a signed [`ManagedDecimalSigned`] with the same scale and value.
     pub fn into_signed(self) -> ManagedDecimalSigned<M, D> {
         ManagedDecimalSigned {
             data: self.data.into_big_int(),
@@ -120,6 +139,9 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigUint<M>>
 }
 
 impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
+    /// Creates a `ManagedDecimal` with a compile-time fixed number of decimals from a raw integer.
+    ///
+    /// The caller is responsible for ensuring `data` is already scaled by `10^DECIMALS`.
     pub fn const_decimals_from_raw(data: BigUint<M>) -> Self {
         ManagedDecimal {
             data,
