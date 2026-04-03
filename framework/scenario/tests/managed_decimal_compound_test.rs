@@ -59,13 +59,13 @@ fn test_exp_approx_const_matches_num() {
     assert_eq!(result_const.into_raw_units(), result_num.into_raw_units());
 }
 
-// ── compounded_interest ───────────────────────────────────────────────────────
+// ── compounded_interest_factor ───────────────────────────────────────────────
 
 #[test]
 fn test_compounded_interest_zero_expiration() {
     // e^(rate * 0) = 1 regardless of rate
     let rate = ray_dec(50_000_000_000_000_000_000_000_000u128); // 0.05 at RAY precision
-    let result = rate.compounded_interest(0, RAY_PRECISION_NUM);
+    let result = rate.compounded_interest_factor(0, RAY_PRECISION_NUM);
     assert_eq!(result.scale(), RAY_PRECISION_NUM);
     assert_eq!(result.into_raw_units(), &BigUint::from(RAY));
 }
@@ -74,7 +74,7 @@ fn test_compounded_interest_zero_expiration() {
 fn test_compounded_interest_zero_rate() {
     // e^(0 * t) = 1
     let rate = ray_dec(0);
-    let result = rate.compounded_interest(100, RAY_PRECISION_NUM);
+    let result = rate.compounded_interest_factor(100, RAY_PRECISION_NUM);
     // x = 0, all powers of x are 0, result = 1
     assert_eq!(result.into_raw_units(), &BigUint::from(RAY));
 }
@@ -90,7 +90,7 @@ fn test_compounded_interest_small_rate() {
     // At RAY (27dp) precision:
     // 1.051271096376024124... * 10^27 ≈ 1_051_271_096_376_024_124_000_000_000
     let rate = ray_dec(50_000_000_000_000_000_000_000_000u128); // 0.05 * 10^27
-    let result = rate.compounded_interest(1, RAY_PRECISION_NUM);
+    let result = rate.compounded_interest_factor(1, RAY_PRECISION_NUM);
 
     // First 18 significant digits should be accurate (5-term Taylor error for x=0.05 is ~x^6/720)
     // Verify it's strictly > 1 (growth factor > 1)
@@ -111,7 +111,7 @@ fn test_compounded_interest_one_percent_per_second() {
     // 5-term Taylor: 1 + 0.01 + 0.00005 + 0.000000166... + 0.000000000416... + ~0
     //              ≈ 1.010050167
     let rate = ray_dec(10_000_000_000_000_000_000_000_000u128); // 0.01 * 10^27
-    let result = rate.compounded_interest(1, RAY_PRECISION_NUM);
+    let result = rate.compounded_interest_factor(1, RAY_PRECISION_NUM);
     assert!(*result.into_raw_units() > BigUint::from(RAY));
     // 5-term Taylor: 1 + 0.01 + 0.00005 + 0.000000166... + 0.000000000416... + ...
     // = 1.010050167083... → at 27dp with half-up rounding:
@@ -125,7 +125,7 @@ fn test_compounded_interest_expiration_scaling() {
     // x = 0.001 * 10 = 0.01
     // Should equal the previous test (rate=0.01, exp=1) since x is the same
     let rate = ray_dec(1_000_000_000_000_000_000_000_000u128); // 0.001 * 10^27
-    let result = rate.compounded_interest(10, RAY_PRECISION_NUM);
+    let result = rate.compounded_interest_factor(10, RAY_PRECISION_NUM);
     // x = 0.001 * 10 = 0.01 — same x as above, must give the same result
     let expected = BigUint::from(1_010_050_167_084_166_666_666_666_667u128);
     assert_eq!(result.into_raw_units(), &expected);
@@ -134,7 +134,7 @@ fn test_compounded_interest_expiration_scaling() {
 #[test]
 fn test_compounded_interest_const_zero_expiration() {
     let rate = ray_dec_const(50_000_000_000_000_000_000_000_000u128); // 0.05
-    let result = rate.compounded_interest(0, RAY_PRECISION_CONST);
+    let result = rate.compounded_interest_factor(0, RAY_PRECISION_CONST);
     assert_eq!(result.scale(), 27);
     assert_eq!(result.into_raw_units(), &BigUint::from(RAY));
 }
@@ -142,7 +142,7 @@ fn test_compounded_interest_const_zero_expiration() {
 #[test]
 fn test_compounded_interest_const_zero_rate() {
     let rate = ray_dec_const(0);
-    let result = rate.compounded_interest(100, RAY_PRECISION_CONST);
+    let result = rate.compounded_interest_factor(100, RAY_PRECISION_CONST);
     assert_eq!(result.into_raw_units(), &BigUint::from(RAY));
 }
 
@@ -152,8 +152,8 @@ fn test_compounded_interest_const_matches_num_small_rate() {
     let rate_const = ray_dec_const(50_000_000_000_000_000_000_000_000u128);
     let rate_num = ray_dec(50_000_000_000_000_000_000_000_000u128);
 
-    let result_const = rate_const.compounded_interest(1, RAY_PRECISION_CONST);
-    let result_num = rate_num.compounded_interest(1, RAY_PRECISION_NUM);
+    let result_const = rate_const.compounded_interest_factor(1, RAY_PRECISION_CONST);
+    let result_num = rate_num.compounded_interest_factor(1, RAY_PRECISION_NUM);
 
     assert_eq!(result_const.into_raw_units(), result_num.into_raw_units());
     let expected = BigUint::from(1_051_271_096_354_166_666_666_666_667u128);
@@ -165,8 +165,8 @@ fn test_compounded_interest_const_matches_num_one_percent() {
     let rate_const = ray_dec_const(10_000_000_000_000_000_000_000_000u128);
     let rate_num = ray_dec(10_000_000_000_000_000_000_000_000u128);
 
-    let result_const = rate_const.compounded_interest(1, RAY_PRECISION_CONST);
-    let result_num = rate_num.compounded_interest(1, RAY_PRECISION_NUM);
+    let result_const = rate_const.compounded_interest_factor(1, RAY_PRECISION_CONST);
+    let result_num = rate_num.compounded_interest_factor(1, RAY_PRECISION_NUM);
 
     assert_eq!(result_const.into_raw_units(), result_num.into_raw_units());
     let expected = BigUint::from(1_010_050_167_084_166_666_666_666_667u128);

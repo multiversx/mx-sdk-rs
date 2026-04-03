@@ -214,20 +214,21 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         result
     }
 
-    /// Approximates e^(`self` × `expiration`) using a 5-term Taylor series.
+    /// Computes the continuous-compounding growth factor e^(`self` × `expiration`).
     ///
-    /// This is the standard compound-interest growth factor calculation used in
-    /// continuous-compounding models (e.g. DeFi lending indices):
+    /// Delegates to [`exp_approx`] after computing `x = rate * expiration`;
+    /// uses a 5-term Taylor series internally:
     ///
     /// ```text
     /// e^(rate * t) ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!,  where x = rate * t
     /// ```
     ///
+    /// Multiply a principal amount by the returned factor to apply interest.
     /// Returns `1` (at `precision`) when `expiration == 0`.
     ///
     /// # Credits
     /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
-    pub fn compounded_interest<Precision: Decimals>(
+    pub fn compounded_interest_factor<Precision: Decimals>(
         &self,
         expiration: u64,
         precision: Precision,
