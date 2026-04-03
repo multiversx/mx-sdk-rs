@@ -189,25 +189,24 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         let x_pow4 = x_cub.mul_half_up(self, self.decimals.clone());
         let x_pow5 = x_pow4.mul_half_up(self, self.decimals.clone());
 
-        // Factorial denominators as exact integer decimals (0 dp)
-        let factor_2 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(2u64), 0usize);
-        let factor_6 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(6u64), 0usize);
-        let factor_24 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(24u64), 0usize);
-        let factor_120 =
-            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(120u64), 0usize);
-
-        // x^n / n!
-        let term2 = x_sq.div_half_up(&factor_2, self.decimals.clone());
-        let term3 = x_cub.div_half_up(&factor_6, self.decimals.clone());
-        let term4 = x_pow4.div_half_up(&factor_24, self.decimals.clone());
-        let term5 = x_pow5.div_half_up(&factor_120, self.decimals.clone());
+        // x^n / n! — reuse one ManagedDecimal, overwriting its data for each factorial
+        const FACT_2: u64 = 2;
+        const FACT_3: u64 = 6;
+        const FACT_4: u64 = 24;
+        const FACT_5: u64 = 120;
+        let mut factor =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(FACT_2), 0usize);
+        let term2 = x_sq.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_3);
+        let term3 = x_cub.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_4);
+        let term4 = x_pow4.div_half_up(&factor, self.decimals.clone());
+        factor.data.overwrite_u64(FACT_5);
+        let term5 = x_pow5.div_half_up(&factor, self.decimals.clone());
 
         // 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
         let mut result = one;
-        result += self;
+        result += self; // using += allows us to avoid cloning self
         result += term2;
         result += term3;
         result += term4;
