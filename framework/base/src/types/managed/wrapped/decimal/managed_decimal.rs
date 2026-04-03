@@ -43,6 +43,15 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal { data, decimals }
     }
 
+    /// Returns the multiplicative identity `1` at the given `decimals` precision.
+    ///
+    /// The raw value is `10^decimals` (the scaling factor), so that
+    /// `self.trunc()` returns `1` and all arithmetic treats it as unity.
+    pub fn one(decimals: D) -> Self {
+        let data = (*decimals.scaling_factor::<M>()).clone();
+        ManagedDecimal { data, decimals }
+    }
+
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
@@ -153,6 +162,73 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         // For k==0, the check in BigUint::nth_root handles the error signal.
         let scaled = &self.data * &sf.pow(k.saturating_sub(1));
         ManagedDecimal::from_raw_units(scaled.nth_root_unchecked(k), self.decimals.clone())
+    }
+
+    /// Approximates e^(`self` × `expiration`) using a 5-term Taylor series.
+    ///
+    /// This is the standard compound-interest growth factor calculation used in
+    /// continuous-compounding models (e.g. DeFi lending indices):
+    ///
+    /// ```text
+    /// e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+    /// ```
+    ///
+    /// where `x = self (rate) * expiration`.
+    ///
+    /// Both operands are first normalised to `precision` decimal places; all
+    /// intermediate multiplications and divisions use [`mul_half_up`] /
+    /// [`div_half_up`] so rounding errors do not accumulate toward zero.
+    ///
+    /// Returns `1` (at `precision`) when `expiration == 0`.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
+    pub fn compounded_interest<Precision: Decimals>(
+        &self,
+        expiration: u64,
+        precision: Precision,
+    ) -> ManagedDecimal<M, Precision>
+    where
+        ManagedDecimal<M, Precision>: core::ops::Add<Output = ManagedDecimal<M, Precision>>,
+    {
+        // "1" at target precision: raw = 10^precision
+        let one = ManagedDecimal::<M, Precision>::one(precision.clone());
+
+        if expiration == 0 {
+            return one;
+        }
+
+        // Represent the time delta as an exact integer decimal (0 dp)
+        let expiration_decimal =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(expiration), 0usize);
+
+        // x = rate * time_delta
+        let x = self.mul_half_up(&expiration_decimal, precision.clone());
+
+        // Higher powers of x
+        let x_sq = x.mul_half_up(&x, precision.clone());
+        let x_cub = x_sq.mul_half_up(&x, precision.clone());
+        let x_pow4 = x_cub.mul_half_up(&x, precision.clone());
+        let x_pow5 = x_pow4.mul_half_up(&x, precision.clone());
+
+        // Factorial denominators as exact integer decimals (0 dp)
+        let factor_2 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(2u64), 0usize);
+        let factor_6 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(6u64), 0usize);
+        let factor_24 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(24u64), 0usize);
+        let factor_120 =
+            ManagedDecimal::<M, NumDecimals>::from_raw_units(BigUint::from(120u64), 0usize);
+
+        // x^n / n!
+        let term2 = x_sq.div_half_up(&factor_2, precision.clone());
+        let term3 = x_cub.div_half_up(&factor_6, precision.clone());
+        let term4 = x_pow4.div_half_up(&factor_24, precision.clone());
+        let term5 = x_pow5.div_half_up(&factor_120, precision);
+
+        // 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+        one + x + term2 + term3 + term4 + term5
     }
 }
 

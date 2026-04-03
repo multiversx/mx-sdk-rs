@@ -17,6 +17,9 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
     /// Adding `scale / 2` before the integer division means that any remainder
     /// ≥ half the scale (i.e. the fractional part ≥ 0.5) causes the quotient
     /// to increment by one — equivalent to round-half-up.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
     pub fn mul_half_up<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimal<M, D2>,
@@ -53,6 +56,9 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
     /// Adding `denominator / 2` means that once the true quotient's remainder
     /// reaches half the denominator (i.e. fractional part ≥ 0.5), integer
     /// division increments the result — equivalent to round-half-up.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
     pub fn div_half_up<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimal<M, D2>,
@@ -92,6 +98,9 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
     /// so the final result rounds away from zero in both directions — matching
     /// the conventional financial definition of "round half up" for signed
     /// numbers.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
     pub fn mul_half_up_signed<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimalSigned<M, D2>,
@@ -139,6 +148,9 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
     ///
     /// Using `sign(denominator)` as the branch condition instead would produce
     /// wrong results whenever the denominator is negative.
+    ///
+    /// # Credits
+    /// Original implementation by [@mihaieremia](https://github.com/mihaieremia).
     pub fn div_half_up_signed<D2: Decimals, DResult: Decimals>(
         &self,
         other: &ManagedDecimalSigned<M, D2>,
