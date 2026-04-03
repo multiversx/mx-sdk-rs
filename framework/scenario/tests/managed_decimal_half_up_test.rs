@@ -233,9 +233,9 @@ fn test_div_half_up_signed_positive_rounds_down_below_half() {
 
 #[test]
 fn test_div_half_up_signed_negative_dividend_positive_divisor() {
-    // -2.00 / 3.00 ≈ -0.667 at precision 1 → -0.7 (away from zero)
-    // num=-200*10=-2000... wait: scaled_a=-20(at p1), scaled_b=30(at p1)
-    // num=-20*10=-200, denom=30, half=15, num<0 → (-200-15)/30=-215/30=-7
+    // With both values aligned to precision 1: scaled_a = -20, scaled_b = 30.
+    // Rounding uses num = scaled_a * 10 = -200, denom = 30, half = 15;
+    // since num < 0, compute (num - half) / denom = (-200 - 15) / 30 = -215 / 30 = -7.
     let result = mds2(-200).div_half_up_signed(&mds2(300), 1usize);
     assert_eq!(result.scale(), 1);
     assert_eq!(result.into_raw_units(), &BigInt::from(-7i64));

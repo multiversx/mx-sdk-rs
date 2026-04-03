@@ -164,7 +164,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         ManagedDecimal::from_raw_units(scaled.nth_root_unchecked(k), self.decimals.clone())
     }
 
-    /// Approximates e^`self` using a 5-term Taylor series.
+    /// Approximates e^`self` using a 5th-order Taylor approximation.
     ///
     /// Treats `self` as the exponent `x` and computes:
     ///

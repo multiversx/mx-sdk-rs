@@ -4,7 +4,7 @@ use multiversx_sc::{
 };
 use multiversx_sc_scenario::api::StaticApi;
 
-// Uses a 5-term Taylor series: e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
+// Uses a 5th-order Taylor approximation: e^x ≈ 1 + x + x²/2! + x³/3! + x⁴/4! + x⁵/5!
 
 const RAY_PRECISION_NUM: usize = 27;
 const RAY_PRECISION_CONST: ConstDecimals<U27> = ConstDecimals::new();

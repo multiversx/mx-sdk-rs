@@ -1,3 +1,5 @@
+use core::ops::Deref;
+
 use crate::{api::ManagedTypeApi, types::Sign};
 
 use super::{Decimals, ManagedDecimal, ManagedDecimalSigned};
@@ -34,7 +36,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
 
         // Half-up rounding at precision
         let scale = precision.scaling_factor();
-        let half_scaled = &*scale / 2u64;
+        let half_scaled = scale.deref().clone() / 2u64;
 
         // Round half-up
         let rounded_product = (product + half_scaled) / &*scale;
@@ -114,7 +116,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
 
         // Half-up rounding at precision
         let scale = precision.scaling_factor();
-        let half_scaled = (scale.clone() / 2u64).into_big_int();
+        let half_scaled = (scale.deref().clone() / 2u64).into_big_int();
 
         // Sign-aware "away-from-zero" rounding
         let rounded_product = if product.sign() == Sign::Minus {
