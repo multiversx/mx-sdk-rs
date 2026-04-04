@@ -106,12 +106,22 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
             index_last_winner += 1;
             iterations += 1;
         }
-        self.lottery_info(lottery_name).set(info);
         self.index_last_winner(lottery_name).set(index_last_winner);
         if index_last_winner > total_winning_tickets {
+            // give any leftover unawarded_amount (from BigUint division rounding) to the 1st place winner
+            if total_winning_tickets > 0 && info.unawarded_amount > 0u32 {
+                let first_place_winner_id =
+                    self.ticket_holders(lottery_name).get(total_winning_tickets);
+                self.assign_prize_to_winner(
+                    info.token_identifier.clone(),
+                    &info.unawarded_amount,
+                    &first_place_winner_id,
+                );
+            }
             self.clear_storage(lottery_name);
             return AwardingStatus::Finished;
         }
+        self.lottery_info(lottery_name).set(info);
         AwardingStatus::Ongoing
     }
 
@@ -141,7 +151,6 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         info: &mut LotteryInfo<Self::Api>,
     ) {
         let rand_index = self.get_distinct_random(*index_last_winner, total_tickets);
-        let ticket_holders_mapper = self.ticket_holders(lottery_name);
 
         // swap indexes of the winner addresses - we are basically bringing the winners in the first indexes of the mapper
         let winner_address = self.ticket_holders(lottery_name).get(rand_index);
@@ -154,32 +163,21 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
 
         // distribute to the first place last. Laws of probability say that order doesn't matter.
         // this is done to mitigate the effects of BigUint division leading to "spare" prize money being left out at times
-        // 1st place will get the spare money instead.
-        if *index_last_winner <= total_winning_tickets {
-            let prize = self.calculate_percentage_of(
-                &info.prize_pool,
-                &BigUint::from(
-                    info.prize_distribution
-                        .get(total_winning_tickets - *index_last_winner),
-                ),
-            );
-            if prize == 0 {
-                return;
-            }
-
-            self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
-
-            info.unawarded_amount -= prize;
-        } else {
-            // insert token in accumulated rewards first place
-            let first_place_winner = ticket_holders_mapper.get(*index_last_winner);
-
-            self.assign_prize_to_winner(
-                info.token_identifier.clone(),
-                &info.unawarded_amount,
-                &first_place_winner,
-            );
+        // 1st place will get the spare money instead (handled in distribute_prizes after the loop).
+        let prize = self.calculate_percentage_of(
+            &info.prize_pool,
+            &BigUint::from(
+                info.prize_distribution
+                    .get(total_winning_tickets - *index_last_winner),
+            ),
+        );
+        if prize == 0 {
+            return;
         }
+
+        self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
+
+        info.unawarded_amount -= prize;
     }
 
     fn assign_prize_to_winner(&self, token_id: TokenIdentifier, amount: &BigUint, winner_id: &u64) {
