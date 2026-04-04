@@ -150,7 +150,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         total_winning_tickets: usize,
         info: &mut LotteryInfo<Self::Api>,
     ) {
-        let rand_index = self.get_distinct_random(*index_last_winner, total_tickets);
+        let rand_index = self.get_distinct_random(*index_last_winner, total_tickets + 1);
 
         // swap indexes of the winner addresses - we are basically bringing the winners in the first indexes of the mapper
         let winner_address = self.ticket_holders(lottery_name).get(rand_index);
