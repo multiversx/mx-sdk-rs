@@ -14,7 +14,7 @@ use multiversx_sc_scenario::{
 use multiversx_sdk::gateway::GatewayAsyncService;
 
 use crate::{
-    InteractorBase, interactor::interactor_tx::interactor_prepare_async::InteractorSimulateGasAsync,
+    InteractorBase, interactor::interactor_tx::interactor_run_trait::InteractorSimulateGasAsync,
 };
 
 use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};

@@ -16,7 +16,7 @@ use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
     InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync,
-    interactor_prepare_async::InteractorRunAsync,
+    interactor_run_trait::InteractorRunAsync,
 };
 
 #[allow(clippy::type_complexity)]
