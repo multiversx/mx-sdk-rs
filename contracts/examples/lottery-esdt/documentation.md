@@ -14,36 +14,37 @@ Deployment of the SC requires no arguments. All you need to do is perform the sc
 
 # Actions after deploy
 
-Once the SC has been deployed, anyone can start a lottery, using the following function: 
+Once the SC has been deployed, anyone can start a lottery, using the following function:
 
 ```
-start(lottery_name: Vec<u8>,
-        token_identifier: Vec<u8>,
-        ticket_price: BigUint, 
-        opt_total_tickets: Option<u32>, 
-        opt_deadline: Option<u64>,
-        opt_max_entries_per_user: Option<u32>,
-        opt_prize_distribution: Option<Vec<u8>>,
-        opt_whitelist: Option<Vec<Address>>)
+startLottery(
+    lottery_name: ManagedBuffer,
+    token_identifier: TokenIdentifier,
+    ticket_price: BigUint,
+    opt_total_tickets: Option<usize>,
+    opt_deadline: Option<TimestampMillis>,
+    opt_max_entries_per_user: Option<usize>,
+    opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
+    opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
+    opt_burn_percentage: OptionalValue<BigUint>)
 ```
-
-You may also call its twin function: *createLotteryPool*. There is no difference in the implementation.
 
 It is also worth noting that the smart contract has a one-to-many relationship with lotteries. A single smart contract can run multiple lotteries at the same time, even started by the same user.
 
-The function requires the following arguments: (Note: Optional arguments still have to be passed.  
-        If you want to skip an argument, pass 0x as value.  
-        If you want to use that argument, pass 0x01, followed by the value - both concatenated.  
-        Example: Option&lt;u32&gt; want to pass 4 as value, pass 0x0100000004)  
+The function requires the following arguments: (Note: Optional arguments still have to be passed.
+        If you want to skip an argument, pass 0x as value.
+        If you want to use that argument, pass 0x01, followed by the value - both concatenated.
+        Example: Option&lt;usize&gt; want to pass 4 as value, pass 0x0100000004)
 
 - lottery_name: Each lottery has to have a unique, case-sensitive name, using ASCII characters only.
-- token_identifier: The identifier of the esdt token that will be used as currency for this lottery.
-- ticket_price: The price of the ticket, currency is the esdt token set above.
-- total_tickets (Optional): The total available tickets for the lottery. If they're sold out, the lottery can be ended. Default is "unlimited"
-- deadline (Optional): The deadline for the lottery, expressed as a timestamp. The default and the maximum is 30 days in the future.
-- max_entries_per_user (Optional): The max number of tickets each user can buy. The default is unlimited.
-- prize_distribution (Optional): Not supported in the current version. In the future, you will be able to split the prize pool. Current version only supports one winner per lottery.
+- token_identifier: The identifier of the ESDT token that will be used as currency for this lottery. EGLD is not accepted.
+- ticket_price: The price of the ticket, currency is the ESDT token set above.
+- total_tickets (Optional): The total available tickets for the lottery. Maximum allowed is 800. If they're sold out, the lottery can be ended. Default is the maximum (800).
+- deadline (Optional): The deadline for the lottery, expressed as a Unix timestamp **in milliseconds**. The default and the maximum is 30 days in the future.
+- max_entries_per_user (Optional): The max number of tickets each user can buy. The default is the maximum number of total tickets.
+- prize_distribution (Optional): A list of percentages (each as a `u8`) that must sum to exactly 100. Each entry represents a prize tier ordered from last place to first place. For example, `[40, 60]` means the 2nd-place winner gets 40% and the 1st-place winner gets 60% of the prize pool. The number of winners must be strictly less than the total number of tickets. Defaults to a single winner taking 100% of the prize pool.
 - whitelist (Optional): If provided, only the addresses on the list can participate in this lottery.
+- burn_percentage (OptionalValue): If provided, this percentage of the prize pool will be burned before distributing prizes. Requires the contract to hold the `ESDTLocalBurn` role for the lottery token. The value must be strictly less than 100.
 
 # Actions after lottery start
 
