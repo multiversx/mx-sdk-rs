@@ -43,7 +43,7 @@ pub trait ClaimModule: storage::StorageModule {
         for token_id in self.user_accumulated_token_rewards(caller_id).iter() {
             require!(
                 !self.accumulated_rewards(&token_id, caller_id).is_empty(),
-                "Token requested not available for claim"
+                "Internal error: token in reward set has no balance"
             );
             all_tokens.push(token_id);
         }
@@ -57,7 +57,7 @@ pub trait ClaimModule: storage::StorageModule {
         caller_id: &u64,
         accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
     ) {
-        for token_id in tokens.iter().rev() {
+        for token_id in tokens.iter() {
             let _ = &self
                 .user_accumulated_token_rewards(caller_id)
                 .swap_remove(&token_id);
