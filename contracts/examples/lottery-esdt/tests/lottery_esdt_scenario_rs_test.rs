@@ -159,7 +159,9 @@ fn start_limited_tickets_and_fixed_deadline_invalid_deadline_rs() {
 
 #[test]
 fn start_limited_tickets_and_fixed_deadline_invalid_ticket_price_arg_rs() {
-    world().run("scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json");
+    world().run(
+        "scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json",
+    );
 }
 
 #[test]
