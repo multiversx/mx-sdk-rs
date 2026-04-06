@@ -1,0 +1,79 @@
+{
+    "name": "start lottery with EGLD",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "../lottery-init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "start-egld-lottery",
+            "tx": {
+                "from": "address:my_address",
+                "to": "sc:lottery#42",
+                "function": "startLottery",
+                "arguments": [
+                    "str:egld_lottery",
+                    "str:EGLD-000000",
+                    "100",
+                    "0x01|u32:2",
+                    "0x01|u64:123,456",
+                    "0x",
+                    "0x",
+                    "0x"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:other_shard_address#41": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery#42": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:lotteryInfo|nested:str:egld_lottery": {
+                            "0-token_identifier": "nested:str:EGLD-000000",
+                            "1-ticket_price": "biguint:100",
+                            "2-tickets-left": "u32:2",
+                            "3-deadline": "u64:123,456",
+                            "4-max_entries_per_user": "u32:800",
+                            "5-prize_distribution": "nested:u8:100",
+                            "6-prize_pool": "biguint:0",
+                            "7-unawarded_amount": "biguint:0"
+                        }
+                    },
+                    "code": "*"
+                }
+            }
+        }
+    ]
+}

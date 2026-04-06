@@ -16,7 +16,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
     fn start_lottery(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_id: TokenId,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<TimestampMillis>,
@@ -42,10 +42,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
             self.status(&lottery_name) == Status::Inactive,
             "Lottery is already active!"
         );
-        require!(
-            token_identifier.is_valid_esdt_identifier(), // this also returns `false` if token is EGLD
-            "Invalid token name provided!"
-        );
+        require!(token_id.is_valid(), "Invalid token name provided!");
         require!(ticket_price > 0, "Ticket price must be higher than 0!");
         require!(
             total_tickets > 0,
@@ -71,7 +68,10 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
 
         match opt_burn_percentage {
             OptionalValue::Some(burn_percentage) => {
-                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
+                let Some(esdt_token_id) = token_id.as_esdt() else {
+                    sc_panic!("Cannot burn EGLD");
+                };
+                let roles = self.blockchain().get_esdt_local_roles(esdt_token_id);
                 require!(
                     roles.has_role(&EsdtLocalRole::Burn),
                     "The contract can't burn the selected token!"
@@ -96,7 +96,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
         }
 
         let info = LotteryInfo {
-            token_identifier,
+            token_id,
             ticket_price,
             tickets_left: total_tickets,
             deadline,

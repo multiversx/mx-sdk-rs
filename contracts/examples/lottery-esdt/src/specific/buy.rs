@@ -9,12 +9,17 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
     #[endpoint]
     #[payable]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
-        let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
+        let payment = self.call_value().single();
+        require!(payment.is_fungible(), "only fungible tokens accepted");
 
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
             Status::Running => {
-                self.update_after_buy_ticket(&lottery_name, &token_identifier, &payment)
+                self.update_after_buy_ticket(
+                    &lottery_name,
+                    &payment.token_identifier,
+                    payment.amount.as_big_uint(),
+                );
             }
             Status::Ended => {
                 sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
@@ -25,7 +30,7 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &ManagedBuffer,
-        token_identifier: &EgldOrEsdtTokenIdentifier,
+        token_identifier: &TokenId,
         payment: &BigUint,
     ) {
         let info_mapper = self.lottery_info(lottery_name);
@@ -39,7 +44,7 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
             "You are not allowed to participate in this lottery!"
         );
         require!(
-            token_identifier == &info.token_identifier && payment == &info.ticket_price,
+            token_identifier == &info.token_id && payment == &info.ticket_price,
             "Wrong ticket fee!"
         );
 

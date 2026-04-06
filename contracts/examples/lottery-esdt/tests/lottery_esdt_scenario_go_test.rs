@@ -96,6 +96,22 @@ fn determine_winner_split_prize_pool_go() {
 }
 
 #[test]
+fn egld_buy_ticket_egld_go() {
+    world().run("scenarios/egld/buy-ticket-egld.scen.json");
+}
+
+#[test]
+#[ignore = "cannot simulate shard on address"]
+fn egld_determine_winner_egld_go() {
+    world().run("scenarios/egld/determine-winner-egld.scen.json");
+}
+
+#[test]
+fn egld_start_with_egld_go() {
+    world().run("scenarios/egld/start-with-egld.scen.json");
+}
+
+#[test]
 fn lottery_init_go() {
     world().run("scenarios/lottery-init.scen.json");
 }
@@ -144,9 +160,7 @@ fn start_limited_tickets_and_fixed_deadline_invalid_deadline_go() {
 
 #[test]
 fn start_limited_tickets_and_fixed_deadline_invalid_ticket_price_arg_go() {
-    world().run(
-        "scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json",
-    );
+    world().run("scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json");
 }
 
 #[test]

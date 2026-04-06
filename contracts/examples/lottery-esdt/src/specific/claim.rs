@@ -5,7 +5,7 @@ use crate::basics::storage;
 #[multiversx_sc::module]
 pub trait ClaimModule: storage::StorageModule {
     #[endpoint]
-    fn claim_rewards(&self, tokens: MultiValueEncoded<TokenIdentifier>) {
+    fn claim_rewards(&self, tokens: MultiValueEncoded<TokenId>) {
         let caller = self.blockchain().get_caller();
         let caller_id = self.address_to_id_mapper().get_id_or_insert(&caller);
         require!(
@@ -13,7 +13,7 @@ pub trait ClaimModule: storage::StorageModule {
             "You have no rewards to claim"
         );
 
-        let mut accumulated_rewards = EsdtTokenPaymentVec::new();
+        let mut accumulated_rewards = PaymentVec::new();
 
         // to save reviewers time, these 2 iterators have different generics, so it was not possible to make just 1 for loop
 
@@ -36,9 +36,9 @@ pub trait ClaimModule: storage::StorageModule {
     fn handle_claim_with_unspecified_tokens(
         &self,
         caller_id: &u64,
-        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
+        accumulated_rewards: &mut PaymentVec<Self::Api>,
     ) {
-        let mut all_tokens: ManagedVec<Self::Api, TokenIdentifier> = ManagedVec::new();
+        let mut all_tokens: ManagedVec<Self::Api, TokenId> = ManagedVec::new();
 
         for token_id in self.user_accumulated_token_rewards(caller_id).iter() {
             require!(
@@ -53,9 +53,9 @@ pub trait ClaimModule: storage::StorageModule {
 
     fn claim_rewards_user(
         &self,
-        tokens: ManagedVec<Self::Api, TokenIdentifier>,
+        tokens: ManagedVec<Self::Api, TokenId>,
         caller_id: &u64,
-        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
+        accumulated_rewards: &mut PaymentVec<Self::Api>,
     ) {
         for token_id in tokens.iter() {
             let _ = &self
@@ -68,11 +68,13 @@ pub trait ClaimModule: storage::StorageModule {
 
     fn prepare_token_for_claim(
         &self,
-        token_id: TokenIdentifier,
+        token_id: TokenId,
         caller_id: &u64,
-        accumulated_rewards: &mut EsdtTokenPaymentVec<Self::Api>,
+        accumulated_rewards: &mut PaymentVec<Self::Api>,
     ) {
         let value = self.accumulated_rewards(&token_id, caller_id).take();
-        accumulated_rewards.push(EsdtTokenPayment::new(token_id, 0, value));
+        if let Some(nz_value) = value.into_non_zero() {
+            accumulated_rewards.push(Payment::new(token_id, 0, nz_value));
+        }
     }
 }
