@@ -5,6 +5,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[ignore = "gas refund issue, fix mandos-go"]
 fn stress_submit_test_go() {
     world().run("scenarios/stress_submit_test.scen.json");
 }
