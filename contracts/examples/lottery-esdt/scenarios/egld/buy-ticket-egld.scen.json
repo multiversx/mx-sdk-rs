@@ -1,27 +1,21 @@
 {
-    "name": "start with fixed deadline",
+    "name": "buy ticket with EGLD",
     "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "lottery-init.scen.json"
+            "path": "start-with-egld.scen.json"
         },
         {
             "step": "scCall",
-            "id": "start fixed deadline",
+            "id": "buy-ticket-egld",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:acc1",
                 "to": "sc:lottery#42",
-                "function": "startLottery",
+                "egldValue": "100",
+                "function": "buy_ticket",
                 "arguments": [
-                    "str:lottery_name",
-                    "str:LOTTERY-123456",
-                    "100",
-                    "0x",
-                    "0x01|u64:123,456",
-                    "0x",
-                    "0x",
-                    "0x"
+                    "str:egld_lottery"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -47,8 +41,8 @@
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "0",
-                    "balance": "1,000,000",
+                    "nonce": "1",
+                    "balance": "999,900",
                     "storage": {}
                 },
                 "address:acc2": {
@@ -58,20 +52,26 @@
                 },
                 "sc:lottery#42": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "100",
                     "storage": {
-                        "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_id": "nested:str:LOTTERY-123456",
+                        "str:lotteryInfo|nested:str:egld_lottery": {
+                            "0-token_id": "nested:str:EGLD-000000",
                             "1-ticket_price": "biguint:100",
-                            "2-tickets-left": "u32:800",
+                            "2-tickets-left": "u32:1",
                             "3-deadline": "u64:123,456",
                             "4-max_entries_per_user": "u32:800",
                             "5-prize_distribution": "nested:u8:100",
-                            "6-prize_pool": "biguint:0",
-                            "7-unawarded_amount": "biguint:0"
-                        }
+                            "6-prize_pool": "biguint:100",
+                            "7-unawarded_amount": "biguint:100"
+                        },
+                        "str:ticketHolder|nested:str:egld_lottery|str:.len": "1",
+                        "str:ticketHolder|nested:str:egld_lottery|str:.item|u32:1": "1",
+                        "str:numberOfEntriesForUser|u32:12|str:egld_lottery|u64:1": "1",
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "*"
                 }
             }
         }

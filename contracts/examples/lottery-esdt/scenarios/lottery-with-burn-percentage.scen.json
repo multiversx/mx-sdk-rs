@@ -31,7 +31,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:The contract can't burn the selected token!",
+                "message": "str:the contract can't burn the selected token",
                 "gas": "*",
                 "refund": "*"
             }
@@ -106,7 +106,7 @@
                     },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_identifier": "nested:str:LOTTERY-123456",
+                            "0-token_id": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:123,456",
@@ -205,7 +205,7 @@
                     },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_identifier": "nested:str:LOTTERY-123456",
+                            "0-token_id": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:0",
                             "3-deadline": "u64:123,456",

@@ -98,6 +98,21 @@ fn determine_winner_split_prize_pool_rs() {
     world().run("scenarios/determine-winner-split-prize-pool.scen.json");
 }
 #[test]
+fn egld_buy_ticket_egld_rs() {
+    world().run("scenarios/egld/buy-ticket-egld.scen.json");
+}
+
+#[test]
+fn egld_determine_winner_egld_rs() {
+    world().run("scenarios/egld/determine-winner-egld.scen.json");
+}
+
+#[test]
+fn egld_start_with_egld_rs() {
+    world().run("scenarios/egld/start-with-egld.scen.json");
+}
+
+#[test]
 fn lottery_init_rs() {
     world().run("scenarios/lottery-init.scen.json");
 }

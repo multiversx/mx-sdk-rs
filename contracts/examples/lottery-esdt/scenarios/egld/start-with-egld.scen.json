@@ -1,27 +1,21 @@
 {
-    "name": "start with limited tickets and fixed deadline with invalid deadline arg",
+    "name": "start lottery with EGLD",
     "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "lottery-init.scen.json"
-        },
-        {
-            "step": "setState",
-            "currentBlockInfo": {
-                "blockTimestampMs": "123,567"
-            }
+            "path": "../lottery-init.scen.json"
         },
         {
             "step": "scCall",
-            "id": "start limited tickets, fixed deadline, invalid deadline arg",
+            "id": "start-egld-lottery",
             "tx": {
                 "from": "address:my_address",
                 "to": "sc:lottery#42",
                 "function": "startLottery",
                 "arguments": [
-                    "str:lottery_name",
-                    "str:LOTTERY-123456",
+                    "str:egld_lottery",
+                    "str:EGLD-000000",
                     "100",
                     "0x01|u32:2",
                     "0x01|u64:123,456",
@@ -34,8 +28,7 @@
             },
             "expect": {
                 "out": [],
-                "status": "4",
-                "message": "str:deadline can't be in the past",
+                "status": "",
                 "gas": "*",
                 "refund": "*"
             }
@@ -66,8 +59,19 @@
                 "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "storage": {
+                        "str:lotteryInfo|nested:str:egld_lottery": {
+                            "0-token_id": "nested:str:EGLD-000000",
+                            "1-ticket_price": "biguint:100",
+                            "2-tickets-left": "u32:2",
+                            "3-deadline": "u64:123,456",
+                            "4-max_entries_per_user": "u32:800",
+                            "5-prize_distribution": "nested:u8:100",
+                            "6-prize_pool": "biguint:0",
+                            "7-unawarded_amount": "biguint:0"
+                        }
+                    },
+                    "code": "*"
                 }
             }
         }

@@ -14,12 +14,12 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         let caller_shard = self.blockchain().get_shard_of_address(&caller);
         require!(
             sc_address_shard != caller_shard,
-            "Caller needs to be on a remote shard"
+            "caller needs to be on a remote shard"
         );
 
         match self.status(&lottery_name) {
-            Status::Inactive => sc_panic!("Lottery is inactive!"),
-            Status::Running => sc_panic!("Lottery is still running!"),
+            Status::Inactive => sc_panic!("lottery is inactive"),
+            Status::Running => sc_panic!("lottery is still running"),
             Status::Ended => self.handle_awarding(&lottery_name),
         }
     }
@@ -72,11 +72,12 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
 
         // Prevent crashing if the role was unset while the lottery was running
         // The tokens will simply remain locked forever
-        let esdt_token_id = info.token_identifier.clone();
-        let roles = self.blockchain().get_esdt_local_roles(&esdt_token_id);
-        if roles.has_role(&EsdtLocalRole::Burn) {
-            self.send().esdt_local_burn(&esdt_token_id, 0, &burn_amount);
-        }
+        if let Some(esdt_token_id) = info.token_id.as_esdt() {
+            let roles = self.blockchain().get_esdt_local_roles(esdt_token_id);
+            if roles.has_role(&EsdtLocalRole::Burn) {
+                self.send().esdt_local_burn(esdt_token_id, 0, &burn_amount);
+            }
+        };
 
         info.prize_pool -= &burn_amount;
         info.unawarded_amount -= burn_amount;
@@ -113,7 +114,7 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
                 let first_place_winner_id =
                     self.ticket_holders(lottery_name).get(total_winning_tickets);
                 self.assign_prize_to_winner(
-                    info.token_identifier.clone(),
+                    info.token_id.clone(),
                     &info.unawarded_amount,
                     &first_place_winner_id,
                 );
@@ -175,12 +176,12 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
             return;
         }
 
-        self.assign_prize_to_winner(info.token_identifier.clone(), &prize, &winner_address);
+        self.assign_prize_to_winner(info.token_id.clone(), &prize, &winner_address);
 
         info.unawarded_amount -= prize;
     }
 
-    fn assign_prize_to_winner(&self, token_id: TokenIdentifier, amount: &BigUint, winner_id: &u64) {
+    fn assign_prize_to_winner(&self, token_id: TokenId, amount: &BigUint, winner_id: &u64) {
         self.accumulated_rewards(&token_id, winner_id)
             .update(|value| *value += amount);
         self.user_accumulated_token_rewards(winner_id)

@@ -115,7 +115,7 @@ where
     }
 
     pub fn claim_rewards<
-        Arg0: ProxyArg<MultiValueEncoded<Env::Api, EsdtTokenIdentifier<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, TokenId<Env::Api>>>,
     >(
         self,
         tokens: Arg0,
@@ -141,7 +141,7 @@ where
 
     pub fn start_lottery<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
-        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<TokenId<Env::Api>>,
         Arg2: ProxyArg<BigUint<Env::Api>>,
         Arg3: ProxyArg<Option<usize>>,
         Arg4: ProxyArg<Option<TimestampMillis>>,
@@ -152,7 +152,7 @@ where
     >(
         self,
         lottery_name: Arg0,
-        token_identifier: Arg1,
+        token_id: Arg1,
         ticket_price: Arg2,
         opt_total_tickets: Arg3,
         opt_deadline: Arg4,
@@ -165,7 +165,7 @@ where
             .payment(NotPayable)
             .raw_call("startLottery")
             .argument(&lottery_name)
-            .argument(&token_identifier)
+            .argument(&token_id)
             .argument(&ticket_price)
             .argument(&opt_total_tickets)
             .argument(&opt_deadline)
@@ -198,7 +198,7 @@ pub struct LotteryInfo<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub token_identifier: EsdtTokenIdentifier<Api>,
+    pub token_id: TokenId<Api>,
     pub ticket_price: BigUint<Api>,
     pub tickets_left: usize,
     pub deadline: TimestampMillis,

@@ -2,7 +2,7 @@
 
 The lottery smart contract is designed to allow anyone to create their very own lottery, directly on the blockchain. Having said that, the purpose of this contract is just to have a bit of fun and show what’s possible on the current version of the MultiversX blockchain. We do not endorse gambling. 
 
-This is the esdt version, which allows any arbitrary token to be used as currency.
+This contract allows any fungible token to be used as currency, including EGLD and any ESDT token.
 
 Now that that’s out of the way, there’s not much else to say in this section. It’s just a lottery! You buy tickets and hope to win. The difference between this and the traditional lottery is that you don’t pick some numbers, you just buy a ticket and at the end, one (more winning tickets not supported as of yet) of the tickets is declared the “winning ticket”.  
 
@@ -19,7 +19,7 @@ Once the SC has been deployed, anyone can start a lottery, using the following f
 ```
 startLottery(
     lottery_name: ManagedBuffer,
-    token_identifier: TokenIdentifier,
+    token_identifier: TokenId,
     ticket_price: BigUint,
     opt_total_tickets: Option<usize>,
     opt_deadline: Option<TimestampMillis>,
@@ -37,14 +37,14 @@ The function requires the following arguments: (Note: Optional arguments still h
         Example: Option&lt;usize&gt; want to pass 4 as value, pass 0x0100000004)
 
 - lottery_name: Each lottery has to have a unique, case-sensitive name, using ASCII characters only.
-- token_identifier: The identifier of the ESDT token that will be used as currency for this lottery. EGLD is not accepted.
+- token_identifier: The identifier of the token that will be used as currency for this lottery. Both EGLD (`EGLD-000000`) and any ESDT fungible token are accepted.
 - ticket_price: The price of the ticket, currency is the ESDT token set above.
 - total_tickets (Optional): The total available tickets for the lottery. Maximum allowed is 800. If they're sold out, the lottery can be ended. Default is the maximum (800).
 - deadline (Optional): The deadline for the lottery, expressed as a Unix timestamp **in milliseconds**. The default and the maximum is 30 days in the future.
 - max_entries_per_user (Optional): The max number of tickets each user can buy. The default is the maximum number of total tickets.
 - prize_distribution (Optional): A list of percentages (each as a `u8`) that must sum to exactly 100. Each entry represents a prize tier ordered from last place to first place. For example, `[40, 60]` means the 2nd-place winner gets 40% and the 1st-place winner gets 60% of the prize pool. The number of winners must be strictly less than the total number of tickets. Defaults to a single winner taking 100% of the prize pool.
 - whitelist (Optional): If provided, only the addresses on the list can participate in this lottery.
-- burn_percentage (OptionalValue): If provided, this percentage of the prize pool will be burned before distributing prizes. Requires the contract to hold the `ESDTLocalBurn` role for the lottery token. The value must be strictly less than 100.
+- burn_percentage (OptionalValue): If provided, this percentage of the prize pool will be burned before distributing prizes. Only supported for ESDT tokens — EGLD cannot be burned. Requires the contract to hold the `ESDTLocalBurn` role for the lottery token. The value must be strictly less than 100.
 
 # Actions after lottery start
 
@@ -114,7 +114,7 @@ Using the following function, you may buy a ticket for one of the available lott
 fn buy_ticket(lottery_name: Vec<u8>)
 ```
 
-All you need to do is pass along the name of the lottery you wish to purchase the ticket for and deposit the appropriate sum of the specific esdt tokens, corresponding to the ticket cost.
+All you need to do is pass along the name of the lottery you wish to purchase the ticket for and deposit the appropriate amount of the token (EGLD or ESDT) corresponding to the ticket cost.
 
 Don’t know the ticket cost? Simply ask the lottery creator, or use the query function described in part 1.
 

@@ -13,22 +13,22 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn generated_fund_rs() {
+fn _generated_fund_rs() {
     world().run("scenarios/_generated_fund.scen.json");
 }
 
 #[test]
-fn generated_init_rs() {
+fn _generated_init_rs() {
     world().run("scenarios/_generated_init.scen.json");
 }
 
 #[test]
-fn generated_query_status_rs() {
+fn _generated_query_status_rs() {
     world().run("scenarios/_generated_query_status.scen.json");
 }
 
 #[test]
-fn generated_sc_err_rs() {
+fn _generated_sc_err_rs() {
     world().run("scenarios/_generated_sc_err.scen.json");
 }
 

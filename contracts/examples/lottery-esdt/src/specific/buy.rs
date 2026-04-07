@@ -9,15 +9,20 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
     #[endpoint]
     #[payable]
     fn buy_ticket(&self, lottery_name: ManagedBuffer) {
-        let (token_identifier, payment) = self.call_value().egld_or_single_fungible_esdt();
+        let payment = self.call_value().single();
+        require!(payment.is_fungible(), "only fungible tokens accepted");
 
         match self.status(&lottery_name) {
-            Status::Inactive => sc_panic!("Lottery is currently inactive."),
+            Status::Inactive => sc_panic!("lottery is currently inactive."),
             Status::Running => {
-                self.update_after_buy_ticket(&lottery_name, &token_identifier, &payment)
+                self.update_after_buy_ticket(
+                    &lottery_name,
+                    &payment.token_identifier,
+                    payment.amount.as_big_uint(),
+                );
             }
             Status::Ended => {
-                sc_panic!("Lottery entry period has ended! Awaiting winner announcement.")
+                sc_panic!("lottery entry period has ended! awaiting winner announcement.")
             }
         };
     }
@@ -25,7 +30,7 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
     fn update_after_buy_ticket(
         &self,
         lottery_name: &ManagedBuffer,
-        token_identifier: &EgldOrEsdtTokenIdentifier,
+        token_identifier: &TokenId,
         payment: &BigUint,
     ) {
         let info_mapper = self.lottery_info(lottery_name);
@@ -36,18 +41,18 @@ pub trait BuyTicketModule: storage::StorageModule + views::ViewsModule {
 
         require!(
             whitelist.is_empty() || whitelist.contains(&caller_id),
-            "You are not allowed to participate in this lottery!"
+            "you are not allowed to participate in this lottery"
         );
         require!(
-            token_identifier == &info.token_identifier && payment == &info.ticket_price,
-            "Wrong ticket fee!"
+            token_identifier == &info.token_id && payment == &info.ticket_price,
+            "wrong ticket fee"
         );
 
         let entries_mapper = self.number_of_entries_for_user(lottery_name, &caller_id);
         let mut entries = entries_mapper.get();
         require!(
             entries < info.max_entries_per_user,
-            "Ticket limit exceeded for this lottery!"
+            "ticket limit exceeded for this lottery"
         );
 
         self.ticket_holders(lottery_name).push(&caller_id);

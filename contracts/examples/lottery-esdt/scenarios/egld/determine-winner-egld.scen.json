@@ -1,26 +1,47 @@
 {
-    "name": "try to determine winner too early",
+    "name": "determine winner EGLD lottery",
     "gasSchedule": "dummy",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "buy-ticket.scen.json"
+            "path": "buy-ticket-egld.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "buy-ticket-egld-2",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "egldValue": "100",
+                "function": "buy_ticket",
+                "arguments": [
+                    "str:egld_lottery"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
         },
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockNonce": "123,000"
+                "blockTimestampMs": "123456789"
             }
         },
         {
             "step": "scCall",
-            "id": "status-test",
+            "id": "determine-winner-egld",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:other_shard_address#41",
                 "to": "sc:lottery#42",
-                "function": "status",
+                "function": "determine_winner",
                 "arguments": [
-                    "str:lottery_name"
+                    "str:egld_lottery"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -36,21 +57,20 @@
         },
         {
             "step": "scCall",
-            "id": "determine-winner-early",
+            "id": "claim-egld-rewards",
             "tx": {
-                "from": "address:my_address",
+                "from": "address:acc1",
                 "to": "sc:lottery#42",
-                "function": "determine_winner",
+                "function": "claim_rewards",
                 "arguments": [
-                    "str:lottery_name"
+                    "str:EGLD-000000"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
-                "status": "4",
-                "message": "str:lottery is still running",
+                "status": "0",
                 "gas": "*",
                 "refund": "*"
             }
@@ -59,17 +79,17 @@
             "step": "checkState",
             "accounts": {
                 "address:my_address": {
-                    "nonce": "4",
+                    "nonce": "2",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:other_shard_address#41": {
-                    "nonce": "0",
+                    "nonce": "1",
                     "balance": "1,000,000",
                     "storage": {}
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "3",
                     "balance": "1,000,000",
                     "storage": {}
                 },
@@ -81,28 +101,12 @@
                 "sc:lottery#42": {
                     "nonce": "0",
                     "balance": "0",
-                    "esdt": {
-                        "str:LOTTERY-123456": "100"
-                    },
                     "storage": {
-                        "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_id": "nested:str:LOTTERY-123456",
-                            "1-ticket_price": "biguint:100",
-                            "2-tickets-left": "u32:1",
-                            "3-deadline": "u64:123,456",
-                            "4-max_entries_per_user": "u32:800",
-                            "5-prize_distribution": "nested:u8:100",
-                            "6-prize_pool": "biguint:100",
-                            "7-unawarded_amount": "biguint:100"
-                        },
-                        "str:ticketHolder|nested:str:lottery_name|str:.len": "1",
-                        "str:ticketHolder|nested:str:lottery_name|str:.item|u32:1": "1",
-                        "str:numberOfEntriesForUser|u32:12|str:lottery_name|u64:1": "1",
                         "str:addressToIdMapper|str:lastId": "1",
                         "str:addressToIdMapper|str:addr|address:acc1": "1",
                         "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "*"
                 }
             }
         }

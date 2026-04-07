@@ -16,7 +16,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
     fn start_lottery(
         &self,
         lottery_name: ManagedBuffer,
-        token_identifier: TokenIdentifier,
+        token_id: TokenId,
         ticket_price: BigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<TimestampMillis>,
@@ -25,7 +25,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
         opt_burn_percentage: OptionalValue<BigUint>,
     ) {
-        require!(!lottery_name.is_empty(), "Name can't be empty!");
+        require!(!lottery_name.is_empty(), "name can't be empty");
 
         let timestamp = self.blockchain().get_block_timestamp_millis();
         let total_tickets = opt_total_tickets.unwrap_or(MAX_TICKETS);
@@ -36,50 +36,47 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
 
         require!(
             total_tickets > prize_distribution.len(),
-            "Number of winners should be smaller than the number of available tickets"
+            "number of winners should be smaller than the number of available tickets"
         );
         require!(
             self.status(&lottery_name) == Status::Inactive,
-            "Lottery is already active!"
+            "lottery is already active"
         );
-        require!(
-            token_identifier.is_valid_esdt_identifier(), // this also returns `false` if token is EGLD
-            "Invalid token name provided!"
-        );
-        require!(ticket_price > 0, "Ticket price must be higher than 0!");
-        require!(
-            total_tickets > 0,
-            "Must have more than 0 tickets available!"
-        );
+        require!(token_id.is_valid(), "invalid token name provided");
+        require!(ticket_price > 0, "ticket price must be higher than 0");
+        require!(total_tickets > 0, "must have more than 0 tickets available");
         require!(
             total_tickets <= MAX_TICKETS,
-            "Only 800 or less total tickets per lottery are allowed!"
+            "only 800 or less total tickets per lottery are allowed"
         );
-        require!(deadline > timestamp, "Deadline can't be in the past!");
+        require!(deadline > timestamp, "deadline can't be in the past");
         require!(
             deadline <= timestamp + THIRTY_DAYS_IN_MILLISECONDS,
-            "Deadline can't be later than 30 days from now!"
+            "deadline can't be later than 30 days from now"
         );
         require!(
             max_entries_per_user > 0,
-            "Must have more than 0 max entries per user!"
+            "must have more than 0 max entries per user"
         );
         require!(
             self.sum_array(&prize_distribution) == PERCENTAGE_TOTAL,
-            "Prize distribution must add up to exactly 100(%)!"
+            "prize distribution must add up to exactly 100(%)"
         );
 
         match opt_burn_percentage {
             OptionalValue::Some(burn_percentage) => {
-                let roles = self.blockchain().get_esdt_local_roles(&token_identifier);
+                let Some(esdt_token_id) = token_id.as_esdt() else {
+                    sc_panic!("cannot burn EGLD");
+                };
+                let roles = self.blockchain().get_esdt_local_roles(esdt_token_id);
                 require!(
                     roles.has_role(&EsdtLocalRole::Burn),
-                    "The contract can't burn the selected token!"
+                    "the contract can't burn the selected token"
                 );
 
                 require!(
                     burn_percentage < PERCENTAGE_TOTAL,
-                    "Invalid burn percentage!"
+                    "invalid burn percentage"
                 );
                 self.burn_percentage_for_lottery(&lottery_name)
                     .set(burn_percentage);
@@ -96,7 +93,7 @@ pub trait SetupModule: storage::StorageModule + views::ViewsModule + utils::Util
         }
 
         let info = LotteryInfo {
-            token_identifier,
+            token_id,
             ticket_price,
             tickets_left: total_tickets,
             deadline,

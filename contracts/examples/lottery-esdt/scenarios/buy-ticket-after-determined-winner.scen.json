@@ -40,7 +40,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Lottery is currently inactive.",
+                "message": "str:lottery is currently inactive.",
                 "gas": "*",
                 "refund": "*"
             }
