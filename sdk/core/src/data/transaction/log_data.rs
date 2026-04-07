@@ -10,11 +10,11 @@ pub enum LogData {
 }
 
 impl LogData {
-    pub fn for_each<F: FnMut(&String)>(&self, mut f: F) {
+    pub fn for_each<F: FnMut(&str)>(&self, mut f: F) {
         match self {
             LogData::Empty => {}
-            LogData::String(s) => f(s),
-            LogData::Vec(v) => v.iter().for_each(f),
+            LogData::String(s) => f(s.as_str()),
+            LogData::Vec(v) => v.iter().for_each(|s| f(s.as_str())),
         }
     }
 }
