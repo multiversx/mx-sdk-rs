@@ -1,4 +1,4 @@
-use crate::sdk::data::transaction::{Transaction, ApiTransactionResult};
+use crate::sdk::data::transaction::{ApiTransactionResult, Transaction};
 use crate::{InteractorBase, Sender, multiversx_sc::types::Address};
 use futures::future::join_all;
 use multiversx_sc_scenario::imports::ReturnCode;

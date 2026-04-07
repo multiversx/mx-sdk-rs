@@ -1,6 +1,6 @@
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_sdk::{
-    data::transaction::{GetTransactionResponse, ApiTransactionResult},
+    data::transaction::{ApiTransactionResult, GetTransactionResponse},
     retrieve_tx_on_network::{
         extract_message_from_string_reason, find_code_and_message, parse_reason,
         replace_with_error_message,

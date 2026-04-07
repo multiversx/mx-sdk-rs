@@ -1,6 +1,8 @@
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response::{self, is_out_scr};
-use multiversx_sc_snippets::sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
+use multiversx_sc_snippets::sdk::data::transaction::{
+    ApiTransactionResult, GetTransactionResponse,
+};
 
 #[test]
 fn test_transaction_multiple_sc_results() {

@@ -1,6 +1,8 @@
 use multiversx_sc_scenario::imports::{Address, ReturnCode};
 use multiversx_sc_snippets::network_response;
-use multiversx_sc_snippets::sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
+use multiversx_sc_snippets::sdk::data::transaction::{
+    ApiTransactionResult, GetTransactionResponse,
+};
 
 #[test]
 fn test_deployed_address() {

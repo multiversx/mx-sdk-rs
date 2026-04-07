@@ -1,5 +1,5 @@
 use crate::{
-    data::transaction::{ApiLogs, Events, LogData, ApiTransactionResult},
+    data::transaction::{ApiLogs, ApiTransactionResult, Events, LogData},
     gateway::{GetTxInfo, GetTxProcessStatus},
     utils::base64_encode,
 };

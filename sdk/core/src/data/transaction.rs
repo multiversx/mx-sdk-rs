@@ -1,30 +1,30 @@
 mod api_logs;
 mod api_smart_contract_result;
+mod api_transaction_result;
 mod arg_create_transaction;
 mod events;
+mod get_transaction_response;
 mod log_data;
-mod send_transaction;
-mod send_transactions;
+mod multiple_transactions;
 mod simulate_gas;
-mod transaction_info;
-mod transaction_on_network;
 mod transaction_process_status;
 mod transaction_request;
+mod transaction_response_data;
 mod transaction_status;
 mod tx_cost;
 
 pub use api_logs::ApiLogs;
 pub use api_smart_contract_result::ApiSmartContractResult;
+pub use api_transaction_result::ApiTransactionResult;
 pub use arg_create_transaction::ArgCreateTransaction;
 pub use events::Events;
+pub use get_transaction_response::{GetTransactionResponse, GetTransactionResponseData};
 pub use log_data::LogData;
-pub use send_transaction::{ResponseTransaction, TransactionResponseData};
-pub use send_transactions::{MultipleTransactionsResponseData, ResponseMultipleTransactions};
+pub use multiple_transactions::{MultipleTransactionsResponseData, ResponseMultipleTransactions};
 pub use simulate_gas::{SimulateGasTransactionData, SimulateGasTransactionResponse};
-pub use transaction_info::{GetTransactionResponse, GetTransactionResponseData};
-pub use transaction_on_network::ApiTransactionResult;
 pub use transaction_process_status::{ProcessStatusResponse, TransactionProcessStatus};
 pub use transaction_request::Transaction;
+pub use transaction_response_data::{ResponseTransaction, TransactionResponseData};
 pub use transaction_status::{ResponseTxStatus, TransactionStatus};
 pub use tx_cost::{ResponseTxCost, TxCostResponseData};
 

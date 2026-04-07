@@ -1,4 +1,4 @@
-use crate::data::transaction::{GetTransactionResponse, ApiTransactionResult};
+use crate::data::transaction::{ApiTransactionResult, GetTransactionResponse};
 use anyhow::anyhow;
 
 use super::{

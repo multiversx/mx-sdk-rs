@@ -1,4 +1,4 @@
-use crate::data::transaction::{Transaction, ResponseTxCost, TxCostResponseData};
+use crate::data::transaction::{ResponseTxCost, Transaction, TxCostResponseData};
 use anyhow::anyhow;
 
 use super::{COST_TRANSACTION_ENDPOINT, GatewayRequest, GatewayRequestType};

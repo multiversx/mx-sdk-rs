@@ -1,5 +1,5 @@
 use crate::sdk::{
-    data::transaction::{ApiLogs, ApiSmartContractResult, Events, ApiTransactionResult},
+    data::transaction::{ApiLogs, ApiSmartContractResult, ApiTransactionResult, Events},
     utils::base64_decode,
 };
 use multiversx_sc_scenario::{

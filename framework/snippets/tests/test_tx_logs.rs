@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
+use multiversx_sdk::data::transaction::{ApiTransactionResult, GetTransactionResponse};
 
 #[test]
 fn test_tx_multiple_logs() {
