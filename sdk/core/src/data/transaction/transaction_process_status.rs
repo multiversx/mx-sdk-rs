@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Corresponds to [`ProcessStatusResponse`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`ProcessStatusResponse`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProcessStatusResponse {
     pub reason: String,

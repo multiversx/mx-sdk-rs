@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Simplified decode of [`TxCostResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go)
+/// Simplified decode of [`TxCostResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go)
 /// used when only the gas cost is needed from the `/transaction/cost` endpoint.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

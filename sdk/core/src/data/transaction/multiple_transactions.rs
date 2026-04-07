@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-/// Corresponds to [`MultipleTransactionsResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`MultipleTransactionsResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MultipleTransactionsResponseData {
     #[serde(rename = "txsSent")]
@@ -11,7 +11,7 @@ pub struct MultipleTransactionsResponseData {
     pub txs_hashes: HashMap<u64, String>,
 }
 
-/// Corresponds to [`ResponseMultipleTransactions`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`ResponseMultipleTransactions`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResponseMultipleTransactions {
     pub error: String,

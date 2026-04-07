@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// Corresponds to [`TxCostResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`TxCostResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TxCostResponseData {
@@ -8,7 +8,7 @@ pub struct TxCostResponseData {
     pub return_message: String,
 }
 
-/// Corresponds to [`ResponseTxCost`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`ResponseTxCost`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseTxCost {

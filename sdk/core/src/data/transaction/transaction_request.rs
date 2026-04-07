@@ -1,7 +1,7 @@
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
-/// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
+/// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
