@@ -3,10 +3,11 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SendTransactionsResponseData {
-    pub num_of_sent_txs: i32,
-    pub txs_hashes: HashMap<i32, String>,
+    #[serde(rename = "txsSent")]
+    pub num_of_sent_txs: u64,
+    #[serde(rename = "txsHashes")]
+    pub txs_hashes: HashMap<u64, String>,
 }
 
 // SendTransactionsResponse holds the response received from the network when broadcasting multiple transactions

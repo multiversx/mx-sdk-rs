@@ -7,6 +7,7 @@ use super::api_logs::ApiLogs;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiSmartContractResult {
+    #[serde(default)]
     pub hash: String,
     pub nonce: u64,
     pub value: u128, // consider switching to BigUint if this proves insufficient
@@ -20,7 +21,7 @@ pub struct ApiSmartContractResult {
     pub gas_price: u64,
     pub call_type: CallType,
     pub relayer_address: Option<String>,
-    pub relayed_value: Option<String>,
+    pub relayed_value: Option<u128>,
     pub code: Option<String>,
     pub code_metadata: Option<String>,
     pub return_message: Option<String>,
