@@ -99,7 +99,7 @@ fn extract_data(event: &Events) -> Vec<Vec<u8>> {
     let mut out: Vec<Vec<u8>> = Vec::new();
     event
         .data
-        .for_each(|data_field| out.push(data_field.clone().into_bytes()));
+        .for_each(|data_field| out.push(data_field.to_string().into_bytes()));
     out
 }
 
