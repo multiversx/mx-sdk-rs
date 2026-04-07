@@ -26,7 +26,7 @@ pub use transaction_info::{TransactionInfo, TransactionInfoData};
 pub use transaction_on_network::TransactionOnNetwork;
 pub use transaction_process_status::{TransactionProcessStatus, TransactionProcessStatusData};
 pub use transaction_status::{TransactionStatus, TransactionStatusData};
-pub use tx_cost::{ResponseTxCost, TxCostResponseData};
+pub use tx_cost::{TxCostResponse, TxCostResponseData};
 
 #[cfg(test)]
 mod test {

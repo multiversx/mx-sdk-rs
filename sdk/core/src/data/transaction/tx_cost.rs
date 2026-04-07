@@ -8,10 +8,10 @@ pub struct TxCostResponseData {
     pub return_message: String,
 }
 
-// ResponseTxCost defines a response from the node holding the transaction cost
+// TxCostResponse defines a response from the node holding the transaction cost
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ResponseTxCost {
+pub struct TxCostResponse {
     pub data: Option<TxCostResponseData>,
     pub error: String,
     pub code: String,
