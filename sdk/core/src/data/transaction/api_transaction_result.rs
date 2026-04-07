@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 use super::api_logs::ApiLogs;
 use super::api_smart_contract_result::ApiSmartContractResult;
 
+/// Data transfer object which will be returned on the get transaction by hash endpoint.
+///
 /// Corresponds to [`ApiTransactionResult`](https://github.com/multiversx/mx-chain-core-go/blob/main/data/transaction/apiTransactionResult.go) in mx-chain-core-go.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]

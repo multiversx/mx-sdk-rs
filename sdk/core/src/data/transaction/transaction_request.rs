@@ -1,6 +1,8 @@
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
+/// Represents the structure that maps and validates user input for publishing a new transaction.
+///
 /// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
