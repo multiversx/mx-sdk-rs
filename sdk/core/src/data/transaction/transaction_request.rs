@@ -1,7 +1,9 @@
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
-// Transaction holds the fields of a transaction to be broadcasted to the network
+/// Represents the structure that maps and validates user input for publishing a new transaction.
+///
+/// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {
@@ -22,7 +24,7 @@ pub struct Transaction {
     pub options: u32,
 }
 
-/// This is only used for serialize
+/// This is only used for serialization.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(num: &u32) -> bool {
     *num == 0

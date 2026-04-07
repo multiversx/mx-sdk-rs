@@ -1,4 +1,4 @@
-use crate::data::transaction::{SendTransactionResponse, Transaction};
+use crate::data::transaction::{ResponseTransaction, Transaction};
 use anyhow::anyhow;
 
 use super::{GatewayRequest, GatewayRequestType, SEND_TRANSACTION_ENDPOINT};
@@ -8,7 +8,7 @@ pub struct SendTxRequest<'a>(pub &'a Transaction);
 
 impl GatewayRequest for SendTxRequest<'_> {
     type Payload = Transaction;
-    type DecodedJson = SendTransactionResponse;
+    type DecodedJson = ResponseTransaction;
     type Result = String;
 
     fn request_type(&self) -> GatewayRequestType {

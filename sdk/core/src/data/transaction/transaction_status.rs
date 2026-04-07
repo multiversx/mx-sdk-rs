@@ -1,14 +1,18 @@
 use serde::{Deserialize, Serialize};
 
+/// Defines a response from the node holding the transaction status.
+///
+/// Corresponds to [`ResponseTxStatus`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TransactionStatusData {
+pub struct ResponseTxStatus {
     pub status: String,
 }
 
-// TransactionStatus holds a transaction's status response from the network
+/// Response envelope for the `/transaction/{hash}/status` endpoint.
+/// The proxy constructs the data field inline; there is no named wrapper type in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionStatus {
     pub error: String,
     pub code: String,
-    pub data: Option<TransactionStatusData>,
+    pub data: Option<ResponseTxStatus>,
 }

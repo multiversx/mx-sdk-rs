@@ -1,32 +1,92 @@
 mod api_logs;
 mod api_smart_contract_result;
+mod api_transaction_result;
 mod arg_create_transaction;
 mod events;
+mod get_transaction_response;
 mod log_data;
-mod send_transaction;
-mod send_transactions;
+mod multiple_transactions;
 mod simulate_gas;
-mod transaction_info;
-mod transaction_on_network;
 mod transaction_process_status;
 mod transaction_request;
+mod transaction_response_data;
 mod transaction_status;
 mod tx_cost;
 
 pub use api_logs::ApiLogs;
 pub use api_smart_contract_result::ApiSmartContractResult;
+pub use api_transaction_result::ApiTransactionResult;
 pub use arg_create_transaction::ArgCreateTransaction;
 pub use events::Events;
+pub use get_transaction_response::{GetTransactionResponse, GetTransactionResponseData};
 pub use log_data::LogData;
-pub use send_transaction::{SendTransactionData, SendTransactionResponse};
-pub use send_transactions::{SendTransactionsResponse, SendTransactionsResponseData};
+pub use multiple_transactions::{MultipleTransactionsResponseData, ResponseMultipleTransactions};
 pub use simulate_gas::{SimulateGasTransactionData, SimulateGasTransactionResponse};
-pub use transaction_info::{TransactionInfo, TransactionInfoData};
-pub use transaction_on_network::TransactionOnNetwork;
-pub use transaction_process_status::{TransactionProcessStatus, TransactionProcessStatusData};
+pub use transaction_process_status::{ProcessStatusResponse, TransactionProcessStatus};
 pub use transaction_request::Transaction;
-pub use transaction_status::{TransactionStatus, TransactionStatusData};
-pub use tx_cost::{TxCostResponse, TxCostResponseData};
+pub use transaction_response_data::{ResponseTransaction, TransactionResponseData};
+pub use transaction_status::{ResponseTxStatus, TransactionStatus};
+pub use tx_cost::{ResponseTxCost, TxCostResponseData};
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ApiTransactionResult, matching the original Go implementation."
+)]
+pub type TransactionOnNetwork = ApiTransactionResult;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to GetTransactionResponse, matching the original Go implementation."
+)]
+pub type TransactionInfo = GetTransactionResponse;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to GetTransactionResponseData, matching the original Go implementation."
+)]
+pub type TransactionInfoData = GetTransactionResponseData;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ResponseTransaction, matching the original Go implementation."
+)]
+pub type SendTransactionResponse = ResponseTransaction;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to TransactionResponseData, matching the original Go implementation."
+)]
+pub type SendTransactionData = TransactionResponseData;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ResponseMultipleTransactions, matching the original Go implementation."
+)]
+pub type SendTransactionsResponse = ResponseMultipleTransactions;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to MultipleTransactionsResponseData, matching the original Go implementation."
+)]
+pub type SendTransactionsResponseData = MultipleTransactionsResponseData;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ResponseTxCost, matching the original Go implementation."
+)]
+pub type TxCostResponse = ResponseTxCost;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ResponseTxStatus, matching the original Go implementation."
+)]
+pub type TransactionStatusData = ResponseTxStatus;
+
+#[deprecated(
+    since = "0.16.0",
+    note = "Renamed to ProcessStatusResponse, matching the original Go implementation."
+)]
+pub type TransactionProcessStatusData = ProcessStatusResponse;
 
 #[cfg(test)]
 mod test {
@@ -174,7 +234,7 @@ mod test {
 }
         "#;
 
-        let transaction = serde_json::from_str::<TransactionInfo>(data).unwrap();
+        let transaction = serde_json::from_str::<GetTransactionResponse>(data).unwrap();
         assert_eq!(
             transaction.data.unwrap().transaction.hash.unwrap(),
             "34cd9c6d0f68c0975971352ed4dcaacc1acd9a2dbd8f5840a2866d09b1d72298"

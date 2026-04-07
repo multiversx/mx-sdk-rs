@@ -1,5 +1,5 @@
 use crate::sdk::{
-    data::transaction::{ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork},
+    data::transaction::{ApiLogs, ApiSmartContractResult, ApiTransactionResult, Events},
     utils::base64_decode,
 };
 use multiversx_sc_scenario::{
@@ -11,8 +11,8 @@ use multiversx_sc_scenario::{
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
-/// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
-pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> TxResponse {
+/// Creates a [`TxResponse`] from an [`ApiTransactionResult`].
+pub fn parse_tx_response(tx: ApiTransactionResult, return_code: ReturnCode) -> TxResponse {
     let tx_error = process_signal_error(&tx, return_code);
     if !tx_error.is_success() {
         return TxResponse {
@@ -25,7 +25,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> T
     process_success(&tx)
 }
 
-fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
+fn process_signal_error(tx: &ApiTransactionResult, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         if event.topics.len() >= 2 {
             let error_message = String::from_utf8(base64_decode(&event.topics[1])).expect(
@@ -38,7 +38,7 @@ fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> T
     TxResponseStatus::default()
 }
 
-fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
+fn process_success(tx: &ApiTransactionResult) -> TxResponse {
     TxResponse {
         out: process_out(tx),
         new_deployed_address: process_new_deployed_address(tx),
@@ -50,7 +50,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
     }
 }
 
-fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
+fn process_tx_hash(tx: &ApiTransactionResult) -> Option<H256> {
     tx.hash.as_ref().map(|encoded_hash| {
         let decoded = hex::decode(encoded_hash).expect("error decoding tx hash from hex");
         assert_eq!(decoded.len(), 32);
@@ -58,7 +58,7 @@ fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
     })
 }
 
-fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
+fn process_out(tx: &ApiTransactionResult) -> Vec<Vec<u8>> {
     let out_multi_transfer = tx.smart_contract_results.iter().find(is_multi_transfer);
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
@@ -78,7 +78,7 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     process_out_from_log(tx).unwrap_or_default()
 }
 
-fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
+fn process_logs(tx: &ApiTransactionResult) -> Vec<Log> {
     if let Some(api_logs) = &tx.logs {
         return api_logs
             .events
@@ -112,7 +112,7 @@ fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
         .collect()
 }
 
-fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
+fn process_out_from_log(tx: &ApiTransactionResult) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
@@ -127,7 +127,7 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     }
 }
 
-fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
+fn process_new_deployed_address(tx: &ApiTransactionResult) -> Option<Address> {
     if tx.processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
         return None;
     }
@@ -150,7 +150,7 @@ fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
     Some(Address::from(address))
 }
 
-fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<String> {
+fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<String> {
     let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
 
     for scr in tx.smart_contract_results.iter() {
@@ -202,7 +202,7 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
     None
 }
 
-fn find_log<'a>(tx: &'a TransactionOnNetwork, log_identifier: &str) -> Option<&'a Events> {
+fn find_log<'a>(tx: &'a ApiTransactionResult, log_identifier: &str) -> Option<&'a Events> {
     if let Some(logs) = &tx.logs {
         logs.events
             .iter()
