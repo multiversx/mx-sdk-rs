@@ -4,7 +4,7 @@ use multiversx_sdk::{
     data::{
         network_config::NetworkConfig,
         transaction::{
-            ArgCreateTransaction, Transaction, TransactionOnNetwork, TxCostResponseData,
+            ArgCreateTransaction, Transaction, ApiTransactionResult, TxCostResponseData,
         },
         vm::{VMQueryInput, VmValuesResponseData},
     },
@@ -23,7 +23,7 @@ impl GatewayHttpProxy {
     }
 
     // get_transaction_info retrieves a transaction's details from the network
-    pub async fn get_transaction_info(&self, hash: &str) -> Result<TransactionOnNetwork> {
+    pub async fn get_transaction_info(&self, hash: &str) -> Result<ApiTransactionResult> {
         self.http_request(GetTxInfo::new(hash)).await
     }
 
@@ -31,7 +31,7 @@ impl GatewayHttpProxy {
     pub async fn get_transaction_info_with_results(
         &self,
         hash: &str,
-    ) -> Result<TransactionOnNetwork> {
+    ) -> Result<ApiTransactionResult> {
         self.http_request(GetTxInfo::new(hash).with_results()).await
     }
 

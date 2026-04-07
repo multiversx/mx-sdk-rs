@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
 
 #[test]
 fn test_process_issued_token_identifier_fungible() {
@@ -199,7 +199,7 @@ fn test_process_issued_token_identifier_fungible() {
 }
       "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -358,7 +358,7 @@ fn test_process_issued_token_identifier_semi_fungible() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -614,7 +614,7 @@ fn test_process_issued_token_identifier_non_fungible() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -915,7 +915,7 @@ fn test_process_issued_token_identifier_meta_esdt() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -1148,7 +1148,7 @@ fn test_set_special_roles_should_not_process_issued_token_identifier() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -1410,7 +1410,7 @@ fn test_multisig_issue_nft_and_set_all_roles() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()

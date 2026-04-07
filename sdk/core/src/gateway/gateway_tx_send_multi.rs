@@ -1,4 +1,4 @@
-use crate::data::transaction::{SendTransactionsResponse, Transaction};
+use crate::data::transaction::{ResponseMultipleTransactions, Transaction};
 use anyhow::anyhow;
 use itertools::Itertools;
 
@@ -9,7 +9,7 @@ pub struct SendMultiTxRequest<'a>(pub &'a [Transaction]);
 
 impl GatewayRequest for SendMultiTxRequest<'_> {
     type Payload = [Transaction];
-    type DecodedJson = SendTransactionsResponse;
+    type DecodedJson = ResponseMultipleTransactions;
     type Result = Vec<String>;
 
     fn request_type(&self) -> GatewayRequestType {

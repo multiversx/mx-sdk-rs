@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
 
 #[test]
 fn test_with_tx_that_has_sc_result() {
@@ -247,7 +247,7 @@ fn test_with_tx_that_has_sc_result() {
             }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -335,7 +335,7 @@ fn test_with_tx_that_has_no_sc_result() {
             }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -453,7 +453,7 @@ fn test_tx_sc_results_with_no_data() {
   "code": "successful"
 }"#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()

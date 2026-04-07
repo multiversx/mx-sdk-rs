@@ -1,6 +1,6 @@
 use multiversx_chain_core::types::ReturnCode;
 use multiversx_sdk::{
-    data::transaction::{TransactionInfo, TransactionOnNetwork},
+    data::transaction::{GetTransactionResponse, ApiTransactionResult},
     retrieve_tx_on_network::{
         extract_message_from_string_reason, find_code_and_message, parse_reason,
         replace_with_error_message,
@@ -222,10 +222,10 @@ fn replace_logs_reason_with_message_test() {
     "options": 0
 }"#;
 
-    let mut tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
-    let expected_tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
+    let mut tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
+    let expected_tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
 
     replace_with_error_message(&mut tx, "out of funds");
     assert_eq!(
@@ -374,10 +374,10 @@ fn replace_logs_parse_empty_reason_test() {
 }
 "#;
 
-    let mut tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
-    let expected_tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
+    let mut tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
+    let expected_tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
 
     replace_with_error_message(&mut tx, "");
     assert_eq!(
@@ -711,10 +711,10 @@ fn replace_logs_parse_reason_test() {
     "options": 0
 }"#;
 
-    let mut tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
-    let expected_tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
+    let mut tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
+    let expected_tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
 
     replace_with_error_message(&mut tx, "caller is not a delegator");
     assert_eq!(
@@ -865,10 +865,10 @@ fn replace_logs_reason_sc_panic_test() {
     }
     "#;
 
-    let mut tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
-    let expected_tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
+    let mut tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
+    let expected_tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
     replace_with_error_message(&mut tx, &String::from_utf8(base64_decode("c3RvcmFnZSBkZWNvZGUgZXJyb3IgKGtleTogcG9vbENvbnRyYWN0AAAAAAAAAe+/vSk6IGlucHV0IHRvbyBzaG9ydA==")).unwrap());
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
@@ -1018,10 +1018,10 @@ fn replace_logs_reason_invalid_test() {
 }
 "#;
 
-    let mut tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(tx_str).unwrap();
-    let expected_tx: TransactionOnNetwork =
-        serde_json::from_str::<TransactionOnNetwork>(expected_tx_str).unwrap();
+    let mut tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
+    let expected_tx: ApiTransactionResult =
+        serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
     replace_with_error_message(&mut tx, "invalid function (not found)");
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
@@ -1033,7 +1033,7 @@ fn replace_logs_reason_invalid_test() {
 fn tx_with_large_scr_value() {
     let tx_str = include_str!("tx_with_large_scr_value.json");
 
-    let tx_info = serde_json::from_str::<TransactionInfo>(tx_str).unwrap();
+    let tx_info = serde_json::from_str::<GetTransactionResponse>(tx_str).unwrap();
 
     let scr_with_large_value = &tx_info.data.unwrap().transaction.smart_contract_results[5];
     assert!(scr_with_large_value.value > u64::MAX as u128);

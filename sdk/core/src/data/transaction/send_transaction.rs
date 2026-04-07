@@ -1,15 +1,16 @@
 use serde::{Deserialize, Serialize};
 
+/// Corresponds to [`TransactionResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SendTransactionData {
+pub struct TransactionResponseData {
     pub tx_hash: String,
 }
 
-// SendTransactionResponse holds the response received from the network when broadcasting a transaction
+/// Corresponds to [`ResponseTransaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SendTransactionResponse {
+pub struct ResponseTransaction {
     pub error: String,
     pub code: String,
-    pub data: Option<SendTransactionData>,
+    pub data: Option<TransactionResponseData>,
 }

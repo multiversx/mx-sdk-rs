@@ -1,4 +1,4 @@
-use crate::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use crate::data::transaction::{GetTransactionResponse, ApiTransactionResult};
 use anyhow::anyhow;
 
 use super::{
@@ -29,8 +29,8 @@ impl<'a> GetTxInfo<'a> {
 
 impl GatewayRequest for GetTxInfo<'_> {
     type Payload = ();
-    type DecodedJson = TransactionInfo;
-    type Result = TransactionOnNetwork;
+    type DecodedJson = GetTransactionResponse;
+    type Result = ApiTransactionResult;
 
     fn request_type(&self) -> GatewayRequestType {
         GatewayRequestType::Get

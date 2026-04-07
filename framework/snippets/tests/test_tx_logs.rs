@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
-use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
 
 #[test]
 fn test_tx_multiple_logs() {
@@ -105,7 +105,7 @@ fn test_tx_multiple_logs() {
   "code": "successful"
 }"#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()

@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::{Address, ReturnCode};
 use multiversx_sc_snippets::network_response;
-use multiversx_sc_snippets::sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
+use multiversx_sc_snippets::sdk::data::transaction::{GetTransactionResponse, ApiTransactionResult};
 
 #[test]
 fn test_deployed_address() {
@@ -48,7 +48,7 @@ fn test_deployed_address() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()
@@ -117,7 +117,7 @@ fn test_deployed_address_should_be_none_if_not_a_sc_deployment_tx() {
 }
         "#;
 
-    let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+    let tx_on_network: ApiTransactionResult = serde_json::from_str::<GetTransactionResponse>(data)
         .unwrap()
         .data
         .unwrap()

@@ -1,17 +1,18 @@
 use serde::{Deserialize, Serialize};
 
-use super::transaction_on_network::TransactionOnNetwork;
+use super::transaction_on_network::ApiTransactionResult;
 
+/// Corresponds to [`GetTransactionResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TransactionInfoData {
-    pub transaction: TransactionOnNetwork,
+pub struct GetTransactionResponseData {
+    pub transaction: ApiTransactionResult,
 }
 
-// TransactionInfo holds a transaction info response from the network
+/// Corresponds to [`GetTransactionResponse`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TransactionInfo {
+pub struct GetTransactionResponse {
     #[serde(default)]
     pub error: String,
     pub code: String,
-    pub data: Option<TransactionInfoData>,
+    pub data: Option<GetTransactionResponseData>,
 }

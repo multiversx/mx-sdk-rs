@@ -1,4 +1,4 @@
-use crate::data::transaction::{Transaction, TxCostResponse, TxCostResponseData};
+use crate::data::transaction::{Transaction, ResponseTxCost, TxCostResponseData};
 use anyhow::anyhow;
 
 use super::{COST_TRANSACTION_ENDPOINT, GatewayRequest, GatewayRequestType};
@@ -10,7 +10,7 @@ pub struct GetTxCost<'a>(pub &'a Transaction);
 
 impl GatewayRequest for GetTxCost<'_> {
     type Payload = Transaction;
-    type DecodedJson = TxCostResponse;
+    type DecodedJson = ResponseTxCost;
     type Result = TxCostResponseData;
 
     fn request_type(&self) -> GatewayRequestType {

@@ -1,7 +1,7 @@
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
-// Transaction holds the fields of a transaction to be broadcasted to the network
+/// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/main/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Transaction {

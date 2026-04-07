@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 use super::api_logs::ApiLogs;
 use super::api_smart_contract_result::ApiSmartContractResult;
 
-// TransactionOnNetwork holds a transaction's info entry in a hyper block
+/// Corresponds to [`ApiTransactionResult`](https://github.com/multiversx/mx-chain-core-go/blob/main/data/transaction/apiTransactionResult.go) in mx-chain-core-go.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct TransactionOnNetwork {
+pub struct ApiTransactionResult {
     #[serde(rename = "type")]
     pub kind: String,
     pub hash: Option<String>,
