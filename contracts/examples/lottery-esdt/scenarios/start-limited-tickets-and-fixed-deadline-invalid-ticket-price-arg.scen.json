@@ -29,7 +29,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Ticket price must be higher than 0!",
+                "message": "str:ticket price must be higher than 0",
                 "gas": "*",
                 "refund": "*"
             }

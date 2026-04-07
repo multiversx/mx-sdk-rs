@@ -10,7 +10,7 @@ pub trait ClaimModule: storage::StorageModule {
         let caller_id = self.address_to_id_mapper().get_id_or_insert(&caller);
         require!(
             !self.user_accumulated_token_rewards(&caller_id).is_empty(),
-            "You have no rewards to claim"
+            "no rewards to claim"
         );
 
         let mut accumulated_rewards = PaymentVec::new();
@@ -43,7 +43,7 @@ pub trait ClaimModule: storage::StorageModule {
         for token_id in self.user_accumulated_token_rewards(caller_id).iter() {
             require!(
                 !self.accumulated_rewards(&token_id, caller_id).is_empty(),
-                "Internal error: token in reward set has no balance"
+                "internal error: token in reward set has no balance"
             );
             all_tokens.push(token_id);
         }

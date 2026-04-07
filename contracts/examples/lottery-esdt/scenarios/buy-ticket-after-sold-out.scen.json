@@ -40,7 +40,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Lottery entry period has ended! Awaiting winner announcement.",
+                "message": "str:lottery entry period has ended! awaiting winner announcement.",
                 "gas": "*",
                 "refund": "*"
             }

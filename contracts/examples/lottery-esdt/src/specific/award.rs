@@ -14,12 +14,12 @@ pub trait AwardingModule: views::ViewsModule + storage::StorageModule + utils::U
         let caller_shard = self.blockchain().get_shard_of_address(&caller);
         require!(
             sc_address_shard != caller_shard,
-            "Caller needs to be on a remote shard"
+            "caller needs to be on a remote shard"
         );
 
         match self.status(&lottery_name) {
-            Status::Inactive => sc_panic!("Lottery is inactive!"),
-            Status::Running => sc_panic!("Lottery is still running!"),
+            Status::Inactive => sc_panic!("lottery is inactive"),
+            Status::Running => sc_panic!("lottery is still running"),
             Status::Ended => self.handle_awarding(&lottery_name),
         }
     }

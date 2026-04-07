@@ -40,7 +40,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:You are not allowed to participate in this lottery!",
+                "message": "str:you are not allowed to participate in this lottery",
                 "gas": "*",
                 "refund": "*"
             }

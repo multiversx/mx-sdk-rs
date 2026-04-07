@@ -40,7 +40,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Ticket limit exceeded for this lottery!",
+                "message": "str:ticket limit exceeded for this lottery",
                 "gas": "*",
                 "refund": "*"
             }

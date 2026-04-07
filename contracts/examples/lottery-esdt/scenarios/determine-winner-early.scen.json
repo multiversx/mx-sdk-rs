@@ -50,7 +50,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:Lottery is still running!",
+                "message": "str:lottery is still running",
                 "gas": "*",
                 "refund": "*"
             }
