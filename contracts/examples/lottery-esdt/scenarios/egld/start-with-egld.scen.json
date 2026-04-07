@@ -61,7 +61,7 @@
                     "balance": "0",
                     "storage": {
                         "str:lotteryInfo|nested:str:egld_lottery": {
-                            "0-token_identifier": "nested:str:EGLD-000000",
+                            "0-token_id": "nested:str:EGLD-000000",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:123,456",

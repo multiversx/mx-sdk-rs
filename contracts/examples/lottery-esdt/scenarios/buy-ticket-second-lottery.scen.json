@@ -75,7 +75,7 @@
                     },
                     "storage": {
                         "str:lotteryInfo|nested:str:lottery_name": {
-                            "0-token_identifier": "nested:str:LOTTERY-123456",
+                            "0-token_id": "nested:str:LOTTERY-123456",
                             "1-ticket_price": "biguint:100",
                             "2-tickets-left": "u32:2",
                             "3-deadline": "u64:123,456",
@@ -85,7 +85,7 @@
                             "7-unawarded_amount": "biguint:0"
                         },
                         "str:lotteryInfo|nested:str:lottery_$$$$": {
-                            "0-token_identifier": "nested:str:LOTTO-123456",
+                            "0-token_id": "nested:str:LOTTO-123456",
                             "1-ticket_price": "biguint:500",
                             "2-tickets-left": "u32:4",
                             "3-deadline": "u64:234,567",
