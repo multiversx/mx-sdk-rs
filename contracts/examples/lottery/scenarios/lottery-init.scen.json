@@ -35,7 +35,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "mxsc:../output/lottery-esdt.mxsc.json",
+                "contractCode": "mxsc:../output/lottery.mxsc.json",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -74,7 +74,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }

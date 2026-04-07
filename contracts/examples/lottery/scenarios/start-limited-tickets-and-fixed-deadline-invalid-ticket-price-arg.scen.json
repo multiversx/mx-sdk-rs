@@ -61,7 +61,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }

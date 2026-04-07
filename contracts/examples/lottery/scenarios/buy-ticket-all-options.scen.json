@@ -90,7 +90,7 @@
                         "str:addressToIdMapper|str:addrId|u64:1": "address:my_address",
                         "+": ""
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }

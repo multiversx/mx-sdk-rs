@@ -101,7 +101,7 @@
                         "str:addressToIdMapper|str:addr|address:acc1": "1",
                         "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }

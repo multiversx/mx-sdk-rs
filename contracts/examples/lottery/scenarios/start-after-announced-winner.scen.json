@@ -79,7 +79,7 @@
                             "7-unawarded_amount": "biguint:0"
                         }
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }

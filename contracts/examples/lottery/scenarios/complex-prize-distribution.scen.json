@@ -115,7 +115,7 @@
                         "str:addressToIdMapper|str:addr|address:acc10": "01",
                         "str:addressToIdMapper|str:addrId|u64:10": "address:acc10"
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             },
             "currentBlockInfo": {
@@ -206,7 +206,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "mxsc:../output/lottery.mxsc.json"
                 }
             }
         }
