@@ -6,10 +6,10 @@ mod log_data;
 mod send_transaction;
 mod send_transactions;
 mod simulate_gas;
-mod transaction;
 mod transaction_info;
 mod transaction_on_network;
 mod transaction_process_status;
+mod transaction_request;
 mod transaction_status;
 mod tx_cost;
 
@@ -21,10 +21,10 @@ pub use log_data::LogData;
 pub use send_transaction::{SendTransactionData, SendTransactionResponse};
 pub use send_transactions::{SendTransactionsResponse, SendTransactionsResponseData};
 pub use simulate_gas::{SimulateGasTransactionData, SimulateGasTransactionResponse};
-pub use transaction::Transaction;
 pub use transaction_info::{TransactionInfo, TransactionInfoData};
 pub use transaction_on_network::TransactionOnNetwork;
 pub use transaction_process_status::{TransactionProcessStatus, TransactionProcessStatusData};
+pub use transaction_request::Transaction;
 pub use transaction_status::{TransactionStatus, TransactionStatusData};
 pub use tx_cost::{TxCostResponse, TxCostResponseData};
 
