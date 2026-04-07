@@ -86,16 +86,15 @@ fn get_mut_lottery_info(lottery_name: &Vec<u8>) -> mut_storage!(LotteryInfo<Self
 *LotteryInfo* is a struct, with its definition as follows:
 
 ```
-pub struct LotteryInfo<BigUint:BigUintApi> {
-    pub token_identifier: Vec<u8>
-    pub ticket_price: BigUint,
-    pub tickets_left: u32,
-    pub deadline: u64,
-    pub max_entries_per_user: u32,
-    pub prize_distribution: Vec<u8>,
-    pub whitelist: Vec<Address>,
-    pub current_ticket_number: u32,
-    pub prize_pool: BigUint
+pub struct LotteryInfo<M: ManagedTypeApi> {
+    pub token_id: TokenId<M>,
+    pub ticket_price: BigUint<M>,
+    pub tickets_left: usize,
+    pub deadline: TimestampMillis,
+    pub max_entries_per_user: usize,
+    pub prize_distribution: ManagedVec<M, u8>,
+    pub prize_pool: BigUint<M>,
+    pub unawarded_amount: BigUint<M>,
 }
 ```
 
