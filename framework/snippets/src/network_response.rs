@@ -11,7 +11,7 @@ use multiversx_sc_scenario::{
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
-/// Creates a [`TxResponse`] from a [`ApiTransactionResult`].
+/// Creates a [`TxResponse`] from an [`ApiTransactionResult`].
 pub fn parse_tx_response(tx: ApiTransactionResult, return_code: ReturnCode) -> TxResponse {
     let tx_error = process_signal_error(&tx, return_code);
     if !tx_error.is_success() {

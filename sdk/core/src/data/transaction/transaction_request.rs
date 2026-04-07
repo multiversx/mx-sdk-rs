@@ -24,7 +24,7 @@ pub struct Transaction {
     pub options: u32,
 }
 
-/// This is only used for serialize
+/// This is only used for serialization.
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_zero(num: &u32) -> bool {
     *num == 0

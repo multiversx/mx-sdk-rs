@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::api_transaction_result::ApiTransactionResult;
 
-/// Follows the format of the data field of get transaction response.
+/// Follows the format of the data field of a get transaction response.
 ///
 /// Corresponds to [`GetTransactionResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]

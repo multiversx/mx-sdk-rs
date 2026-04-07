@@ -9,7 +9,7 @@ pub struct TransactionResponseData {
     pub tx_hash: String,
 }
 
-/// Defines a response tx holding the resulting hash.
+/// Response envelope holding the resulting transaction hash.
 ///
 /// Corresponds to [`ResponseTransaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
