@@ -41,8 +41,9 @@ fn validate_endpoint_var_args_number(endpoint_abi: &EndpointAbi) -> Result<(), S
         .count();
     if num_var_args > 1usize && !endpoint_abi.allow_multiple_var_args {
         return Err(format!(
-        "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
-        &endpoint_abi.rust_method_name));
+            "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
+            &endpoint_abi.rust_method_name
+        ));
     }
 
     Ok(())
@@ -56,7 +57,8 @@ fn validate_endpoint_var_args_order(endpoint_abi: &EndpointAbi) -> Result<(), St
         } else if var_args_encountered {
             return Err(format!(
                 "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
-                &endpoint_abi.rust_method_name));
+                &endpoint_abi.rust_method_name
+            ));
         }
     }
 
@@ -86,9 +88,13 @@ mod tests {
         endpoint_def.inputs.push(var_arg_2);
 
         assert!(!endpoint_def.allow_multiple_var_args);
-        assert_eq!(Err(format!(
-        "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
-        &endpoint_def.rust_method_name)), validate_endpoint_var_args_number(&endpoint_def));
+        assert_eq!(
+            Err(format!(
+                "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
+                &endpoint_def.rust_method_name
+            )),
+            validate_endpoint_var_args_number(&endpoint_def)
+        );
 
         endpoint_def.allow_multiple_var_args = true;
         assert_eq!(Ok(()), validate_endpoint_var_args_number(&endpoint_def));
@@ -110,9 +116,13 @@ mod tests {
 
         endpoint_def.inputs.push(var_arg_1.clone());
         endpoint_def.inputs.push(arg.clone());
-        assert_eq!(Err(format!(
-            "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
-            &endpoint_def.rust_method_name)), validate_endpoint_var_args_order(&endpoint_def));
+        assert_eq!(
+            Err(format!(
+                "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
+                &endpoint_def.rust_method_name
+            )),
+            validate_endpoint_var_args_order(&endpoint_def)
+        );
 
         endpoint_def.inputs.clear();
 

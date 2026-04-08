@@ -1,7 +1,7 @@
 use crate::{
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::VMAddress,
+    types::Address,
 };
 
 pub trait BuiltinFunction {
@@ -33,7 +33,7 @@ pub trait BuiltinFunction {
 /// Contains a builtin function call ESDT transfers (if any) and the real recipient of the transfer
 /// (can be different from the "to" field.)
 pub struct BuiltinFunctionEsdtTransferInfo {
-    pub real_recipient: VMAddress,
+    pub real_recipient: Address,
     pub transfers: Vec<TxTokenTransfer>,
 }
 

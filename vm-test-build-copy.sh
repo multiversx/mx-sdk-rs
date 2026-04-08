@@ -17,6 +17,7 @@ build_and_copy() {
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    rm $vm_contract_path/output/*.wasm
+   rm $vm_contract_path/output/*-dbg.mxsc.json
 }
 
 build_and_copy_with_scenarios() {
@@ -30,11 +31,13 @@ build_and_copy_with_scenarios() {
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    rm $vm_contract_path/output/*.wasm
+   rm $vm_contract_path/output/*-dbg.mxsc.json
 
    # copying scenarios ...
    rsync -av \
       $contract_path/scenarios/ \
       $vm_contract_path/scenarios/
+   rm $vm_contract_path/scenarios/should-panic*.scen.json # these are Rust testing framework tests
 }
 
 # building all contracts takes a lot of time, only the ones for the wasm-vm tests are built below
@@ -53,6 +56,7 @@ build_and_copy_with_scenarios ./contracts/feature-tests/basic-features $VM_REPO_
 build_and_copy_with_scenarios ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
 build_and_copy_with_scenarios ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
 build_and_copy_with_scenarios ./contracts/feature-tests/formatted-message-features $VM_REPO_PATH/test/features/formatted-message-features
+build_and_copy_with_scenarios ./contracts/feature-tests/panic-message-features $VM_REPO_PATH/test/features/panic-message-features
 build_and_copy_with_scenarios ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features
 build_and_copy_with_scenarios ./contracts/feature-tests/esdt-system-sc-mock $VM_REPO_PATH/test/features/esdt-system-sc-mock
 
@@ -73,7 +77,6 @@ build_and_copy ./contracts/feature-tests/composability/forwarder-raw         $VM
 build_and_copy ./contracts/feature-tests/composability/proxy-test-first      $VM_REPO_PATH/test/features/composability/proxy-test-first
 build_and_copy ./contracts/feature-tests/composability/proxy-test-second     $VM_REPO_PATH/test/features/composability/proxy-test-second
 build_and_copy ./contracts/feature-tests/composability/recursive-caller      $VM_REPO_PATH/test/features/composability/recursive-caller
-build_and_copy ./contracts/feature-tests/composability/promises-features     $VM_REPO_PATH/test/features/composability/promises-features
 build_and_copy ./contracts/feature-tests/composability/vault                 $VM_REPO_PATH/test/features/composability/vault
 
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*

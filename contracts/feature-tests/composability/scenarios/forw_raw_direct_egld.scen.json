@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -27,7 +26,7 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "forward_payment",
+                "function": "forward_direct_transfer",
                 "arguments": [
                     "sc:vault"
                 ],

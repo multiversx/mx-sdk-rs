@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -85,6 +84,16 @@
                             "str:ESDTTransfer",
                             "str:TEST-TOKENA",
                             "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:async_callback"
+                        ],
+                        "data": [
+                            ""
                         ]
                     },
                     {

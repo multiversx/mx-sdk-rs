@@ -4,24 +4,24 @@ use crate::{
     abi::TypeAbiFrom,
     codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        ManagedVec, OriginalResultMarker, Tx, TxScEnv,
+        ESDTSystemSCAddress, EgldPayment, FunctionCall, ManagedVec, OriginalResultMarker, Tx,
+        TxScEnv, system_proxy::ESDTSystemSCProxy,
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -29,16 +29,58 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
+        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenIdentifier, EsdtTokenPayment,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         system_proxy::{
             MetaTokenProperties, NonFungibleTokenProperties, SemiFungibleTokenProperties,
         },
-        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
-const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible issue";
+const INVALID_TOKEN_TYPE_ERR_MSG: &str = "Invalid token type for NonFungible issue";
 
+/// High-level mapper for non-fungible, semi-fungible, and meta-fungible ESDT tokens.
+/// Provides comprehensive NFT/SFT lifecycle management including issuance, creation,
+/// minting, burning, and attribute management.
+///
+/// # Storage Layout
+///
+/// The mapper stores the token state at the base key:
+/// - `base_key` → `TokenMapperState<SA>` (NotSet | Pending | Token(EsdtTokenIdentifier))
+///
+/// # Main Operations
+///
+/// ## Token Lifecycle
+/// - **Issue**: Create new NFT/SFT collection via `issue()` or `issue_and_set_all_roles()`
+/// - **Set ID**: Manually set token ID with `set_token_id()` for existing collections
+/// - **Query**: Check token state with `is_empty()`, `get_token_id()`, etc.
+///
+/// ## NFT Operations
+/// - **Create**: Mint new NFTs with `nft_create()` or `nft_create_named()`
+/// - **Add Quantity**: Increase SFT supply with `nft_add_quantity()`
+/// - **Update**: Modify NFT attributes with `nft_update_attributes()`
+/// - **Burn**: Destroy NFT/SFT with `nft_burn()`
+/// - **Transfer**: Send tokens with `send_payment()`
+///
+/// ## Token Management
+/// - **Roles**: Manage collection roles with `set_local_roles()`
+/// - **Balance**: Query token balance with `get_balance()`
+/// - **Metadata**: Retrieve token data with `get_all_token_data()`, `get_token_attributes()`
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Supports all non-fungible token types (NFT, SFT, MetaFungible)
+/// - Complete NFT lifecycle in one mapper
+/// - Built-in metadata and attribute management
+/// - Automatic nonce handling
+/// - Payment validation utilities
+///
+/// **Limitations:**
+/// - Single collection per mapper instance
+/// - Requires careful callback implementation for issuance
+/// - Token creation requires local roles
+/// - Attribute updates limited by protocol
 pub type IssueCallTo<Api> = Tx<
     TxScEnv<Api>,
     (),
@@ -46,7 +88,7 @@ pub type IssueCallTo<Api> = Tx<
     EgldPayment<Api>,
     (),
     FunctionCall<Api>,
-    OriginalResultMarker<TokenIdentifier<Api>>,
+    OriginalResultMarker<EsdtTokenIdentifier<Api>>,
 >;
 
 pub struct NonFungibleTokenMapper<SA, A = CurrentStorage>
@@ -125,14 +167,14 @@ where
         let contract_call = match token_type {
             EsdtTokenType::NonFungible => {
                 Self::nft_issue(issue_cost, token_display_name, token_ticker)
-            },
+            }
             EsdtTokenType::SemiFungible => {
                 Self::sft_issue(issue_cost, token_display_name, token_ticker)
-            },
-            EsdtTokenType::Meta => {
+            }
+            EsdtTokenType::MetaFungible => {
                 Self::meta_issue(issue_cost, token_display_name, token_ticker, num_decimals)
-            },
-            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
+            }
+            _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes()),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
@@ -169,7 +211,7 @@ where
         self.check_not_set();
 
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
-            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
+            SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG.as_bytes());
         }
 
         let callback = match opt_callback {
@@ -346,12 +388,12 @@ where
             .transfer();
     }
 
-    pub fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_token_id(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         self.store_token_id(&token_id);
         self.token_state = TokenMapperState::Token(token_id);
     }
 
-    pub fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_if_empty(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         if self.is_empty() {
             self.set_token_id(token_id);
         }
@@ -383,7 +425,7 @@ where
             .async_call_and_exit()
     }
 
-    pub(crate) fn store_token_id(&self, token_id: &TokenIdentifier<SA>) {
+    pub(crate) fn store_token_id(&self, token_id: &EsdtTokenIdentifier<SA>) {
         if self.get_token_state().is_set() {
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
         }
@@ -431,13 +473,13 @@ where
     pub(crate) fn check_not_set(&self) {
         let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
         match storage_value {
-            TokenMapperState::NotSet => {},
+            TokenMapperState::NotSet => {}
             TokenMapperState::Pending => {
                 SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-            },
+            }
             TokenMapperState::Token(_) => {
                 SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-            },
+            }
         }
     }
 
@@ -451,7 +493,7 @@ where
         }
     }
 
-    pub fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+    pub fn require_same_token(&self, expected_token_id: &EsdtTokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
@@ -467,7 +509,7 @@ where
         }
     }
 
-    pub fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
+    pub fn get_storage_key(&self) -> crate::types::ManagedRef<'_, SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 
@@ -475,7 +517,7 @@ where
         self.token_state.clone()
     }
 
-    pub fn get_token_id(&self) -> TokenIdentifier<SA> {
+    pub fn get_token_id(&self) -> EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token.clone()
         } else {
@@ -483,7 +525,7 @@ where
         }
     }
 
-    pub fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+    pub fn get_token_id_ref(&self) -> &EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token
         } else {
@@ -520,7 +562,7 @@ where
     }
 }
 
-impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
@@ -534,15 +576,15 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TokenIdentifier::<SA>::type_name()
+        EsdtTokenIdentifier::<SA>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        TokenIdentifier::<SA>::type_name_rust()
+        EsdtTokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+        EsdtTokenIdentifier::<SA>::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {

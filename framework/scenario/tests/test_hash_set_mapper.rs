@@ -1,7 +1,7 @@
 use multiversx_sc::{
     storage::{
-        mappers::{SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress},
         StorageKey,
+        mappers::{SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress},
     },
     types::ManagedAddress,
 };

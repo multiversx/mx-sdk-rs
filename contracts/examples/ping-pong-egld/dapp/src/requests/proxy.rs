@@ -193,7 +193,7 @@ where
     }
 
     /// Block timestamp of the block where the contract got activated. 
-    /// If not specified in the constructor it is the the deploy block timestamp. 
+    /// If not specified in the constructor it is the deploy block timestamp. 
     pub fn activation_timestamp(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {

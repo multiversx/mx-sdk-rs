@@ -29,9 +29,9 @@ pub struct BondingCurve<
 }
 
 impl<
-        M: ManagedTypeApi,
-        T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
-    > BondingCurve<M, T>
+    M: ManagedTypeApi,
+    T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+> BondingCurve<M, T>
 {
     pub fn payment_token(&self) -> EgldOrEsdtTokenIdentifier<M> {
         self.payment.token_identifier.clone()

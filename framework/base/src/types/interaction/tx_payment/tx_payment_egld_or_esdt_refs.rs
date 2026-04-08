@@ -1,6 +1,9 @@
-use crate::types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, TxFrom, TxToSpecified},
+};
 
-use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{Egld, FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EgldOrEsdtTokenPaymentRefs<'_, Env::Api>
 where
@@ -10,7 +13,23 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.map_egld_or_esdt(
+            fc,
+            |fc, amount| Egld(amount).perform_transfer_execute_fallible(env, to, gas_limit, fc),
+            |fc, esdt_payment| {
+                esdt_payment.perform_transfer_execute_fallible(env, to, gas_limit, fc)
+            },
+        )
+    }
+
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -19,8 +38,8 @@ where
     ) {
         self.map_egld_or_esdt(
             fc,
-            |fc, amount| Egld(amount).perform_transfer_execute(env, to, gas_limit, fc),
-            |fc, esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
+            |fc, amount| Egld(amount).perform_transfer_execute_legacy(env, to, gas_limit, fc),
+            |fc, esdt_payment| esdt_payment.perform_transfer_execute_legacy(env, to, gas_limit, fc),
         )
     }
 
@@ -44,11 +63,11 @@ where
         )
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
         self.map_egld_or_esdt(
             (),
-            |(), amount| TxPayment::<Env>::into_full_payment_data(Egld(amount), env),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
+            |(), amount| TxPayment::<Env>::into_scenario_payments(Egld(amount), env),
+            |(), esdt_payment| TxPayment::<Env>::into_scenario_payments(esdt_payment, env),
         )
     }
 }

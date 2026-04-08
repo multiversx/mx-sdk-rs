@@ -13,10 +13,6 @@ fn world() -> ScenarioWorld {
         "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
     );
-    blockchain.register_contract(
-        "mxsc:output/basic-features-crypto.mxsc.json",
-        basic_features::ContractBuilder,
-    );
 
     blockchain
 }
@@ -34,6 +30,29 @@ fn big_int_to_i_64_rs() {
 #[test]
 fn big_num_conversions_rs() {
     world().run("scenarios/big_num_conversions.scen.json");
+}
+
+#[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
+fn big_num_ops_arith_rs() {
+    world().run("scenarios/big_num_ops_arith.scen.json");
+}
+
+#[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
+fn big_num_ops_bitwise_rs() {
+    world().run("scenarios/big_num_ops_bitwise.scen.json");
+}
+
+#[test]
+fn big_num_ops_cmp_rs() {
+    world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
+fn big_num_ops_shift_rs() {
+    world().run("scenarios/big_num_ops_shift.scen.json");
 }
 
 #[test]
@@ -64,6 +83,17 @@ fn big_uint_to_u_64_rs() {
 #[test]
 fn block_info_rs() {
     world().run("scenarios/block_info.scen.json");
+}
+
+#[test]
+fn block_info_ms_rs() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn code_hash_rs() {
+    world().run("scenarios/code_hash.scen.json");
 }
 
 #[test]
@@ -99,19 +129,16 @@ fn crypto_sha_256_rs() {
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_rs() {
     world().run("scenarios/crypto_verify_bls.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_aggregated_signature_rs() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore]
 fn crypto_verify_bls_share_rs() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
@@ -191,6 +218,11 @@ fn echo_managed_vec_rs() {
 #[test]
 fn echo_multi_value_tuples_rs() {
     world().run("scenarios/echo_multi_value_tuples.scen.json");
+}
+
+#[test]
+fn echo_non_zero_big_uint_rs() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
 }
 
 #[test]
@@ -320,6 +352,21 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn mmap_get_rs() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_rs() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_rs() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_rs() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -357,14 +404,14 @@ fn sc_properties_rs() {
 }
 
 #[test]
-fn small_num_overflow_rs() {
-    world().run("scenarios/small_num_overflow.scen.json");
-}
-
-#[test]
 #[ignore = "unsupported"]
 fn send_esdt_to_nonexisting_account_rs() {
     world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+}
+
+#[test]
+fn small_num_overflow_rs() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -395,6 +442,12 @@ fn storage_i_64_rs() {
 #[test]
 fn storage_i_64_bad_rs() {
     world().run("scenarios/storage_i64_bad.scen.json");
+}
+
+#[test]
+#[ignore = "requires the small-int-bug feature to reproduce"]
+fn storage_i_64_bug_rs() {
+    world().run("scenarios/storage_i64_bug.scen.json");
 }
 
 #[test]
@@ -480,16 +533,6 @@ fn storage_mapper_single_value_rs() {
 }
 
 #[test]
-fn storage_mapper_timelock_rs() {
-    world().run("scenarios/timelock_mapper.scen.json");
-}
-
-#[test]
-fn storage_mapper_timelock_at_address_rs() {
-    world().run("scenarios/timelock_mapper_at_address.scen.json");
-}
-
-#[test]
 fn storage_mapper_token_attributes_rs() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }
@@ -547,4 +590,14 @@ fn storage_usize_bad_rs() {
 #[test]
 fn struct_eq_rs() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_rs() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_rs() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

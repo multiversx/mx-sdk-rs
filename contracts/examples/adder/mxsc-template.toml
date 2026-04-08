@@ -16,6 +16,7 @@ files_include = [
     "README.md",
     "sc-config.toml",
     "multiversx.json",
+    "wasm/Cargo.lock",
     "interactor/Cargo.toml",
     "interactor/config.toml",
     "interactor/.gitignore",

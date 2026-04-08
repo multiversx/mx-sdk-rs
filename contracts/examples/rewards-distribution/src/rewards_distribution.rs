@@ -105,7 +105,7 @@ pub trait RewardsDistribution:
             OperationCompletionStatus::Completed => {
                 self.completed_raffle_id_count().set(raffle.raffle_id + 1);
                 None
-            },
+            }
         };
 
         self.raffle_progress().set(raffle_progress);
@@ -279,9 +279,15 @@ pub trait RewardsDistribution:
             }
         }
 
-        self.tx().to(&caller).egld(total_egld_reward).transfer();
-        self.tx().to(&caller).payment(rewards).transfer();
-        self.tx().to(&caller).payment(nfts).transfer();
+        self.tx()
+            .to(&caller)
+            .egld(total_egld_reward)
+            .transfer_if_not_empty();
+        self.tx()
+            .to(&caller)
+            .payment(rewards)
+            .transfer_if_not_empty();
+        self.tx().to(&caller).payment(nfts).transfer_if_not_empty();
     }
 
     fn claim_reward_token(
@@ -419,7 +425,7 @@ pub trait RewardsDistribution:
 
     #[view(getNftTokenId)]
     #[storage_mapper("nftTokenIdentifier")]
-    fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn nft_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 
     #[storage_mapper("tickets")]
     fn tickets(&self, position: u64) -> SingleValueMapper<u64>;
@@ -432,17 +438,9 @@ pub trait RewardsDistribution:
 }
 
 fn ticket_to_storage(position: u64, ticket_id: u64) -> u64 {
-    if position == ticket_id {
-        0
-    } else {
-        ticket_id
-    }
+    if position == ticket_id { 0 } else { ticket_id }
 }
 
 fn ticket_from_storage(position: u64, ticket_id: u64) -> u64 {
-    if ticket_id == 0 {
-        position
-    } else {
-        ticket_id
-    }
+    if ticket_id == 0 { position } else { ticket_id }
 }

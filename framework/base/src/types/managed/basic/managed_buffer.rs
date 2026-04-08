@@ -1,21 +1,22 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, RawHandle, StaticVarApiImpl,
+        ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi,
+        RawHandle, StaticVarApiImpl, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
         TryStaticCast,
     },
+    err_msg,
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
-        SCLowerHex,
+        FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+        hex_util::encode_bytes_as_hex,
     },
     types::{
-        heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedRef, ManagedRefMut, ManagedType,
-        StaticBufferRef,
+        ManagedBufferCachedBuilder, ManagedRef, ManagedRefMut, ManagedType, StaticBufferRef,
+        heap::BoxedBytes,
     },
 };
 
@@ -84,9 +85,11 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        let new_handle: M::ManagedBufferHandle =
-            use_raw_handle(M::static_var_api_impl().next_handle());
-        ManagedBuffer::from_handle(new_handle)
+        unsafe {
+            let new_handle: M::ManagedBufferHandle =
+                use_raw_handle(M::static_var_api_impl().next_handle());
+            ManagedBuffer::from_handle(new_handle)
+        }
     }
 
     /// Creates a shared managed reference to a given raw handle.
@@ -97,7 +100,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub unsafe fn temp_const_ref(
         raw_handle: RawHandle,
     ) -> ManagedRef<'static, M, ManagedBuffer<M>> {
-        ManagedRef::wrap_handle(use_raw_handle(raw_handle))
+        unsafe { ManagedRef::wrap_handle(use_raw_handle(raw_handle)) }
     }
 
     /// Creates a shared managed reference to a given raw handle.
@@ -108,7 +111,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub unsafe fn temp_const_ref_mut(
         raw_handle: RawHandle,
     ) -> ManagedRefMut<'static, M, ManagedBuffer<M>> {
-        ManagedRefMut::wrap_handle(use_raw_handle(raw_handle))
+        unsafe { ManagedRefMut::wrap_handle(use_raw_handle(raw_handle)) }
     }
 
     fn load_static_cache(&self) -> StaticBufferRef<M>
@@ -116,7 +119,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M: ManagedTypeApi,
     {
         StaticBufferRef::try_new_from_copy_bytes(self.len(), |dest_slice| {
-            let _ = self.load_slice(0, dest_slice);
+            self.load_slice(0, dest_slice);
         })
         .unwrap_or_else(|| {
             M::error_api_impl().signal_error(b"static cache too small or already in use")
@@ -196,6 +199,17 @@ where
     }
 }
 
+/// Syntactic sugar only.
+impl<M, const N: usize> From<[u8; N]> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(bytes: [u8; N]) -> Self {
+        Self::new_from_bytes(&bytes)
+    }
+}
+
 impl<M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
@@ -255,17 +269,30 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.to_boxed_bytes().into_vec()
     }
 
-    /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
-    #[inline]
-    pub fn load_slice(
-        &self,
-        starting_position: usize,
-        dest_slice: &mut [u8],
-    ) -> Result<(), InvalidSliceError> {
-        M::managed_type_impl().mb_load_slice(self.handle.clone(), starting_position, dest_slice)
+    pub fn load_slice(&self, starting_position: usize, dest_slice: &mut [u8]) {
+        let result = M::managed_type_impl().mb_load_slice(
+            self.handle.clone(),
+            starting_position,
+            dest_slice,
+        );
+        if result.is_err() {
+            M::error_api_impl().signal_error(err_msg::BAD_MB_SLICE.as_bytes());
+        }
     }
 
     pub fn copy_slice(
+        &self,
+        starting_position: usize,
+        slice_len: usize,
+    ) -> Option<ManagedBuffer<M>> {
+        let mb_len = self.len();
+        if starting_position > mb_len || starting_position + slice_len > mb_len {
+            return None;
+        }
+        self.copy_slice_unchecked(starting_position, slice_len)
+    }
+
+    fn copy_slice_unchecked(
         &self,
         starting_position: usize,
         slice_len: usize,
@@ -291,7 +318,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             M::error_api_impl().signal_error(&b"failed to load to byte array"[..]);
         }
         let byte_slice = &mut array[..len];
-        let _ = self.load_slice(0, byte_slice);
+        self.load_slice(0, byte_slice);
         byte_slice
     }
 
@@ -304,7 +331,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             let bytes_remaining = arg_len - current_arg_index;
             let bytes_to_load = core::cmp::min(bytes_remaining, BATCH_SIZE);
             let loaded_slice = &mut buffer[0..bytes_to_load];
-            let _ = self.load_slice(current_arg_index, loaded_slice);
+            self.load_slice(current_arg_index, loaded_slice);
             f(loaded_slice);
             current_arg_index += BATCH_SIZE;
         }
@@ -359,23 +386,29 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
-    ///
-    /// TODO: remove this method once TopDecodeInput is implemented for ManagedBuffer reference.
     pub fn parse_as_u64(&self) -> Option<u64> {
+        use crate::api::ManagedTypeApiImpl;
+
         const U64_NUM_BYTES: usize = 8;
         let l = self.len();
         if l > U64_NUM_BYTES {
             return None;
         }
-        let mut bytes = [0u8; U64_NUM_BYTES];
-        if M::managed_type_impl()
-            .mb_load_slice(self.handle.clone(), 0, &mut bytes[U64_NUM_BYTES - l..])
-            .is_err()
-        {
-            None
-        } else {
-            Some(u64::from_be_bytes(bytes))
+        let value = M::managed_type_impl().mb_to_small_int_unsigned(self.handle.clone());
+        Some(value as u64)
+    }
+
+    /// Convenience method for quickly getting a top-decoded i64 from the managed buffer.
+    pub fn parse_as_i64(&self) -> Option<i64> {
+        use crate::api::ManagedTypeApiImpl;
+
+        const I64_NUM_BYTES: usize = 8;
+        let l = self.len();
+        if l > I64_NUM_BYTES {
+            return None;
         }
+        let value = M::managed_type_impl().mb_to_small_int_signed(self.handle.clone());
+        Some(value)
     }
 
     /// Produces a hex expression in another managed buffer,
@@ -561,11 +594,8 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        use crate::contract_base::ErrorHelper;
-
-        let s = alloc::string::String::from_utf8(self.to_boxed_bytes().into_vec())
-            .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
-
+        let bytes = self.to_boxed_bytes();
+        let s = alloc::string::String::from_utf8_lossy(bytes.as_slice());
         s.fmt(f)
     }
 }

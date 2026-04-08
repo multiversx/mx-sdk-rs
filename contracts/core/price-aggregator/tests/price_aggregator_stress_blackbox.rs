@@ -1,6 +1,6 @@
 use multiversx_price_aggregator_sc::{
-    price_aggregator_data::{OracleStatus, TokenPair},
     PriceAggregator,
+    price_aggregator_data::{OracleStatus, TokenPair},
 };
 
 use multiversx_sc_scenario::imports::*;
@@ -34,7 +34,7 @@ fn world() -> ScenarioWorld {
 
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
-    oracles: Vec<AddressValue>,
+    oracles: Vec<Address>,
 }
 
 impl PriceAggregatorTestState {
@@ -47,29 +47,23 @@ impl PriceAggregatorTestState {
             .nonce(1)
             .new_address(OWNER, 1, PRICE_AGGREGATOR_ADDRESS)
             .current_block()
-            .block_timestamp(100);
+            .block_timestamp_seconds(100);
 
         let mut oracles = Vec::new();
         for i in 1..=NR_ORACLES {
             let address_expr = format!("oracle{}", i);
             let address: TestAddress = TestAddress::new(address_expr.as_str());
-            let address_value = AddressValue::from(address.eval_to_expr().as_str());
 
             world.account(address).nonce(1).balance(STAKE_AMOUNT);
 
-            oracles.push(address_value);
+            oracles.push(address.to_address());
         }
 
         Self { world, oracles }
     }
 
     fn deploy(&mut self) -> &mut Self {
-        let oracles = MultiValueVec::from(
-            self.oracles
-                .iter()
-                .map(|oracle| oracle.to_address())
-                .collect::<Vec<_>>(),
-        );
+        let oracles = MultiValueVec::from(self.oracles.clone());
 
         self.world
             .tx()
@@ -90,7 +84,7 @@ impl PriceAggregatorTestState {
         for address in self.oracles.iter() {
             self.world
                 .tx()
-                .from(&address.to_address())
+                .from(address)
                 .to(PRICE_AGGREGATOR_ADDRESS)
                 .gas(5_000_000u64)
                 .typed(price_aggregator_proxy::PriceAggregatorProxy)
@@ -123,10 +117,10 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
+    fn submit(&mut self, from: &Address, submission_timestamp: TimestampSeconds, price: u64) {
         self.world
             .tx()
-            .from(&from.to_address())
+            .from(from)
             .to(PRICE_AGGREGATOR_ADDRESS)
             .gas(7_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
@@ -153,18 +147,26 @@ fn test_price_aggregator_submit() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, rand::random::<u64>());
+    state.submit(
+        &state.oracles[0].clone(),
+        TimestampSeconds::new(95),
+        rand::random::<u64>(),
+    );
 
     // submit ok
     for index in 1..SUBMISSION_COUNT - 1 {
-        state.submit(&state.oracles[index].clone(), 100, rand::random::<u64>());
+        state.submit(
+            &state.oracles[index].clone(),
+            TimestampSeconds::new(100),
+            rand::random::<u64>(),
+        );
     }
 
-    let current_timestamp = 100;
+    let current_timestamp = TimestampSeconds::new(100);
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
         |sc| {
-            let blockchain_timestamp = sc.blockchain().get_block_timestamp();
+            let blockchain_timestamp = sc.blockchain().get_block_timestamp_seconds();
 
             let token_pair = TokenPair {
                 from: managed_buffer!(EGLD_TICKER),
@@ -190,7 +192,7 @@ fn test_price_aggregator_submit() {
             for index in 0..SUBMISSION_COUNT - 1 {
                 assert_eq!(
                     sc.oracle_status()
-                        .get(&managed_address!(&state.oracles[index].to_address()))
+                        .get(&managed_address!(&state.oracles[index]))
                         .unwrap(),
                     OracleStatus {
                         total_submissions: 1,
@@ -204,7 +206,7 @@ fn test_price_aggregator_submit() {
     // submit last that resets the round
     state.submit(
         &state.oracles[SUBMISSION_COUNT - 1].clone(),
-        100,
+        TimestampSeconds::new(100),
         rand::random::<u64>(),
     );
 }

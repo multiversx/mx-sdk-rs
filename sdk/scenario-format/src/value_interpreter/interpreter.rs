@@ -1,7 +1,7 @@
 use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
 use super::{
-    file_loader::{load_file, MxscFileJson},
+    file_loader::{MxscFileJson, load_file},
     functions::*,
     parse_num::*,
     prefixes::*,
@@ -16,14 +16,14 @@ pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Ve
                 concat.extend_from_slice(interpret_subtree(item, context).as_slice());
             }
             concat
-        },
+        }
         ValueSubTree::Map(m) => {
             let mut concat = Vec::<u8>::new();
             for (_, value) in m.iter() {
                 concat.extend_from_slice(interpret_subtree(value, context).as_slice());
             }
             concat
-        },
+        }
     }
 }
 

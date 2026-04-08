@@ -20,10 +20,7 @@ impl TypeDescription {
     /// We use this as value while the fields are being computed.
     pub const PLACEHOLDER: TypeDescription = TypeDescription {
         docs: Vec::new(),
-        names: TypeNames {
-            abi: String::new(),
-            rust: String::new(),
-        },
+        names: TypeNames::new(),
         contents: TypeContents::NotSpecified,
         macro_attributes: Vec::new(),
     };
@@ -84,6 +81,21 @@ impl EnumVariantDescription {
             discriminant,
             fields,
         }
+    }
+
+    pub fn is_empty_variant(&self) -> bool {
+        self.fields.is_empty()
+    }
+
+    pub fn is_tuple_variant(&self) -> bool {
+        // all fields are numbers
+        for field in self.fields.iter() {
+            if field.name.parse::<u64>().is_err() {
+                return false;
+            }
+        }
+
+        true
     }
 }
 

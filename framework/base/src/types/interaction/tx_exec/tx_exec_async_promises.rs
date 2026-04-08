@@ -1,10 +1,10 @@
 use crate::{
-    api::{const_handles, CallTypeApi},
+    api::{CallTypeApi, const_handles},
     contract_base::{ErrorHelper, SendRawWrapper},
     types::{
-        interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, ManagedBuffer, OriginalResultMarker, Tx, TxData, TxGas, TxGasValue,
-        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+        CallbackClosure, ExplicitGas, FunctionCall, ManagedBuffer, OriginalResultMarker, Tx,
+        TxData, TxGas, TxGasValue, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+        interaction::callback_closure::CallbackClosureWithGas,
     },
 };
 

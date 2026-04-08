@@ -1,8 +1,8 @@
 use anyhow::anyhow;
 
 use super::{
-    gateway_chain_simulator_set_state::SetStateResponse, GatewayRequest, GatewayRequestType,
-    SetStateAccount, SET_STATE_OVERWRITE_ENDPOINT,
+    GatewayRequest, GatewayRequestType, SET_STATE_OVERWRITE_ENDPOINT, SetStateAccount,
+    gateway_chain_simulator_set_state::SetStateResponse,
 };
 
 /// Sets state for a list of accounts using the chain simulator API.

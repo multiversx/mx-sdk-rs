@@ -1,10 +1,10 @@
 use multiversx_sc_codec as codec;
 
 use codec::{
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
     test_util::{check_dep_encode_decode, check_top_encode_decode},
-    top_decode_from_nested_or_handle_err, top_encode_from_nested, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    top_decode_from_nested_or_handle_err, top_encode_from_nested,
 };
 
 #[derive(PartialEq, Eq, Clone, Debug)]
@@ -24,20 +24,20 @@ impl NestedEncode for E {
         match self {
             E::Unit => {
                 0u32.dep_encode_or_handle_err(dest, h)?;
-            },
+            }
             E::Newtype(arg1) => {
                 1u32.dep_encode_or_handle_err(dest, h)?;
                 arg1.dep_encode_or_handle_err(dest, h)?;
-            },
+            }
             E::Tuple(arg1, arg2) => {
                 2u32.dep_encode_or_handle_err(dest, h)?;
                 arg1.dep_encode_or_handle_err(dest, h)?;
                 arg2.dep_encode_or_handle_err(dest, h)?;
-            },
+            }
             E::Struct { a } => {
                 3u32.dep_encode_or_handle_err(dest, h)?;
                 a.dep_encode_or_handle_err(dest, h)?;
-            },
+            }
         }
         Ok(())
     }

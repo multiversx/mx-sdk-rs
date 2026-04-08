@@ -1,11 +1,11 @@
 use multiversx_sc_scenario::{
+    ScenarioTxEnvData,
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{RHListExec, TxBaseWithEnv},
     },
     scenario::tx_to_step::{StepWrapper, TxToStep},
     scenario_model::TxResponse,
-    ScenarioTxEnvData,
 };
 use multiversx_sdk::gateway::GatewayAsyncService;
 

@@ -1,10 +1,10 @@
-use super::{token_properties::*, TokenPropertiesResult};
+use super::{TokenPropertiesResult, token_properties::*};
 
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, TokenIdentifier, Tx, TxEnv,
+        BigUint, EgldPayment, EsdtLocalRole, EsdtTokenIdentifier, EsdtTokenType, FunctionCall,
+        ManagedAddress, ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, Tx, TxEnv,
         TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
@@ -25,7 +25,7 @@ pub type IssueCall<Env, From, To, Gas> = Tx<
     EgldPayment<<Env as TxEnv>::Api>,
     Gas,
     FunctionCall<<Env as TxEnv>::Api>,
-    OriginalResultMarker<TokenIdentifier<<Env as TxEnv>::Api>>,
+    OriginalResultMarker<EsdtTokenIdentifier<<Env as TxEnv>::Api>>,
 >;
 
 /// Proxy for the ESDT system smart contract.
@@ -181,7 +181,7 @@ where
         let zero = &BigUint::zero();
         self.issue(
             issue_cost,
-            EsdtTokenType::Meta,
+            EsdtTokenType::MetaFungible,
             token_display_name,
             token_ticker,
             zero,
@@ -213,21 +213,23 @@ where
     ) -> IssueCall<Env, From, To, Gas> {
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
-            EsdtTokenType::NonFungible | EsdtTokenType::DynamicNFT => "NFT",
+            EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
+            | EsdtTokenType::DynamicNFT => "NFT",
             EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
-            EsdtTokenType::Meta | EsdtTokenType::DynamicMeta => "META",
+            EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
             EsdtTokenType::Invalid => "",
         };
 
         let endpoint = match token_type {
             EsdtTokenType::Fungible
             | EsdtTokenType::NonFungible
+            | EsdtTokenType::NonFungibleV2
             | EsdtTokenType::SemiFungible
-            | EsdtTokenType::Meta => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+            | EsdtTokenType::MetaFungible => ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
-
+            }
             EsdtTokenType::Invalid => "",
         };
 
@@ -261,7 +263,7 @@ where
         let endpoint_name = match token_type {
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
-            },
+            }
             _ => "",
         };
 
@@ -305,7 +307,7 @@ where
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
-            EsdtTokenType::Meta => REGISTER_META_ESDT_ENDPOINT_NAME,
+            EsdtTokenType::MetaFungible => REGISTER_META_ESDT_ENDPOINT_NAME,
             _ => "",
         };
 
@@ -319,7 +321,7 @@ where
         if token_type == EsdtTokenType::Fungible {
             tx = tx.argument(&initial_supply);
             tx = tx.argument(&properties.num_decimals);
-        } else if token_type == EsdtTokenType::Meta {
+        } else if token_type == EsdtTokenType::MetaFungible {
             tx = tx.argument(&properties.num_decimals);
         }
 
@@ -348,7 +350,10 @@ where
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to mint more fungible ESDT tokens.
     /// It will fail if the SC is not the owner of the token.
-    pub fn mint<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<BigUint<Env::Api>>>(
+    pub fn mint<
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
         token_identifier: Arg0,
         amount: Arg1,
@@ -363,7 +368,10 @@ where
 
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to burn fungible ESDT tokens owned by the SC.
-    pub fn burn<Arg0: ProxyArg<TokenIdentifier<Env::Api>>, Arg1: ProxyArg<BigUint<Env::Api>>>(
+    pub fn burn<
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+    >(
         self,
         token_identifier: Arg0,
         amount: Arg1,
@@ -378,7 +386,7 @@ where
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn pause<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -390,7 +398,7 @@ where
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn unpause<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -405,7 +413,7 @@ where
     /// As a consequence, no tokens may be transferred to or from the frozen account.
     /// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
     pub fn freeze<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -422,7 +430,7 @@ where
 
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -442,7 +450,7 @@ where
     /// and it must be done by the token manager.
     /// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
     pub fn wipe<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -461,7 +469,7 @@ where
     /// As a consequence, no NFT can be transferred to or from the frozen Account.
     /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
     pub fn freeze_nft<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -480,7 +488,7 @@ where
 
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze_nft<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -502,7 +510,7 @@ where
     /// and it must be done by the token manager.
     /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
     pub fn wipe_nft<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -521,7 +529,7 @@ where
 
     /// This function converts an SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
     /// This function as almost all in case of ESDT can be called only by the owner.
-    pub fn change_sft_to_meta_esdt<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn change_sft_to_meta_esdt<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
         num_decimals: usize,
@@ -541,7 +549,7 @@ where
     pub fn set_special_roles<
         RoleIter: Iterator<Item = EsdtLocalRole>,
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -564,7 +572,7 @@ where
     }
 
     /// This function can be called to retrieve the special roles of a specific token.
-    pub fn get_special_roles<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn get_special_roles<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -584,7 +592,7 @@ where
     pub fn unset_special_roles<
         RoleIter: Iterator<Item = EsdtLocalRole>,
         Arg0: ProxyArg<ManagedAddress<Env::Api>>,
-        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -607,7 +615,7 @@ where
     }
 
     pub fn transfer_ownership<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -623,7 +631,7 @@ where
     }
 
     pub fn transfer_nft_create_role<
-        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
@@ -640,7 +648,7 @@ where
             .original_result()
     }
 
-    pub fn control_changes<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn control_changes<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
         property_arguments: &TokenPropertyArguments,
@@ -656,7 +664,7 @@ where
 
     /// Changes token to dynamic.
     /// Does not work for: FungibleESDT, NonFungibleESDT, NonFungibleESDTv2.
-    pub fn change_to_dynamic<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn change_to_dynamic<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -668,7 +676,7 @@ where
     }
 
     /// Updates a specific token to the newest version.
-    pub fn update_token<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn update_token<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
@@ -680,7 +688,7 @@ where
     }
 
     /// Fetches token properties for a specific token.
-    pub fn get_token_properties<Arg0: ProxyArg<TokenIdentifier<Env::Api>>>(
+    pub fn get_token_properties<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_id: Arg0,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenPropertiesResult> {
@@ -696,11 +704,7 @@ const TRUE_STR: &str = "true";
 const FALSE_STR: &str = "false";
 
 fn bool_name_bytes(b: bool) -> &'static str {
-    if b {
-        TRUE_STR
-    } else {
-        FALSE_STR
-    }
+    if b { TRUE_STR } else { FALSE_STR }
 }
 
 fn set_token_property<Api>(contract_call: &mut FunctionCall<Api>, name: &str, value: bool)

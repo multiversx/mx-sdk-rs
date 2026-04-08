@@ -1,6 +1,6 @@
 use crate::{
     version::FrameworkVersion,
-    version_history::{find_version_by_str, LAST_VERSION},
+    version_history::{LAST_VERSION, find_version_by_str},
 };
 
 /// Crate version requirements, as expressed in Cargo.toml. A very crude version.

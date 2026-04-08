@@ -9,7 +9,7 @@ use super::{
 use crate::folder_structure::{DirectoryType, RelevantDirectory};
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use ruplacer::Query;
-use toml::{value::Table, Value};
+use toml::{Value, value::Table};
 
 #[rustfmt::skip]
 pub const SCENARIO_FILE_PATTERNS: &[(&str, &str)] = &[

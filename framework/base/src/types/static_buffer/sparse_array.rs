@@ -3,7 +3,7 @@ use alloc::format;
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ErrorApiImpl},
-    codec::{self, arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode},
+    codec::{self, NestedDecode, NestedEncode, TopDecode, TopEncode, arrayvec::ArrayVec},
 };
 use core::marker::PhantomData;
 
@@ -95,11 +95,7 @@ where
 
     fn get_item_unchecked(&self, index: usize) -> usize {
         let value = self.array[index];
-        if value == EMPTY_ENTRY {
-            index
-        } else {
-            value
-        }
+        if value == EMPTY_ENTRY { index } else { value }
     }
 
     fn set_item_unchecked(&mut self, index: usize, value: usize) {
@@ -116,7 +112,7 @@ where
         }
     }
 
-    pub fn iter(&self) -> SparseArrayIterator<E, CAPACITY> {
+    pub fn iter(&self) -> SparseArrayIterator<'_, E, CAPACITY> {
         SparseArrayIterator::new(self)
     }
 }
@@ -271,7 +267,7 @@ where
                     len: array_vec.len(),
                     _phantom: PhantomData,
                 })
-            },
+            }
             Err(e) => Err(h.handle_error(e)),
         }
     }
@@ -298,7 +294,7 @@ where
                     len: array_vec.len(),
                     _phantom: PhantomData,
                 })
-            },
+            }
             Err(e) => Err(h.handle_error(e)),
         }
     }

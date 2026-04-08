@@ -1,11 +1,11 @@
 use std::{
-    fs::{create_dir_all, File},
+    fs::{File, create_dir_all},
     io::Write,
     path::Path,
 };
 
 use crate::{
-    abi_json::{serialize_abi_to_json, ContractAbiJson, EsdtAttributeAbiJson},
+    abi_json::{ContractAbiJson, EsdtAttributeAbiJson, serialize_abi_to_json},
     esdt_attr_file_json::create_new_esdt_attr_file,
 };
 

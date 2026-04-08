@@ -1,6 +1,6 @@
-use crate::types::VMAddress;
+use crate::types::Address;
 
-pub fn address_hex(address: &VMAddress) -> String {
+pub fn address_hex(address: &Address) -> String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 

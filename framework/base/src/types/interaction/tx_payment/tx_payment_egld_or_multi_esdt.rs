@@ -1,6 +1,9 @@
-use crate::types::{BigUint, EgldOrMultiEsdtPayment, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, EgldOrMultiEsdtPayment, ManagedAddress, TxFrom, TxToSpecified},
+};
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EgldOrMultiEsdtPayment<Env::Api>
 where
@@ -11,7 +14,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.as_refs()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -19,7 +34,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -40,8 +55,8 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.as_refs().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.as_refs().into_scenario_payments(env)
     }
 }
 
@@ -54,7 +69,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.as_refs()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -62,7 +89,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -83,7 +110,7 @@ where
     }
 
     #[inline]
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.as_refs().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.as_refs().into_scenario_payments(env)
     }
 }

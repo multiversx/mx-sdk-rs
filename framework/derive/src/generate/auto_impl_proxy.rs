@@ -4,7 +4,7 @@ use crate::{
     parse::split_path_last,
 };
 use proc_macro2::Ident;
-use syn::{punctuated::Punctuated, token::PathSep, Pat};
+use syn::{Pat, punctuated::Punctuated, token::PathSep};
 
 /// Path to a Rust module containing a contract call proxy.
 pub type ProxyModulePath = Punctuated<syn::PathSegment, PathSep>;
@@ -26,12 +26,14 @@ pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
                         proxy_obj_name: last_segment,
                     }
                 } else {
-                    panic!("Proxy getter return type must be specified with some module specifier (e.g. `path::to::module::Proxy`)");
+                    panic!(
+                        "Proxy getter return type must be specified with some module specifier (e.g. `path::to::module::Proxy`)"
+                    );
                 }
             } else {
                 panic!("Invalid proxy getter return type")
             }
-        },
+        }
     }
 }
 

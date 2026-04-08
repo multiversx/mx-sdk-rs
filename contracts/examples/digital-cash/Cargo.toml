@@ -1,17 +1,17 @@
 [package]
 name = "digital-cash"
 version = "0.0.0"
-authors = [ "Valentin Craciun"]
-edition = "2021"
+authors = ["Valentin Craciun"]
+edition = "2024"
 publish = false
 
 [lib]
 path = "src/digital_cash.rs"
 
 [dependencies.multiversx-sc]
-version = "0.58.0"
+version = "0.65.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.58.0"
+version = "0.65.1"
 path = "../../../framework/scenario"

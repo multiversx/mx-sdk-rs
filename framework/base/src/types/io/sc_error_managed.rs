@@ -3,7 +3,7 @@ use alloc::{string::String, vec::Vec};
 
 use crate::{
     api::{EndpointFinishApi, ErrorApi, ErrorApiImpl, ManagedTypeApi},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    types::{ManagedBuffer, ManagedType, heap::BoxedBytes},
 };
 
 use super::SCError;

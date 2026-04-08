@@ -125,7 +125,7 @@ pub trait TransferRoleProxyModule {
                 sc_print!("{}", err.err_msg);
 
                 err_result
-            },
+            }
         }
     }
 

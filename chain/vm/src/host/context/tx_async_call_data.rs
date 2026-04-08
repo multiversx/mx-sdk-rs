@@ -1,7 +1,7 @@
 use crate::{
     builtin_functions::BuiltinFunctionContainer,
     host::context::{TxInput, TxResult},
-    types::{top_encode_u64, VMAddress, H256},
+    types::{Address, H256, top_encode_u64},
 };
 
 use num_bigint::BigUint;
@@ -10,8 +10,8 @@ use super::{CallType, CallbackPayments, Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
-    pub from: VMAddress,
-    pub to: VMAddress,
+    pub from: Address,
+    pub to: Address,
     pub call_value: BigUint,
     pub endpoint_name: TxFunctionName,
     pub arguments: Vec<Vec<u8>>,
@@ -45,7 +45,7 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
 fn real_recipient(
     async_data: &AsyncCallTxData,
     builtin_functions: &BuiltinFunctionContainer,
-) -> VMAddress {
+) -> Address {
     let tx_input = async_call_tx_input(async_data, CallType::AsyncCall);
     let transfers = builtin_functions.extract_token_transfers(&tx_input);
     transfers.real_recipient
@@ -81,7 +81,7 @@ pub fn async_callback_tx_input(
 }
 
 fn extract_callback_payments(
-    callback_contract_address: &VMAddress,
+    callback_contract_address: &Address,
     async_result: &TxResult,
     builtin_functions: &BuiltinFunctionContainer,
 ) -> CallbackPayments {
@@ -121,10 +121,10 @@ pub fn async_promise_callback_tx_input(
     callback_input
 }
 
-pub fn merge_results(mut original: TxResult, mut new: TxResult) -> TxResult {
+pub fn merge_async_results(mut original: TxResult, mut new: TxResult) -> TxResult {
     if original.result_status.is_success() {
         original.result_values.append(&mut new.result_values);
-        original.result_logs.append(&mut new.result_logs);
+        original.append_all_logs(&mut new);
         original.result_message = new.result_message;
         original
     } else {

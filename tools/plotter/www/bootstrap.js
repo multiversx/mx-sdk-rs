@@ -1,5 +1,3 @@
-init();
-
 async function init() {
     if (typeof process == "object") {
         // We run in the npm/webpack environment.
@@ -10,12 +8,13 @@ async function init() {
         setup(Chart);
         main();
     } else {
-        const [{Chart, default: init}, {main, setup}] = await Promise.all([
+        const [{Chart}, {main, setup}] = await Promise.all([
             import("../pkg/sc_plotter_wasm.js"),
             import("./index.js"),
         ]);
-        await init();
         setup(Chart);
         main();
     }
 }
+
+init();

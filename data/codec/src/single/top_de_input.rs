@@ -1,7 +1,7 @@
 use crate::{
+    DecodeError, DecodeErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
     num_conv::{universal_decode_number, universal_decode_number_unchecked},
     transmute::vec_into_boxed_slice,
-    DecodeError, DecodeErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 

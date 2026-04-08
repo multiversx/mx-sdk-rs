@@ -1,10 +1,12 @@
+mod all_rustc_check;
+
 use super::{
     check_wasmer_dependencies::check_wasmer_dependencies,
     print_util::{print_all_command, print_all_count, print_all_index},
 };
 use crate::{
     cli::AllArgs,
-    folder_structure::{dir_pretty_print, RelevantDirectories},
+    folder_structure::{RelevantDirectories, dir_pretty_print},
 };
 use std::{path::Path, process::Command};
 
@@ -15,13 +17,13 @@ pub fn call_all_meta(args: &AllArgs) {
         Path::new("./")
     };
 
-    perform_call_all_meta(path, args.ignore.as_slice(), args.to_cargo_run_args());
+    perform_call_all_meta(path, args);
 }
 
-fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) {
+fn perform_call_all_meta(path: &Path, args: &AllArgs) {
     check_wasmer_dependencies(path);
 
-    let dirs = RelevantDirectories::find_all(path, ignore);
+    let dirs = RelevantDirectories::find_all(path, &args.ignore);
 
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
@@ -34,22 +36,20 @@ fn perform_call_all_meta(path: &Path, ignore: &[String], raw_args: Vec<String>) 
 
     for (i, contract_crate) in dirs.iter_contract_crates().enumerate() {
         print_all_index(i + 1, num_contract_crates);
-        call_contract_meta(contract_crate.path.as_path(), raw_args.as_slice());
+
+        contract_crate.assert_meta_path_exists();
+        let meta_path = contract_crate.meta_path();
+
+        all_rustc_check::verify_rustc_version(contract_crate, args);
+        call_contract_meta(&meta_path, &args.to_cargo_run_args());
     }
 }
 
-pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String]) {
-    let meta_path = contract_crate_path.join("meta");
-    assert!(
-        meta_path.exists(),
-        "Contract meta crate not found at {}",
-        meta_path.as_path().display()
-    );
-
-    print_all_command(meta_path.as_path(), cargo_run_args);
+pub fn call_contract_meta(meta_path: &Path, cargo_run_args: &[String]) {
+    print_all_command(meta_path, cargo_run_args);
 
     let exit_status = Command::new("cargo")
-        .current_dir(&meta_path)
+        .current_dir(meta_path)
         .args(cargo_run_args)
         .spawn()
         .expect("failed to spawn cargo run process in meta crate")

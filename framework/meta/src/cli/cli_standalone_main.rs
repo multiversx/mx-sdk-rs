@@ -1,6 +1,7 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::chain_simulator::chain_simulator;
 use crate::cmd::retrieve_address::retrieve_address;
+use crate::cmd::scen_blackbox::scen_blackbox_tool;
 use crate::cmd::wallet::wallet;
 use clap::Parser;
 
@@ -24,44 +25,47 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::Install(args)) => {
             args.validate_args();
             install(args).await;
-        },
+        }
         Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
             args.validate_args();
             upgrade_sc(args);
-        },
+        }
         Some(StandaloneCliAction::Template(args)) => {
             args.validate_args();
             create_contract(args).await;
-        },
+        }
         Some(StandaloneCliAction::TemplateList(args)) => {
             args.validate_args();
             print_template_names(args).await;
-        },
+        }
         Some(StandaloneCliAction::TestGen(args)) => {
             test_gen_tool(args);
-        },
+        }
+        Some(StandaloneCliAction::ScenBlackbox(args)) => {
+            scen_blackbox_tool(args);
+        }
         Some(StandaloneCliAction::Test(args)) => test(args),
         Some(StandaloneCliAction::TestCoverage(args)) => {
             test_coverage(args);
-        },
+        }
         Some(StandaloneCliAction::CodeReportGen(args)) => {
             args.validate_args();
             report(args);
-        },
+        }
         Some(StandaloneCliAction::Account(args)) => {
             args.validate_args();
             retrieve_address(args).await;
-        },
+        }
         Some(StandaloneCliAction::LocalDeps(args)) => {
             local_deps(args);
-        },
+        }
         Some(StandaloneCliAction::Wallet(args)) => {
             wallet(args);
-        },
+        }
         Some(StandaloneCliAction::ChainSimulator(args)) => {
             chain_simulator(args);
-        },
-        None => {},
+        }
+        None => {}
     }
 }

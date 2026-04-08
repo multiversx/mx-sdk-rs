@@ -1,4 +1,4 @@
-use multiversx_sc::api::{const_handles, RawHandle, StaticVarApiFlags};
+use multiversx_sc::api::{RawHandle, StaticVarApiFlags, const_handles};
 
 #[derive(Debug)]
 pub struct TxStaticVars {

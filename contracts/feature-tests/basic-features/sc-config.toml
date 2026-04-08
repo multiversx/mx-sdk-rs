@@ -8,12 +8,14 @@ add-unlabelled = false
 add-endpoints = ["init", "load_bytes", "store_bytes"]
 kill_legacy_callback = true
 
-[contracts.basic-features-crypto]
-ei = "1.4"
+# can be used for testing the buggy mBufferFromSmallIntSigned VM hook
+# TODO: remove once it's fixed
+[contracts.basic-features-small-int-bug]
 add-unlabelled = false
-add-endpoints = ["init"]
-add-labels = ["crypto-ei-1.4"]
+add-endpoints = ["init", "store_i64", "load_i64"]
 kill_legacy_callback = true
+features = ["small-int-bug"]
+ei = "ignore" # bypasses the deprecated VM hook check
 
 [[proxy]]
 path = "src/basic_features_proxy.rs"
@@ -34,5 +36,14 @@ add-endpoints = [
     "timelock_get_current_value_at_address",
     "timelock_get_unlock_timestamp_at_address",
     "timelock_get_future_value_at_address",
+    "verify_secp256r1_signature",
+    "verify_bls_signature_share",
+    "verify_bls_aggregated_signature",
+    "mm_get",
+    "mm_contains",
+    "mm_remove_get",
+    "epoch_info",
+    "code_hash",
+    "get_block_timestamps",
+    "get_esdt_token_data",
 ]
-add-labels = ["crypto-ei-1.4"]

@@ -32,7 +32,7 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     }
 }
 
-impl<T> TypeAbiFrom<T> for IgnoreValue {}
+impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
 
 impl TypeAbi for IgnoreValue {
     type Unmanaged = Self;
@@ -51,6 +51,10 @@ impl TypeAbi for IgnoreValue {
 }
 
 impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFrom<U> {}
+
+// IgnoreValue -> OptionalValue::None
+// It makes it easier with
+impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     type Unmanaged = OptionalValue<T::Unmanaged>;

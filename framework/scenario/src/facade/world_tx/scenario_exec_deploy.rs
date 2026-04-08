@@ -7,8 +7,8 @@ use multiversx_sc::{
 };
 
 use crate::{
-    scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec, ScenarioTxRun,
-    ScenarioWorld,
+    ScenarioEnvExec, ScenarioTxRun, ScenarioWorld, scenario::tx_to_step::TxToStep,
+    scenario_model::TxResponse,
 };
 
 use super::ScenarioTxEnvData;

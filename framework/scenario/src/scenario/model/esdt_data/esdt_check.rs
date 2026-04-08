@@ -83,7 +83,7 @@ impl CheckEsdt {
                     }];
 
                     prev_esdt_check.instances = CheckEsdtInstances::Equal(new_instances_check);
-                },
+                }
                 CheckEsdtInstances::Equal(esdt_instance_check) => {
                     if let Some(i) = esdt_instance_check
                         .iter()
@@ -97,7 +97,7 @@ impl CheckEsdt {
                             ..Default::default()
                         });
                     }
-                },
+                }
             }
         }
     }
@@ -129,7 +129,7 @@ impl CheckEsdt {
                     }];
 
                     prev_esdt_check.instances = CheckEsdtInstances::Equal(new_instances_check);
-                },
+                }
                 CheckEsdtInstances::Equal(esdt_instance_check) => {
                     if let Some(i) = esdt_instance_check
                         .iter()
@@ -145,7 +145,7 @@ impl CheckEsdt {
                             ..Default::default()
                         });
                     }
-                },
+                }
             }
         }
     }

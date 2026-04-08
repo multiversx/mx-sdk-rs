@@ -5,8 +5,8 @@ use crate::codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStati
 use crate::{
     api::ManagedTypeApi,
     formatter::{
-        hex_util::{byte_to_binary_digits, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
+        hex_util::{byte_to_binary_digits, byte_to_hex_digits},
     },
     types::ManagedBuffer,
 };

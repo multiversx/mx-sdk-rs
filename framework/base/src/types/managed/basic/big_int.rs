@@ -3,16 +3,16 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
+        RawHandle, StaticVarApiImpl, const_handles, use_raw_handle,
     },
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
+    formatter::{FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
     types::{
-        heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign,
+        BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign, heap::BoxedBytes,
     },
 };
 
@@ -83,8 +83,11 @@ impl<M: ManagedTypeApi> BigInt<M> {
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        let new_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        BigInt::from_handle(new_handle)
+        unsafe {
+            let new_handle: M::BigIntHandle =
+                use_raw_handle(M::static_var_api_impl().next_handle());
+            BigInt::from_handle(new_handle)
+        }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
@@ -189,7 +192,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     #[inline]
-    pub fn overwrite_i64(&self, value: i64) {
+    pub fn overwrite_i64(&mut self, value: i64) {
         Self::set_value(self.handle.clone(), value);
     }
 
@@ -369,6 +372,43 @@ impl<M: ManagedTypeApi> BigInt<M> {
             result
         }
     }
+
+    /// Calculates proportion of this value, consuming self.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (can be negative)
+    /// * `total` - The denominator value for the ratio calculation
+    ///
+    /// # Returns
+    /// The proportional amount as BigInt (self * part / total)
+    pub fn into_proportion(mut self, part: i64, total: i64) -> Self {
+        let mut temp = BigInt::from(part);
+        self *= &temp;
+        temp.overwrite_i64(total);
+        self /= &temp;
+        self
+    }
+
+    /// Calculates proportion of this value.
+    ///
+    /// # Arguments
+    /// * `part` - The numerator value (can be negative)
+    /// * `total` - The denominator value for the ratio calculation
+    ///
+    /// # Returns
+    /// The proportional amount as BigInt (self * part / total)
+    pub fn proportion(&self, part: i64, total: i64) -> Self {
+        self.clone().into_proportion(part, total)
+    }
+
+    /// Creates a managed buffer containing the textual representation of the number.
+    pub fn to_display(&self) -> ManagedBuffer<M> {
+        unsafe {
+            let result = ManagedBuffer::<M>::new_uninit();
+            M::managed_type_impl().bi_to_string(self.handle.clone(), result.handle.clone());
+            result
+        }
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
@@ -378,6 +418,13 @@ impl<M: ManagedTypeApi> SCDisplay for BigInt<M> {
         let cast_handle = str_handle.cast_or_signal_error::<M, _>();
         let wrap_cast = unsafe { ManagedRef::wrap_handle(cast_handle) };
         f.append_managed_buffer(&wrap_cast);
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for BigInt<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Display::fmt(&self.to_display(), f)
     }
 }
 

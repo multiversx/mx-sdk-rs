@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -94,6 +93,16 @@
                             "5",
                             "01",
                             "sc:forwarder"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:callBack",
+                        "topics": [
+                            "str:async_callback"
+                        ],
+                        "data": [
+                            ""
                         ]
                     },
                     {

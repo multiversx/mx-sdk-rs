@@ -1,4 +1,4 @@
-use crate::api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi};
+use crate::api::{EndpointArgumentApi, endpoint_arg_api::EndpointArgumentApiImpl};
 
 use super::UncallableApi;
 

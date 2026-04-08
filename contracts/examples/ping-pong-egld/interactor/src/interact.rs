@@ -5,7 +5,7 @@ mod interact_state;
 use crate::interact_state::State;
 use clap::Parser;
 pub use interact_config::Config;
-use ping_pong_egld::proxy_ping_pong_egld::{self, ContractState, UserStatus};
+use ping_pong_egld::proxy::{self, ContractState, UserStatus};
 
 use multiversx_sc_snippets::imports::*;
 
@@ -26,71 +26,73 @@ pub async fn ping_pong_egld_cli() {
             interact
                 .deploy(
                     args.ping_amount.clone(),
-                    args.duration_in_seconds,
-                    args.opt_activation_timestamp,
+                    DurationMillis::new(args.duration),
+                    args.opt_activation_timestamp.map(TimestampMillis::new),
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::Upgrade(args)) => {
             interact
                 .upgrade(
                     args.ping_amount.clone(),
-                    args.duration_in_seconds,
-                    args.opt_activation_timestamp,
+                    DurationMillis::new(args.duration),
+                    args.opt_activation_timestamp.map(TimestampMillis::new),
                     OptionalValue::from(args.max_funds.clone()),
                 )
                 .await
-        },
+        }
         Some(interact_cli::InteractCliCommand::Ping(args)) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact
                 .ping(args.cost.unwrap_or_default(), None, &sender)
                 .await
-        },
+        }
         Some(interact_cli::InteractCliCommand::Pong) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact.pong(None, &sender).await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::PongAll) => {
             let sender = interact.ping_pong_owner_address.clone();
             interact.pong_all(None, &sender).await;
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
             let user_addresses = interact.get_user_addresses().await;
             println!("User addresses: ");
             for address in user_addresses {
                 print!("{address} ");
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetContractState) => {
             let contract_state = interact.get_contract_state().await;
-            println!("Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}", 
-            contract_state.ping_amount,
-            contract_state.deadline,
-            contract_state.activation_timestamp,
-            contract_state.max_funds,
-            contract_state.pong_all_last_user);
-        },
+            println!(
+                "Contract state: ping_amount -> {:#?} | deadline -> {:#?} | activation_timestamp -> {:#?} | max_funds -> {:#?} | pong_all_last_user -> {:#?}",
+                contract_state.ping_amount,
+                contract_state.deadline,
+                contract_state.activation_timestamp,
+                contract_state.max_funds,
+                contract_state.pong_all_last_user
+            );
+        }
         Some(interact_cli::InteractCliCommand::GetPingAmount) => {
             let ping_amount = interact.get_ping_amount().await;
             println!("Ping amount: {}", ping_amount);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetDeadline) => {
             let deadline = interact.get_deadline().await;
             println!("Deadline: {}", deadline);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetActivationTimestamp) => {
             let activation_timestamp = interact.get_activation_timestamp().await;
             println!("Activation timestamp: {}", activation_timestamp);
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetMaxFunds) => {
             let max_funds = interact.get_max_funds().await;
             match max_funds {
                 Some(funds) => println!("Max funds: {}", funds),
                 None => println!("Max funds: none"),
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::GetUserStatus(args)) => {
             let user_status = interact.get_user_status(args.id).await;
             match user_status {
@@ -98,12 +100,12 @@ pub async fn ping_pong_egld_cli() {
                 UserStatus::Registered => println!("User status: `ping`-ed"),
                 UserStatus::Withdrawn => println!("User status: `pong`-ed"),
             }
-        },
+        }
         Some(interact_cli::InteractCliCommand::PongAllLastUser) => {
             let pong_all_last_user = interact.pong_all_last_user().await;
             println!("Pong all last user: {pong_all_last_user}");
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
@@ -127,7 +129,7 @@ impl PingPongEgldInteract {
         let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
 
         // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_epoch(1).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         Self {
             interactor,
@@ -148,8 +150,8 @@ impl PingPongEgldInteract {
     pub async fn deploy(
         &mut self,
         ping_amount: RustBigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<RustBigUint>,
     ) -> (u64, String) {
         self.set_state().await;
@@ -159,13 +161,8 @@ impl PingPongEgldInteract {
             .tx()
             .from(&self.ping_pong_owner_address)
             .gas(30_000_000u64)
-            .typed(proxy_ping_pong_egld::PingPongProxy)
-            .init(
-                ping_amount,
-                duration_in_seconds,
-                opt_activation_timestamp,
-                max_funds,
-            )
+            .typed(proxy::PingPongEgldProxy)
+            .init(ping_amount, duration, opt_activation_timestamp, max_funds)
             .code(PING_PONG_CODE)
             .returns(ReturnsNewBech32Address)
             .returns(ReturnsStatus)
@@ -182,8 +179,8 @@ impl PingPongEgldInteract {
     pub async fn upgrade(
         &mut self,
         ping_amount: RustBigUint,
-        duration_in_seconds: u64,
-        opt_activation_timestamp: Option<u64>,
+        duration: DurationMillis,
+        opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<RustBigUint>,
     ) {
         let response = self
@@ -192,13 +189,8 @@ impl PingPongEgldInteract {
             .to(self.state.current_ping_pong_egld_address())
             .from(&self.wallet_address)
             .gas(30_000_000u64)
-            .typed(proxy_ping_pong_egld::PingPongProxy)
-            .upgrade(
-                ping_amount,
-                duration_in_seconds,
-                opt_activation_timestamp,
-                max_funds,
-            )
+            .typed(proxy::PingPongEgldProxy)
+            .upgrade(ping_amount, duration, opt_activation_timestamp, max_funds)
             .code(PING_PONG_CODE)
             .returns(ReturnsNewAddress)
             .run()
@@ -216,7 +208,7 @@ impl PingPongEgldInteract {
             .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .ping(_data)
             .egld(egld_amount)
             .returns(ReturnsHandledOrError::new())
@@ -228,7 +220,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Ping failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -239,7 +231,7 @@ impl PingPongEgldInteract {
             .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .pong()
             .returns(ReturnsHandledOrError::new())
             .run()
@@ -250,7 +242,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Pong failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -261,7 +253,7 @@ impl PingPongEgldInteract {
             .from(sender)
             .to(self.state.current_ping_pong_egld_address())
             .gas(30_000_000u64)
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .pong_all()
             .returns(ReturnsHandledOrError::new())
             .run()
@@ -272,7 +264,7 @@ impl PingPongEgldInteract {
             Err(err) => {
                 println!("Pong All failed with message: {}", err.message);
                 assert_eq!(message.unwrap_or_default(), err.message);
-            },
+            }
         }
     }
 
@@ -281,7 +273,7 @@ impl PingPongEgldInteract {
             .interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .get_user_addresses()
             .returns(ReturnsResult)
             .run()
@@ -299,7 +291,7 @@ impl PingPongEgldInteract {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .get_contract_state()
             .returns(ReturnsResult)
             .run()
@@ -310,29 +302,29 @@ impl PingPongEgldInteract {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .ping_amount()
             .returns(ReturnsResultUnmanaged)
             .run()
             .await
     }
 
-    pub async fn get_deadline(&mut self) -> u64 {
+    pub async fn get_deadline(&mut self) -> TimestampMillis {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .deadline()
             .returns(ReturnsResultUnmanaged)
             .run()
             .await
     }
 
-    pub async fn get_activation_timestamp(&mut self) -> u64 {
+    pub async fn get_activation_timestamp(&mut self) -> TimestampMillis {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .activation_timestamp()
             .returns(ReturnsResultUnmanaged)
             .run()
@@ -343,7 +335,7 @@ impl PingPongEgldInteract {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .max_funds()
             .returns(ReturnsResultUnmanaged)
             .run()
@@ -354,7 +346,7 @@ impl PingPongEgldInteract {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .user_status(user_id)
             .returns(ReturnsResultUnmanaged)
             .run()
@@ -365,7 +357,7 @@ impl PingPongEgldInteract {
         self.interactor
             .query()
             .to(self.state.current_ping_pong_egld_address())
-            .typed(proxy_ping_pong_egld::PingPongProxy)
+            .typed(proxy::PingPongEgldProxy)
             .pong_all_last_user()
             .returns(ReturnsResultUnmanaged)
             .run()

@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 
 use crate::{
     blockchain::state::EsdtInstanceMetadata, host::context::TxPanic,
-    system_sc::is_system_sc_address, types::VMAddress,
+    system_sc::is_system_sc_address, types::Address,
 };
 
 use super::TxCache;
@@ -11,7 +11,7 @@ use super::TxCache;
 impl TxCache {
     pub fn subtract_egld_balance(
         &self,
-        address: &VMAddress,
+        address: &Address,
         call_value: &BigUint,
     ) -> Result<(), TxPanic> {
         self.with_account_mut(address, |account| {
@@ -23,7 +23,7 @@ impl TxCache {
         })
     }
 
-    pub fn subtract_tx_gas(&self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&self, address: &Address, gas_limit: u64, gas_price: u64) {
         self.with_account_mut(address, |account| {
             let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
             assert!(
@@ -34,7 +34,7 @@ impl TxCache {
         });
     }
 
-    pub fn increase_egld_balance(&self, address: &VMAddress, amount: &BigUint) {
+    pub fn increase_egld_balance(&self, address: &Address, amount: &BigUint) {
         self.with_account_mut(address, |account| {
             account.egld_balance += amount;
         });
@@ -42,7 +42,7 @@ impl TxCache {
 
     pub fn subtract_esdt_balance(
         &self,
-        address: &VMAddress,
+        address: &Address,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
@@ -71,7 +71,7 @@ impl TxCache {
 
     pub fn increase_esdt_balance(
         &self,
-        address: &VMAddress,
+        address: &Address,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
@@ -89,8 +89,8 @@ impl TxCache {
 
     pub fn transfer_egld_balance(
         &self,
-        from: &VMAddress,
-        to: &VMAddress,
+        from: &Address,
+        to: &Address,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
         if !is_system_sc_address(from) {
@@ -104,8 +104,8 @@ impl TxCache {
 
     pub fn transfer_esdt_balance(
         &self,
-        from: &VMAddress,
-        to: &VMAddress,
+        from: &Address,
+        to: &Address,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,

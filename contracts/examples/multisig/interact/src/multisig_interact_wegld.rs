@@ -63,7 +63,7 @@ impl MultisigInteract {
         action_id
     }
 
-    pub async fn query_wegld_token_identifier(&mut self) -> TokenIdentifier<StaticApi> {
+    pub async fn query_wegld_token_identifier(&mut self) -> EsdtTokenIdentifier<StaticApi> {
         let wegld_token_id = self
             .interactor
             .query()

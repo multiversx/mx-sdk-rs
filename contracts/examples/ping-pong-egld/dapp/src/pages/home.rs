@@ -33,11 +33,11 @@ pub fn home_page() -> Html {
                             "New deployed address: {}",
                             result.to_bech32_string()
                         ));
-                    },
+                    }
                     Err(err) => {
                         log::error!("SC Setup failed: {:?}", err);
                         new_sc_address.set("SC Setup failed!".to_string());
-                    },
+                    }
                 }
             });
         })
@@ -55,11 +55,11 @@ pub fn home_page() -> Html {
                 match transaction::ping().await {
                     Ok(result) => {
                         ping_result.set(result);
-                    },
+                    }
                     Err(err) => {
                         log::error!("Ping failed: {:?}", err);
                         ping_result.set("Ping failed!".to_string());
-                    },
+                    }
                 }
             });
         })

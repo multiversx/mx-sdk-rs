@@ -166,7 +166,7 @@ impl TxExpect {
             CheckValue::Star => "*".to_string(),
             CheckValue::Equal(list) => {
                 itertools::join(list.iter().map(|val| format!("{val}")), ", ")
-            },
+            }
         }
     }
 }

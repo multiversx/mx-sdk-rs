@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use serde::Deserialize;
 
@@ -29,20 +29,6 @@ pub struct ProxyConfigSerde {
     #[serde(default)]
     #[serde(rename = "add-endpoints")]
     pub add_endpoints: Vec<String>,
-}
-
-impl ProxyConfigSerde {
-    pub fn new() -> Self {
-        Self {
-            path: Path::new("output").join("proxy.rs"),
-            override_import: None,
-            path_rename: None,
-            variant: None,
-            add_unlabelled: None,
-            add_labels: Vec::new(),
-            add_endpoints: Vec::new(),
-        }
-    }
 }
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]

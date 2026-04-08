@@ -24,15 +24,15 @@ impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
                 linear_function.calculate_price(token_start, amount, arguments)
-            },
+            }
 
             FunctionSelector::CustomExample(initial_cost) => {
                 let sum = token_start + amount;
                 &(&sum * &sum * sum / 3u32) + &arguments.balance + initial_cost.clone()
-            },
+            }
             FunctionSelector::None => {
                 M::error_api_impl().signal_error(b"Bonding Curve function is not assigned")
-            },
+            }
         }
     }
 }

@@ -51,14 +51,14 @@ pub trait TestTestapi {
 
     fn test_set_timestamp(&self) {
         // Given
-        let value = 1234567890u64;
+        let value = TimestampSeconds::new(1234567890u64);
 
         // When
-        self.test_raw().set_block_timestamp(value);
+        self.test_raw().set_block_timestamp(value.as_u64_seconds());
 
         // Expect
         require!(
-            value == self.blockchain().get_block_timestamp(),
+            value == self.blockchain().get_block_timestamp_seconds(),
             "Actual timestamp does not match the given value"
         );
     }

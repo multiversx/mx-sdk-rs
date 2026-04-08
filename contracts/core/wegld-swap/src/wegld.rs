@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
     #[init]
-    fn init(&self, wrapped_egld_token_id: TokenIdentifier) {
+    fn init(&self, wrapped_egld_token_id: EsdtTokenIdentifier) {
         self.wrapped_egld_token_id().set(&wrapped_egld_token_id);
     }
 
@@ -58,11 +58,11 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
     #[title("lockedEgldBalance")]
     fn get_locked_egld_balance(&self) -> BigUint {
         self.blockchain()
-            .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
+            .get_sc_balance(EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     #[view(getWrappedEgldTokenId)]
     #[title("wrappedEgldTokenId")]
     #[storage_mapper("wrappedEgldTokenId")]
-    fn wrapped_egld_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn wrapped_egld_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 }

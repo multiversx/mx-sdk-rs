@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 pub trait ForwarderStorageModule {
     #[view(lastIssuedToken)]
     #[storage_mapper("lastIssuedToken")]
-    fn last_issued_token(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn last_issued_token(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 
     #[view(lastErrorMessage)]
     #[storage_mapper("lastErrorMessage")]

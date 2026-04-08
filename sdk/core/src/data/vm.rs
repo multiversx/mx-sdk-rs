@@ -1,7 +1,9 @@
-use super::sdk_address::SdkAddress;
+use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
+
+use crate::utils::base64_decode;
 
 #[derive(Serialize_repr, Deserialize_repr, Debug, Clone)]
 #[repr(u8)]
@@ -26,7 +28,7 @@ pub enum CallType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct VMQueryInput {
-    pub sc_address: SdkAddress,
+    pub sc_address: Bech32Address,
     pub func_name: String,
     pub args: Vec<String>,
 }
@@ -36,7 +38,7 @@ pub struct VMQueryInput {
 #[serde(rename_all = "camelCase")]
 pub struct LogEntryApi {
     pub identifier: String,
-    pub address: SdkAddress,
+    pub address: Bech32Address,
     pub topics: Vec<String>,
     pub data: String,
 }
@@ -49,17 +51,17 @@ pub struct OutputTransferApi {
     pub gas_limit: u64,
     pub data: String,
     pub call_type: CallType,
-    pub sender_address: SdkAddress,
+    pub sender_address: Bech32Address,
 }
 
 // OutputAccountApi is a wrapper over vmcommon's OutputAccount
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct OutputAccountApi {
-    address: SdkAddress,
+    address: Bech32Address,
     nonce: u64,
 
-    // TODO: unknow type of data
+    // TODO: unknown type of data
     // balance: Option<String>,
     balance_delta: u64,
     storage_updates: Option<HashMap<String, StorageUpdateApi>>,
@@ -84,7 +86,7 @@ pub struct StorageUpdateApi {
 #[serde(rename_all = "camelCase")]
 pub struct VMOutputApi {
     #[serde(default)]
-    pub return_data: Vec<String>,
+    pub return_data: Option<Vec<String>>,
     pub return_code: String,
     pub return_message: String,
     pub gas_remaining: u64,
@@ -93,6 +95,24 @@ pub struct VMOutputApi {
     pub deleted_accounts: Option<Vec<String>>,
     pub touched_accounts: Option<Vec<String>>,
     pub logs: Option<Vec<LogEntryApi>>,
+}
+
+impl VMOutputApi {
+    pub fn return_data(&self) -> &[String] {
+        if let Some(return_data) = &self.return_data {
+            return_data
+        } else {
+            &[]
+        }
+    }
+
+    pub fn return_data_base64_decode(&self) -> Vec<Vec<u8>> {
+        self.return_data().iter().map(base64_decode).collect()
+    }
+
+    pub fn is_ok(&self) -> bool {
+        self.return_code == "ok"
+    }
 }
 
 // VmValuesResponseData follows the format of the data field in an API response for a VM values query

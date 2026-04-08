@@ -3,10 +3,10 @@ use std::{io::BufRead, path::Path, process::Command};
 
 #[test]
 fn run_format_tests() {
-    let home_dir = home::home_dir().unwrap();
+    let home_dir = std::env::home_dir().unwrap();
 
     let mut vscode_lldb_plugin_lookup = home_dir.clone();
-    vscode_lldb_plugin_lookup.push(".vscode/extensions/vadimcn.vscode-lldb-1.11.3*");
+    vscode_lldb_plugin_lookup.push(".vscode/extensions/vadimcn.vscode-lldb*");
 
     let vscode_lldb_plugin = glob::glob(vscode_lldb_plugin_lookup.as_os_str().to_str().unwrap())
         .expect("Failed to read glob pattern")

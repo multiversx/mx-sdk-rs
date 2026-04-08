@@ -14,7 +14,7 @@ use std::{
     time::Duration,
 };
 
-use crate::{account_tool::retrieve_account_as_scenario_set_state, Sender};
+use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
@@ -63,12 +63,15 @@ where
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let address = wallet.to_address();
 
-        self.send_user_funds(&address).await.unwrap();
+        self.send_user_funds(&address.to_bech32(self.get_hrp()))
+            .await
+            .unwrap();
         self.generate_blocks(1).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {
                 address: address.clone(),
+                hrp: self.network_config.address_hrp.clone(),
                 wallet,
                 current_nonce: None,
             },
@@ -99,6 +102,14 @@ where
 
     pub fn get_state_file_path(&self) -> PathBuf {
         self.current_dir.join(INTERACTOR_SET_STATE_PATH)
+    }
+
+    pub fn get_hrp(&self) -> &str {
+        &self.network_config.address_hrp
+    }
+
+    pub fn is_registered_wallet(&self, address: &Address) -> bool {
+        self.sender_map.contains_key(address)
     }
 
     pub fn get_accounts_from_file(&self) -> Vec<SetStateAccount> {

@@ -1,4 +1,4 @@
-use crate::types::{heap::Address, DeployRawResult, RHListItem, RHListItemExec, TxEnv};
+use crate::types::{DeployRawResult, RHListItem, RHListItemExec, TxEnv, heap::Address};
 
 /// Indicates that the newly deployed address will be returned after a deploy.
 pub struct ReturnsNewAddress;

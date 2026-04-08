@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use yew_icons::{Icon, IconId};
 
 #[function_component(Footer)]
 pub fn footer() -> Html {
@@ -7,7 +6,7 @@ pub fn footer() -> Html {
         <footer class = "footer">
             <p>
                 { "Made with " }
-                <Icon class="icon" icon_id={IconId::BootstrapHeartFill}/>
+                <span class="icon">{"❤️"}</span>
                 { " by the MultiversX team" }
             </p>
         </footer>

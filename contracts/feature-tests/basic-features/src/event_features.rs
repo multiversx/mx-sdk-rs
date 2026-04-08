@@ -19,7 +19,8 @@ pub trait EventFeatures {
         }
     }
 
-    #[event("event_b")]
+    /// If event identifier is missing, the name of the method will be used.
+    #[event]
     fn event_b(
         &self,
         #[indexed] arg1: &BigUint,

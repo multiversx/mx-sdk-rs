@@ -1,0 +1,13 @@
+[package]
+name = "forwarder-blind-meta"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies.forwarder-blind]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.65.1"
+path = "../../../../../framework/meta-lib"
+default-features = false

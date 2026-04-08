@@ -4,7 +4,7 @@ use crate::{
     api::{ErrorApi, ManagedTypeApi},
     codec::*,
     contract_base::ExitCodecErrorHandler,
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
+    types::{ManagedBuffer, ManagedByteArray, ManagedType, heap::BoxedBytes},
     *,
 };
 
@@ -23,8 +23,10 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: A::ManagedBufferHandle) -> Self {
-        StorageKey {
-            buffer: ManagedBuffer::from_handle(handle),
+        unsafe {
+            StorageKey {
+                buffer: ManagedBuffer::from_handle(handle),
+            }
         }
     }
 
@@ -33,7 +35,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        unsafe { self.buffer.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &A::ManagedBufferHandle) -> &Self {

@@ -2,8 +2,8 @@ use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
-use crate::host::vm_hooks::vh_early_exit::early_exit_vm_error;
 use crate::host::vm_hooks::VMHooksContext;
+use crate::host::vm_hooks::vh_early_exit::early_exit_vm_error;
 use crate::vm_err_msg;
 
 use crate::types::RawHandle;

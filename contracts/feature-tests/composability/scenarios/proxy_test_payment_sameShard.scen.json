@@ -1,6 +1,5 @@
 {
     "name": "payment_sameShard",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",

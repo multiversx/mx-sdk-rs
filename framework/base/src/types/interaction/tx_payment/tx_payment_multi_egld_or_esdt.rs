@@ -1,11 +1,11 @@
 use core::ops::Deref;
 
 use crate::{
-    contract_base::SendRawWrapper,
+    contract_base::{SendRawWrapper, TransferExecuteFailed},
     types::{BigUint, ManagedAddress, ManagedRef, MultiEgldOrEsdtPayment, TxFrom, TxToSpecified},
 };
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for &MultiEgldOrEsdtPayment<Env::Api>
 where
@@ -15,14 +15,30 @@ where
         self.is_empty()
     }
 
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute_fallible(
+            to,
+            self,
+            gas_limit,
+            &fc.function_name,
+            &fc.arg_buffer,
+        )
+    }
+
+    fn perform_transfer_execute_legacy(
         self,
         _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
+        SendRawWrapper::<Env::Api>::new().multi_egld_or_esdt_transfer_execute(
             to,
             self,
             gas_limit,
@@ -50,10 +66,10 @@ where
         })
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: self.clone(),
+            multi_esdt: self.clone().into_payment_vec(),
         }
     }
 }
@@ -68,7 +84,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.deref()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -76,7 +104,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.deref()
-            .perform_transfer_execute(env, to, gas_limit, fc)
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -96,8 +124,8 @@ where
         self.deref().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
-        self.deref().into_full_payment_data(env)
+    fn into_scenario_payments(self, env: &Env) -> ScenarioPayments<Env::Api> {
+        self.deref().into_scenario_payments(env)
     }
 }
 
@@ -111,14 +139,25 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        (&self).perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        (&self).perform_transfer_execute(env, to, gas_limit, fc);
+        (&self).perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -138,10 +177,10 @@ where
         (&self).with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: self,
+            multi_esdt: self.into_payment_vec(),
         }
     }
 }

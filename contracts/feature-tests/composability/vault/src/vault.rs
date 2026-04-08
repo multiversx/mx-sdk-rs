@@ -50,8 +50,8 @@ pub trait Vault {
         self.blockchain().get_caller()
     }
 
-    fn all_transfers_multi(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
-        self.call_value().all_transfers().clone().into_multi_value()
+    fn all_transfers_multi(&self) -> MultiValueEncoded<PaymentMultiValue> {
+        self.call_value().all().clone().into_multi_value()
     }
 
     #[payable("*")]
@@ -66,7 +66,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn accept_funds_echo_payment(&self) -> MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue> {
+    fn accept_funds_echo_payment(&self) -> MultiValueEncoded<PaymentMultiValue> {
         let esdt_transfers_multi = self.all_transfers_multi();
         self.accept_funds_event(&esdt_transfers_multi);
 
@@ -94,7 +94,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds_with_transfer_exec(
         &self,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
         amount: BigUint,
         opt_receive_func: OptionalValue<ManagedBuffer>,
     ) {
@@ -109,100 +109,51 @@ pub trait Vault {
             .transfer_execute();
     }
 
-    #[allow_multiple_var_args]
-    #[label("promises-endpoint")]
-    #[payable("*")]
     #[endpoint]
-    fn retrieve_funds_promises(
-        &self,
-        back_transfers: OptionalValue<u64>,
-        back_transfer_value: OptionalValue<BigUint>,
-    ) {
-        let payment = self.call_value().egld_or_single_esdt();
-        let caller = self.blockchain().get_caller();
-        let endpoint_name = ManagedBuffer::from(b"");
-        let nr_callbacks = match back_transfers.into_option() {
-            Some(nr) => nr,
-            None => sc_panic!("Nr of calls is None"),
-        };
-
-        let value = match back_transfer_value.into_option() {
-            Some(val) => val,
-            None => sc_panic!("Value for parent callback is None"),
-        };
-
-        let return_payment =
-            EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, value);
-
-        self.num_called_retrieve_funds_promises()
-            .update(|c| *c += 1);
-
-        for _ in 0..nr_callbacks {
-            self.num_async_calls_sent_from_child().update(|c| *c += 1);
-
-            self.tx()
-                .to(&caller)
-                .raw_call(endpoint_name.clone())
-                .payment(&return_payment)
-                .gas(self.blockchain().get_gas_left() / 2)
-                .transfer_execute()
-        }
-    }
-
-    #[endpoint]
-    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
-        self.retrieve_funds_event(&token, nonce, &amount);
+    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: NonZeroBigUint) {
+        self.retrieve_funds_event(&token, nonce, amount.as_big_uint());
         let caller = self.blockchain().get_caller();
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
             self.tx()
                 .to(caller)
-                .esdt((esdt_token_id, nonce, amount))
+                .payment(Payment::new(esdt_token_id, nonce, amount))
                 .transfer();
         } else {
-            self.tx().to(caller).egld(amount).transfer();
+            self.tx().to(caller).egld(amount.as_big_uint()).transfer();
         }
     }
 
     #[endpoint]
     #[payable("*")]
     fn retrieve_funds_egld_or_single_esdt(&self) {
-        let token = self.call_value().egld_or_single_esdt();
-        self.retrieve_funds_event(&token.token_identifier, token.token_nonce, &token.amount);
+        if let Some(payment) = self.call_value().single_optional() {
+            self.retrieve_funds_event(
+                payment.token_identifier.as_legacy(),
+                payment.token_nonce,
+                payment.amount.as_big_uint(),
+            );
 
-        if let Some(esdt_token_id) = token.token_identifier.into_esdt_option() {
-            self.tx()
-                .to(ToCaller)
-                .esdt((esdt_token_id, token.token_nonce, token.amount))
-                .transfer();
-        } else {
-            self.tx().to(ToCaller).egld(token.amount).transfer();
+            self.tx().to(ToCaller).payment(payment).transfer();
         }
     }
 
     #[endpoint]
     #[payable("*")]
-    fn retrieve_funds_multi_esdt(&self) {
-        let tokens = self.call_value().all_esdt_transfers().clone_value();
+    fn retrieve_received_funds_immediately(&self) {
+        let tokens = self.call_value().all();
 
-        self.tx().to(ToCaller).multi_esdt(tokens).transfer();
+        self.tx().to(ToCaller).payment(tokens).transfer();
     }
 
     #[endpoint]
-    fn retrieve_multi_funds_async(
-        &self,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) {
-        let caller = self.blockchain().get_caller();
-        let mut all_payments = ManagedVec::new();
+    fn retrieve_funds_multi(&self, transfers: MultiValueEncoded<PaymentMultiValue>) {
+        self.retrieve_funds_multi_event(&transfers);
 
-        for multi_arg in token_payments.into_iter() {
-            let (token_id, nonce, amount) = multi_arg.into_tuple();
-
-            all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
-        }
-
-        self.tx().to(caller).payment(all_payments).transfer();
+        self.tx()
+            .to(ToCaller)
+            .payment(transfers.convert_payment())
+            .transfer();
     }
 
     #[payable("*")]
@@ -250,16 +201,10 @@ pub trait Vault {
     }
 
     #[event("accept_funds")]
-    fn accept_funds_event(
-        &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
-    );
+    fn accept_funds_event(&self, #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>);
 
     #[event("reject_funds")]
-    fn reject_funds_event(
-        &self,
-        #[indexed] multi_esdt: &MultiValueEncoded<EgldOrEsdtTokenPaymentMultiValue>,
-    );
+    fn reject_funds_event(&self, #[indexed] multi_esdt: &MultiValueEncoded<PaymentMultiValue>);
 
     #[event("retrieve_funds")]
     fn retrieve_funds_event(
@@ -267,6 +212,12 @@ pub trait Vault {
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
+    );
+
+    #[event("retrieve_funds_multi")]
+    fn retrieve_funds_multi_event(
+        &self,
+        #[indexed] transfers: &MultiValueEncoded<PaymentMultiValue>,
     );
 
     #[endpoint]
@@ -279,12 +230,4 @@ pub trait Vault {
     #[view]
     #[storage_mapper("call_counts")]
     fn call_counts(&self, endpoint: ManagedBuffer) -> SingleValueMapper<usize>;
-
-    #[view]
-    #[storage_mapper("num_called_retrieve_funds_promises")]
-    fn num_called_retrieve_funds_promises(&self) -> SingleValueMapper<usize>;
-
-    #[view]
-    #[storage_mapper("num_async_calls_sent_from_child")]
-    fn num_async_calls_sent_from_child(&self) -> SingleValueMapper<usize>;
 }

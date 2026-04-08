@@ -1,23 +1,20 @@
-use crate::{
-    api::CallTypeApi,
-    types::{
-        heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
-        TokenIdentifier,
-    },
+use crate::types::{
+    BigUint, CodeMetadata, CodePath, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+    EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
+    EsdtTokenPaymentRefs, EsdtTokenPaymentVec, ManagedAddress, ManagedBuffer, ManagedVec,
+    TxPaymentCompose, heap::H256,
 };
 
+use alloc::borrow::ToOwned;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    AnnotatedValue, Code, CodePath, ContractCallBase, ContractCallNoPayment, ContractCallWithEgld,
-    ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
+    AnnotatedValue, Code, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
     ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
     TxCodePathValue, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
     TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
-    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified, UpgradeCall, UNSPECIFIED_GAS_LIMIT,
+    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxTo, TxToSpecified,
+    UpgradeCall,
 };
 
 /// Universal representation of a blockchain transaction.
@@ -138,6 +135,61 @@ where
     }
 }
 
+impl<Env, From, To, OldPayment, Gas, Data, RH> Tx<Env, From, To, OldPayment, Gas, Data, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    OldPayment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Adds any payment to a transaction, using the payment compose mechanism.
+    ///
+    /// # Compose Mechanism
+    ///
+    /// The `payment` method is generic and flexible, allowing you to add any type of payment to a transaction.
+    /// It uses the [`TxPaymentCompose`] trait to determine how to combine the existing payment (if any)
+    /// with the new payment being added. This enables a fluent and type-safe way to build up complex payment scenarios.
+    ///
+    /// - If no payment has been added yet (i.e., the payment type is `()`), the new payment is simply set as the transaction's payment.
+    /// - If a payment already exists, the `compose` method is called, which merges the new payment with the existing one according to the rules defined by their types.
+    /// - This allows for single or multiple ESDT payments, EGLD payments, or combinations thereof, all handled transparently.
+    ///
+    /// ## Example
+    ///
+    /// ```ignore
+    /// let tx = Tx::new_with_env(env)
+    ///     .to(address)
+    ///     .payment(esdt_payment)
+    ///     .payment(another_esdt_payment)
+    ///     .payment(egld_payment);
+    /// ```
+    ///
+    /// Each call to `.payment(...)` will combine the new payment with the previous one, producing the correct payment type for the transaction.
+    ///
+    /// This mechanism is extensible and supports custom payment types as long as they implement the required traits.
+    pub fn payment<NewPayment>(
+        self,
+        payment: NewPayment,
+    ) -> Tx<Env, From, To, <OldPayment as TxPaymentCompose<Env, NewPayment>>::Output, Gas, Data, RH>
+    where
+        NewPayment: TxPayment<Env>,
+        OldPayment: TxPaymentCompose<Env, NewPayment>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment.compose(payment),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, (), Gas, Data, RH>
 where
     Env: TxEnv,
@@ -147,22 +199,6 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    /// Adds any payment to a transaction, if no payment has been added before.
-    pub fn payment<Payment>(self, payment: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
-    where
-        Payment: TxPayment<Env>,
-    {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-
     /// Adds EGLD value to a transaction.
     ///
     /// Accepts any type that can represent and EGLD amount: BigUint, &BigUint, etc.
@@ -189,6 +225,10 @@ where
     /// Since this is the first ESDT payment, a single payment tx is produced.
     ///
     /// Can subsequently be called again for multiple payments.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -201,7 +241,7 @@ where
     /// This is handy when we only want one ESDT transfer and we want to avoid unnecessary object clones.
     pub fn single_esdt<'a>(
         self,
-        token_identifier: &'a TokenIdentifier<Env::Api>,
+        token_identifier: &'a EsdtTokenIdentifier<Env::Api>,
         token_nonce: u64,
         amount: &'a BigUint<Env::Api>,
     ) -> Tx<Env, From, To, EsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
@@ -231,12 +271,16 @@ where
     /// Can be formed from single ESDT payments, but the result will always be a collection.
     ///
     /// Always converts the argument into an owned collection of ESDT payments. For work with references, use `.payment(&p)` instead.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<IntoMulti>(
         self,
         payments: IntoMulti,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH>
     where
-        IntoMulti: Into<MultiEsdtPayment<Env::Api>>,
+        IntoMulti: Into<EsdtTokenPaymentVec<Env::Api>>,
     {
         self.payment(payments.into())
     }
@@ -245,16 +289,16 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        self.payment(MultiEsdtPayment::new())
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
+        self.payment(EsdtTokenPaymentVec::new())
             .with_esdt_transfer(payment)
     }
 
     /// Backwards compatibility.
     pub fn with_multi_token_transfer(
         self,
-        payments: MultiEsdtPayment<Env::Api>,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        payments: EsdtTokenPaymentVec<Env::Api>,
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payments)
     }
 
@@ -292,10 +336,14 @@ where
     ///
     /// When the Tx already contains a single (owned) ESDT payment,
     /// adding the second one will convert it to a list.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         let mut payments = ManagedVec::new();
         payments.push(self.payment);
         payments.push(payment.into());
@@ -311,7 +359,7 @@ where
     }
 }
 
-impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
+impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -323,10 +371,14 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, also try to migrate to `Payment` as the unique payment type."
+    )]
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.payment.push(payment.into());
         self
     }
@@ -335,10 +387,14 @@ where
     /// calling `multi_esdt` is equivalent to `esdt`, it just adds another payment to the list.
     ///
     /// Can be called multiple times.
+    #[deprecated(
+        since = "0.65.0",
+        note = "Use .payment(...) instead, it should support all the same, plus composition of payments"
+    )]
     pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.esdt(payment)
     }
 
@@ -346,7 +402,7 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    ) -> Tx<Env, From, To, EsdtTokenPaymentVec<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payment)
     }
 }
@@ -565,7 +621,7 @@ where
     ///
     /// Whenever possible, use proxies instead.
     ///
-    /// Doesa not serialize, does not enforce type safety.
+    /// Does not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
@@ -934,6 +990,17 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Sets the mock transaction ID to be used in a test.
+    ///
+    /// Transaction ids help identifying transactions in tests,
+    /// but they are not used in the actual transaction sending process, so they can be set to any value.
+    ///
+    /// They also show up when generating Mandos (scenario) JSON.
+    pub fn id(mut self, id: &str) -> Self {
+        self.env.set_tx_id(id.to_owned());
+        self
+    }
+
     /// Sets the mock transaction hash to be used in a test.
     ///
     /// Only allowed in tests.
@@ -943,84 +1010,5 @@ where
     {
         self.env.set_tx_hash(H256::from(tx_hash));
         self
-    }
-}
-
-impl<Api, To, Payment, OriginalResult>
-    From<
-        Tx<
-            TxScEnv<Api>,
-            (),
-            To,
-            Payment,
-            (),
-            DeployCall<TxScEnv<Api>, ()>,
-            OriginalResultMarker<OriginalResult>,
-        >,
-    > for ContractDeploy<Api, OriginalResult>
-where
-    Api: CallTypeApi + 'static,
-    To: TxTo<TxScEnv<Api>>,
-    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
-    OriginalResult: TopEncodeMulti,
-{
-    fn from(
-        value: Tx<
-            TxScEnv<Api>,
-            (),
-            To,
-            Payment,
-            (),
-            DeployCall<TxScEnv<Api>, ()>,
-            OriginalResultMarker<OriginalResult>,
-        >,
-    ) -> Self {
-        ContractDeploy {
-            _phantom: core::marker::PhantomData,
-            to: ManagedOption::none(),
-            egld_payment: value.payment.into_egld_payment(&value.env),
-            explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-            arg_buffer: value.data.arg_buffer,
-            _return_type: core::marker::PhantomData,
-        }
-    }
-}
-
-// Conversion from new syntax to old syntax.
-impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
-    for Tx<
-        TxScEnv<Api>,
-        (),
-        To,
-        Payment,
-        (),
-        FunctionCall<Api>,
-        OriginalResultMarker<OriginalResult>,
-    >
-where
-    Api: CallTypeApi + 'static,
-    To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
-    OriginalResult: TopEncodeMulti,
-{
-    type OriginalResult = OriginalResult;
-
-    fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
-        self.payment.with_normalized(
-            &self.env,
-            &self.from,
-            self.to,
-            self.data,
-            |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
-                basic: ContractCallNoPayment {
-                    _phantom: core::marker::PhantomData,
-                    to: norm_to.clone(),
-                    function_call: norm_fc.clone(),
-                    explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-                    _return_type: core::marker::PhantomData,
-                },
-                egld_payment: norm_egld.clone(),
-            },
-        )
     }
 }

@@ -18,6 +18,7 @@ pub mod macro_features;
 pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_decimal_features;
+pub mod managed_map_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
 pub mod small_num_overflow_test_ops;
@@ -88,6 +89,7 @@ pub trait BasicFeatures:
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
     + storage_mapper_get_at_address::StorageMapperGetAtAddress
     + managed_decimal_features::ManagedDecimalFeatures
+    + managed_map_features::ManagedMapFeatures
 {
     #[init]
     fn init(&self) {}
@@ -113,4 +115,42 @@ pub trait BasicFeatures:
 
     #[storage_mapper("coolTree")]
     fn cool_tree(&self) -> OrderedBinaryTreeMapper<Self::Api, BigUint>;
+
+    /// TODO: it's duplicated in composability, de-duplicate after sorting out the interactors
+    #[view]
+    fn get_esdt_token_data(
+        &self,
+        address: ManagedAddress,
+        token_id: EsdtTokenIdentifier,
+        nonce: u64,
+    ) -> EsdtTokenDataMultiValue<Self::Api> {
+        let token_data = self
+            .blockchain()
+            .get_esdt_token_data(&address, &token_id, nonce);
+
+        (
+            token_data.token_type,
+            token_data.amount,
+            token_data.frozen,
+            token_data.hash,
+            token_data.name,
+            token_data.attributes,
+            token_data.creator,
+            token_data.royalties,
+            token_data.uris,
+        )
+            .into()
+    }
 }
+
+pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+    EsdtTokenType,
+    BigUint<M>,
+    bool,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedBuffer<M>,
+    ManagedAddress<M>,
+    BigUint<M>,
+    ManagedVec<M, ManagedBuffer<M>>,
+>;

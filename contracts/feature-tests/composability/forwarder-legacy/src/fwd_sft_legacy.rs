@@ -35,13 +35,13 @@ pub trait ForwarderSftModule: fwd_storage_legacy::ForwarderStorageModule {
     fn sft_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -51,7 +51,7 @@ pub trait ForwarderSftModule: fwd_storage_legacy::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 }

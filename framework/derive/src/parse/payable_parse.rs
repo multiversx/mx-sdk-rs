@@ -1,4 +1,4 @@
-use super::{attributes::PayableAttribute, MethodAttributesPass1};
+use super::{MethodAttributesPass1, attributes::PayableAttribute};
 use crate::model::MethodPayableMetadata;
 
 pub fn process_payable_attribute(

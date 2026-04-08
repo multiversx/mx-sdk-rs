@@ -1,3 +1,6 @@
+//! No longer used, since it the builtin function was dropped.
+#![allow(unused)]
+
 use crate::chain_core::builtin_func_names::MIGRATE_USERNAME_FUNC_NAME;
 use crate::host::context::{BlockchainUpdate, TxCache, TxInput, TxResult};
 use crate::host::runtime::{RuntimeInstanceCallLambda, RuntimeRef};

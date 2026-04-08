@@ -61,6 +61,15 @@ impl ScenarioWorld {
         self
     }
 
+    /// Flag that allows sending funds to inexistent accounts.
+    ///
+    /// Disabled by default, to better signal missing accounts.
+    pub fn insert_ghost_accounts(mut self) -> Self {
+        let vm = &mut self.get_mut_debugger_backend().vm_runner.blockchain_mock.vm;
+        vm.set_insert_ghost_accounts(true);
+        self
+    }
+
     pub fn vm_go() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
@@ -77,10 +86,10 @@ impl ScenarioWorld {
         match self.backend {
             Backend::Debugger(mut debugger) => {
                 debugger.run_scenario_file(&absolute_path);
-            },
+            }
             Backend::VmGoBackend => {
                 run_mx_scenario_go(&absolute_path);
-            },
+            }
         }
     }
 
@@ -145,5 +154,17 @@ impl ScenarioWorld {
     )]
     pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
         self.write_scenario_trace(file_path);
+    }
+
+    #[cfg(feature = "bls")]
+    pub fn create_aggregated_signature(
+        &mut self,
+        pk_size: usize,
+        message: &[u8],
+    ) -> Result<
+        (multiversx_chain_vm::G1, Vec<multiversx_chain_vm::G2>),
+        multiversx_chain_vm::BlsError,
+    > {
+        multiversx_chain_vm::crypto_functions_bls::create_aggregated_signature(pk_size, message)
     }
 }

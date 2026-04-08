@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -22,12 +21,12 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec 1000 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "egldValue": "1000",
-                "function": "forward_transf_exec_egld",
+                "function": "forward_transf_exec",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"
@@ -70,11 +69,11 @@
         },
         {
             "step": "scCall",
-            "id": "11",
+            "id": "forward_transf_exec 0 EGLD",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_transf_exec_egld",
+                "function": "forward_transf_exec",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

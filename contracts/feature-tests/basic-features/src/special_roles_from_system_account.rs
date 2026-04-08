@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait RetrieveSpecialRoles {
     #[endpoint]
-    fn token_has_transfer_role(&self, token_identifier: TokenIdentifier) -> bool {
+    fn token_has_transfer_role(&self, token_identifier: EsdtTokenIdentifier) -> bool {
         self.blockchain().token_has_transfer_role(token_identifier)
     }
 }

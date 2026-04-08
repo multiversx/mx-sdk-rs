@@ -1,12 +1,10 @@
 use crate::{
-    data::{
-        sdk_address::SdkAddress,
-        transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
-    },
+    data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
     gateway::{GetTxInfo, GetTxProcessStatus},
+    utils::base64_encode,
 };
 use log::info;
-use multiversx_chain_core::types::{Address, ReturnCode};
+use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
 
 use crate::gateway::GatewayAsyncService;
 
@@ -34,30 +32,35 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let transaction_info_with_results = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
+                            .unwrap_or_else(|err| {
+                                panic!("Failed to retrieve transaction {tx_hash}: {err}")
+                            });
+
+                        log::info!("Transaction retrieved successfully, with status {status}",);
+                        return (transaction_info_with_results, ReturnCode::Success);
+                    }
+                    "fail" => {
+                        let (error_code, reason) = parse_reason(&reason);
+
+                        let mut failed_transaction: TransactionOnNetwork = proxy
+                            .request(GetTxInfo::new(&tx_hash).with_results())
+                            .await
                             .unwrap();
 
-                        info!(
-                            "Transaction retrieved successfully, with status {}: {:#?}",
-                            status, transaction_info_with_results
-                        );
-                        return (transaction_info_with_results, ReturnCode::Success);
-                    },
-                    "fail" => {
-                        let (error_code, error_message) = parse_reason(&reason);
-                        let failed_transaction_info: TransactionOnNetwork =
-                            create_tx_failed(&error_message);
+                        replace_with_error_message(&mut failed_transaction, &reason);
 
-                        info!(
-                            "Transaction failed with error code: {} and message: {error_message}",
+                        log::error!(
+                            "Transaction {tx_hash} failed with error code: {} and message: {reason}",
                             error_code.as_u64()
                         );
-                        return (failed_transaction_info, error_code);
-                    },
+
+                        return (failed_transaction, error_code);
+                    }
                     _ => {
                         continue;
-                    },
+                    }
                 }
-            },
+            }
             Err(err) => {
                 retries += 1;
                 if retries >= MAX_RETRIES {
@@ -69,15 +72,15 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                 let backoff_time = backoff_delay.min(MAX_BACKOFF_DELAY);
                 proxy.sleep(backoff_time).await;
                 backoff_delay *= 2; // exponential backoff
-            },
+            }
         }
     }
 
     // retries have been exhausted
     println!(
-            "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
-            proxy.elapsed_seconds(&start_time)
-        );
+        "Fetching transaction failed and retries exhausted, returning default transaction. Total elapsed time: {:?}s",
+        proxy.elapsed_seconds(&start_time)
+    );
 
     let error_message = ReturnCode::message(ReturnCode::NetworkTimeout);
     let failed_transaction: TransactionOnNetwork = create_tx_failed(error_message);
@@ -99,7 +102,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             }
 
             (return_code, message)
-        },
+        }
         None => {
             if message.is_empty() {
                 message = extract_message_from_string_reason(reason);
@@ -107,7 +110,7 @@ pub fn parse_reason(reason: &str) -> (ReturnCode, String) {
             let return_code = ReturnCode::from_message(&message).unwrap_or(ReturnCode::UserError);
 
             (return_code, message)
-        },
+        }
     }
 }
 
@@ -145,11 +148,11 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     let mut failed_transaction_info = TransactionOnNetwork::default();
 
     let log: ApiLogs = ApiLogs {
-        address: SdkAddress(Address::zero()),
+        address: Bech32Address::zero_default_hrp(),
         events: vec![Events {
-            address: SdkAddress(Address::zero()),
+            address: Bech32Address::zero_default_hrp(),
             identifier: LOG_IDENTIFIER_SIGNAL_ERROR.to_string(),
-            topics: Some(vec![error_message.to_string()]),
+            topics: vec![String::new(), base64_encode(error_message.as_bytes())],
             data: LogData::default(),
         }],
     };
@@ -157,4 +160,28 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     failed_transaction_info.logs = Some(log);
 
     failed_transaction_info
+}
+
+pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: &str) {
+    if error_message.is_empty() {
+        return;
+    }
+
+    let error_message_encoded = base64_encode(error_message);
+
+    if let Some(event) = find_log(tx) {
+        if event.topics.len() >= 2 && event.topics[1] != error_message_encoded {
+            event.topics[1] = error_message_encoded;
+        }
+    }
+}
+
+fn find_log(tx: &mut TransactionOnNetwork) -> Option<&mut Events> {
+    if let Some(logs) = tx.logs.as_mut() {
+        logs.events
+            .iter_mut()
+            .find(|event| event.identifier == LOG_IDENTIFIER_SIGNAL_ERROR)
+    } else {
+        None
+    }
 }

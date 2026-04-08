@@ -16,38 +16,38 @@ pub async fn adder_cli() {
 
     let config = Config::load_config();
 
-    let mut basic_interact = AdderInteract::new(config).await;
+    let mut basic_interact = BasicInteractor::new(config).await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
         Some(basic_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
             let owner_address = basic_interact.adder_owner_address.clone();
             basic_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Add(args)) => {
             basic_interact.add(args.value).await;
-        },
+        }
         Some(basic_interactor_cli::InteractCliCommand::Sum) => {
             let sum = basic_interact.get_sum().await;
             println!("sum: {sum}");
-        },
-        None => {},
+        }
+        None => {}
     }
 }
 
-pub struct AdderInteract {
+pub struct BasicInteractor {
     pub interactor: Interactor,
     pub adder_owner_address: Bech32Address,
     pub wallet_address: Bech32Address,
     pub state: State,
 }
 
-impl AdderInteract {
+impl BasicInteractor {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
@@ -59,7 +59,7 @@ impl AdderInteract {
 
         interactor.generate_blocks(30u64).await.unwrap();
 
-        AdderInteract {
+        BasicInteractor {
             interactor,
             adder_owner_address: adder_owner_address.into(),
             wallet_address: wallet_address.into(),
@@ -67,10 +67,18 @@ impl AdderInteract {
         }
     }
 
+    pub async fn generate_blocks(&self, num_blocks: i32) {
+        self.interactor
+            .generate_blocks(num_blocks as u64)
+            .await
+            .unwrap();
+    }
+
     pub async fn deploy(&mut self) {
         let new_address = self
             .interactor
             .tx()
+            .id("interactor deploy")
             .from(&self.adder_owner_address.clone())
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
@@ -102,17 +110,18 @@ impl AdderInteract {
         match response {
             Ok(_) => {
                 println!("Contract successfully upgraded.");
-            },
+            }
             Err(tx_err) => {
                 println!("Contract failed upgrade with error: {}", tx_err.message);
                 assert_eq!(tx_err.message, err.unwrap_or_default());
-            },
+            }
         }
     }
 
     pub async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
+            .id("interactor add")
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)

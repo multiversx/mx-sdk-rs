@@ -30,7 +30,7 @@ fn adder_whitebox() {
             sc.init(BigUint::from(3u64));
         });
 
-    assert_eq!(new_address, ADDER_ADDRESS.to_address().into());
+    assert_eq!(new_address, ADDER_ADDRESS.to_address());
 
     world
         .tx()

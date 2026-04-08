@@ -1,6 +1,5 @@
 {
     "comment": "not the main test, just warmup",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -71,7 +70,7 @@
                         "endpoint": "str:accept_funds",
                         "topics": [
                             "str:accept_funds",
-                            "str:EGLD",
+                            "str:EGLD-000000",
                             "0",
                             "1"
                         ],

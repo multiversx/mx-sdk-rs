@@ -1,5 +1,5 @@
 use multiversx_sdk::gateway::NetworkConfigRequest;
-use multiversx_sdk_http::{GatewayHttpProxy, CHAIN_SIMULATOR_GATEWAY};
+use multiversx_sdk_http::{CHAIN_SIMULATOR_GATEWAY, GatewayHttpProxy};
 
 #[tokio::test]
 #[cfg_attr(not(feature = "chain_simulator"), ignore)]

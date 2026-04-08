@@ -8,15 +8,15 @@ use crate::{
 use crate::{
     builtin_functions::BuiltinFunctionEsdtTransferInfo,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::VMAddress,
+    types::Address,
 };
 
 use super::{
     super::BuiltinFunction,
     transfer_common::{
-        adjust_call_type, execute_transfer_builtin_func, extract_transfer_info,
-        push_func_name_if_necessary, push_transfer_bytes, ParsedTransferBuiltinFunCall,
-        RawEsdtTransfer,
+        ParsedTransferBuiltinFunCall, RawEsdtTransfer, adjust_call_type,
+        execute_transfer_builtin_func, extract_transfer_info, push_func_name_if_necessary,
+        push_transfer_bytes,
     },
 };
 
@@ -49,11 +49,11 @@ impl BuiltinFunction for ESDTMultiTransfer {
             Ok(parsed_tx) => {
                 let log = build_log(&tx_input, &parsed_tx);
                 execute_transfer_builtin_func(runtime, parsed_tx, tx_input, tx_cache, log, f)
-            },
+            }
             Err(message) => {
                 let err_result = TxResult::from_vm_error(message);
                 (err_result, BlockchainUpdate::empty())
-            },
+            }
         }
     }
 }
@@ -92,7 +92,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
 
     let mut arg_index = 0;
     let destination_bytes = tx_input.args[arg_index].as_slice();
-    let destination = VMAddress::from_slice(destination_bytes);
+    let destination = Address::from_slice(destination_bytes);
     arg_index += 1;
     let num_payments = top_decode_u64(tx_input.args[arg_index].as_slice()) as usize;
     arg_index += 1;

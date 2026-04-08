@@ -22,31 +22,26 @@ pub trait AdderCaller {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn call_adder(&self, value: BigUint) -> ManagedBuffer {
+    fn call_adder(&self, value: BigUint) {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(value);
 
-        let result = self.send_raw().direct_egld_execute(
+        self.send_raw().direct_egld_execute(
             &self.dest().get(),
             &BigUint::from(30u32),
             5000000,
             &ManagedBuffer::from(b"add"),
             &arg_buffer,
         );
-
-        match result {
-            Result::Err(e) => sc_panic!(e),
-            Result::Ok(_) => ManagedBuffer::from("added"),
-        }
     }
 
     #[endpoint]
     #[payable("MYESDT")]
-    fn call_adder_esdt(&self, value: BigUint) -> ManagedBuffer {
+    fn call_adder_esdt(&self, value: BigUint) {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(value);
 
-        let result = self.send_raw().transfer_esdt_execute(
+        self.send_raw().transfer_esdt_execute(
             &self.dest().get(),
             &TokenIdentifier::from_esdt_bytes(b"MYESDT"),
             &BigUint::from(20u32),
@@ -54,11 +49,6 @@ pub trait AdderCaller {
             &ManagedBuffer::from(b"add"),
             &arg_buffer,
         );
-
-        match result {
-            Result::Err(e) => sc_panic!(e),
-            Result::Ok(_) => ManagedBuffer::from("added-esdt"),
-        }
     }
 }
 

@@ -1,4 +1,5 @@
 use crate::{
+    ScenarioWorld,
     api::DebugApi,
     executor::debug::ContractContainer,
     multiversx_sc::{
@@ -7,7 +8,6 @@ use crate::{
     },
     scenario_format::interpret_trait::InterpreterContext,
     scenario_model::BytesValue,
-    ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 

@@ -60,7 +60,7 @@ impl ContractAbi {
 
     /// Contract main crate name.
     pub fn get_crate_name(&self) -> &str {
-        self.build_info.contract_crate.name
+        &self.build_info.contract_crate.name
     }
 
     /// Contract main crate name, but with underscores instead of dashes.
@@ -82,5 +82,33 @@ impl ContractAbi {
             .chain(self.upgrade_constructors.iter())
             .chain(self.endpoints.iter())
             .chain(self.promise_callbacks.iter())
+    }
+
+    /// Looks up an endpoint by name.
+    pub fn find_endpoint(&self, endpoint_name: &str) -> Option<&EndpointAbi> {
+        self.endpoints.iter().find(|e| e.name == endpoint_name)
+    }
+
+    /// Looks up the ABI inputs for an endpoint by its scenario name.
+    pub fn find_endpoint_inputs(&self, endpoint_name: &str) -> Option<Vec<InputAbi>> {
+        self.find_endpoint(endpoint_name).map(|e| e.inputs.clone())
+    }
+
+    /// Looks up the ABI outputs for an endpoint by its scenario name.
+    pub fn find_endpoint_outputs(&self, endpoint_name: &str) -> Option<Vec<OutputAbi>> {
+        self.find_endpoint(endpoint_name).map(|e| e.outputs.clone())
+    }
+
+    /// Looks up the ABI inputs for the constructor.
+    pub fn find_constructor_inputs(&self) -> Option<Vec<InputAbi>> {
+        self.constructors.first().map(|e| e.inputs.clone())
+    }
+
+    /// Maps an endpoint name from the scenario (usually camelCase) to the Rust method name (snake_case)
+    /// by looking it up in the contract ABI.
+    pub fn find_endpoint_rust_name(&self, scenario_endpoint_name: &str) -> String {
+        self.find_endpoint(scenario_endpoint_name)
+            .map(|e| e.rust_method_name.clone())
+            .unwrap_or_else(|| scenario_endpoint_name.to_string())
     }
 }

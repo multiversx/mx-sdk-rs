@@ -1,5 +1,5 @@
-use quote::{quote, ToTokens};
-use syn::{punctuated::Punctuated, token::Comma, Variant};
+use quote::{ToTokens, quote};
+use syn::{Variant, punctuated::Punctuated, token::Comma};
 
 pub const BITFLAGS_PRIMITIVE: &str = ":: __private :: PublicFlags > :: Primitive";
 const BITFLAGS_INTERNAL: &str = ":: __private :: PublicFlags > :: Internal";
@@ -44,7 +44,7 @@ pub fn self_field_expr(index: usize, field: &syn::Field) -> proc_macro2::TokenSt
             } else {
                 quote!(self.#index_lit)
             }
-        },
+        }
     }
 }
 
@@ -98,7 +98,7 @@ where
             quote! {
                 { #(#local_variables),* }
             }
-        },
+        }
         syn::Fields::Unnamed(fields_unnamed) => {
             let local_variables: Vec<proc_macro2::TokenStream> = fields_unnamed
                 .unnamed
@@ -109,7 +109,7 @@ where
             quote! {
                 ( #(#local_variables),* )
             }
-        },
+        }
         syn::Fields::Unit => quote! {},
     }
 }
@@ -138,7 +138,7 @@ pub fn get_discriminant(
                     value,
                 });
                 value
-            },
+            }
             _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
         };
         return quote! { #lit};

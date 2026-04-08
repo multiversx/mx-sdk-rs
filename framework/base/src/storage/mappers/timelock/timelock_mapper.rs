@@ -1,18 +1,18 @@
 use core::{borrow::Borrow, marker::PhantomData};
 
 pub use crate::storage::mappers::{
-    single_value_mapper::SingleValue, source::CurrentStorage, StorageMapper,
+    StorageMapper, single_value_mapper::SingleValue, source::CurrentStorage,
 };
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{BlockchainApi, BlockchainApiImpl, StorageMapperApi},
     codec::{
-        multi_types::PlaceholderOutput, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_types::PlaceholderOutput,
     },
     imports::StorageMapperFromAddress,
     storage::{
-        mappers::source::StorageAddress, storage_clear, storage_overwrite, storage_set, StorageKey,
+        StorageKey, mappers::source::StorageAddress, storage_clear, storage_overwrite, storage_set,
     },
     storage_get,
     types::{ManagedAddress, ManagedType},
@@ -21,6 +21,9 @@ use crate::{
 const UNLOCK_TIMESTAMP_KEY: &[u8] = b"unlock_timestamp";
 const FUTURE_VALUE_KEY: &[u8] = b"future_value";
 
+/// Note that TimelockMapper uses the block time in seconds.
+///
+/// TODO: create a new timelock mapper that works with millisecond timestamp.
 pub struct TimelockMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,

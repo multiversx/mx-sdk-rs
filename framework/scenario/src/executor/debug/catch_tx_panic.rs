@@ -31,7 +31,7 @@ where
                 // fallback, general panics
                 Err(interpret_panic_as_tx_panic(panic_any, panic_message_flag))
             }
-        },
+        }
     }
 }
 
