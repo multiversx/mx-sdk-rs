@@ -8,7 +8,7 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToQueryStep,
     scenario_model::TxResponse,
 };
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
 
 use crate::InteractorBase;
 
@@ -46,6 +46,10 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_query(self)
+    }
+
+    fn into_sdk_transaction(self) -> Transaction {
+        unimplemented!("SC queries don't produce blockchain transactions")
     }
 }
 

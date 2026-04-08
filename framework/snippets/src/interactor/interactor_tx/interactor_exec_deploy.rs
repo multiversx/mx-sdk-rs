@@ -10,7 +10,7 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::{ScDeployStep, TxResponse},
 };
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
 
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
@@ -100,6 +100,14 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_deploy(self)
+    }
+
+    fn into_sdk_transaction(self) -> Transaction {
+        let step_wrapper = self.tx_to_step();
+        step_wrapper
+            .env
+            .world
+            .sc_deploy_to_blockchain_tx(&step_wrapper.step)
     }
 }
 
