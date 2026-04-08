@@ -2,7 +2,7 @@ mod contract_variant;
 mod contract_variant_builder;
 mod contract_variant_settings;
 mod contract_variant_validate;
-mod execute_command;
+pub(crate) mod execute_command;
 pub mod proxy_config;
 mod sc_config_model;
 mod sc_config_proxy;

@@ -82,7 +82,7 @@ where
 
     pub fn wrapped_egld_token_identifier(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenId<Env::Api>> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getWrappedEgldTokenIdentifier")

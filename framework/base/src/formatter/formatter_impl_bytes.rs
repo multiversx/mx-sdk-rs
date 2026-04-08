@@ -1,6 +1,6 @@
 use super::{
-    hex_util::{byte_to_binary_digits, encode_bytes_as_hex},
     FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+    hex_util::{byte_to_binary_digits, encode_bytes_as_hex},
 };
 
 impl SCDisplay for &[u8] {

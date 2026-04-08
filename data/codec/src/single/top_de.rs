@@ -1,8 +1,8 @@
 use alloc::boxed::Box;
 
 use crate::{
-    codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecode,
-    NestedDecodeInput, TopDecodeInput,
+    DecodeErrorHandler, DefaultErrorHandler, NestedDecode, NestedDecodeInput, TopDecodeInput,
+    codec_err::DecodeError,
 };
 
 /// Trait that allows zero-copy read of values from an underlying API in big endian format.
@@ -11,7 +11,7 @@ use crate::{
 /// so we have the benefit of knowing their length.
 /// This is useful in many scenarios, such as not having to encode Vec length and others.
 ///
-/// The opther optimization that can be done when deserializing top-level objects
+/// The other optimization that can be done when deserializing top-level objects
 /// is using special functions from the underlying API that do some of the work for the deserializer.
 /// These include getting values directly as i64/u64 or wrapping them directly into an owned Box<[u8]>.
 ///

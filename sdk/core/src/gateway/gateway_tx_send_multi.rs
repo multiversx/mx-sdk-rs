@@ -34,7 +34,7 @@ impl GatewayRequest for SendMultiTxRequest<'_> {
                 }
 
                 Ok(tx_hashes)
-            },
+            }
         }
     }
 }

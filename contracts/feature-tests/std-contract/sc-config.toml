@@ -1,0 +1,5 @@
+[contracts.std-contract]
+std = true
+rustc-version = "1.86" # necessary for building std, without bulk memory operations
+rustc-target = "wasm32-unknown-unknown"
+# wasm-opt-version = "116" ## TODO: enable once the CI wasm-opt installer provides a predictable version of wasm-opt

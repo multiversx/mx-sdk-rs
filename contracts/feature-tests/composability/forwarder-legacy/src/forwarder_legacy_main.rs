@@ -9,6 +9,7 @@ pub mod fwd_call_transf_exec_legacy;
 pub mod fwd_change_owner_legacy;
 pub mod fwd_deploy_legacy;
 pub mod fwd_esdt_legacy;
+pub mod fwd_fallible_legacy;
 pub mod fwd_nft_legacy;
 pub mod fwd_roles_legacy;
 pub mod fwd_sft_legacy;
@@ -27,6 +28,7 @@ pub trait ForwarderLegacy:
     + fwd_deploy_legacy::DeployContractModule
     + fwd_upgrade_legacy::UpgradeContractModule
     + fwd_esdt_legacy::ForwarderEsdtModule
+    + fwd_fallible_legacy::ForwarderFallibleModule
     + fwd_sft_legacy::ForwarderSftModule
     + fwd_nft_legacy::ForwarderNftModule
     + fwd_roles_legacy::ForwarderRolesModule

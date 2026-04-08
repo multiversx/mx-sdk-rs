@@ -13,11 +13,11 @@ impl<T: NestedEncode> NestedEncode for Option<T> {
             Some(v) => {
                 dest.push_byte(1u8);
                 v.dep_encode_or_handle_err(dest, h)
-            },
+            }
             None => {
                 dest.push_byte(0u8);
                 Ok(())
-            },
+            }
         }
     }
 }
@@ -50,10 +50,10 @@ impl<T: NestedEncode> TopEncode for Option<T> {
                 buffer.push_byte(1u8);
                 v.dep_encode_or_handle_err(&mut buffer, h)?;
                 output.finalize_nested_encode(buffer);
-            },
+            }
             None => {
                 output.set_slice_u8(&[]);
-            },
+            }
         }
         Ok(())
     }
@@ -90,8 +90,8 @@ pub mod tests {
     use alloc::vec::Vec;
 
     use crate::{
-        test_util::{check_top_decode, check_top_encode_decode},
-        DecodeError, TopDecode,
+        DecodeError, DefaultErrorHandler, TopDecode, dep_decode_from_byte_slice,
+        test_util::{check_dep_encode_decode, check_top_decode, check_top_encode_decode},
     };
 
     #[test]
@@ -132,5 +132,22 @@ pub mod tests {
             Option::<u32>::top_decode(&[0x02u8][..]),
             Err(DecodeError::INVALID_VALUE)
         );
+    }
+
+    #[test]
+    fn test_dep() {
+        // Some(u32)
+        check_dep_encode_decode(Some(5u32), &[1, 0, 0, 0, 5]);
+        check_dep_encode_decode(Some(0u32), &[1, 0, 0, 0, 0]);
+
+        // None
+        check_dep_encode_decode(Option::<u32>::None, &[0]);
+    }
+
+    #[test]
+    fn test_dep_decode_invalid_discriminant() {
+        let result: Result<Option<u32>, _> =
+            dep_decode_from_byte_slice(&[2u8, 0, 0, 0, 0], DefaultErrorHandler);
+        assert_eq!(result, Err(DecodeError::INVALID_VALUE));
     }
 }

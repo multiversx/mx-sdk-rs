@@ -42,9 +42,5 @@ impl PreComputedGroupElement {
 // equal returns 1 if b == c and 0 otherwise, assuming that b and c are
 // non-negative.
 fn equal(b: i32, c: i32) -> i32 {
-    if b == c {
-        1
-    } else {
-        0
-    }
+    if b == c { 1 } else { 0 }
 }

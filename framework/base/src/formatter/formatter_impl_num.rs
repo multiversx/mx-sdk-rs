@@ -1,4 +1,4 @@
-use super::{hex_util::byte_to_hex_digits, SCBinary, SCDisplay, SCLowerHex};
+use super::{SCBinary, SCDisplay, SCLowerHex, hex_util::byte_to_hex_digits};
 
 const MINUS_SYMBOL: &[u8] = b"-";
 

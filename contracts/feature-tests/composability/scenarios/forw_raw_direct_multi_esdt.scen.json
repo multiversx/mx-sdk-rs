@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -39,7 +38,7 @@
                         "value": "2000"
                     }
                 ],
-                "function": "forward_direct_esdt_multi",
+                "function": "forward_direct_transfer",
                 "arguments": [
                     "address:a_user"
                 ],

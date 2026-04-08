@@ -1,7 +1,7 @@
 use core::ops::DerefMut;
 
 use crate::{
-    api::{const_handles, CallTypeApi},
+    api::{CallTypeApi, const_handles},
     contract_base::SendRawWrapper,
     types::{BigUint, CallbackClosure, FunctionCall, ManagedAddress, ManagedBuffer},
 };

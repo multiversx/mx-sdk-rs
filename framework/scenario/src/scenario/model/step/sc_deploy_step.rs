@@ -1,22 +1,14 @@
 use multiversx_sc::types::H256;
 
 use crate::{
-    api::StaticApi,
-    scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-};
-
-use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
     scenario_model::TxResponse,
 };
 
 use crate::multiversx_sc::types::CodeMetadata;
 
-use super::{convert_call_args, TypedScDeploy};
-
 #[derive(Debug, Clone)]
 pub struct ScDeployStep {
-    pub id: String,
     pub tx_id: Option<String>,
     pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
@@ -28,7 +20,6 @@ pub struct ScDeployStep {
 impl Default for ScDeployStep {
     fn default() -> Self {
         Self {
-            id: Default::default(),
             tx_id: Default::default(),
             explicit_tx_hash: Default::default(),
             comment: Default::default(),
@@ -42,6 +33,14 @@ impl Default for ScDeployStep {
 impl ScDeployStep {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn get_tx_id(&self) -> &str {
+        if let Some(tx_id) = &self.tx_id {
+            tx_id
+        } else {
+            ""
+        }
     }
 
     pub fn from<V>(mut self, expr: V) -> Self
@@ -73,15 +72,6 @@ impl ScDeployStep {
         self
     }
 
-    #[deprecated(
-        since = "0.42.0",
-        note = "Please use method `code` instead. To ease transition, it is also possible to call it with a tuple like so: `.code((expr, context))`"
-    )]
-    pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
-        self.tx.contract_code = BytesValue::interpret_from(expr, context);
-        self
-    }
-
     pub fn argument(mut self, expr: &str) -> Self {
         self.tx.arguments.push(BytesValue::from(expr));
         self
@@ -93,25 +83,6 @@ impl ScDeployStep {
     {
         self.tx.gas_limit = U64Value::from(value);
         self
-    }
-
-    /// Sets following fields based on the smart contract proxy:
-    /// - "function"
-    /// - "arguments"
-    #[deprecated(
-        since = "0.49.0",
-        note = "Please use the unified transaction syntax instead."
-    )]
-    #[allow(deprecated)]
-    pub fn call<OriginalResult, CD>(mut self, contract_deploy: CD) -> TypedScDeploy<OriginalResult>
-    where
-        CD: Into<multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>>,
-    {
-        let (_, mandos_args) = process_contract_deploy(contract_deploy.into());
-        for arg in mandos_args {
-            self = self.argument(arg.as_str());
-        }
-        self.into()
     }
 
     /// Adds a custom expect section to the tx.
@@ -155,23 +126,4 @@ impl AsMut<ScDeployStep> for ScDeployStep {
     fn as_mut(&mut self) -> &mut ScDeployStep {
         self
     }
-}
-
-/// Extracts
-/// - (optional) recipient (needed for contract upgrade, not yet used);
-/// - the arguments.
-#[deprecated(
-    since = "0.49.0",
-    note = "Please use the unified transaction syntax instead."
-)]
-#[allow(deprecated)]
-pub(crate) fn process_contract_deploy<OriginalResult>(
-    contract_deploy: multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>,
-) -> (Option<String>, Vec<String>) {
-    let to_str = contract_deploy
-        .to
-        .as_option()
-        .map(|to| format!("0x{}", hex::encode(to.to_address().as_bytes())));
-    let mandos_args = convert_call_args(&contract_deploy.arg_buffer);
-    (to_str, mandos_args)
 }

@@ -5,23 +5,23 @@ use crate::{
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
-        source::{CurrentStorage, StorageAddress},
         StorageMapperFromAddress,
+        source::{CurrentStorage, StorageAddress},
     },
     storage_clear, storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
         ESDTSystemSCAddress, ManagedRef, Tx,
+        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
     },
 };
 
 use super::{
     super::StorageMapper,
+    TokenMapperState,
     error::{
         INVALID_PAYMENT_TOKEN_ERR_MSG, INVALID_TOKEN_ID_ERR_MSG, MUST_SET_TOKEN_ID_ERR_MSG,
         PENDING_ERR_MSG, TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
-    TokenMapperState,
 };
 use crate::{
     abi::TypeName,
@@ -29,8 +29,8 @@ use crate::{
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, CallbackClosure, EsdtTokenIdentifier, EsdtTokenPayment, EsdtTokenType,
+        ManagedAddress, ManagedBuffer, ManagedType, ManagedVec,
     },
 };
 
@@ -38,6 +38,45 @@ pub(crate) const DEFAULT_ISSUE_CALLBACK_NAME: &str = "default_issue_cb";
 pub(crate) const DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME: &str =
     "default_issue_init_supply_cb";
 
+/// High-level mapper for fungible ESDT tokens, providing token issuance, minting, burning,
+/// and management operations. This mapper handles the complete lifecycle of fungible tokens
+/// from issuance to day-to-day operations.
+///
+/// # Storage Layout
+///
+/// The mapper stores the token state at the base key:
+/// - `base_key` → `TokenMapperState<SA>` (NotSet | Pending | Token(EsdtTokenIdentifier))
+///
+/// # Main Operations
+///
+/// ## Token Lifecycle
+/// - **Issue**: Create new fungible token via `issue()` or `issue_and_set_all_roles()`
+/// - **Set ID**: Manually set token ID with `set_token_id()` for existing tokens
+/// - **Query**: Check token state with `is_empty()`, `get_token_id()`, etc.
+///
+/// ## Token Operations
+/// - **Mint**: Create new token supply with `mint()` or `mint_and_send()`
+/// - **Burn**: Destroy token supply with `burn()`
+/// - **Transfer**: Send tokens with `send_payment()`
+/// - **Roles**: Manage token roles with `set_local_roles()`
+///
+/// ## Balance Management
+/// - **Query Balance**: Check contract's balance with `get_balance()`
+/// - **Payment Validation**: Ensure payments match expected token
+///
+/// # Trade-offs
+///
+/// **Advantages:**
+/// - Complete token lifecycle management in one mapper
+/// - Built-in async callback handling for issuance
+/// - Payment validation and role management
+/// - Automatic error handling for invalid states
+///
+/// **Limitations:**
+/// - Single token per mapper instance
+/// - Requires careful callback implementation for custom flows
+/// - Token issuance requires blockchain interaction
+/// - State transitions must follow protocol rules
 pub struct FungibleTokenMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi + CallTypeApi,
@@ -220,7 +259,7 @@ where
             .transfer();
     }
 
-    pub fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_if_empty(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         if self.is_empty() {
             self.set_token_id(token_id);
         }
@@ -252,12 +291,12 @@ where
             .async_call_and_exit()
     }
 
-    pub fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+    pub fn set_token_id(&mut self, token_id: EsdtTokenIdentifier<SA>) {
         self.store_token_id(&token_id);
         self.token_state = TokenMapperState::Token(token_id);
     }
 
-    pub(crate) fn store_token_id(&self, token_id: &TokenIdentifier<SA>) {
+    pub(crate) fn store_token_id(&self, token_id: &EsdtTokenIdentifier<SA>) {
         if self.get_token_state().is_set() {
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
         }
@@ -289,7 +328,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
     A: StorageAddress<SA>,
 {
-    pub fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>> {
+    pub fn get_storage_key(&self) -> ManagedRef<'_, SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 
@@ -297,7 +336,7 @@ where
         self.token_state.clone()
     }
 
-    pub fn get_token_id(&self) -> TokenIdentifier<SA> {
+    pub fn get_token_id(&self) -> EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token.clone()
         } else {
@@ -305,7 +344,7 @@ where
         }
     }
 
-    pub fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+    pub fn get_token_id_ref(&self) -> &EsdtTokenIdentifier<SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token
         } else {
@@ -323,7 +362,7 @@ where
         }
     }
 
-    pub fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+    pub fn require_same_token(&self, expected_token_id: &EsdtTokenIdentifier<SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
@@ -360,13 +399,13 @@ where
     pub(crate) fn check_not_set(&self) {
         let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
         match storage_value {
-            TokenMapperState::NotSet => {},
+            TokenMapperState::NotSet => {}
             TokenMapperState::Pending => {
                 SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-            },
+            }
             TokenMapperState::Token(_) => {
                 SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-            },
+            }
         }
     }
 }
@@ -388,7 +427,7 @@ where
     }
 }
 
-impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
@@ -402,15 +441,15 @@ where
     type Unmanaged = Self;
 
     fn type_name() -> TypeName {
-        TokenIdentifier::<SA>::type_name()
+        EsdtTokenIdentifier::<SA>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        TokenIdentifier::<SA>::type_name_rust()
+        EsdtTokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+        EsdtTokenIdentifier::<SA>::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {

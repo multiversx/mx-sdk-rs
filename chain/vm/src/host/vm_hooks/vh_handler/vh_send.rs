@@ -5,11 +5,12 @@ use crate::{
     },
     host::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext},
+        vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
-    types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
+    types::{Address, RawHandle, VMCodeMetadata, top_encode_big_uint, top_encode_u64},
     vm_err_msg,
 };
+use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_traits::Zero;
 
@@ -29,7 +30,7 @@ fn append_endpoint_name_and_args(
 impl<C: VMHooksContext> VMHooksHandler<C> {
     fn perform_transfer_execute_esdt(
         &mut self,
-        to: VMAddress,
+        to: Address,
         token: Vec<u8>,
         amount: num_bigint::BigUint,
         _gas_limit: u64,
@@ -50,7 +51,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     #[allow(clippy::too_many_arguments)]
     fn perform_transfer_execute_nft(
         &mut self,
-        to: VMAddress,
+        to: Address,
         token: Vec<u8>,
         nonce: u64,
         amount: num_bigint::BigUint,
@@ -79,7 +80,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
     fn perform_transfer_execute_multi(
         &mut self,
-        to: VMAddress,
+        to: Address,
         payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
         endpoint_name: TxFunctionName,
@@ -110,7 +111,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
     fn perform_upgrade_contract(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
@@ -191,6 +192,25 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         } else {
             self.perform_transfer_execute_multi(to, payments, gas_limit, endpoint_name, arg_buffer)
         }
+    }
+
+    pub fn managed_multi_transfer_esdt_nft_execute_with_return(
+        &mut self,
+        to_handle: i32,
+        payments_handle: i32,
+        gas_limit: u64,
+        function_handle: i32,
+        arguments_handle: i32,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        self.multi_transfer_esdt_nft_execute(
+            to_handle,
+            payments_handle,
+            gas_limit,
+            function_handle,
+            arguments_handle,
+        )?;
+        // TODO: fallibility
+        Ok(0)
     }
 
     pub fn async_call_raw(
@@ -394,7 +414,14 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
 
-    pub fn execute_on_dest_context_raw(
+    /// Executes a sync call, and returns the TxResult, as-is.
+    ///
+    /// It is also used in the fallible variant, so it will not kill the current execution on execution error.
+    ///
+    /// However, it will cause a failure if any other failure occurs, such as parsing the arguments.
+    ///
+    /// Gas usage should also cause an immediate failure, but it isn't yet implemented.
+    fn execute_on_dest_context_fallible_raw(
         &mut self,
         _gas: u64,
         to_handle: RawHandle,
@@ -402,7 +429,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
-    ) -> Result<(), VMHooksEarlyExit> {
+    ) -> Result<(ReturnCode, String), VMHooksEarlyExit> {
         let to = self.context.m_types_lock().mb_to_address(to_handle);
         let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
@@ -411,16 +438,69 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.load_arg_data(arg_buffer_handle)?;
 
-        let result = self.context.perform_execute_on_dest_context(
+        let tx_result = self.context.perform_execute_on_dest_context(
             to,
             egld_value,
             endpoint_name,
             arg_buffer,
         )?;
 
-        self.set_return_data(result_handle, result)?;
+        if tx_result.result_status.is_success() {
+            self.set_return_data(result_handle, tx_result.result_values)?;
+        }
 
-        Ok(())
+        Ok((tx_result.result_status, tx_result.result_message))
+    }
+
+    pub fn execute_on_dest_context_raw(
+        &mut self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let (result_status, result_message) = self.execute_on_dest_context_fallible_raw(
+            gas,
+            to_handle,
+            egld_value_handle,
+            endpoint_name_handle,
+            arg_buffer_handle,
+            result_handle,
+        )?;
+
+        if result_status.is_success() {
+            Ok(())
+        } else {
+            // kill current execution
+            Err(VMHooksEarlyExit::new(result_status.as_u64()).with_message(result_message.clone()))
+        }
+    }
+
+    pub fn execute_on_dest_context_fallible(
+        &mut self,
+        gas: u64,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) -> Result<i32, VMHooksEarlyExit> {
+        let (result_status, _) = self.execute_on_dest_context_fallible_raw(
+            gas,
+            to_handle,
+            egld_value_handle,
+            endpoint_name_handle,
+            arg_buffer_handle,
+            result_handle,
+        )?;
+
+        if result_status.is_success() {
+            Ok(0)
+        } else {
+            Ok(1)
+        }
     }
 
     pub fn execute_on_dest_context_readonly_raw(

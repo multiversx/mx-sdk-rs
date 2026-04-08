@@ -16,7 +16,7 @@ pub fn generate() {
     match &cli.command {
         Some(cli::CliCommand::Generate(arg)) => {
             generate_file_content(arg.toml_version);
-        },
-        None => {},
+        }
+        None => {}
     }
 }

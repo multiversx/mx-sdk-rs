@@ -25,14 +25,14 @@ pub trait ZombieFeeding:
     fn trigger_cooldown(&self, zombie_id: usize) {
         let cooldown_time = self.cooldown_time().get();
         self.zombies(&zombie_id).update(|my_zombie| {
-            my_zombie.ready_time = self.blockchain().get_block_timestamp() + cooldown_time
+            my_zombie.ready_time = self.blockchain().get_block_timestamp_millis() + cooldown_time
         });
     }
 
     #[view]
     fn is_ready(&self, zombie_id: usize) -> bool {
         let my_zombie = self.zombies(&zombie_id).get();
-        my_zombie.ready_time <= self.blockchain().get_block_timestamp()
+        my_zombie.ready_time <= self.blockchain().get_block_timestamp_millis()
     }
 
     #[callback]
@@ -45,8 +45,8 @@ pub trait ZombieFeeding:
             ManagedAsyncCallResult::Ok(kitty) => {
                 let kitty_dna = kitty.genes.get_as_u64();
                 self.feed_and_multiply(zombie_id, kitty_dna, ManagedBuffer::from(b"kitty"));
-            },
-            ManagedAsyncCallResult::Err(_) => {},
+            }
+            ManagedAsyncCallResult::Err(_) => {}
         }
     }
 

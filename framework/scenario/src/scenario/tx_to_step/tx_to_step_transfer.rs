@@ -2,7 +2,7 @@ use multiversx_sc::types::{Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpe
 
 use crate::{imports::TxESDT, scenario_model::TransferStep};
 
-use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
+use super::{StepWrapper, TxToStep, address_annotated, gas_annotated};
 
 impl<Env, From, To, Payment, Gas> TxToStep<Env, ()> for Tx<Env, From, To, Payment, Gas, (), ()>
 where
@@ -45,7 +45,7 @@ where
 
     step.tx.gas_limit = gas_annotated(env, gas);
 
-    let full_payment_data = payment.into_full_payment_data(env);
+    let full_payment_data = payment.into_scenario_payments(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     } else {

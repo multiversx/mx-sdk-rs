@@ -1,7 +1,7 @@
 [package]
 name = "multiversx-chain-vm-wasmer-prod"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
 publish = false
 
 description = "MultiversX VM adapter for the Wasmer Production executor"
@@ -9,24 +9,26 @@ description = "MultiversX VM adapter for the Wasmer Production executor"
 [lib]
 path = "src/wasmer_prod.rs"
 
+[dependencies]
+home = "=0.5.1" # downgrading, >= 0.5.2 requires rustc 1.88, which is causing linker problems on Linux
+
 [dependencies.multiversx-chain-core]
-version = "=0.15.0"
+version = "=0.22.1"
 path = "../core"
 
 
 [dependencies.multiversx-chain-vm]
-version = "=0.15.0"
+version = "=0.22.1"
 path = "../vm"
 
 [dependencies.multiversx-chain-vm-executor]
-version = "0.4.0"
+version = "=0.5.1"
 
 [dependencies.multiversx-chain-vm-executor-wasmer]
-version = "0.4.0"
+version = "=0.5.1"
 default-features = false
-features = ["multiversx-chain-vm-executor-published"]
 git = "https://github.com/multiversx/mx-vm-executor-rs"
-rev = "163cf65be3cd204408c6d23b264e17aa9a9449e2"
+rev = "bcdc91e2e280b31acbf6aa9d03a4c11c70b8cc39"
 
 [workspace]
 members = ["."]

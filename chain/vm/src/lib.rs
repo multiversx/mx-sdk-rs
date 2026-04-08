@@ -1,3 +1,8 @@
+// TODO: remove once minimum version is 1.87+
+#![allow(unknown_lints)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::manual_is_multiple_of)]
+
 pub mod blockchain;
 pub mod builtin_functions;
 pub mod crypto_functions;
@@ -8,7 +13,6 @@ pub mod schedule;
 pub mod system_sc;
 pub mod types;
 pub mod vm_err_msg;
-pub mod with_shared;
 
 pub use blockchain::BlockchainMock;
 
@@ -20,3 +24,9 @@ pub use multiversx_chain_core as chain_core;
 
 #[macro_use]
 extern crate alloc;
+
+#[cfg(feature = "bls")]
+pub mod crypto_functions_bls;
+
+#[cfg(feature = "bls")]
+pub use multiversx_bls::{BlsError, G1, G2};

@@ -83,7 +83,7 @@ where
             ManagedAsyncCallResult::Ok(result) => {
                 0u32.multi_encode_or_handle_err(output, h)?;
                 result.multi_encode_or_handle_err(output, h)?;
-            },
+            }
             ManagedAsyncCallResult::Err(error_message) => {
                 error_message
                     .err_code
@@ -91,7 +91,7 @@ where
                 error_message
                     .err_msg
                     .multi_encode_or_handle_err(output, h)?;
-            },
+            }
         }
         Ok(())
     }

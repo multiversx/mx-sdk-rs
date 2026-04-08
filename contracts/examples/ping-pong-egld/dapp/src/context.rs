@@ -40,7 +40,8 @@ pub fn config_provider(props: &ChildrenProps) -> Html {
     let set_network_status_async = set_network_status.clone();
 
     // refresh context on component mount
-    use_effect_with_deps(
+    use_effect_with(
+        (), // empty dependency array, run once on mount
         move |_| {
             wasm_bindgen_futures::spawn_local(async move {
                 let new_status = refresh_context().await;
@@ -50,7 +51,6 @@ pub fn config_provider(props: &ChildrenProps) -> Html {
             });
             || () // no cleanup fn
         },
-        (), // empty dependency array, run once on mount
     );
 
     let context = ConfigContext {
@@ -60,7 +60,7 @@ pub fn config_provider(props: &ChildrenProps) -> Html {
 
     html! {
         <ContextProvider<ConfigContext> context={context}>
-            { for props.children.iter() }
+            { props.children.clone() }
         </ContextProvider<ConfigContext>>
     }
 }

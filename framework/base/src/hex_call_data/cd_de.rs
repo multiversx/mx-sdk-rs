@@ -91,14 +91,14 @@ impl<'a> HexCallDataDeserializer<'a> {
                     match hex_digits_to_byte(arg_hex[2 * i], arg_hex[2 * i + 1]) {
                         None => {
                             return Err(err_msg::DESERIALIZATION_INVALID_BYTE);
-                        },
+                        }
                         Some(byte) => {
                             res_vec.push(byte);
-                        },
+                        }
                     }
                 }
                 Ok(Some(res_vec))
-            },
+            }
         }
     }
 }

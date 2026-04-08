@@ -9,7 +9,7 @@
         {
             "step": "setState",
             "currentBlockInfo": {
-                "blockTimestamp": "779"
+                "blockTimestampMs": "779"
             }
         },
         {

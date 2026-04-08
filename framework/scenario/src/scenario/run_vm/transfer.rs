@@ -1,4 +1,4 @@
-use super::{sc_call::tx_esdt_transfers_from_scenario, ScenarioVMRunner};
+use super::{ScenarioVMRunner, sc_call::tx_esdt_transfers_from_scenario};
 use crate::scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep};
 use multiversx_chain_vm::{
     blockchain::state::BlockchainStateRef,

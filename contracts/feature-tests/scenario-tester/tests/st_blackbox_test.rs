@@ -1,4 +1,7 @@
-use multiversx_sc_scenario::{imports::*, scenario_model::TxResponseStatus};
+use multiversx_sc_scenario::{
+    imports::*, multiversx_chain_vm::crypto_functions_bls::verify_bls_aggregated_signature,
+    scenario_model::TxResponseStatus,
+};
 
 use scenario_tester::*;
 
@@ -30,6 +33,7 @@ fn st_blackbox() {
 
     world.start_trace();
 
+    #[allow(deprecated)]
     world
         .account(OWNER_ADDRESS)
         .nonce(1)
@@ -38,7 +42,7 @@ fn st_blackbox() {
         .nonce(2)
         .balance(300)
         .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .commit(); // optional, ignore
 
     world
         .check_account(OWNER_ADDRESS)
@@ -47,23 +51,24 @@ fn st_blackbox() {
         .check_account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world.new_address(OWNER_ADDRESS, 1, ST_ADDRESS);
 
     let new_address = world
         .tx()
+        .id("st deploy")
         .from(OWNER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .init(5u32)
         .code(CODE_PATH)
         .returns(ReturnsNewAddress)
         .run();
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
 
     let value = world
         .query()
+        .id("st query 1")
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
@@ -73,6 +78,7 @@ fn st_blackbox() {
 
     world
         .tx()
+        .id("st add 1")
         .from(OWNER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -84,11 +90,11 @@ fn st_blackbox() {
         .nonce(3)
         .balance(100)
         .check_account(ST_ADDRESS)
-        .check_storage("str:sum", "6")
-        .commit();
+        .check_storage("str:sum", "6");
 
     world
         .tx()
+        .id("st add 1 again")
         .from(OTHER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -97,6 +103,7 @@ fn st_blackbox() {
 
     world
         .tx()
+        .id("st multi param")
         .from(OTHER_ADDRESS)
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
@@ -125,7 +132,17 @@ fn st_blackbox() {
         MultiValue2((RustBigUint::from(1u32), RustBigUint::from(2u32)))
     );
 
-    world.write_scenario_trace("trace1.scen.json");
+    world.write_scenario_trace("trace/st_trace1.scen.json");
+
+    // Compare generated trace with expected trace
+    let generated_trace = std::fs::read_to_string("trace/st_trace1.scen.json")
+        .expect("failed to read generated trace");
+    let expected_trace = std::fs::read_to_string("trace/expected_trace1.scen.json")
+        .expect("failed to read expected trace");
+    assert_eq!(
+        generated_trace, expected_trace,
+        "Generated trace does not match expected trace"
+    );
 }
 
 #[test]
@@ -149,8 +166,7 @@ fn set_state_test() {
         .account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world
         .check_account(first)
@@ -159,22 +175,19 @@ fn set_state_test() {
         .check_account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     world
         .account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance(NFT_ID, 2, 1, ())
-        .commit();
+        .esdt_nft_balance(NFT_ID, 2, 1, ());
 
     world
         .check_account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, "")
-        .commit();
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, "");
 
     let fourth_uris = FOURTH_URIS
         .iter()
@@ -193,15 +206,13 @@ fn set_state_test() {
             None::<Address>,
             (),
             fourth_uris,
-        )
-        .commit();
+        );
 
     world
         .check_account(fourth)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, FOURTH_ATTRIBUTES)
-        .commit();
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, FOURTH_ATTRIBUTES);
 
     world
         .account(fifth)
@@ -257,8 +268,7 @@ fn st_blackbox_tx_hash() {
         .account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     let (new_address, tx_hash) = world
         .tx()
@@ -272,7 +282,7 @@ fn st_blackbox_tx_hash() {
         .returns(ReturnsTxHash)
         .run();
 
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
     assert_eq!(tx_hash.as_array(), &[11u8; 32]);
 
     let tx_hash = world
@@ -299,8 +309,7 @@ fn st_blackbox_returns_result_or_error() {
         .account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance(TOKEN_ID, 500)
-        .commit();
+        .esdt_balance(TOKEN_ID, 500);
 
     // deploy
     let (result, check_tx_hash, pass_value_2) = world
@@ -324,7 +333,7 @@ fn st_blackbox_returns_result_or_error() {
 
     assert_eq!(check_tx_hash.as_array(), &[33u8; 32]);
     let (new_address, out_value, pass_value_1, also_check_tx_hash) = result.unwrap();
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
     assert_eq!(out_value, "init-result");
     assert_eq!(pass_value_1, "pass-value-1");
     assert_eq!(also_check_tx_hash.as_array(), &[33u8; 32]);
@@ -405,7 +414,7 @@ fn st_blackbox_storage_check_test() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, ST_ADDRESS.to_address());
+    assert_eq!(new_address, ST_ADDRESS);
 
     // set value for otherMapper in storage
     world
@@ -420,4 +429,29 @@ fn st_blackbox_storage_check_test() {
     world
         .check_account(ST_ADDRESS)
         .check_storage("str:otherMapper", "str:SomeValueInStorage");
+}
+
+#[test]
+fn create_bls_aggregate_signature() {
+    let mut world = world();
+
+    let (agg_signature, public_keys) = world
+        .create_aggregated_signature(3, b"st blackbox test")
+        .expect("failed to create aggregate signature");
+
+    let pk_bytes: Vec<Vec<u8>> = public_keys
+        .iter()
+        .map(|pk| pk.serialize().unwrap())
+        .collect();
+
+    assert!(verify_bls_aggregated_signature(
+        pk_bytes.clone(),
+        b"st blackbox test",
+        &agg_signature.serialize().unwrap()
+    ));
+    assert!(!verify_bls_aggregated_signature(
+        pk_bytes,
+        b"blackbox test",
+        &agg_signature.serialize().unwrap()
+    ));
 }

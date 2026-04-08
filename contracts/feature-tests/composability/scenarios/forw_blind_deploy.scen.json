@@ -1,0 +1,63 @@
+{
+    "name": "Deploy vault from forwarder blind",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../forwarder-blind/output/forwarder-blind.mxsc.json"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "sc:forwarder",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:child"
+                }
+            ]
+        },
+        {
+            "step": "scCall",
+            "id": "blind_deploy vault",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "blindDeploy",
+                "arguments": [
+                    "mxsc:../vault/output/vault.mxsc.json",
+                    "0x0100"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "sc:child"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:child": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
+                    "codeMetadata": "0x0100",
+                    "owner": "sc:forwarder"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

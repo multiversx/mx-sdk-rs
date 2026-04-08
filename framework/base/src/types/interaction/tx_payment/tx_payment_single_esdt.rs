@@ -1,6 +1,12 @@
-use crate::types::{BigUint, EsdtTokenPayment, ManagedAddress, ManagedVec, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{
+        BigUint, EsdtTokenPayment, ManagedAddress, ManagedVec, PaymentVec, TxFrom,
+        TxPaymentCompose, TxToSpecified,
+    },
+};
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for EsdtTokenPayment<Env::Api>
 where
@@ -12,7 +18,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.as_refs()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -20,7 +38,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc);
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -40,10 +58,10 @@ where
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.into_multi_egld_or_esdt_payment()),
+            multi_esdt: ManagedVec::from_single_item(self.into_payment()),
         }
     }
 }
@@ -58,7 +76,19 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        self.as_refs()
+            .perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
@@ -66,7 +96,7 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         self.as_refs()
-            .perform_transfer_execute(env, to, gas_limit, fc);
+            .perform_transfer_execute_legacy(env, to, gas_limit, fc)
     }
 
     #[inline]
@@ -86,10 +116,36 @@ where
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments {
             egld: None,
-            multi_esdt: ManagedVec::from_single_item(self.as_egld_or_esdt_payment().clone()),
+            multi_esdt: ManagedVec::from_single_item(self.clone().into_payment()),
         }
+    }
+}
+
+impl<Env> TxPaymentCompose<Env, EsdtTokenPayment<Env::Api>> for EsdtTokenPayment<Env::Api>
+where
+    Env: TxEnv,
+{
+    type Output = PaymentVec<Env::Api>;
+
+    fn compose(self, rhs: EsdtTokenPayment<Env::Api>) -> Self::Output {
+        let mut payments = PaymentVec::new();
+        payments.push(self.into_payment());
+        payments.push(rhs.into_payment());
+        payments
+    }
+}
+
+impl<Env> TxPaymentCompose<Env, EsdtTokenPayment<Env::Api>> for PaymentVec<Env::Api>
+where
+    Env: TxEnv,
+{
+    type Output = PaymentVec<Env::Api>;
+
+    fn compose(mut self, rhs: EsdtTokenPayment<Env::Api>) -> Self::Output {
+        self.push(rhs.into_payment());
+        self
     }
 }

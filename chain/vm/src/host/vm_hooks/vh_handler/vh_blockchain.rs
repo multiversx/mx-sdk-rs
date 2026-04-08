@@ -2,9 +2,9 @@ use crate::{
     blockchain::state::{EsdtData, EsdtInstance},
     chain_core::builtin_func_names::*,
     host::vm_hooks::VMHooksContext,
-    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
+    types::{Address, EsdtLocalRole, EsdtLocalRoleFlags, RawHandle},
 };
-use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_core::types::{EsdtTokenType, ReturnCode};
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -36,7 +36,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn is_contract_address(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
-        let address = VMAddress::from_slice(address_bytes);
+        let address = Address::from_slice(address_bytes);
         Ok(&address == self.context.current_address())
     }
 
@@ -89,13 +89,14 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_shard_of_address(&mut self, address_bytes: &[u8]) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_shard_of_address)?;
 
-        Ok((address_bytes[address_bytes.len() - 1] % 3).into())
+        let address = Address::from_slice(address_bytes);
+        Ok(address.shard_of_3().as_u32() as i32)
     }
 
     pub fn is_smart_contract(&mut self, address_bytes: &[u8]) -> Result<bool, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.is_smart_contract)?;
 
-        Ok(VMAddress::from_slice(address_bytes).is_smart_contract_address())
+        Ok(Address::from_slice(address_bytes).is_smart_contract_address())
     }
 
     pub fn load_balance(
@@ -134,25 +135,54 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
-        Ok(self.context.get_current_block_info().block_timestamp as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
+    }
+
+    pub fn get_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
-        Ok(self.context.get_current_block_info().block_nonce as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_nonce as i64)
     }
 
     pub fn get_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
-        Ok(self.context.get_current_block_info().block_round as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_round as i64)
     }
 
     pub fn get_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
-        Ok(self.context.get_current_block_info().block_epoch as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .current_block_info
+            .block_epoch as i64)
     }
 
     pub fn get_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
@@ -161,7 +191,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.context.m_types_lock().mb_set(
             dest,
             self.context
-                .get_current_block_info()
+                .get_block_config()
+                .current_block_info
                 .block_random_seed
                 .to_vec(),
         );
@@ -171,25 +202,85 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_prev_block_timestamp(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
 
-        Ok(self.context.get_previous_block_info().block_timestamp as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_timestamp_millis
+            .to_seconds()
+            .as_u64_seconds() as i64)
+    }
+
+    pub fn get_prev_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
     }
 
     pub fn get_prev_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
 
-        Ok(self.context.get_previous_block_info().block_nonce as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_nonce as i64)
     }
 
     pub fn get_prev_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
 
-        Ok(self.context.get_previous_block_info().block_round as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_round as i64)
     }
 
     pub fn get_prev_block_epoch(&mut self) -> Result<i64, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_epoch)?;
 
-        Ok(self.context.get_previous_block_info().block_epoch as i64)
+        Ok(self
+            .context
+            .get_block_config()
+            .previous_block_info
+            .block_epoch as i64)
+    }
+
+    pub fn get_epoch_start_block_timestamp_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_time_stamp)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_timestamp_millis
+            .as_u64_millis() as i64)
+    }
+
+    pub fn get_epoch_start_block_nonce(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_nonce)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_nonce as i64)
+    }
+
+    pub fn get_epoch_start_block_round(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
+
+        Ok(self
+            .context
+            .get_block_config()
+            .epoch_start_block_info
+            .block_round as i64)
     }
 
     pub fn get_prev_block_random_seed(&mut self, dest: RawHandle) -> Result<(), VMHooksEarlyExit> {
@@ -198,11 +289,18 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.context.m_types_lock().mb_set(
             dest,
             self.context
-                .get_previous_block_info()
+                .get_block_config()
+                .previous_block_info
                 .block_random_seed
                 .to_vec(),
         );
         Ok(())
+    }
+
+    pub fn get_block_round_time_ms(&mut self) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_block_round)?;
+
+        Ok(self.context.get_block_config().block_round_time_ms as i64)
     }
 
     pub fn get_current_esdt_nft_nonce(
@@ -263,7 +361,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .m_buffer_set_bytes,
         )?;
 
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let Some(data) = self.context.account_data(&address) else {
             return Err(
                 VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64()).with_message(format!(
@@ -315,7 +413,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .managed_buffer_api_cost
                 .m_buffer_get_bytes,
         )?;
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
 
         if let Some(account) = self.context.account_data(&address) {
@@ -349,6 +447,22 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             uris_handle,
         )?;
 
+        Ok(())
+    }
+
+    pub fn managed_get_esdt_token_type(
+        &mut self,
+        _address_handle: i32,
+        _token_id_handle: i32,
+        nonce: i64,
+        type_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        // TODO: model the token type properly in the VM
+        let token_type = EsdtTokenType::based_on_token_nonce(nonce as u64);
+        self.context.m_types_lock().bi_overwrite(
+            type_handle,
+            num_bigint::BigInt::from(token_type.as_u8() as i32),
+        );
         Ok(())
     }
 
@@ -386,7 +500,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
                 .m_buffer_get_bytes,
         )?;
 
-        let address = VMAddress::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.context.m_types_lock().mb_get(token_id_handle).to_vec();
         if let Some(account) = self.context.account_data(&address) {
             if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {

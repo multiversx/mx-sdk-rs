@@ -1,6 +1,9 @@
-use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
+use crate::{
+    contract_base::TransferExecuteFailed,
+    types::{BigUint, ManagedAddress, TxFrom, TxToSpecified},
+};
 
-use super::{FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
+use super::{FunctionCall, ScenarioPayments, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
 
 /// Transaction marker, which indicates that a transaction should never have any payment added to it.
 ///
@@ -20,14 +23,33 @@ where
     }
 
     #[inline]
-    fn perform_transfer_execute(
+    fn perform_transfer_execute_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        ().perform_transfer_execute_fallible(env, to, gas_limit, fc)
+    }
+
+    #[inline]
+    fn perform_transfer_fallible(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+    ) -> Result<(), TransferExecuteFailed> {
+        ().perform_transfer_fallible(env, to)
+    }
+
+    fn perform_transfer_execute_legacy(
         self,
         env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        ().perform_transfer_execute(env, to, gas_limit, fc);
+        ().perform_transfer_execute_legacy(env, to, gas_limit, fc);
     }
 
     #[inline]
@@ -47,8 +69,8 @@ where
         ().with_normalized(env, from, to, fc, f)
     }
 
-    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
-        FullPaymentData::default()
+    fn into_scenario_payments(self, _env: &Env) -> ScenarioPayments<Env::Api> {
+        ScenarioPayments::default()
     }
 }
 

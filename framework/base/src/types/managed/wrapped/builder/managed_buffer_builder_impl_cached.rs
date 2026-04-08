@@ -71,7 +71,7 @@ where
     fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
         if let Some(static_cache) = &mut self.static_cache {
             let success = static_cache.try_extend_from_copy_bytes(item.len(), |dest_slice| {
-                let _ = item.load_slice(0, dest_slice);
+                item.load_slice(0, dest_slice);
             });
             if !success {
                 self.flush_to_managed_buffer();

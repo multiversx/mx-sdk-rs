@@ -2,9 +2,9 @@ use super::*;
 use std::fmt;
 
 use serde::{
+    Deserialize, Serialize,
     de::{self, Deserializer, SeqAccess, Visitor},
     ser::{SerializeSeq, Serializer},
-    Deserialize, Serialize,
 };
 
 #[derive(Default)]
@@ -48,7 +48,7 @@ impl Serialize for CheckLogsRaw {
                     seq.serialize_element("+")?;
                 }
                 seq.end()
-            },
+            }
         }
     }
 }
@@ -136,10 +136,10 @@ impl<'de> Visitor<'de> for CheckLogsVisitor {
                         ));
                     }
                     check_list.list.push(log);
-                },
+                }
                 CheckLogElement::Plus => {
                     check_list.more_allowed_at_end = true;
-                },
+                }
             }
         }
 

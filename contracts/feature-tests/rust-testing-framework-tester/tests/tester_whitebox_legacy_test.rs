@@ -960,21 +960,49 @@ fn blockchain_state_test() {
 
     let expected_epoch = 10;
     let expected_nonce = 20;
-    let expected_timestamp = 30;
+    let expected_timestamp_millis: TimestampMillis = TimestampMillis::new(40);
 
     wrapper.set_block_epoch(expected_epoch);
     wrapper.set_block_nonce(expected_nonce);
-    wrapper.set_block_timestamp(expected_timestamp);
+    wrapper.set_block_timestamp_millis(expected_timestamp_millis);
 
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let actual_epoch = sc.get_block_epoch();
             let actual_nonce = sc.get_block_nonce();
-            let actual_timestamp = sc.get_block_timestamp();
+            let actual_timestamp_millis = sc.get_block_timestamp_millis();
 
             assert_eq!(expected_epoch, actual_epoch);
             assert_eq!(expected_nonce, actual_nonce);
-            assert_eq!(expected_timestamp, actual_timestamp);
+            assert_eq!(expected_timestamp_millis, actual_timestamp_millis);
+        })
+        .assert_ok();
+}
+
+#[test]
+fn blockchain_state_seconds_test() {
+    let rust_zero = rust_biguint!(0);
+    let mut wrapper = BlockchainStateWrapper::new();
+    let sc_wrapper = wrapper.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    let expected_timestamp_seconds: TimestampSeconds = TimestampSeconds::new(30_000);
+    wrapper.set_block_timestamp_seconds(expected_timestamp_seconds);
+
+    wrapper
+        .execute_query(&sc_wrapper, |sc| {
+            let actual_timestamp_seconds = sc.get_block_timestamp_seconds();
+            let actual_timestamp_millis = sc.get_block_timestamp_millis();
+
+            assert_eq!(expected_timestamp_seconds, actual_timestamp_seconds);
+            assert_eq!(
+                expected_timestamp_seconds.to_millis(),
+                actual_timestamp_millis
+            );
         })
         .assert_ok();
 }
@@ -1006,10 +1034,9 @@ fn execute_on_dest_context_query_test() {
     wrapper
         .execute_query(&sc_wrapper, |sc| {
             let expected_result = managed_biguint!(5);
-            let actual_result =
-                sc.call_other_contract_execute_on_dest(managed_address!(&other_sc_wrapper
-                    .address_ref()
-                    .clone()));
+            let actual_result = sc.call_other_contract_execute_on_dest(managed_address!(
+                &other_sc_wrapper.address_ref().clone()
+            ));
 
             assert_eq!(expected_result, actual_result);
         })
@@ -1304,15 +1331,15 @@ fn test_managed_values_standalone_consistency() {
         BASIC_FEATURES_WASM_PATH,
     );
 
-    let foo_token = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
+    let foo_token = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1");
     blockchain_wrapper
         .execute_query(&basic_features_wrapper, |_sc| {
-            let _bar = TokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
+            let _bar = EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"BAR-a1a1a1");
             // 'foo' and '_bar' have the same numerical handle value
             // check that the value of 'foo' is taken from the correct context
             assert_eq!(
                 foo_token,
-                TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
+                EsdtTokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
             );
         })
         .assert_error(

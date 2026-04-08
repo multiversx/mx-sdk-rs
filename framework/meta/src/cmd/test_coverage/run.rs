@@ -45,10 +45,10 @@ pub fn run_test_coverage(
     match output_format {
         OutputFormat::Markdown => {
             render_coverage(&mut output, &coverage, root_path);
-        },
+        }
         OutputFormat::Json => {
             output = serde_json::to_string_pretty(&coverage).unwrap();
-        },
+        }
     };
 
     let Ok(_) = fs::write(output_path, output) else {

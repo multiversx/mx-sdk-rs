@@ -2,7 +2,6 @@ mod annotated;
 mod back_transfers;
 mod callback_closure;
 mod callback_selector_result;
-mod contract_call_legacy;
 mod expr;
 mod managed_arg_buffer;
 mod markers;
@@ -21,12 +20,11 @@ mod tx_result_handler_list;
 mod tx_to;
 
 pub use annotated::*;
-pub use back_transfers::BackTransfers;
+pub use back_transfers::{BackTransfers, BackTransfersLegacy};
 pub use callback_closure::{
-    new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,
+    CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher, new_callback_call,
 };
 pub use callback_selector_result::CallbackSelectorResult;
-pub use contract_call_legacy::*;
 pub use expr::*;
 pub use managed_arg_buffer::ManagedArgBuffer;
 pub use markers::*;
@@ -44,3 +42,8 @@ pub use tx_result_handler_list::*;
 pub use tx_to::*;
 
 pub type TxScBase<Api> = TxBaseWithEnv<TxScEnv<Api>>;
+
+#[cfg(feature = "contract-call-legacy")]
+mod contract_call_legacy;
+#[cfg(feature = "contract-call-legacy")]
+pub use contract_call_legacy::*;

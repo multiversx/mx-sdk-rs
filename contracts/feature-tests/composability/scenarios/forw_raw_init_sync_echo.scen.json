@@ -56,7 +56,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "",
+                        "endpoint": "str:init",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],

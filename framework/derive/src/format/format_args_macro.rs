@@ -2,7 +2,7 @@ use quote::quote;
 
 use crate::{format::format_tokenize, generate::util::byte_str_literal};
 
-use super::{count_args, parse_format_string, FormatPartType};
+use super::{FormatPartType, count_args, parse_format_string};
 
 pub fn format_receiver_args_macro(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let tokens = format_tokenize::tokenize(input);

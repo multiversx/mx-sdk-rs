@@ -33,7 +33,7 @@ mod try_static_cast;
 pub use crate::{
     num_conv::{top_encode_number, universal_decode_number},
     try_static_cast::{
-        try_cast_execute_or_else, try_cast_ref, try_execute_then_cast, TryStaticCast,
+        TryStaticCast, try_cast_execute_or_else, try_cast_ref, try_execute_then_cast,
     },
 };
 pub use codec_err::{DecodeError, EncodeError};

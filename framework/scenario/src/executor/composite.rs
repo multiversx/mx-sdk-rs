@@ -35,12 +35,12 @@ impl Executor for CompositeExecutor {
             match executor.new_instance(wasm_bytes, compilation_options) {
                 Ok(instance) => {
                     return Ok(instance);
-                },
+                }
                 Err(err) => {
                     if !is_recoverable_error(&err) {
                         return Err(err);
                     }
-                },
+                }
             }
         }
 

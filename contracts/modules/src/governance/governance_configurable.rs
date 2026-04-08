@@ -35,7 +35,7 @@ pub trait GovernanceConfigurablePropertiesModule {
     /// to not modify parameters manually
     fn init_governance_module(
         &self,
-        governance_token_id: TokenIdentifier,
+        governance_token_id: EsdtTokenIdentifier,
         quorum: BigUint,
         min_token_balance_for_proposal: BigUint,
         voting_delay_in_blocks: u64,
@@ -152,7 +152,7 @@ pub trait GovernanceConfigurablePropertiesModule {
 
     #[view(getGovernanceTokenId)]
     #[storage_mapper("governance:governanceTokenId")]
-    fn governance_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn governance_token_id(&self) -> SingleValueMapper<EsdtTokenIdentifier>;
 
     // storage - configurable parameters
 

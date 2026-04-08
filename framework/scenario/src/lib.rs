@@ -1,7 +1,9 @@
-#![allow(clippy::type_complexity)]
+// TODO: remove once minimum version is 1.87+
+#![allow(unknown_lints)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::manual_is_multiple_of)]
 
 pub mod api;
-pub mod bech32;
 pub mod display_util;
 pub mod executor;
 mod facade;
@@ -36,12 +38,12 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract};
-
-use std::path::Path;
+pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract, result_handlers::*, world_tx::*};
 
 /// Imports normally needed in integration tests, grouped together.
 pub mod imports;
+
+use std::path::Path;
 
 /// Legacy function for running a scenario test using the Go VM tool.
 ///

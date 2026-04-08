@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
@@ -17,6 +17,26 @@ fn big_int_to_i_64_go() {
 #[test]
 fn big_num_conversions_go() {
     world().run("scenarios/big_num_conversions.scen.json");
+}
+
+#[test]
+fn big_num_ops_arith_go() {
+    world().run("scenarios/big_num_ops_arith.scen.json");
+}
+
+#[test]
+fn big_num_ops_bitwise_go() {
+    world().run("scenarios/big_num_ops_bitwise.scen.json");
+}
+
+#[test]
+fn big_num_ops_cmp_go() {
+    world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
+fn big_num_ops_shift_go() {
+    world().run("scenarios/big_num_ops_shift.scen.json");
 }
 
 #[test]
@@ -50,6 +70,16 @@ fn block_info_go() {
 }
 
 #[test]
+fn block_info_ms_go() {
+    world().run("scenarios/block_info_ms.scen.json");
+}
+
+#[test]
+fn code_hash_go() {
+    world().run("scenarios/code_hash.scen.json");
+}
+
+#[test]
 fn codec_err_go() {
     world().run("scenarios/codec_err.scen.json");
 }
@@ -60,6 +90,7 @@ fn count_ones_go() {
 }
 
 #[test]
+#[ignore = "some hooks are being disabled (after-supernova)"]
 fn crypto_elliptic_curves_go() {
     world().run("scenarios/crypto_elliptic_curves.scen.json");
 }
@@ -85,13 +116,11 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_aggregated_signature_go() {
     world().run("scenarios/crypto_verify_bls_aggregated_signature.scen.json");
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_bls_share_go() {
     world().run("scenarios/crypto_verify_bls_share.scen.json");
 }
@@ -107,7 +136,6 @@ fn crypto_verify_secp_256_k_1_go() {
 }
 
 #[test]
-#[ignore = "requires EI 1.4 in mx-scenario-go"]
 fn crypto_verify_secp_256_r_1_go() {
     world().run("scenarios/crypto_verify_secp256r1.scen.json");
 }
@@ -170,6 +198,11 @@ fn echo_managed_vec_go() {
 #[test]
 fn echo_multi_value_tuples_go() {
     world().run("scenarios/echo_multi_value_tuples.scen.json");
+}
+
+#[test]
+fn echo_non_zero_big_uint_go() {
+    world().run("scenarios/echo_non_zero_big_uint.scen.json");
 }
 
 #[test]
@@ -299,6 +332,21 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn mmap_get_go() {
+    world().run("scenarios/mmap_get.scen.json");
+}
+
+#[test]
+fn mmap_mutable_input_go() {
+    world().run("scenarios/mmap_mutable_input.scen.json");
+}
+
+#[test]
+fn mmap_remove_go() {
+    world().run("scenarios/mmap_remove.scen.json");
+}
+
+#[test]
 fn new_address_go() {
     world().run("scenarios/new_address.scen.json");
 }
@@ -334,13 +382,13 @@ fn sc_properties_go() {
 }
 
 #[test]
-fn small_num_overflow_go() {
-    world().run("scenarios/small_num_overflow.scen.json");
+fn send_esdt_to_nonexisting_account_go() {
+    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
 }
 
 #[test]
-fn send_esdt_to_nonexisting_account_go() {
-    world().run("scenarios/send_esdt_to_nonexisting_account.scen.json");
+fn small_num_overflow_go() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -371,6 +419,11 @@ fn storage_i_64_go() {
 #[test]
 fn storage_i_64_bad_go() {
     world().run("scenarios/storage_i64_bad.scen.json");
+}
+
+#[test]
+fn storage_i_64_bug_go() {
+    world().run("scenarios/storage_i64_bug.scen.json");
 }
 
 #[test]
@@ -455,16 +508,6 @@ fn storage_mapper_single_value_go() {
 }
 
 #[test]
-fn storage_mapper_timelock_go() {
-    world().run("scenarios/timelock_mapper.scen.json");
-}
-
-#[test]
-fn storage_mapper_timelock_at_address_go() {
-    world().run("scenarios/timelock_mapper_at_address.scen.json");
-}
-
-#[test]
 fn storage_mapper_token_attributes_go() {
     world().run("scenarios/storage_mapper_token_attributes.scen.json");
 }
@@ -522,4 +565,14 @@ fn storage_usize_bad_go() {
 #[test]
 fn struct_eq_go() {
     world().run("scenarios/struct_eq.scen.json");
+}
+
+#[test]
+fn timelock_mapper_go() {
+    world().run("scenarios/timelock_mapper.scen.json");
+}
+
+#[test]
+fn timelock_mapper_at_address_go() {
+    world().run("scenarios/timelock_mapper_at_address.scen.json");
 }

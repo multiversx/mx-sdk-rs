@@ -1,7 +1,7 @@
 use crate::{
     cli::LocalDepsArgs,
     folder_structure::{
-        dir_pretty_print, RelevantDirectories, CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES,
+        CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES, RelevantDirectories, dir_pretty_print,
     },
 };
 use common_path::common_path_all;

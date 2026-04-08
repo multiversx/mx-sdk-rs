@@ -58,7 +58,7 @@ fn create_snippets_crate_and_get_lib_file(
     create_snippets_gitignore(snippets_folder_path, overwrite);
     create_snippets_cargo_toml(snippets_folder_path, contract_crate_name, overwrite);
     create_src_folder(snippets_folder_path);
-    create_sc_config_file(overwrite);
+    create_sc_config_file(overwrite, contract_crate_name);
     create_main_file(snippets_folder_path, contract_crate_name);
     create_and_get_lib_file(snippets_folder_path, overwrite)
 }
@@ -69,14 +69,14 @@ fn create_config_and_get_file(snippets_folder_path: &Path) -> File {
     create_config_rust_file(snippets_folder_path)
 }
 
-fn write_snippets_to_file(file: &mut File, abi: &ContractAbi, crate_name: &str) {
-    write_snippet_imports(file);
+fn write_snippets_to_file(file: &mut File, abi: &ContractAbi, contract_crate_name: &str) {
+    write_snippet_imports(file, contract_crate_name);
     write_snippet_constants(file);
-    write_snippet_main_function(file, abi, crate_name);
+    write_snippet_main_function(file, abi, contract_crate_name);
     write_state_struct_declaration(file);
     write_snippet_state_impl(file);
     write_interact_struct_declaration(file);
-    write_interact_struct_impl(file, abi, crate_name);
+    write_interact_struct_impl(file, abi, contract_crate_name);
 }
 
 fn write_config_to_file(file: &mut File) {

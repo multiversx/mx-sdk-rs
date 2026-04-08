@@ -59,6 +59,12 @@ pub enum StandaloneCliAction {
     )]
     TestGen(TestGenArgs),
 
+    #[command(
+        name = "scen-blackbox",
+        about = "Generates blackbox tests from scenario files (.scen.json)."
+    )]
+    ScenBlackbox(ScenBlackboxArgs),
+
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
 
@@ -287,14 +293,14 @@ impl AllArgs {
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
+                }
                 ContractCliAction::BuildDbg(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
+                }
                 ContractCliAction::Twiggy(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
         result
@@ -308,6 +314,23 @@ impl AllArgs {
             raw.push(target_dir_meta.clone());
         }
         raw.append(&mut processed.command.to_raw());
+        if !processed.load_abi_git_version {
+            raw.push("--no-abi-git-version".to_string());
+        }
+        raw
+    }
+
+    /// Produces the arguments for an abi call corresponding to a build.
+    ///
+    /// Used to get the rustc and framework versions configured for a build.
+    pub fn to_cargo_abi_for_build(&self) -> Vec<String> {
+        let processed = self.target_dir_all_override();
+        let mut raw = vec!["run".to_string()];
+        if let Some(target_dir_meta) = &processed.target_dir_meta {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir_meta.clone());
+        }
+        raw.push("abi".to_string());
         if !processed.load_abi_git_version {
             raw.push("--no-abi-git-version".to_string());
         }
@@ -406,6 +429,28 @@ pub struct TestGenArgs {
     pub create: bool,
 }
 
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct ScenBlackboxArgs {
+    /// Target directory where to generate contract blackbox tests.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Override test files if they already exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    /// Output file path for the generated blackbox test.
+    /// If not specified, the default path inside the contract's tests/ folder is used.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+}
+
 #[derive(Default, PartialEq, Eq, Debug, Clone, Parser)]
 #[command(propagate_version = true)]
 pub struct InstallArgs {
@@ -489,13 +534,24 @@ pub struct WalletNewArgs {
     /// The name of the wallet to create.
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
+
+    /// If set, mines a wallet assigned to the given shard ID.
+    /// For the standard 3-shard mainnet configuration, valid shard IDs are 0, 1, or 2.
+    #[arg(long = "shard", verbatim_doc_comment)]
+    pub shard: Option<u8>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
+    /// The format of the input wallet. Allowed values: mnemonic, pem, keystore-secret.
     #[arg(long = "in-format", verbatim_doc_comment)]
     pub from: String,
 
+    /// The format of the output wallet. Allowed values: pem, keystore-secret.
+    /// Supported conversions: mnemonic -> pem, keystore-secret -> pem, pem -> keystore-secret.
     #[arg(long = "out-format", verbatim_doc_comment)]
     pub to: String,
 
@@ -504,6 +560,9 @@ pub struct WalletConvertArgs {
 
     #[arg(long = "outfile", verbatim_doc_comment)]
     pub outfile: Option<String>,
+
+    #[arg(long = "hrp", verbatim_doc_comment)]
+    pub hrp: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

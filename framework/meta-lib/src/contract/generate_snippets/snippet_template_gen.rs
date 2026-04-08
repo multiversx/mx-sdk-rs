@@ -4,13 +4,15 @@ use multiversx_sc::abi::ContractAbi;
 
 use super::snippet_gen_common::write_newline;
 
-pub(crate) fn write_snippet_imports(file: &mut File) {
+pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
+    let proxy_name = format!("{}_proxy", contract_crate_name.replace("-", "_"));
+
     writeln!(
         file,
         "#![allow(non_snake_case)]
 
 pub mod config;
-mod proxy;
+mod {proxy_name};
 
 use config::Config;
 use multiversx_sc_snippets::imports::*;

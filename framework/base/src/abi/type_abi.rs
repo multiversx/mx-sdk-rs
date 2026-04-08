@@ -15,15 +15,28 @@ pub trait TypeAbi: TypeAbiFrom<Self> {
         TypeNames {
             abi: Self::type_name(),
             rust: Self::type_name_rust(),
+            specific: Self::type_name_specific(),
         }
     }
 
+    /// The type name, as it shows up in the ABI.
     fn type_name() -> TypeName {
         core::any::type_name::<Self>().into()
     }
 
+    /// The type name as it shows up in Rust code. Used for proxies.
+    ///
+    /// Does not get saved into the ABI, but is used for code generation.
     fn type_name_rust() -> TypeName {
         core::any::type_name::<Self>().into()
+    }
+
+    /// Specific name to be optionally added to the ABI.
+    ///
+    /// Added to allow adding more type information to the ABI, in a backwards compatible manner.
+    /// This is important, since we currently do not encode the original Rust type information.
+    fn type_name_specific() -> Option<TypeName> {
+        None
     }
 
     /// A type can provide more than its own name.

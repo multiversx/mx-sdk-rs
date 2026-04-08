@@ -1,4 +1,4 @@
-name: CI
+name: LLDB
 
 on:
   push:
@@ -12,26 +12,30 @@ jobs:
     name: LLDB formatter tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          default: true
           toolchain: 1.87
 
       - name: Download vscode-lldb
-        uses: robinraju/release-downloader@v1.5
+        uses: robinraju/release-downloader@v1
         with:
           repository: vadimcn/vscode-lldb
-          tag: v1.11.0
+          latest: true
           fileName: codelldb-linux-x64.vsix
 
       - name: Setup vscode-lldb
         run: |
           unzip codelldb-linux-x64.vsix -d vscode-lldb
-          mkdir -p $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.3/
-          mv vscode-lldb/extension/* $HOME/.vscode/extensions/vadimcn.vscode-lldb-1.11.3/
+          mkdir -p "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
+          mv vscode-lldb/extension/* "$HOME"/.vscode/extensions/vadimcn.vscode-lldb
 
-      - name: Run the rust tests
+      - name: Test LLDB formatters
+        env:
+          CARGO_PROFILE_DEV_DEBUG: 2
         run: |
           cd tools/rust-debugger/format-tests
           cargo test

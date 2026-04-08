@@ -9,24 +9,12 @@ pub trait CallerContract {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn call_other(
-        &self,
-        dest: ManagedAddress,
-        func: ManagedBuffer,
-        value: i64,
-        to_send: BigUint,
-    ) -> ManagedBuffer {
+    fn call_other(&self, dest: ManagedAddress, func: ManagedBuffer, value: i64, to_send: BigUint) {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(value);
 
-        let result =
-            self.send_raw()
-                .direct_egld_execute(&dest, &to_send, 5000000, &func, &arg_buffer);
-
-        match result {
-            Result::Err(_) => ManagedBuffer::from("failed"),
-            Result::Ok(_) => ManagedBuffer::from("done"),
-        }
+        self.send_raw()
+            .direct_egld_execute(&dest, &to_send, 5000000, &func, &arg_buffer);
     }
 
     #[endpoint]
@@ -50,7 +38,7 @@ pub trait CallerContract {
         );
 
         require!(
-            result.len() == 1,
+            result.0.len() == 1,
             "ExecuteOnDestContext result data is empty"
         );
 

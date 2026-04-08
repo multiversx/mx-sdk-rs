@@ -7,7 +7,7 @@ use crate::{
     },
 };
 
-use super::{tx_interpret_util::interpret_egld_value, DEFAULT_GAS_EXPR};
+use super::{DEFAULT_GAS_EXPR, tx_interpret_util::interpret_egld_value};
 
 #[derive(Debug, Clone)]
 pub struct TxDeploy {

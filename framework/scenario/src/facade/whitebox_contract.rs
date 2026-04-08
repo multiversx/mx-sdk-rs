@@ -1,6 +1,6 @@
 use multiversx_sc::contract_base::{CallableContract, ContractBase};
 
-use crate::{scenario_model::AddressKey, DebugApi};
+use crate::{DebugApi, scenario_model::AddressKey};
 
 /// Wraps a contract that is supposed to be used in whitebox tests.
 ///

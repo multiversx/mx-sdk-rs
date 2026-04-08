@@ -40,7 +40,7 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.append_vec(results.into_vec_of_buffers());
 
                 cb_result.into()
-            },
+            }
             ManagedAsyncCallResult::Err(err) => {
                 let mut cb_result =
                     ManagedVec::from_single_item(ManagedBuffer::new_from_bytes(b"error"));
@@ -50,18 +50,18 @@ pub trait ForwarderAsyncCallModule {
                 cb_result.push(err.err_msg);
 
                 cb_result.into()
-            },
+            }
         }
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
-        let payment = self.call_value().egld_or_single_esdt();
+        let payment = self.call_value().all();
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .async_call()
             .call_and_exit()
     }
@@ -85,9 +85,9 @@ pub trait ForwarderAsyncCallModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: u32) {
         let payment = self.call_value().egld_or_single_esdt();
-        let fees = &payment.amount * &percentage_fees / PERCENTAGE_TOTAL;
+        let fees = &payment.amount * percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = &payment.amount - &fees;
 
         self.vault_proxy()
@@ -108,7 +108,7 @@ pub trait ForwarderAsyncCallModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: NonZeroBigUint,
     ) {
         self.vault_proxy()
             .contract(to)
@@ -178,21 +178,12 @@ pub trait ForwarderAsyncCallModule {
     fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        payment_args: MultiValueEncoded<MultiValue3<EsdtTokenIdentifier, u64, BigUint>>,
     ) {
-        let mut all_token_payments = ManagedVec::new();
-
-        for multi_arg in token_payments.into_iter() {
-            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
-            let payment = EsdtTokenPayment::new(token_identifier, token_nonce, amount);
-
-            all_token_payments.push(payment);
-        }
-
         self.vault_proxy()
             .contract(to)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .with_multi_token_transfer(payment_args.convert_payment_multi_triples())
             .async_call()
             .call_and_exit()
     }

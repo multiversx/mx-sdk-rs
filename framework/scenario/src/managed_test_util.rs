@@ -1,7 +1,7 @@
 use multiversx_sc::{
-    codec::{test_util::check_top_encode, TopDecode, TopEncode},
+    codec::{TopDecode, TopEncode, test_util::check_top_encode},
     contract_base::ManagedSerializer,
-    types::{heap::BoxedBytes, ManagedBuffer},
+    types::{ManagedBuffer, heap::BoxedBytes},
 };
 
 use core::fmt::Debug;
@@ -38,13 +38,13 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) 
     match T::top_decode(bytes) {
         Ok(from_unmanaged) => {
             assert_eq!(from_unmanaged, from_mb);
-        },
+        }
         Err(err) => {
             panic!(
                 "Unexpected encoding error:: {}",
                 core::str::from_utf8(err.message_bytes()).unwrap()
             )
-        },
+        }
     }
 
     from_mb

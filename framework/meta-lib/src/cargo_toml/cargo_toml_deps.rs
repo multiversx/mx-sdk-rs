@@ -37,11 +37,19 @@ pub enum DependencyReference {
 }
 
 impl DependencyReference {
-    pub fn is_framework_version(&self, version: &FrameworkVersion) -> bool {
+    pub fn eq_framework_version(&self, version: &FrameworkVersion) -> bool {
         if let DependencyReference::Version(version_req) = self {
             &version_req.semver == version
         } else {
             false
+        }
+    }
+
+    pub fn to_framework_version(&self) -> Option<VersionReq> {
+        if let DependencyReference::Version(version_req) = self {
+            Some(version_req.clone())
+        } else {
+            None
         }
     }
 }
@@ -58,14 +66,14 @@ impl DependencyRawValue {
             return match (self.rev, self.branch, self.tag) {
                 (Some(rev), None, None) => {
                     DependencyReference::GitCommit(GitCommitReference { git, rev })
-                },
+                }
                 (None, Some(branch), None) => {
                     DependencyReference::GitBranch(GitBranchReference { git, branch })
-                },
+                }
 
                 (None, None, Some(tag)) => {
                     DependencyReference::GitTag(GitTagReference { git, tag })
-                },
+                }
 
                 (None, None, None) => DependencyReference::Unsupported(
                     "need at least one of: git commit, git branch, or git tag".to_owned(),

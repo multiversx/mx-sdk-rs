@@ -1,7 +1,17 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
+}
+
+#[test]
+fn alloc_mem_fail_go() {
+    world().run("scenarios/alloc_mem_fail.scen.json");
+}
+
+#[test]
+fn alloc_mem_leaking_go() {
+    world().run("scenarios/alloc_mem_leaking.scen.json");
 }
 
 #[test]
@@ -62,16 +72,6 @@ fn echo_varargs_u_32_alloc_go() {
 #[test]
 fn echo_vec_u_8_go() {
     world().run("scenarios/echo_vec_u8.scen.json");
-}
-
-#[test]
-fn fail_memory_go() {
-    world().run("scenarios/alloc_mem_fail.scen.json");
-}
-
-#[test]
-fn leaking_memory_go() {
-    world().run("scenarios/alloc_mem_leaking.scen.json");
 }
 
 #[test]

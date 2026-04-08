@@ -17,7 +17,7 @@ pub struct Color {
 pub struct ComplexAttributes<M: ManagedTypeApi> {
     pub biguint: BigUint<M>,
     pub vec_u8: ManagedBuffer<M>,
-    pub token_id: TokenIdentifier<M>,
+    pub token_id: EsdtTokenIdentifier<M>,
     pub boolean: bool,
     pub boxed_bytes: ManagedBuffer<M>,
 }
@@ -25,7 +25,7 @@ pub struct ComplexAttributes<M: ManagedTypeApi> {
 #[multiversx_sc::module]
 pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[view]
-    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
+    fn get_nft_balance(&self, token_identifier: &EsdtTokenIdentifier, nonce: u64) -> BigUint {
         self.blockchain().get_esdt_balance(
             &self.blockchain().get_sc_address(),
             token_identifier,
@@ -35,7 +35,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
 
     #[payable("*")]
     #[endpoint]
-    fn buy_nft(&self, nft_id: TokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {
+    fn buy_nft(&self, nft_id: EsdtTokenIdentifier, nft_nonce: u64, nft_amount: BigUint) -> BigUint {
         let payment = self.call_value().egld_or_single_esdt();
 
         self.send().sell_nft(
@@ -79,13 +79,13 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     fn nft_issue_callback(
         &self,
         caller: &ManagedAddress,
-        #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
+        #[call_result] result: ManagedAsyncCallResult<EsdtTokenIdentifier>,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_identifier) => {
                 self.last_issued_token().set(&token_identifier);
                 self.last_error_message().clear();
-            },
+            }
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 let (token_identifier, returned_tokens) =
@@ -95,14 +95,14 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
                 }
 
                 self.last_error_message().set(&message.err_msg);
-            },
+            }
         }
     }
 
     #[endpoint]
     fn nft_create(
         &self,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         amount: BigUint,
         name: ManagedBuffer,
         royalties: BigUint,
@@ -128,7 +128,12 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn nft_create_compact(&self, token_identifier: TokenIdentifier, amount: BigUint, color: Color) {
+    fn nft_create_compact(
+        &self,
+        token_identifier: EsdtTokenIdentifier,
+        amount: BigUint,
+        color: Color,
+    ) {
         self.send()
             .esdt_nft_create_compact(&token_identifier, &amount, &color);
     }
@@ -136,7 +141,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[endpoint]
     fn nft_add_uris(
         &self,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         nonce: u64,
         uris: MultiValueEncoded<ManagedBuffer>,
     ) {
@@ -147,7 +152,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[endpoint]
     fn nft_update_attributes(
         &self,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         nonce: u64,
         new_attributes: Color,
     ) {
@@ -158,13 +163,13 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[endpoint]
     fn nft_decode_complex_attributes(
         &self,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         amount: BigUint,
         name: ManagedBuffer,
         royalties: BigUint,
         hash: ManagedBuffer,
         uri: ManagedBuffer,
-        attrs_arg: MultiValue5<BigUint, ManagedBuffer, TokenIdentifier, bool, ManagedBuffer>,
+        attrs_arg: MultiValue5<BigUint, ManagedBuffer, EsdtTokenIdentifier, bool, ManagedBuffer>,
     ) {
         let attrs_pieces = attrs_arg.into_tuple();
         let orig_attr = ComplexAttributes {
@@ -206,13 +211,13 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn nft_add_quantity(&self, token_identifier: EsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.send()
             .esdt_local_mint(&token_identifier, nonce, &amount);
     }
 
     #[endpoint]
-    fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn nft_burn(&self, token_identifier: EsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.send()
             .esdt_local_burn(&token_identifier, nonce, &amount);
     }
@@ -221,7 +226,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     fn transfer_nft_via_async_call(
         &self,
         to: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         nonce: u64,
         amount: BigUint,
     ) {
@@ -233,7 +238,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     fn transfer_nft_and_execute(
         &self,
         to: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         nonce: u64,
         amount: BigUint,
         function: ManagedBuffer,
@@ -253,7 +258,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     fn create_and_send(
         &self,
         to: ManagedAddress,
-        token_identifier: TokenIdentifier,
+        token_identifier: EsdtTokenIdentifier,
         amount: BigUint,
         name: ManagedBuffer,
         royalties: BigUint,
@@ -282,7 +287,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     #[event("create")]
     fn create_event(
         &self,
-        #[indexed] token_id: &TokenIdentifier,
+        #[indexed] token_id: &EsdtTokenIdentifier,
         #[indexed] token_nonce: u64,
         #[indexed] amount: &BigUint,
     );
@@ -291,7 +296,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
     fn send_event(
         &self,
         #[indexed] to: &ManagedAddress,
-        #[indexed] token_id: &TokenIdentifier,
+        #[indexed] token_id: &EsdtTokenIdentifier,
         #[indexed] token_nonce: u64,
         #[indexed] amount: &BigUint,
     );

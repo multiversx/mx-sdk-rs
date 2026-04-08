@@ -1,17 +1,17 @@
 use crate::{Color, KittyGenes};
 
-use multiversx_sc::derive_imports::*;
+use multiversx_sc::{derive_imports::*, imports::*};
 
 const SECONDS_PER_MINUTE: u64 = 60;
-const MAX_COOLDOWN: u64 = 60 * 60 * 24 * 7; // 7 days
+const MAX_COOLDOWN: DurationMillis = DurationMillis::new(60 * 60 * 24 * 7); // 7 days
 const MAX_TIREDNESS: u16 = 20;
 
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Kitty {
     pub genes: KittyGenes,
-    pub birth_time: u64,   // timestamp
-    pub cooldown_end: u64, // timestamp, used for pregnancy timer and siring cooldown
+    pub birth_time: TimestampMillis,   // timestamp
+    pub cooldown_end: TimestampMillis, // timestamp, used for pregnancy timer and siring cooldown
     pub matron_id: u32,
     pub sire_id: u32,
     pub siring_with_id: u32, // for pregnant cats, 0 otherwise
@@ -22,7 +22,7 @@ pub struct Kitty {
 impl Kitty {
     pub fn new(
         genes: KittyGenes,
-        birth_time: u64,
+        birth_time: TimestampMillis,
         matron_id: u32,
         sire_id: u32,
         generation: u16,
@@ -30,7 +30,7 @@ impl Kitty {
         Kitty {
             genes,
             birth_time,
-            cooldown_end: 0,
+            cooldown_end: TimestampMillis::zero(),
             matron_id,
             sire_id,
             siring_with_id: 0,
@@ -41,13 +41,13 @@ impl Kitty {
 }
 
 impl Kitty {
-    pub fn get_next_cooldown_time(&self) -> u64 {
+    pub fn get_next_cooldown_time(&self) -> DurationMillis {
         let tiredness = self.nr_children + self.generation / 2;
         if tiredness > MAX_TIREDNESS {
             return MAX_COOLDOWN;
         }
 
-        let cooldown = SECONDS_PER_MINUTE << tiredness; // 2^(tiredness) minutes
+        let cooldown = DurationMillis::new(SECONDS_PER_MINUTE << tiredness); // 2^(tiredness) minutes
         if cooldown > MAX_COOLDOWN {
             MAX_COOLDOWN
         } else {
@@ -77,8 +77,8 @@ impl Default for Kitty {
     fn default() -> Self {
         Kitty {
             genes: KittyGenes::default(),
-            birth_time: 0,
-            cooldown_end: u64::MAX,
+            birth_time: TimestampMillis::zero(),
+            cooldown_end: TimestampMillis::max(),
             matron_id: 0,
             sire_id: 0,
             siring_with_id: 0,

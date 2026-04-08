@@ -24,7 +24,7 @@ impl RepoSource {
         match self {
             RepoSource::Downloaded(repo_temp_download) => {
                 repo_temp_download.repository_temp_dir_path()
-            },
+            }
             RepoSource::LocalPath(local_path) => local_path.clone(),
         }
     }

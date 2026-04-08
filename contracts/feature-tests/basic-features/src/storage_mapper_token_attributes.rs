@@ -17,7 +17,7 @@ pub trait TokenAttributesMapperFeatures {
     #[endpoint]
     fn token_attributes_set(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         token_nonce: u64,
         attributes: &TokenAttributesStruct<Self::Api>,
     ) {
@@ -28,7 +28,7 @@ pub trait TokenAttributesMapperFeatures {
     #[endpoint]
     fn token_attributes_update(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         token_nonce: u64,
         attributes: &TokenAttributesStruct<Self::Api>,
     ) {
@@ -39,7 +39,7 @@ pub trait TokenAttributesMapperFeatures {
     #[endpoint]
     fn token_attributes_get_attributes(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         token_nonce: u64,
     ) -> TokenAttributesStruct<Self::Api> {
         self.token_attributes()
@@ -49,7 +49,7 @@ pub trait TokenAttributesMapperFeatures {
     #[endpoint]
     fn token_attributes_get_nonce(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         attributes: TokenAttributesStruct<Self::Api>,
     ) -> u64 {
         self.token_attributes()
@@ -57,7 +57,7 @@ pub trait TokenAttributesMapperFeatures {
     }
 
     #[endpoint]
-    fn token_attributes_clear(&self, token_id: &TokenIdentifier, token_nonce: u64) {
+    fn token_attributes_clear(&self, token_id: &EsdtTokenIdentifier, token_nonce: u64) {
         self.token_attributes()
             .clear::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, token_nonce)
     }
@@ -65,7 +65,7 @@ pub trait TokenAttributesMapperFeatures {
     #[endpoint]
     fn token_attributes_has_attributes(
         &self,
-        token_id: &TokenIdentifier,
+        token_id: &EsdtTokenIdentifier,
         token_nonce: u64,
     ) -> bool {
         self.token_attributes()

@@ -47,11 +47,7 @@ impl ManagedTypeContainer {
 
     pub fn bi_get_signed_bytes(&self, handle: RawHandle) -> Vec<u8> {
         let bi = self.bi_get(handle);
-        if bi.is_zero() {
-            Vec::new()
-        } else {
-            bi.to_signed_bytes_be()
-        }
+        big_int_signed_bytes(&bi)
     }
 
     pub fn bi_set_signed_bytes(&mut self, destination: RawHandle, bytes: &[u8]) {
@@ -75,7 +71,7 @@ pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
             } else {
                 None
             }
-        },
+        }
         Sign::Minus => {
             if digits.len() == 1 {
                 let as_u64 = digits[0];
@@ -87,6 +83,31 @@ pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
             } else {
                 None
             }
-        },
+        }
+    }
+}
+
+pub fn big_uint_to_u64(bu: &num_bigint::BigUint) -> Option<u64> {
+    let digits = bu.to_u64_digits();
+    match digits.len() {
+        0 => Some(0),
+        1 => Some(digits[0]),
+        _ => None,
+    }
+}
+
+pub fn big_uint_unsigned_bytes(bu: &num_bigint::BigUint) -> Vec<u8> {
+    if bu.is_zero() {
+        Vec::new()
+    } else {
+        bu.to_bytes_be()
+    }
+}
+
+pub fn big_int_signed_bytes(bi: &num_bigint::BigInt) -> Vec<u8> {
+    if bi.is_zero() {
+        Vec::new()
+    } else {
+        bi.to_signed_bytes_be()
     }
 }

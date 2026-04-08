@@ -3,12 +3,15 @@ use super::stg_section::ScenarioTestFn;
 pub const TEST_ANNOTATION: &str = "#[test]";
 pub const IGNORE_ANNOTATION: &str = "#[ignore]";
 pub const IGNORE_ANNOTATION_PREFIX: &str = "#[ignore";
+pub const SHOULD_PANIC_ANNOTATION_PREFIX: &str = "#[should_panic";
 pub const SCEN_PATTERN_PREFIX: &str = "\"scenarios/";
 pub const SCEN_PATTERN_SUFFIX: &str = ".scen.json\"";
+pub const INSERT_GHOST_ACCOUNTS: &str = ".insert_ghost_accounts()";
 
 pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
     let mut docs = String::new();
     let mut ignore_line = None;
+    let mut should_panic_line = None;
     let mut opt_test_line = None;
     let mut all_commented_out = true;
     let mut opt_scenario_file_name = None;
@@ -30,6 +33,8 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
             opt_test_line = Some(uncomm_line.to_string());
         } else if uncomm_line.starts_with(IGNORE_ANNOTATION_PREFIX) {
             ignore_line = Some(uncomm_line.to_string());
+        } else if uncomm_line.starts_with(SHOULD_PANIC_ANNOTATION_PREFIX) {
+            should_panic_line = Some(uncomm_line.to_string());
         } else if let Some(scenario_file_name) = find_scenario_name(uncomm_line) {
             opt_scenario_file_name = Some(scenario_file_name.to_string());
         }
@@ -53,7 +58,9 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
             docs,
             test_line,
             ignore_line,
+            should_panic_line,
             scenario_file_name,
+            insert_ghost_accounts: section_str.contains(INSERT_GHOST_ACCOUNTS),
         })
     } else {
         None

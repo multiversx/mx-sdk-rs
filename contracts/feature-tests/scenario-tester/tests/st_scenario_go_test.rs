@@ -1,7 +1,12 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
+}
+
+#[test]
+fn forbidden_opcodes_go() {
+    world().run("scenarios/forbidden-opcodes.scen.json");
 }
 
 #[test]
@@ -17,9 +22,4 @@ fn st_adder_go() {
 #[test]
 fn st_partial_key_check_go() {
     world().run("scenarios/st-partial-key-check.scen.json");
-}
-
-#[test]
-fn st_forbidden_opcodes_go() {
-    world().run("scenarios/forbidden-opcodes.scen.json");
 }

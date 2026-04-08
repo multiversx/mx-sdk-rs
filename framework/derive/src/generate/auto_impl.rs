@@ -22,7 +22,7 @@ pub fn generate_auto_impls(contract: &ContractTrait) -> Vec<proc_macro2::TokenSt
                     "method `{}` needs either an auto-implementation or a default implementation",
                     m.name
                 )
-            },
+            }
         })
         .collect()
 }
@@ -35,7 +35,7 @@ fn generate_auto_impl(m: &Method, auto_impl: &AutoImpl) -> proc_macro2::TokenStr
         AutoImpl::StorageMapper { identifier } => generate_mapper_impl(m, identifier),
         AutoImpl::StorageMapperFromAddress { identifier } => {
             generate_mapper_from_address_impl(m, identifier)
-        },
+        }
         AutoImpl::StorageIsEmpty { identifier } => generate_is_empty_impl(m, identifier),
         AutoImpl::StorageClear { identifier } => generate_clear_impl(m, identifier),
         AutoImpl::ProxyGetter => generate_proxy_getter_impl(m),

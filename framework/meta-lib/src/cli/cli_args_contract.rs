@@ -80,33 +80,33 @@ impl CliArgsToRaw for ContractCliAction {
         match self {
             ContractCliAction::Abi => {
                 raw.push("abi".to_string());
-            },
+            }
             ContractCliAction::Build(args) => {
                 raw.push("build".to_string());
                 raw.append(&mut args.to_raw());
-            },
+            }
             ContractCliAction::BuildDbg(args) => {
                 raw.push("build-dbg".to_string());
                 raw.append(&mut args.to_raw());
-            },
+            }
             ContractCliAction::Twiggy(args) => {
                 raw.push("twiggy".to_string());
                 raw.append(&mut args.to_raw());
-            },
+            }
             ContractCliAction::Clean => {
                 raw.push("clean".to_string());
-            },
+            }
             ContractCliAction::Update => {
                 raw.push("update".to_string());
-            },
+            }
             ContractCliAction::GenerateSnippets(args) => {
                 raw.push("snippets".to_string());
                 raw.append(&mut args.to_raw());
-            },
+            }
             ContractCliAction::GenerateProxies(args) => {
                 raw.push("proxy".to_string());
                 raw.append(&mut args.to_raw());
-            },
+            }
         }
         raw
     }
@@ -134,6 +134,10 @@ pub struct GenerateProxyArgs {
     /// Runs proxy comparison (newly generated vs already present on disk).
     #[arg(long, verbatim_doc_comment)]
     pub compare: bool,
+
+    /// Prints a summary of types defined, skipped, and external in the proxy.
+    #[arg(long, verbatim_doc_comment)]
+    pub verbose: bool,
 }
 
 impl CliArgsToRaw for GenerateProxyArgs {
@@ -141,6 +145,9 @@ impl CliArgsToRaw for GenerateProxyArgs {
         let mut raw = Vec::new();
         if self.compare {
             raw.push("--compare".to_string());
+        }
+        if self.verbose {
+            raw.push("--verbose".to_string());
         }
         raw
     }

@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::api::{const_handles, BigIntApiImpl, ManagedTypeApi};
+use crate::api::{BigIntApiImpl, ManagedTypeApi, const_handles};
 
 use super::BigInt;
 
@@ -15,6 +15,7 @@ where
     }
 }
 
+#[allow(unused)]
 pub(crate) fn bi_gt_zero<M>(bi_handle: M::BigIntHandle) -> bool
 where
     M: ManagedTypeApi,

@@ -4,17 +4,18 @@ use crate::model::{
 };
 
 use super::{
-    attributes::{
-        is_allow_multiple_var_args, is_callback_raw, is_init, is_only_admin, is_only_owner,
-        is_only_user_account, is_upgrade, CallbackAttribute, EndpointAttribute,
-        ExternalViewAttribute, LabelAttribute, OutputNameAttribute, PromisesCallbackAttribute,
-        TitleAttribute, ViewAttribute,
-    },
     MethodAttributesPass1,
+    attributes::{
+        CallbackAttribute, EndpointAttribute, ExternalViewAttribute, LabelAttribute,
+        OutputNameAttribute, PromisesCallbackAttribute, TitleAttribute, ViewAttribute,
+        is_allow_multiple_var_args, is_callback_raw, is_init, is_only_admin, is_only_owner,
+        is_only_user_account, is_upgrade,
+    },
 };
 
 fn check_single_role(method: &Method) {
-    assert!(matches!(method.public_role, PublicRole::Private),
+    assert!(
+        matches!(method.public_role, PublicRole::Private),
         "Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
     );
 }

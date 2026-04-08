@@ -3,7 +3,7 @@ use crate::{
     api::ManagedTypeApi,
     codec::TopEncodeOutput,
     proxy_imports::TypeAbi,
-    types::{heap::BoxedBytes, ManagedArgBuffer},
+    types::{ManagedArgBuffer, heap::BoxedBytes},
 };
 use alloc::vec::Vec;
 

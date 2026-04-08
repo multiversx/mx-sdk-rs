@@ -6,7 +6,9 @@ mod tx_managed_map;
 
 pub use handle_map::HandleMap;
 use num_bigint::BigInt;
-pub use tx_big_int::big_int_to_i64;
+pub use tx_big_int::{
+    big_int_signed_bytes, big_int_to_i64, big_uint_to_u64, big_uint_unsigned_bytes,
+};
 pub use tx_managed_buffer::InvalidSliceError;
 
 use std::collections::HashMap;

@@ -276,6 +276,15 @@ where
             .original_result()
     }
 
+    pub fn time_types(
+        self,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("time_types")
+            .original_result()
+    }
+
     pub fn sample_storage_mapper(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OnlyShowsUpAsNestedInSingleValueMapper> {
@@ -586,24 +595,25 @@ pub struct OnlyShowsUpAsNested10 {}
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
-    Thirty,
-    Twelve,
-    Fifty,
+    Thirty = 30,
+    Twelve = 12,
+    Fifty = 50,
     FiftyOne,
 }
 
 #[rustfmt::skip]
+#[repr(u8)]
 #[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
-    Unit,
+    Unit = 3,
     Tuple(u16),
     Five,
     Struct {
         a: u8,
         b: u16,
-    },
+    } = 1,
 }
 
 #[type_abi]

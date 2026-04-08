@@ -5,7 +5,11 @@ use multiversx_sc::abi::{
     TypeDescription,
 };
 
-use crate::contract::{meta_config::MetaConfig, sc_config::proxy_config::ProxyConfig};
+use crate::contract::{
+    generate_proxy::proxy_process_type_name::{c_enum_representation, explicit_discriminant},
+    meta_config::MetaConfig,
+    sc_config::proxy_config::ProxyConfig,
+};
 
 use super::proxy_process_type_name::{
     extract_paths, extract_struct_crate, process_rust_type, proxy_methods_type_name,
@@ -33,11 +37,12 @@ const ZERO: &str = "0";
 const TYPES_FROM_FRAMEWORK: &[&str] = &[
     "EsdtTokenPayment",
     "EgldOrEsdtTokenPayment",
+    "Payment",
     "EsdtTokenData",
     "EgldOrEsdtTokenIdentifier",
-    "EgldOrEsdtTokenPayment",
+    "TokenIdentifier",
+    "TokenId",
     "EgldOrMultiEsdtPayment",
-    "EsdtTokenData",
     "EsdtLocalRole",
     "EsdtTokenType",
 ];
@@ -47,6 +52,7 @@ pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
     pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfig,
+    pub verbose: bool,
 }
 
 impl<'a> ProxyGenerator<'a> {
@@ -54,11 +60,13 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut dyn std::io::Write,
         proxy_config: &'a ProxyConfig,
+        verbose: bool,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
+            verbose,
         }
     }
 
@@ -151,15 +159,81 @@ where
         }
     }
 
-    fn write_types(&mut self) {
+    fn print_types_info(&self) {
+        let crate_name = self.proxy_config.abi.get_crate_name_for_code();
+        let mut local_types: Vec<&str> = Vec::new();
+        let mut skipped_types: Vec<&str> = Vec::new();
+        let mut external_types: Vec<&str> = Vec::new();
+
         for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
-            if self.proxy_config.abi.get_crate_name_for_code()
-                != extract_struct_crate(type_description.names.rust.as_str())
-            {
+            let rust_name = type_description.names.rust.as_str();
+            let type_short_name = rust_name.split("::").last().unwrap_or(rust_name);
+
+            if TYPES_FROM_FRAMEWORK.contains(&type_short_name) {
                 continue;
             }
 
-            let type_name = self.adjust_type_name_with_api(&type_description.names.rust);
+            if crate_name == extract_struct_crate(rust_name) {
+                match &type_description.contents {
+                    TypeContents::Struct(_) | TypeContents::Enum(_) => {
+                        if self.has_path_rename_for_crate(rust_name) {
+                            skipped_types.push(rust_name);
+                        } else {
+                            local_types.push(rust_name);
+                        }
+                    }
+                    _ => {}
+                }
+            } else if rust_name.contains("::") {
+                external_types.push(rust_name);
+            }
+        }
+
+        if !local_types.is_empty() || !skipped_types.is_empty() || !external_types.is_empty() {
+            println!(
+                "\nProxy types summary for {}:",
+                self.proxy_config.path.display()
+            );
+        }
+
+        if !local_types.is_empty() {
+            println!("  Types defined in proxy:");
+            for type_name in &local_types {
+                println!("    {type_name}");
+            }
+        }
+
+        if !skipped_types.is_empty() {
+            println!("  Types not generated (path-rename configured):");
+            for type_name in &skipped_types {
+                println!("    {type_name}");
+            }
+        }
+
+        if !external_types.is_empty() {
+            println!("  External type dependencies (configure [[proxy.path-rename]] to adjust):");
+            for type_name in &external_types {
+                println!("    {type_name}");
+            }
+        }
+    }
+
+    fn write_types(&mut self) {
+        if self.verbose {
+            self.print_types_info();
+        }
+
+        for (_, type_description) in &self.proxy_config.abi.type_descriptions.0 {
+            let rust_name = type_description.names.rust.as_str();
+            if self.proxy_config.abi.get_crate_name_for_code() != extract_struct_crate(rust_name) {
+                continue;
+            }
+
+            if self.has_path_rename_for_crate(rust_name) {
+                continue;
+            }
+
+            let type_name = self.adjust_type_name_with_api(rust_name);
             if TYPES_FROM_FRAMEWORK.contains(&type_name.as_str()) {
                 continue;
             }
@@ -167,14 +241,24 @@ where
             match &type_description.contents {
                 TypeContents::Enum(enum_variants) => {
                     self.write_enum(enum_variants, type_description, &type_name)
-                },
+                }
                 TypeContents::Struct(struct_fields) => {
                     self.write_struct(struct_fields, type_description, &type_name)
-                },
-                TypeContents::NotSpecified => {},
-                TypeContents::ExplicitEnum(_) => {},
+                }
+                TypeContents::NotSpecified => {}
+                TypeContents::ExplicitEnum(_) => {}
             }
         }
+    }
+
+    /// Checks if a path-rename rule applies to this type's crate prefix,
+    /// meaning the type should not be generated in the proxy (it's accessible via the renamed path).
+    fn has_path_rename_for_crate(&self, rust_name: &str) -> bool {
+        let crate_prefix = extract_struct_crate(rust_name);
+        self.proxy_config
+            .path_rename
+            .iter()
+            .any(|pr| pr.from == crate_prefix)
     }
 
     fn write_constructors(&mut self) {
@@ -414,11 +498,11 @@ where
         match outputs.len() {
             0 => {
                 self.write("()");
-            },
+            }
             1 => {
                 let adjusted = self.adjust_type_name_with_env_api(&outputs[0].type_names.rust);
                 self.write(adjusted);
-            },
+            }
             _ => {
                 self.write(format!("MultiValue{}<", outputs.len()));
                 for (i, output) in outputs.iter().enumerate() {
@@ -429,18 +513,22 @@ where
                     self.write(adjusted);
                 }
                 self.write(">");
-            },
+            }
         }
     }
 
     fn write_enum(
         &mut self,
-        enum_variants: &Vec<EnumVariantDescription>,
+        enum_variants: &[EnumVariantDescription],
         type_description: &TypeDescription,
         name: &str,
     ) {
         if self.enum_contains_struct_variant(enum_variants) {
             self.write("\n#[rustfmt::skip]");
+
+            if let Some(c_type) = c_enum_representation(enum_variants) {
+                self.write(format!("\n#[repr({})]", c_type));
+            };
         }
 
         self.start_write_type("enum", type_description, name);
@@ -452,17 +540,23 @@ where
 
         self.insert_open_brace(name);
 
-        for variant in enum_variants {
+        for (i, variant) in enum_variants.iter().enumerate() {
             self.write(format!("    {}", variant.name));
+            let discriminant = explicit_discriminant(i, variant, enum_variants);
+
             if variant.fields.is_empty() {
+                if discriminant.is_some() {
+                    self.write(format!(" = {}", variant.discriminant));
+                }
+
                 self.writeln(",");
                 continue;
             }
 
             if variant.fields[0].name == ZERO {
-                self.write_tuple_in_variant(&variant.fields, COMMA);
+                self.write_tuple_in_variant(&variant.fields, discriminant, COMMA);
             } else {
-                self.write_struct_in_variant(&variant.fields);
+                self.write_struct_in_variant(&variant.fields, discriminant);
             }
         }
         self.writeln("}");
@@ -470,7 +564,7 @@ where
 
     fn write_struct(
         &mut self,
-        struct_fields: &Vec<StructFieldDescription>,
+        struct_fields: &[StructFieldDescription],
         type_description: &TypeDescription,
         name: &str,
     ) {
@@ -482,7 +576,7 @@ where
         }
 
         if struct_fields.len() == 1 && struct_fields[0].name == ZERO {
-            self.write_tuple_in_variant(struct_fields, SEMICOLON);
+            self.write_tuple_in_variant(struct_fields, None, SEMICOLON);
             return;
         }
 
@@ -496,7 +590,12 @@ where
         self.writeln("}");
     }
 
-    fn write_tuple_in_variant(&mut self, fields: &[StructFieldDescription], punctuation: char) {
+    fn write_tuple_in_variant(
+        &mut self,
+        fields: &[StructFieldDescription],
+        discriminant: Option<usize>,
+        punctuation: char,
+    ) {
         self.write("(");
         for (i, field) in fields.iter().enumerate() {
             if i > 0 {
@@ -506,10 +605,17 @@ where
             self.write(adjusted_type_name);
         }
 
-        self.writeln(format!("){}", punctuation));
+        match discriminant {
+            Some(d) => self.write(format!(") = {}{}", d, punctuation)),
+            None => self.writeln(format!("){}", punctuation)),
+        }
     }
 
-    fn write_struct_in_variant(&mut self, fields: &[StructFieldDescription]) {
+    fn write_struct_in_variant(
+        &mut self,
+        fields: &[StructFieldDescription],
+        discriminant: Option<usize>,
+    ) {
         self.writeln(" {");
 
         for field in fields {
@@ -517,7 +623,13 @@ where
             self.writeln(format!("        {}: {adjusted_type_name},", field.name,));
         }
 
-        self.writeln("    },");
+        self.write("    }");
+
+        if let Some(d) = discriminant {
+            self.write(format!(" = {}", d));
+        }
+
+        self.writeln(",");
     }
 
     pub fn clean_paths(&mut self, rust_type: &str) -> String {
@@ -557,10 +669,24 @@ where
         self.writeln("");
         self.writeln("#[type_abi]");
 
-        if macro_attributes.is_empty() {
+        // Emit standalone attributes (e.g. `#[rustfmt::skip]`) that are stored
+        // as path strings containing "::" rather than as derive trait names.
+        for attr in macro_attributes {
+            if attr.contains("::") {
+                self.writeln(format!("#[{attr}]"));
+            }
+        }
+
+        let derive_attrs: Vec<&str> = macro_attributes
+            .iter()
+            .filter(|a| !a.contains("::"))
+            .map(String::as_str)
+            .collect();
+
+        if derive_attrs.is_empty() {
             self.writeln("#[derive(TopEncode, TopDecode)]");
         } else {
-            self.writeln(format!("#[derive({})]", macro_attributes.join(", ")));
+            self.writeln(format!("#[derive({})]", derive_attrs.join(", ")));
         }
     }
 
@@ -603,10 +729,15 @@ where
 
         for path in paths {
             let type_rust_name = path.split("::").last().unwrap();
-            if crate_name == extract_struct_crate(path)
-                || TYPES_FROM_FRAMEWORK.contains(&type_rust_name)
-            {
+            if TYPES_FROM_FRAMEWORK.contains(&type_rust_name) {
                 processed_paths.push(type_rust_name.to_string());
+            } else if crate_name == extract_struct_crate(path) {
+                if self.has_path_rename_for_crate(path) {
+                    // Keep full path so rename_path_with_custom_config can apply the rename.
+                    processed_paths.push(path.to_string());
+                } else {
+                    processed_paths.push(type_rust_name.to_string());
+                }
             } else {
                 processed_paths.push(path.to_string());
             }
@@ -615,7 +746,7 @@ where
         processed_paths
     }
 
-    fn enum_contains_struct_variant(&self, enum_variants: &Vec<EnumVariantDescription>) -> bool {
+    fn enum_contains_struct_variant(&self, enum_variants: &[EnumVariantDescription]) -> bool {
         for variant in enum_variants {
             if variant.fields.is_empty() {
                 continue;
@@ -641,10 +772,11 @@ pub mod tests {
     #[test]
     fn clean_paths_unsanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };
@@ -655,6 +787,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
@@ -672,10 +805,11 @@ pub mod tests {
     #[test]
     fn clean_paths_sanitized_test() {
         let build_info = BuildInfoAbi {
+            rustc: None,
             contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate",
-                version: "0.0.0",
-                git_version: "0.0.0",
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
             },
             framework: FrameworkBuildAbi::create(),
         };
@@ -686,6 +820,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfig::output_dir_proxy_config(original_contract_abi),
+            verbose: false,
         };
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(

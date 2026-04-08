@@ -5,8 +5,8 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeMulti, TopDecodeMultiInput,
-        TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+        DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecode, TopDecodeMulti,
+        TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
     },
     contract_base::{ExitCodecErrorHandler, ManagedSerializer},
     err_msg,
@@ -28,9 +28,9 @@ use super::MultiValueEncodedIterator;
 ///
 /// ## Item length
 ///
-/// Its item type must implement `TopDecodeMultiLength`, which is a length marker for multi-values.
+/// Its item type must implement `MultiValueConstLength`, which is a length marker for multi-values.
 ///
-/// Some examples for `TopDecodeMultiLength`:
+/// Some examples for `MultiValueConstLength`:
 /// - MultiValue3 has a "multi-length" of 3
 /// - a simple type, like i32, has a "multi-length" of 1
 /// - MultiValueEncoded has no known "multi-length", and therefore cannot be used inside `MultiValueEncodedCounted`.
@@ -42,7 +42,7 @@ use super::MultiValueEncodedIterator;
 pub struct MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi,
-    T: TopDecodeMultiLength,
+    T: MultiValueConstLength,
 {
     raw_buffers: ManagedVec<M, ManagedBuffer<M>>,
     _phantom: PhantomData<T>,
@@ -51,7 +51,7 @@ where
 impl<M, T> MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi,
-    T: TopDecodeMultiLength,
+    T: MultiValueConstLength,
 {
     #[inline]
     fn from_raw_vec(raw_buffers: ManagedVec<M, ManagedBuffer<M>>) -> Self {
@@ -70,7 +70,7 @@ where
 impl<M, T> MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMultiLength,
+    T: TopEncodeMulti + MultiValueConstLength,
 {
     pub fn push(&mut self, item: T) {
         item.multi_encode_or_handle_err(
@@ -84,7 +84,7 @@ where
 impl<M, T> IntoIterator for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecodeMulti + TopDecodeMultiLength,
+    T: TopDecodeMulti + MultiValueConstLength,
 {
     type Item = T;
     type IntoIter = MultiValueEncodedIterator<M, T>;
@@ -105,7 +105,7 @@ where
 impl<M, T> MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecodeMultiLength,
+    T: MultiValueConstLength,
 {
     /// Length of the underlying data.
     ///
@@ -124,14 +124,14 @@ where
     /// Number of items. Only available for multi-encode items.
     #[inline]
     pub fn len(&self) -> usize {
-        self.raw_len() / T::LEN
+        self.raw_len() / T::MULTI_VALUE_CONST_LEN
     }
 }
 
 impl<M, T> MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: ManagedVecItem + TopDecode + TopDecodeMultiLength,
+    T: ManagedVecItem + TopDecode + MultiValueConstLength,
 {
     pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
@@ -146,7 +146,7 @@ where
 impl<M, T> TopEncodeMulti for &MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMultiLength,
+    T: TopEncodeMulti + MultiValueConstLength,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -154,7 +154,7 @@ where
         H: EncodeErrorHandler,
     {
         let raw_count = self.raw_buffers.len();
-        let count = raw_count / T::LEN;
+        let count = raw_count / T::MULTI_VALUE_CONST_LEN;
         count.multi_encode_or_handle_err(output, h)?;
         for elem in &self.raw_buffers {
             elem.multi_encode_or_handle_err(output, h)?;
@@ -166,7 +166,7 @@ where
 impl<M, T> TopEncodeMulti for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMultiLength,
+    T: TopEncodeMulti + MultiValueConstLength,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -180,7 +180,7 @@ where
 impl<M, T> TopDecodeMulti for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopDecodeMulti + TopDecodeMultiLength,
+    T: TopDecodeMulti + MultiValueConstLength,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -188,7 +188,7 @@ where
         H: DecodeErrorHandler,
     {
         let count: usize = input.next_value(h)?;
-        let raw_count = count * T::LEN;
+        let raw_count = count * T::MULTI_VALUE_CONST_LEN;
         let mut raw_buffers = ManagedVec::new();
         for _ in 0..raw_count {
             raw_buffers.push(input.next_value(h)?);
@@ -200,21 +200,21 @@ where
 impl<M, T> TypeAbiFrom<Self> for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi,
-    T: TypeAbi + TopDecodeMultiLength,
+    T: TypeAbi + MultiValueConstLength,
 {
 }
 
 impl<M, T> TypeAbiFrom<&Self> for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi,
-    T: TypeAbi + TopDecodeMultiLength,
+    T: TypeAbi + MultiValueConstLength,
 {
 }
 
 impl<M, T> TypeAbi for MultiValueEncodedCounted<M, T>
 where
     M: ManagedTypeApi,
-    T: TypeAbi + TopDecodeMultiLength,
+    T: TypeAbi + MultiValueConstLength,
 {
     type Unmanaged = MultiValueVec<T::Unmanaged>;
 
@@ -242,14 +242,14 @@ impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncodedCounted<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: TypeAbiFrom<T> + TopDecodeMultiLength,
+    U: TypeAbiFrom<T> + MultiValueConstLength,
 {
 }
 
 impl<M, T, U> TypeAbiFrom<MultiValueEncodedCounted<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
-    T: TopEncodeMulti + TopDecodeMultiLength,
+    T: TopEncodeMulti + MultiValueConstLength,
     U: TypeAbiFrom<T>,
 {
 }
@@ -257,7 +257,7 @@ where
 impl<M, V> FromIterator<V> for MultiValueEncodedCounted<M, V>
 where
     M: ManagedTypeApi,
-    V: TopEncodeMulti + TopDecodeMultiLength,
+    V: TopEncodeMulti + MultiValueConstLength,
 {
     fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
         let mut result: MultiValueEncodedCounted<M, V> = MultiValueEncodedCounted::new();

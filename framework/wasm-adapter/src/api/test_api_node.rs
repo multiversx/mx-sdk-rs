@@ -1,7 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{TestApi, TestApiImpl};
 
-extern "C" {
+unsafe extern "C" {
 
     fn createAccount(addressHandle: i32, nonce: i64, balanceHandle: i32);
 

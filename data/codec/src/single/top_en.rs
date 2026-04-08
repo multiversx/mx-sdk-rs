@@ -1,6 +1,6 @@
 use crate::{
-    codec_err::EncodeError, DefaultErrorHandler, EncodeErrorHandler, NestedEncode,
-    PanicErrorHandler, TopEncodeOutput,
+    DefaultErrorHandler, EncodeErrorHandler, NestedEncode, PanicErrorHandler, TopEncodeOutput,
+    codec_err::EncodeError,
 };
 use alloc::vec::Vec;
 use unwrap_infallible::UnwrapInfallible;

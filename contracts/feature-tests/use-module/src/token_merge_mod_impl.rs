@@ -93,7 +93,7 @@ where
     fn get_merged_token_attributes(
         &self,
         _sc: &Self::ScType,
-        _merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
+        _merged_token_id: &EsdtTokenIdentifier<<Self::ScType as ContractBase>::Api>,
         _merged_token_raw_attributes: &MergedTokenInstances<<Self::ScType as ContractBase>::Api>,
     ) -> Self::AttributesType {
         CustomAttributes {

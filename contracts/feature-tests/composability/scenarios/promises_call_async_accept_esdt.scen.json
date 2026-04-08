@@ -18,7 +18,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -107,7 +107,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

@@ -28,8 +28,12 @@ where
 
         let gas_limit = self.gas.gas_value(&self.env);
         self.to.with_value_ref(&self.env, |to| {
-            self.payment
-                .perform_transfer_execute(&self.env, to, gas_limit, self.data.into());
+            self.payment.perform_transfer_execute_legacy(
+                &self.env,
+                to,
+                gas_limit,
+                self.data.into(),
+            );
         });
         TestRawWrapper::<Api>::new().stop_prank();
     }

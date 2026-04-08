@@ -1,20 +1,17 @@
-extern crate rand;
-
 use core::str;
 use std::{
     fs::{self},
     io::{self, Read},
 };
 
-use aes::{cipher::KeyIvInit, Aes128};
+use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
-use bip39::{Language, Mnemonic};
-use ctr::{cipher::StreamCipher, Ctr128BE};
+use bip39::Mnemonic;
+use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, Mac};
-use multiversx_chain_core::types::Address;
+use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
-use rand::RngCore;
-use scrypt::{scrypt, Params};
+use scrypt::{Params, scrypt};
 use serde_json::json;
 use sha2::{Digest, Sha256, Sha512};
 use sha3::Keccak256;
@@ -22,14 +19,12 @@ use zeroize::Zeroize;
 
 use crate::{
     crypto::{
-        private_key::{PrivateKey, PRIVATE_KEY_LENGTH},
+        private_key::{PRIVATE_KEY_LENGTH, PrivateKey},
         public_key::PublicKey,
     },
     data::{keystore::*, transaction::Transaction},
     utils::*,
 };
-
-use uuid::Uuid;
 
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
@@ -45,11 +40,6 @@ pub struct Wallet {
 }
 
 impl Wallet {
-    // GenerateMnemonic will generate a new mnemonic value using the bip39 implementation
-    pub fn generate_mnemonic() -> Mnemonic {
-        Mnemonic::generate_in(Language::English, 24).unwrap()
-    }
-
     fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {
         let mut salt = String::with_capacity(8 + password.len());
         salt.push_str("mnemonic");
@@ -129,7 +119,7 @@ impl Wallet {
     }
 
     pub fn from_pem_file(file_path: &str) -> Result<Self> {
-        let contents = std::fs::read_to_string(file_path).unwrap();
+        let contents = std::fs::read_to_string(file_path)?;
         Self::from_pem_file_contents(contents)
     }
 
@@ -171,13 +161,13 @@ impl Wallet {
                         panic!("Error: {:?}", e);
                     },
                 )
-            },
+            }
             InsertPassword::StandardInput => {
                 Self::validate_keystore_password(file_path, Self::get_keystore_password())
                     .unwrap_or_else(|e| {
                         panic!("Error: {:?}", e);
                     })
-            },
+            }
         };
         let priv_key = PrivateKey::from_hex_str(
             hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),
@@ -203,8 +193,8 @@ impl Wallet {
         since = "0.54.0",
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
     )]
-    pub fn address(&self) -> crate::data::sdk_address::SdkAddress {
-        crate::data::sdk_address::SdkAddress(self.to_address())
+    pub fn address(&self) -> Bech32Address {
+        self.to_address().to_bech32_default()
     }
 
     pub fn to_address(&self) -> Address {
@@ -221,7 +211,7 @@ impl Wallet {
         if should_sign_on_tx_hash {
             let mut h = Keccak256::new();
             h.update(tx_bytes);
-            tx_bytes = h.finalize().as_slice().to_vec();
+            tx_bytes = h.finalize().to_vec();
         }
 
         self.priv_key.sign(tx_bytes)
@@ -275,7 +265,7 @@ impl Wallet {
         input_mac.update(&ciphertext);
         let computed_mac = input_mac.finalize().into_bytes();
 
-        if computed_mac.as_slice() == json_mac.as_slice() {
+        if computed_mac.to_vec() == json_mac {
             println!("Password is correct");
             Ok(DecryptionParams {
                 derived_key_first_half,
@@ -299,19 +289,26 @@ impl Wallet {
         decrypted
     }
 
+    /// Not available in dapps, since it uses randomness to generate the keystore.
+    ///
+    /// Only available in the sc-meta standalone CLI.
+    #[cfg(feature = "wallet-full")]
     pub fn encrypt_keystore(
         data: &[u8],
+        hrp: &str,
         address: &Address,
         public_key: &str,
         password: &str,
     ) -> String {
+        use rand::Rng;
+
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];
-        rand::thread_rng().fill_bytes(&mut rand_salt);
+        rand::rng().fill_bytes(&mut rand_salt);
         let salt_hex = hex::encode(rand_salt);
 
         let mut rand_iv: [u8; 16] = [0u8; 16];
-        rand::thread_rng().fill_bytes(&mut rand_iv);
+        rand::rng().fill_bytes(&mut rand_iv);
         let iv_hex = hex::encode(rand_iv);
 
         let mut derived_key = vec![0u8; 32];
@@ -346,11 +343,11 @@ impl Wallet {
                 },
                 mac: hex::encode(mac),
             },
-            id: Uuid::new_v4().to_string(),
+            id: uuid::Uuid::new_v4().to_string(),
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: crate::bech32::encode(address),
+            bech32: address.to_bech32(hrp).bech32,
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -358,7 +355,12 @@ impl Wallet {
         keystore_json
     }
 
-    pub fn generate_pem_content(address: &Address, private_key: &str, public_key: &str) -> String {
+    pub fn generate_pem_content(
+        hrp: &str,
+        address: &Address,
+        private_key: &str,
+        public_key: &str,
+    ) -> String {
         let concat_keys = format!("{}{}", private_key, public_key);
         let concat_keys_b64 = base64_encode(concat_keys);
 
@@ -370,7 +372,7 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
-        let address_bech32 = crate::bech32::encode(address);
+        let address_bech32 = Bech32Address::encode_address(hrp, address.clone());
         let pem_content = format!(
             "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );

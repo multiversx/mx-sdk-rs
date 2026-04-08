@@ -13,6 +13,8 @@ pub struct SetStateStep {
     pub block_hashes: Vec<BytesValue>,
     pub previous_block_info: Box<Option<BlockInfo>>,
     pub current_block_info: Box<Option<BlockInfo>>,
+    pub epoch_start_block_info: Box<Option<BlockInfo>>,
+    pub block_round_time_ms: Option<U64Value>,
 }
 
 impl SetStateStep {
@@ -92,7 +94,15 @@ impl SetStateStep {
         self
     }
 
-    pub fn block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
+    #[deprecated(since = "0.63.2", note = "Renamed to block_timestamp_seconds")]
+    pub fn block_timestamp<N>(self, block_timestamp_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        self.block_timestamp_seconds(block_timestamp_expr)
+    }
+
+    pub fn block_timestamp_seconds<N>(mut self, block_timestamp_expr: N) -> Self
     where
         U64Value: From<N>,
     {
@@ -100,6 +110,26 @@ impl SetStateStep {
 
         let mut block_info = self.current_block_info.unwrap_or_default();
         block_info.block_timestamp = Some(block_timestamp);
+        self.current_block_info = Box::new(Some(block_info));
+        self
+    }
+
+    #[deprecated(since = "0.63.2", note = "Renamed to block_timestamp_millis")]
+    pub fn block_timestamp_ms<N>(self, block_timestamp_ms_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        self.block_timestamp_millis(block_timestamp_ms_expr)
+    }
+
+    pub fn block_timestamp_millis<N>(mut self, block_timestamp_ms_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_timestamp_ms = U64Value::from(block_timestamp_ms_expr);
+
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_timestamp_ms = Some(block_timestamp_ms);
         self.current_block_info = Box::new(Some(block_info));
         self
     }

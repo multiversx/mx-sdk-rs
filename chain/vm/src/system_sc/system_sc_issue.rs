@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 use crate::{
     crypto_functions::keccak256,
     host::context::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::{top_decode_u64, VMTokenType},
+    types::{VMTokenType, top_decode_u64},
 };
 
 /// Issues a new fungible token.
@@ -120,6 +120,7 @@ fn generate_token_identifier_from_ticker(
         tx_input.from.as_bytes(),
         tx_cache
             .blockchain_ref()
+            .block_config
             .current_block_info
             .block_random_seed
             .as_slice(),
@@ -128,14 +129,12 @@ fn generate_token_identifier_from_ticker(
     let new_random = keccak256(&new_random_base);
     let new_random_for_ticker = &new_random[..3];
 
-    let token_identifier = [
+    [
         ticker,
         "-".as_bytes(),
         hex::encode(new_random_for_ticker).as_bytes(),
     ]
-    .concat();
-
-    token_identifier
+    .concat()
 }
 
 #[cfg(test)]

@@ -73,7 +73,7 @@ fn test_staking_module() {
             whitelist.push(SALLY_ADDRESS.to_managed_address());
 
             sc.init_staking_module(
-                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID.to_token_identifier()),
+                &EgldOrEsdtTokenIdentifier::esdt(STAKING_TOKEN_ID.to_esdt_token_identifier()),
                 &BigUint::from(REQUIRED_STAKE_AMOUNT),
                 &BigUint::from(SLASH_AMOUNT),
                 QUORUM,
@@ -81,14 +81,14 @@ fn test_staking_module() {
             );
         });
 
-    assert_eq!(new_address.to_address(), USE_MODULE_ADDRESS.to_address());
+    assert_eq!(new_address, USE_MODULE_ADDRESS);
 
     // try stake - not a board member
     world
         .tx()
         .from(EVE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .returns(ExpectError(4u64, "Only whitelisted members can stake"))
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
@@ -99,11 +99,7 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(
-            STAKING_TOKEN_ID,
-            0,
-            REQUIRED_STAKE_AMOUNT / 2,
-        ))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT / 2).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -122,7 +118,7 @@ fn test_staking_module() {
         .tx()
         .from(BOB_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -131,7 +127,7 @@ fn test_staking_module() {
         .tx()
         .from(CAROL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -140,7 +136,7 @@ fn test_staking_module() {
         .tx()
         .from(PAUL_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -149,7 +145,7 @@ fn test_staking_module() {
         .tx()
         .from(SALLY_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
         });
@@ -179,7 +175,7 @@ fn test_staking_module() {
         .tx()
         .from(ALICE_ADDRESS)
         .to(USE_MODULE_ADDRESS)
-        .payment(TestEsdtTransfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT))
+        .payment(Payment::try_new(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT).unwrap())
         .whitebox(use_module::contract_obj, |sc| {
             sc.stake();
             let alice_staked_amount = sc.staked_amount(&ALICE_ADDRESS.to_managed_address()).get();
@@ -213,9 +209,10 @@ fn test_staking_module() {
                     .len(),
                 1
             );
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
         });
 
     // bob vote to slash alice
@@ -277,18 +274,22 @@ fn test_staking_module() {
                     .len(),
                 3
             );
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&BOB_ADDRESS.to_managed_address()));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&CAROL_ADDRESS.to_managed_address()));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&PAUL_ADDRESS.to_managed_address()));
-            assert!(!sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .contains(&SALLY_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&BOB_ADDRESS.to_managed_address())
+            );
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&CAROL_ADDRESS.to_managed_address())
+            );
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&PAUL_ADDRESS.to_managed_address())
+            );
+            assert!(
+                !sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .contains(&SALLY_ADDRESS.to_managed_address())
+            );
         });
 
     // slash alice
@@ -304,9 +305,10 @@ fn test_staking_module() {
                 BigUint::from(REQUIRED_STAKE_AMOUNT - SLASH_AMOUNT)
             );
             assert_eq!(sc.total_slashed_amount().get(), BigUint::from(SLASH_AMOUNT));
-            assert!(sc
-                .slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
-                .is_empty());
+            assert!(
+                sc.slashing_proposal_voters(&ALICE_ADDRESS.to_managed_address())
+                    .is_empty()
+            );
         });
 
     // alice try vote after slash
@@ -336,21 +338,24 @@ fn test_staking_module() {
         .to(USE_MODULE_ADDRESS)
         .whitebox(use_module::contract_obj, |sc| {
             // check alice's votes before slash
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
 
             sc.remove_board_member(&ALICE_ADDRESS.to_managed_address());
 
             assert_eq!(sc.user_whitelist().len(), 4);
-            assert!(!sc
-                .user_whitelist()
-                .contains(&ALICE_ADDRESS.to_managed_address()));
+            assert!(
+                !sc.user_whitelist()
+                    .contains(&ALICE_ADDRESS.to_managed_address())
+            );
 
             // alice's vote gets removed
-            assert!(sc
-                .slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
-                .is_empty());
+            assert!(
+                sc.slashing_proposal_voters(&BOB_ADDRESS.to_managed_address())
+                    .is_empty()
+            );
         });
 
     // alice unstake ok

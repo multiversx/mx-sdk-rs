@@ -48,7 +48,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                     parts.push(FormatPartType::Display);
 
                     start_index = i + 2;
-                },
+                }
                 TWO_DOTS => {
                     match ascii_bytes.get(i + 2) {
                         Some(letter) => {
@@ -56,7 +56,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                                 panic!("{}", UNMATCHED_BRACE_ERR_MSG);
                             }
                             format_byte = letter;
-                        },
+                        }
                         None => panic!("{}", UNMATCHED_BRACE_ERR_MSG),
                     }
                     match ascii_bytes.get(i + 3) {
@@ -64,7 +64,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                             if *closed_brace != CLOSED_BRACE {
                                 panic!("{}", UNMATCHED_BRACE_ERR_MSG);
                             }
-                        },
+                        }
                         None => panic!("{}", UNMATCHED_BRACE_ERR_MSG),
                     }
 
@@ -85,7 +85,7 @@ pub fn parse_format_string(raw_string: &str) -> Vec<FormatPartType> {
                     }
 
                     start_index = i + 4;
-                },
+                }
                 _ => panic!("{}", UNMATCHED_BRACE_ERR_MSG),
             },
             None => panic!("{}", UNMATCHED_BRACE_ERR_MSG),
@@ -109,7 +109,7 @@ pub(crate) fn count_args(format_types: &[FormatPartType]) -> usize {
             FormatPartType::LowerHex => nr_args += 1,
             FormatPartType::Codec => nr_args += 1,
             FormatPartType::Bytes => nr_args += 1,
-            FormatPartType::StaticAscii(_) => {},
+            FormatPartType::StaticAscii(_) => {}
         }
     }
 

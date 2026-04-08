@@ -3,7 +3,7 @@ use crate::{
     types::{BackTransfers, RHListItem, RHListItemExec, TxEnv},
 };
 
-/// Indicates that back-transfers will be returned.
+/// Indicates that all back-transfers, as list of EGLD and ESDT payments.
 ///
 /// Back-transfers are reset before a call, to avoid unwanted interferences.
 pub struct ReturnsBackTransfersReset;
@@ -21,9 +21,7 @@ where
     Env: TxEnv,
 {
     fn item_preprocessing(&self, prev: Env::RHExpect) -> Env::RHExpect {
-        // retrieval resets back-transfers
-        // the result is of no interest
-        let _ = BlockchainWrapper::<Env::Api>::new().get_back_transfers();
+        BlockchainWrapper::<Env::Api>::new().reset_back_transfers();
 
         prev
     }

@@ -1,9 +1,9 @@
 use multiversx_sc_codec as codec;
 
 use codec::{
-    test_util::check_top_encode_decode, top_decode_from_nested_or_handle_err, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    test_util::check_top_encode_decode, top_decode_from_nested_or_handle_err,
 };
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]

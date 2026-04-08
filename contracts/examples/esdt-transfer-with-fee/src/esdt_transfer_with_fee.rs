@@ -13,9 +13,9 @@ pub trait EsdtTransferWithFee {
     #[endpoint(setExactValueFee)]
     fn set_exact_value_fee(
         &self,
-        fee_token: TokenIdentifier,
+        fee_token: EsdtTokenIdentifier,
         fee_amount: BigUint,
-        token: TokenIdentifier,
+        token: EsdtTokenIdentifier,
     ) {
         self.token_fee(&token)
             .set(Fee::ExactValue(EsdtTokenPayment::new(
@@ -25,7 +25,7 @@ pub trait EsdtTransferWithFee {
 
     #[only_owner]
     #[endpoint(setPercentageFee)]
-    fn set_percentage_fee(&self, fee: u32, token: TokenIdentifier) {
+    fn set_percentage_fee(&self, fee: u32, token: EsdtTokenIdentifier) {
         self.token_fee(&token).set(Fee::Percentage(fee));
     }
 
@@ -72,13 +72,13 @@ pub trait EsdtTransferWithFee {
                     );
                     let _ = self.get_payment_after_fees(fee_type, &next_payment);
                     new_payments.push(payment.clone());
-                },
+                }
                 Fee::Percentage(_) => {
                     new_payments.push(self.get_payment_after_fees(fee_type, &payment));
-                },
+                }
                 Fee::Unset => {
                     new_payments.push(payment.clone());
-                },
+                }
             }
         }
         self.tx().to(&address).payment(new_payments).transfer();
@@ -115,19 +115,19 @@ pub trait EsdtTransferWithFee {
                 let calculated_fee_amount = &provided.amount * *percentage / PERCENTAGE_DIVISOR;
                 provided.amount = calculated_fee_amount;
                 provided
-            },
+            }
             Fee::Unset => {
                 provided.amount = BigUint::zero();
                 provided
-            },
+            }
         }
     }
 
     #[view(getTokenFee)]
     #[storage_mapper("token_fee")]
-    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
+    fn token_fee(&self, token: &EsdtTokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
+    fn paid_fees(&self) -> MapMapper<(EsdtTokenIdentifier, u64), BigUint>;
 }

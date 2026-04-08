@@ -1,6 +1,6 @@
 use core::borrow::Borrow;
 
-use multiversx_sc_codec::multi_types::MultiValueVec;
+use multiversx_sc_codec::multi_types::{IgnoreValue, MultiValueVec};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -49,7 +49,7 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        Self(ManagedVec::from_handle(handle))
+        unsafe { Self(ManagedVec::from_handle(handle)) }
     }
 
     fn get_handle(&self) -> M::ManagedBufferHandle {
@@ -57,7 +57,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.0.forget_into_handle()
+        unsafe { self.0.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -131,6 +131,10 @@ where
         self.0
     }
 
+    pub fn as_vec(&self) -> &ManagedVec<M, T> {
+        &self.0
+    }
+
     #[cfg(feature = "alloc")]
     pub fn with_self_as_vec<F>(&mut self, f: F)
     where
@@ -139,7 +143,7 @@ where
         self.0.with_self_as_vec(f)
     }
 
-    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+    pub fn iter(&self) -> ManagedVecRefIterator<'_, M, T> {
         ManagedVecRefIterator::new(&self.0)
     }
 }
@@ -236,10 +240,34 @@ where
     }
 }
 
-impl<M, T: TypeAbi> TypeAbiFrom<Self> for MultiValueManagedVec<M, T>
+impl<M, T, U> TypeAbiFrom<MultiValueManagedVec<M, U>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
-    T: ManagedVecItem,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: ManagedVecItem + TypeAbi,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<&MultiValueManagedVec<M, U>> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: ManagedVecItem + TypeAbi,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<MultiValueVec<U>> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<IgnoreValue> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi,
 {
 }
 

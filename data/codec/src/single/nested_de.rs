@@ -1,6 +1,6 @@
 // use core::ops::Try;
 
-use crate::{codec_err::DecodeError, DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput};
+use crate::{DecodeErrorHandler, DefaultErrorHandler, NestedDecodeInput, codec_err::DecodeError};
 
 /// Trait that allows zero-copy read of value-references from slices in LE format.
 pub trait NestedDecode: Sized {

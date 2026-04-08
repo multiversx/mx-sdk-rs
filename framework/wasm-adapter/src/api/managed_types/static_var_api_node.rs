@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{const_handles, RawHandle, StaticVarApi, StaticVarApiFlags, StaticVarApiImpl},
+    api::{RawHandle, StaticVarApi, StaticVarApiFlags, StaticVarApiImpl, const_handles},
     types::LockableStaticBuffer,
 };
 
@@ -76,8 +76,6 @@ impl StaticVarApiImpl for VmApiImpl {
     }
 
     fn set_scaling_factor_cached(&self, decimals: usize) {
-        {
-            unsafe { SCALING_FACTOR_INIT[decimals] = true }
-        }
+        unsafe { SCALING_FACTOR_INIT[decimals] = true }
     }
 }

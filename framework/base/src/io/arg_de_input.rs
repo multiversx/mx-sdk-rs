@@ -3,10 +3,10 @@ use core::marker::PhantomData;
 use crate::{
     api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedTypeApi},
     codec::{
-        try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
+        DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast, try_execute_then_cast,
     },
     types::{
-        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, heap::Box,
     },
 };
 

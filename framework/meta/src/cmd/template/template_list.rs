@@ -1,6 +1,6 @@
 use crate::cli::TemplateListArgs;
 
-use super::{contract_creator::get_repo_version, template_source::template_sources, RepoSource};
+use super::{RepoSource, contract_creator::get_repo_version, template_source::template_sources};
 
 pub async fn print_template_names(args: &TemplateListArgs) {
     let version = get_repo_version(&args.tag);

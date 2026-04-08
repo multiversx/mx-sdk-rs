@@ -8,8 +8,8 @@ use crate::{
     abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
-        heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
-        TxFromSpecified, TxTo, TxToSpecified,
+        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+        TxToSpecified, heap::Address,
     },
 };
 
@@ -21,7 +21,7 @@ const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 /// Encodes a dummy SC address, to be used for tests.
 ///
-/// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
+/// It is designed to be usable from contracts (especially test contracts), with a minimal footprint.
 /// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct TestSCAddress<'a> {
@@ -75,6 +75,20 @@ impl PartialEq<Address> for TestSCAddress<'_> {
 impl<'a> PartialEq<TestSCAddress<'a>> for Address {
     fn eq(&self, other: &TestSCAddress<'a>) -> bool {
         self == &other.to_address()
+    }
+}
+
+#[cfg(feature = "std")]
+impl PartialEq<multiversx_chain_core::std::Bech32Address> for TestSCAddress<'_> {
+    fn eq(&self, other: &multiversx_chain_core::std::Bech32Address) -> bool {
+        self.to_address() == other.address
+    }
+}
+
+#[cfg(feature = "std")]
+impl<'a> PartialEq<TestSCAddress<'a>> for multiversx_chain_core::std::Bech32Address {
+    fn eq(&self, other: &TestSCAddress<'a>) -> bool {
+        self.address == other.to_address()
     }
 }
 

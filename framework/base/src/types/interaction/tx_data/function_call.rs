@@ -6,12 +6,12 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        ManagedTypeApi,
     },
     types::{
-        ContractCallNoPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, MultiEgldOrEsdtPayment, MultiValueEncoded, TypedFunctionCall,
+        EsdtTokenPaymentRefs, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        MultiEgldOrEsdtPayment, MultiValueEncoded,
     },
 };
 
@@ -65,13 +65,6 @@ where
         self.arg_buffer = raw;
         self
     }
-
-    pub fn typed_result<R>(self) -> TypedFunctionCall<Api, R>
-    where
-        R: TopEncodeMulti + TopDecodeMulti,
-    {
-        self.into()
-    }
 }
 
 impl<Api> From<()> for FunctionCall<Api>
@@ -83,11 +76,12 @@ where
     }
 }
 
-impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
+#[cfg(feature = "contract-call-legacy")]
+impl<Api, R> From<crate::types::ContractCallNoPayment<Api, R>> for FunctionCall<Api>
 where
-    Api: CallTypeApi,
+    Api: crate::api::CallTypeApi,
 {
-    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
+    fn from(ccnp: crate::types::ContractCallNoPayment<Api, R>) -> Self {
         ccnp.function_call
     }
 }
@@ -209,7 +203,7 @@ where
         for payment in payments {
             // serializing token identifier buffer to get EGLD-00000 instead of EGLD
             result = result
-                .argument(&payment.token_identifier.buffer)
+                .argument(&payment.token_identifier.token_id)
                 .argument(&payment.token_nonce)
                 .argument(&payment.amount);
         }

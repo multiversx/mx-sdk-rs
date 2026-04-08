@@ -1,5 +1,5 @@
 use crate::{
-    api::{const_handles, BlockchainApi, BlockchainApiImpl, CallTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, CallTypeApi, const_handles},
     contract_base::BlockchainWrapper,
     types::{
         AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv, TxTo, TxToSpecified,

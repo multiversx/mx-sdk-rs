@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::imports::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

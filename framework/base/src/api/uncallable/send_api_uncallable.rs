@@ -18,7 +18,7 @@ impl SendApiImpl for UncallableApi {
         _gas_limit: u64,
         _endpoint_name_handle: RawHandle,
         _arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]> {
+    ) {
         unreachable!()
     }
 
@@ -29,7 +29,18 @@ impl SendApiImpl for UncallableApi {
         _gas_limit: u64,
         _endpoint_name_handle: RawHandle,
         _arg_buffer_handle: RawHandle,
-    ) -> Result<(), &'static [u8]> {
+    ) {
+        unreachable!()
+    }
+
+    fn multi_transfer_esdt_nft_execute_with_return(
+        &self,
+        _to_handle: RawHandle,
+        _payments_handle: RawHandle,
+        _gas_limit: u64,
+        _endpoint_name_handle: RawHandle,
+        _arg_buffer_handle: RawHandle,
+    ) -> i32 {
         unreachable!()
     }
 
@@ -140,6 +151,18 @@ impl SendApiImpl for UncallableApi {
         _arg_buffer_handle: RawHandle,
         _result_handle: RawHandle,
     ) {
+        unreachable!()
+    }
+
+    fn execute_on_dest_context_error_return_raw(
+        &self,
+        _gas: u64,
+        _address: RawHandle,
+        _value: RawHandle,
+        _endpoint_name_handle: RawHandle,
+        _arg_buffer_handle: RawHandle,
+        _result_handle: RawHandle,
+    ) -> i32 {
         unreachable!()
     }
 

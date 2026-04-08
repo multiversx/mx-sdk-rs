@@ -46,7 +46,7 @@ fn transfer_fungible_promise_no_callback_blackbox_test() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, BUILTIN_FEATURES_FUNC_ADDRESS.to_address());
+    assert_eq!(new_address, BUILTIN_FEATURES_FUNC_ADDRESS);
 
     world
         .tx()
@@ -90,7 +90,7 @@ fn transfer_fungible_promise_with_callback_blackbox_test() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, BUILTIN_FEATURES_FUNC_ADDRESS.to_address());
+    assert_eq!(new_address, BUILTIN_FEATURES_FUNC_ADDRESS);
 
     world
         .tx()

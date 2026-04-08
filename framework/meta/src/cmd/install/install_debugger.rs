@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 use crate::cmd::template::RepoSource;
 use std::fs::{self};
 use std::path::{Path, PathBuf};
@@ -11,6 +13,7 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
+    remove_old_lldb_extension();
     let _ = install_lldb_extension();
     install_script(custom_path).await;
     if !testing {
@@ -19,23 +22,45 @@ pub async fn install_debugger(custom_path: Option<PathBuf>) {
     }
 }
 
+// home_dir is deprecated on older version of Rust (1.85 ...), but we are keeping it
+// not deprecated on newer versions (1.90 for sure)
+#[allow(deprecated)]
+fn home_dir() -> PathBuf {
+    std::env::home_dir().expect("Could not find home directory")
+}
+
+fn remove_old_lldb_extension() {
+    let extension_id = "vadimcn.vscode-lldb";
+
+    // Run the VSCode command to remove the previous installed extension
+    let _ = Command::new("code")
+        .arg("--uninstall-extension")
+        .arg(extension_id)
+        .status();
+
+    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
+    let _ = Command::new("rm")
+        .arg("-rf")
+        .arg("~/.vscode/extensions/vadim*")
+        .status();
+}
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
 
     // Run the VSCode command to install the extension
-    let status = Command::new("code")
+    let install_lldb_command = Command::new("code")
         .arg("--install-extension")
         .arg(extension_id)
         .status()?;
 
-    // Check if the command was successful
-    if status.success() {
-        println!("Extension {} installed successfully.", extension_id);
+    if install_lldb_command.success() {
+        println!("Extension {} installed successfully.", install_lldb_command);
     } else {
-        eprintln!("Failed to install extension {}.", extension_id);
+        eprintln!("Failed to install extension {}.", install_lldb_command);
     }
 
     Ok(())
+    // Check if the command was successful
 }
 
 async fn install_script(custom_path: Option<PathBuf>) {
@@ -59,7 +84,7 @@ async fn install_script(custom_path: Option<PathBuf>) {
     let target_path = if let Some(unwrapped_custom_path) = custom_path {
         unwrapped_custom_path
     } else {
-        home::home_dir().unwrap().join(TARGET_PATH)
+        home_dir().join(TARGET_PATH)
     };
 
     let _ = fs::create_dir_all(&target_path);
@@ -74,7 +99,7 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 
 fn get_path_to_settings() -> PathBuf {
     let os = env::consts::OS;
-    let user_home = home::home_dir().unwrap();
+    let user_home = home_dir();
     match os {
         "macos" => {
             // For macOS
@@ -84,7 +109,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         "linux" => {
             // For Linux
             Path::new(&user_home)
@@ -92,7 +117,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("Code")
                 .join("User")
                 .join("settings.json")
-        },
+        }
         _ => panic!("OS not supported"),
     }
 }
@@ -100,8 +125,23 @@ fn get_path_to_settings() -> PathBuf {
 fn configure_vscode() {
     let path_to_settings = get_path_to_settings();
 
-    let script_full_path = get_script_path(home::home_dir().unwrap().join(TARGET_PATH));
-    let json = fs::read_to_string(&path_to_settings).expect("Unable to read settings.json");
+    let script_full_path = get_script_path(home_dir().join(TARGET_PATH));
+    let json = match fs::read_to_string(&path_to_settings) {
+        Err(_) => {
+            eprintln!(
+                "{}",
+                format!(
+                "WARNING: Could not find settings.json at {}. Debugger configuration will be skipped.",
+                path_to_settings.display()
+            )
+                .bright_yellow()
+                .bold(),
+            );
+            return;
+        }
+        Ok(json) => json,
+    };
+
     let mut sub_values: serde_json::Value = serde_json::from_str(&json).unwrap_or_else(
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );
@@ -109,7 +149,7 @@ fn configure_vscode() {
     let init_commands = sub_values
         .as_object_mut()
         .unwrap()
-        .entry("lldb.launch.initCommands")
+        .entry("lldb.launch.preRunCommands")
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
     let command_script_line =
         "command script import ".to_owned() + script_full_path.to_str().unwrap();

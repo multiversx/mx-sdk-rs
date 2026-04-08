@@ -1,3 +1,7 @@
+use crate::ei::deprecated_ei::deprecated_vm_hooks_1_5;
+
+use super::DeprecatedVMHook;
+
 /// The version of the SC environment interface (EI), it deals with the VM hooks available at a certain point in time.
 ///
 /// It is not tied to the version of the VM, hence the different numbering.
@@ -26,13 +30,13 @@ pub enum EIVersion {
     /// Latest VM Hooks version, released with VM 1.5 in January 2024: https://multiversx.com/release/release-sirius-v1-6-7
     ///
     /// It adds the new async call functionality (promises).
-    #[default]
     V1_3,
 
     /// Hooks made available in the Spica release, November 12, 2024: https://multiversx.com/release/release-spica-v1-8-4-0
     V1_4,
 
-    /// Version planned for Q3 2024.
+    /// Hooks made available in the Barnard release, activated July 26 2025: https://multiversx.com/release/release-barnard-v1-10-4
+    #[default]
     V1_5,
 }
 
@@ -73,6 +77,17 @@ impl EIVersion {
 
     pub fn contains_vm_hook(&self, vm_hook_names: &str) -> bool {
         self.vm_hook_names().contains(&vm_hook_names)
+    }
+
+    pub fn deprecated_vm_hook(&self, name: &str) -> Option<&'static DeprecatedVMHook> {
+        match self {
+            EIVersion::V1_0
+            | EIVersion::V1_1
+            | EIVersion::V1_2
+            | EIVersion::V1_3
+            | EIVersion::V1_4 => None,
+            EIVersion::V1_5 => deprecated_vm_hooks_1_5(name),
+        }
     }
 }
 

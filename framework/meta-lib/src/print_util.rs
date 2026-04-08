@@ -2,6 +2,8 @@ use std::{path::Path, process::Command};
 
 use colored::Colorize;
 
+use crate::tools::RustcVersion;
+
 /// Just for convenience, since we seem to be printing many things in green.
 ///
 /// The argument is of type `String` because the argument is always a `format!` expression.
@@ -37,6 +39,43 @@ pub fn print_build_command(contract_name: String, command: &Command) {
         "{}\n{}",
         format!("Building {} in {} ...", contract_name, path.display()).green(),
         format_command(command).green(),
+    );
+}
+
+pub fn print_rustup_check_target(
+    rustc_version: &RustcVersion,
+    target_name: &str,
+    rustup_cmd: &Command,
+) {
+    println!(
+        "{}\n{}{}",
+        format!("Checking if target {target_name} is installed for {rustc_version} ...").green(),
+        "Running: ".green(),
+        format_command(rustup_cmd).green(),
+    );
+}
+
+pub fn print_rustup_check_target_result(installed: bool) {
+    if installed {
+        println!("{}", "Installed.".green());
+    } else {
+        println!("{}", "Not installed.".green());
+    }
+}
+
+pub fn print_rustup_install_target(target_name: &str, rustup_cmd: &Command) {
+    println!(
+        "\n{}\n{}{}",
+        format!("Installing target {target_name} ...").yellow(),
+        "Running: ".green(),
+        format_command(rustup_cmd).green(),
+    );
+}
+
+pub fn print_rustup_install_target_success(target_name: &str) {
+    println!(
+        "{}",
+        format!("Target {target_name} installed successfully").yellow(),
     );
 }
 
@@ -77,9 +116,8 @@ pub fn print_check_ei(ei_version: &str) {
 pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
     print!(
         "\n{}",
-        format!(
-            "WARNING! Import '{import_name}' is not available on EI version {ei_version}! This will become a hard error in the next release."
-        ).yellow(),
+        format!("WARNING! Import '{import_name}' is not available on EI version {ei_version}!")
+            .yellow(),
     );
 }
 
@@ -109,5 +147,19 @@ pub fn print_sc_config_main_deprecated(path: &Path) {
             path.display()
         )
         .yellow(),
+    );
+}
+
+pub fn print_proxy_error(path: &Path, error: String) {
+    println!(
+        "{}",
+        format!("Could not write proxy file {}: {error}", path.display()).red(),
+    );
+}
+
+pub fn print_wasm_opt_not_installed(wasm_opt_name: &str) {
+    println!(
+        "{}",
+        format!("Warning: {wasm_opt_name} not installed.").yellow(),
     );
 }

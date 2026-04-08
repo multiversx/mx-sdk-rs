@@ -1,15 +1,15 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
-        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, HandleConstraints,
-        ManagedBufferApiImpl, ManagedTypeApi,
+        BigFloatApiImpl, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
+        const_handles, use_raw_handle,
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
-    typenum::{Unsigned, U4, U8},
+    typenum::{U4, U8, Unsigned},
     types::{
-        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index, BigFloat,
-        BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, ManagedVecRef, Sign,
+        BigFloat, BigInt, BigUint, ManagedVecItem, ManagedVecItemPayloadBuffer, Ref, Sign,
+        managed_vec_item_read_from_payload_index, managed_vec_item_save_to_payload_index,
     },
 };
 
@@ -19,13 +19,13 @@ use multiversx_sc_codec::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-use core::{cmp::Ordering, ops::Deref};
+use core::cmp::Ordering;
 
-use super::{
-    decimals::{ConstDecimals, Decimals, NumDecimals},
-    ManagedDecimal,
-};
 use super::{ManagedBufferCachedBuilder, ManagedRef};
+use super::{
+    ManagedDecimal,
+    decimals::{ConstDecimals, Decimals, NumDecimals},
+};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -38,7 +38,7 @@ pub struct ManagedDecimalSigned<M: ManagedTypeApi, D: Decimals> {
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     pub fn trunc(&self) -> BigInt<M> {
-        &self.data / self.decimals.scaling_factor().deref()
+        &self.data / self.decimals.scaling_factor().as_big_int()
     }
 
     pub fn into_raw_units(&self) -> &BigInt<M> {
@@ -65,13 +65,13 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
                 &self.data * &scaling_factor.value
-            },
+            }
             Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
                 &self.data / &scaling_factor.value
-            },
+            }
         }
     }
 
@@ -194,7 +194,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
 
     const SKIPS_RESERIALIZATION: bool = false;
 
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
@@ -207,7 +207,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
@@ -226,14 +226,14 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
 
     const SKIPS_RESERIALIZATION: bool = false;
 
-    type Ref<'a> = ManagedVecRef<'a, Self>;
+    type Ref<'a> = Ref<'a, Self>;
 
     fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         Self::const_decimals_from_raw(BigInt::read_from_payload(payload))
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        ManagedVecRef::new(Self::read_from_payload(payload))
+        unsafe { Ref::new(Self::read_from_payload(payload)) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {

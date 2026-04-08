@@ -1,7 +1,8 @@
 #![allow(unused)]
 
 use crate::{
-    api::{InvalidSliceError, ManagedTypeApi},
+    api::{InvalidSliceError, ManagedTypeApi, quick_signal_error},
+    err_msg,
     types::{ManagedBuffer, StaticBufferRef},
 };
 
@@ -34,21 +35,20 @@ where
 
         self.static_cache =
             StaticBufferRef::try_new_from_copy_bytes(self.managed_buffer.len(), |dest_slice| {
-                let _ = self.managed_buffer.load_slice(0, dest_slice);
+                self.managed_buffer.load_slice(0, dest_slice);
             });
     }
 
-    pub fn load_slice(
-        &mut self,
-        starting_position: usize,
-        dest_slice: &mut [u8],
-    ) -> Result<(), InvalidSliceError> {
+    pub fn load_slice(&mut self, starting_position: usize, dest_slice: &mut [u8]) {
         self.try_load_static_cache_if_necessary();
         if let Some(static_cache) = &self.static_cache {
-            static_cache.load_slice(starting_position, dest_slice)
+            let result = static_cache.load_slice(starting_position, dest_slice);
+            if result.is_err() {
+                quick_signal_error::<M>(err_msg::BAD_MB_SLICE);
+            }
         } else {
             self.managed_buffer
-                .load_slice(starting_position, dest_slice)
+                .load_slice(starting_position, dest_slice);
         }
     }
 

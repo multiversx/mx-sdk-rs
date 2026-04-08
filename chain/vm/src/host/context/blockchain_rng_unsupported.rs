@@ -9,6 +9,8 @@ impl BlockchainRng {
     }
 
     pub fn next_bytes(&mut self, _length: usize) -> Vec<u8> {
-        panic!("BlockchainRng not supported for wasm builds, feature `wasm-incompatible` needs to be enabled")
+        panic!(
+            "BlockchainRng not supported for wasm builds, feature `wasm-incompatible` needs to be enabled"
+        )
     }
 }

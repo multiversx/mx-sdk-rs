@@ -1,6 +1,6 @@
 use multiversx_price_aggregator_sc::{
+    MAX_ROUND_DURATION_SECONDS, PriceAggregator,
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
-    PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
 
 use multiversx_sc_scenario::imports::*;
@@ -35,7 +35,7 @@ fn world() -> ScenarioWorld {
 
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
-    oracles: Vec<AddressValue>,
+    oracles: Vec<Address>,
 }
 
 impl PriceAggregatorTestState {
@@ -43,7 +43,7 @@ impl PriceAggregatorTestState {
         let mut world = world();
 
         world.account(OWNER_ADDRESS).nonce(1);
-        world.current_block().block_timestamp(100);
+        world.current_block().block_timestamp_seconds(100);
 
         world.new_address(OWNER_ADDRESS, 1, PRICE_AGGREGATOR_ADDRESS);
 
@@ -51,22 +51,16 @@ impl PriceAggregatorTestState {
         for i in 1..=NR_ORACLES {
             let address_name = format!("oracle{i}");
             let address = TestAddress::new(&address_name);
-            let address_value = AddressValue::from(address);
 
             world.account(address).nonce(1).balance(STAKE_AMOUNT);
-            oracles.push(address_value);
+            oracles.push(address.to_address());
         }
 
         Self { world, oracles }
     }
 
     fn deploy(&mut self) -> &mut Self {
-        let oracles = MultiValueVec::from(
-            self.oracles
-                .iter()
-                .map(|oracle| oracle.to_address())
-                .collect::<Vec<_>>(),
-        );
+        let oracles = MultiValueVec::from(self.oracles.clone());
 
         self.world
             .tx()
@@ -117,7 +111,7 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
+    fn submit(&mut self, from: &Address, submission_timestamp: TimestampSeconds, price: u64) {
         self.world
             .tx()
             .from(from)
@@ -135,8 +129,8 @@ impl PriceAggregatorTestState {
 
     fn submit_and_expect_err(
         &mut self,
-        from: &AddressValue,
-        submission_timestamp: u64,
+        from: &Address,
+        submission_timestamp: TimestampSeconds,
         price: u64,
         err_message: &str,
     ) {
@@ -157,7 +151,7 @@ impl PriceAggregatorTestState {
             .run();
     }
 
-    fn vote_slash_member(&mut self, from: &AddressValue, member_to_slash: Address) {
+    fn vote_slash_member(&mut self, from: &Address, member_to_slash: Address) {
         self.world
             .tx()
             .from(from)
@@ -177,7 +171,12 @@ fn test_price_aggregator_submit() {
     state.set_pair_decimals();
 
     // try submit while paused
-    state.submit_and_expect_err(&state.oracles[0].clone(), 99, 100, "Contract is paused");
+    state.submit_and_expect_err(
+        &state.oracles[0].clone(),
+        TimestampSeconds::new(99),
+        100,
+        "Contract is paused",
+    );
 
     // unpause
     state.unpause_endpoint();
@@ -185,15 +184,15 @@ fn test_price_aggregator_submit() {
     // submit first timestamp too old
     state.submit_and_expect_err(
         &state.oracles[0].clone(),
-        10,
+        TimestampSeconds::new(10),
         100,
         "First submission too old",
     );
 
     // submit ok
-    state.submit(&state.oracles[0].clone(), 95, 100);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 100);
 
-    let current_timestamp = 100;
+    let current_timestamp = TimestampSeconds::new(100);
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -215,14 +214,14 @@ fn test_price_aggregator_submit() {
             assert_eq!(submissions.len(), 1);
             assert_eq!(
                 submissions
-                    .get(&managed_address!(&state.oracles[0].to_address()))
+                    .get(&managed_address!(&state.oracles[0]))
                     .unwrap(),
                 managed_biguint!(100)
             );
 
             assert_eq!(
                 sc.oracle_status()
-                    .get(&managed_address!(&state.oracles[0].to_address()))
+                    .get(&managed_address!(&state.oracles[0]))
                     .unwrap(),
                 OracleStatus {
                     total_submissions: 1,
@@ -233,14 +232,14 @@ fn test_price_aggregator_submit() {
     );
 
     // first oracle submit again - submission not accepted
-    state.submit(&state.oracles[0].clone(), 95, 100);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 100);
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
         |sc| {
             assert_eq!(
                 sc.oracle_status()
-                    .get(&managed_address!(&state.oracles[0].to_address()))
+                    .get(&managed_address!(&state.oracles[0]))
                     .unwrap(),
                 OracleStatus {
                     total_submissions: 2,
@@ -263,19 +262,27 @@ fn test_price_aggregator_submit_round_ok() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, 10_000);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 10_000);
 
-    let current_timestamp = 110;
+    let current_timestamp = TimestampSeconds::new(110);
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp);
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second
-    state.submit(&state.oracles[1].clone(), 101, 11_000);
+    state.submit(
+        &state.oracles[1].clone(),
+        TimestampSeconds::new(101),
+        11_000,
+    );
 
     // submit third
-    state.submit(&state.oracles[2].clone(), 105, 12_000);
+    state.submit(
+        &state.oracles[2].clone(),
+        TimestampSeconds::new(105),
+        12_000,
+    );
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -322,16 +329,21 @@ fn test_price_aggregator_discarded_round() {
     state.unpause_endpoint();
 
     // submit first
-    state.submit(&state.oracles[0].clone(), 95, 10_000);
+    state.submit(&state.oracles[0].clone(), TimestampSeconds::new(95), 10_000);
 
-    let current_timestamp = 100 + MAX_ROUND_DURATION_SECONDS + 1;
+    let current_timestamp =
+        TimestampSeconds::new(100) + MAX_ROUND_DURATION_SECONDS + DurationSeconds::new(1);
     state
         .world
         .current_block()
-        .block_timestamp(current_timestamp);
+        .block_timestamp_seconds(current_timestamp);
 
     // submit second - this will discard the previous submission
-    state.submit(&state.oracles[1].clone(), current_timestamp - 1, 11_000);
+    state.submit(
+        &state.oracles[1].clone(),
+        current_timestamp - DurationSeconds::new(1),
+        11_000,
+    );
 
     state.world.query().to(PRICE_AGGREGATOR_ADDRESS).whitebox(
         multiversx_price_aggregator_sc::contract_obj,
@@ -344,7 +356,7 @@ fn test_price_aggregator_discarded_round() {
             assert_eq!(submissions.len(), 1);
             assert_eq!(
                 submissions
-                    .get(&managed_address!(&state.oracles[1].to_address()))
+                    .get(&managed_address!(&state.oracles[1]))
                     .unwrap(),
                 managed_biguint!(11_000)
             );
@@ -360,9 +372,9 @@ fn test_price_aggregator_slashing() {
     // unpause
     state.unpause_endpoint();
 
-    state.vote_slash_member(&state.oracles[0].clone(), state.oracles[1].to_address());
-    state.vote_slash_member(&state.oracles[2].clone(), state.oracles[1].to_address());
-    state.vote_slash_member(&state.oracles[3].clone(), state.oracles[1].to_address());
+    state.vote_slash_member(&state.oracles[0].clone(), state.oracles[1].clone());
+    state.vote_slash_member(&state.oracles[2].clone(), state.oracles[1].clone());
+    state.vote_slash_member(&state.oracles[3].clone(), state.oracles[1].clone());
 
     state
         .world
@@ -370,13 +382,13 @@ fn test_price_aggregator_slashing() {
         .from(&state.oracles[0])
         .to(PRICE_AGGREGATOR_ADDRESS)
         .typed(price_aggregator_proxy::PriceAggregatorProxy)
-        .slash_member(state.oracles[1].to_address())
+        .slash_member(state.oracles[1].clone())
         .run();
 
     // oracle 1 try submit after slashing
     state.submit_and_expect_err(
         &state.oracles[1].clone(),
-        95,
+        TimestampSeconds::new(95),
         10_000,
         "only oracles allowed",
     );

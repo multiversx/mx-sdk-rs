@@ -8,10 +8,9 @@ use std::{
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
-    process_code,
+    WriteTestFn, process_code,
     stg_print::*,
-    stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_SETUP_GO, DEFAULT_SETUP_RS},
-    WriteTestFn,
+    stg_write::{DEFAULT_SETUP_GO, DEFAULT_SETUP_RS, format_test_fn_go, format_test_fn_rs},
 };
 
 const TESTS_DIR_NAME: &str = "tests";
@@ -142,16 +141,29 @@ fn find_test_file(test_dir: &Path, suffix: &str) -> Option<PathBuf> {
 
 fn find_scenario_names(scenarios_dir: &Path) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
-    let read_dir = fs::read_dir(scenarios_dir).expect("error reading directory");
+    find_scenario_names_recursive(scenarios_dir, scenarios_dir, &mut result);
+    result
+}
+
+fn find_scenario_names_recursive(
+    scenarios_dir: &Path,
+    current_dir: &Path,
+    result: &mut BTreeSet<String>,
+) {
+    let read_dir = fs::read_dir(current_dir).expect("error reading directory");
     for file_result in read_dir {
         let file = file_result.unwrap();
-        if !file.file_type().unwrap().is_file() {
-            continue;
-        }
-        let file_name = file.file_name().into_string().unwrap();
-        if let Some(scenario_name) = file_name.strip_suffix(".scen.json") {
-            result.insert(scenario_name.to_string());
+        let file_type = file.file_type().unwrap();
+        let file_path = file.path();
+        if file_type.is_dir() {
+            find_scenario_names_recursive(scenarios_dir, &file_path, result);
+        } else if file_type.is_file() {
+            if let Ok(relative) = file_path.strip_prefix(scenarios_dir) {
+                let relative_str = relative.to_string_lossy().replace('\\', "/");
+                if let Some(name) = relative_str.strip_suffix(".scen.json") {
+                    result.insert(name.to_string());
+                }
+            }
         }
     }
-    result
 }

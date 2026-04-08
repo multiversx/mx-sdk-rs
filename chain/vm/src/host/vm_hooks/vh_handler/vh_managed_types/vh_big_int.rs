@@ -1,7 +1,7 @@
 use crate::{
     host::{
         context::big_int_to_i64,
-        vm_hooks::{vh_early_exit::early_exit_vm_error, VMHooksContext, VMHooksHandler},
+        vm_hooks::{VMHooksContext, VMHooksHandler, vh_early_exit::early_exit_vm_error},
     },
     types::RawHandle,
     vm_err_msg,
@@ -11,76 +11,8 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
-use num_traits::{pow, sign::Signed};
+use num_traits::{Zero, pow, sign::Signed};
 use std::convert::TryInto;
-
-macro_rules! binary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
-        pub fn $method_name(
-            &mut self,
-            dest: RawHandle,
-            x: RawHandle,
-            y: RawHandle,
-        ) -> Result<(), VMHooksEarlyExit> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
-
-            let bi_x = self.context.m_types_lock().bi_get(x);
-            let bi_y = self.context.m_types_lock().bi_get(y);
-            let result = bi_x.$rust_op_name(bi_y);
-            self.context.m_types_lock().bi_overwrite(dest, result);
-
-            Ok(())
-        }
-    };
-}
-
-macro_rules! binary_bitwise_op_method {
-    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
-        pub fn $method_name(
-            &mut self,
-            dest: RawHandle,
-            x: RawHandle,
-            y: RawHandle,
-        ) -> Result<(), VMHooksEarlyExit> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
-
-            let bi_x = self.context.m_types_lock().bi_get(x);
-            if bi_x.sign() == num_bigint::Sign::Minus {
-                return Err(early_exit_vm_error(
-                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
-                ));
-            }
-            let bi_y = self.context.m_types_lock().bi_get(y);
-            if bi_y.sign() == num_bigint::Sign::Minus {
-                return Err(early_exit_vm_error(
-                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
-                ));
-            }
-            let result = bi_x.$rust_op_name(bi_y);
-            self.context.m_types_lock().bi_overwrite(dest, result);
-
-            Ok(())
-        }
-    };
-}
-
-macro_rules! unary_op_method {
-    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
-        pub fn $method_name(
-            &mut self,
-            dest: RawHandle,
-            x: RawHandle,
-        ) -> Result<(), VMHooksEarlyExit> {
-            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
-
-            let bi_x = self.context.m_types_lock().bi_get(x);
-            let result = bi_x.$rust_op_name();
-            self.context.m_types_lock().bi_overwrite(dest, result);
-
-            Ok(())
-        }
-    };
-}
 
 /// Provides VM hook implementations for methods that deal big ints.
 impl<C: VMHooksContext> VMHooksHandler<C> {
@@ -209,16 +141,101 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             )),
         }
     }
+}
 
+macro_rules! binary_op_method {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
+        pub fn $method_name(
+            &mut self,
+            dest: RawHandle,
+            x: RawHandle,
+            y: RawHandle,
+        ) -> Result<(), VMHooksEarlyExit> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
+
+            let bi_x = self.context.m_types_lock().bi_get(x);
+            let bi_y = self.context.m_types_lock().bi_get(y);
+            let result = bi_x.$rust_op_name(bi_y);
+            self.context.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
+        }
+    };
+}
+
+impl<C: VMHooksContext> VMHooksHandler<C> {
     binary_op_method! {bi_add, add, big_int_add}
     binary_op_method! {bi_sub, sub, big_int_sub}
     binary_op_method! {bi_mul, mul, big_int_mul}
-    binary_op_method! {bi_t_div, div, big_int_t_div}
-    binary_op_method! {bi_t_mod, rem, big_int_t_mod}
 
+    pub fn bi_t_div(
+        &mut self,
+        dest: RawHandle,
+        x: RawHandle,
+        y: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_t_div)?;
+
+        let bi_x = self.context.m_types_lock().bi_get(x);
+        let bi_y = self.context.m_types_lock().bi_get(y);
+
+        if bi_y.is_zero() {
+            return Err(early_exit_vm_error(vm_err_msg::DIVISION_BY_0));
+        }
+
+        let result = bi_x.div(bi_y);
+        self.context.m_types_lock().bi_overwrite(dest, result);
+
+        Ok(())
+    }
+
+    pub fn bi_t_mod(
+        &mut self,
+        dest: RawHandle,
+        x: RawHandle,
+        y: RawHandle,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().big_int_api_cost.big_int_t_mod)?;
+
+        let bi_x = self.context.m_types_lock().bi_get(x);
+        let bi_y = self.context.m_types_lock().bi_get(y);
+
+        if bi_y.is_zero() {
+            return Err(early_exit_vm_error(vm_err_msg::DIVISION_BY_0));
+        }
+
+        let result = bi_x.rem(bi_y);
+        self.context.m_types_lock().bi_overwrite(dest, result);
+
+        Ok(())
+    }
+}
+
+macro_rules! unary_op_method {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
+        pub fn $method_name(
+            &mut self,
+            dest: RawHandle,
+            x: RawHandle,
+        ) -> Result<(), VMHooksEarlyExit> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
+
+            let bi_x = self.context.m_types_lock().bi_get(x);
+            let result = bi_x.$rust_op_name();
+            self.context.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
+        }
+    };
+}
+
+impl<C: VMHooksContext> VMHooksHandler<C> {
     unary_op_method! {bi_abs, abs, big_int_abs}
     unary_op_method! {bi_neg, neg, big_int_neg}
+    unary_op_method! {bi_sqrt, sqrt, big_int_sqrt}
+}
 
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn bi_sign(&mut self, x: RawHandle) -> Result<i32, VMHooksEarlyExit> {
         self.use_gas(self.gas_schedule().big_int_api_cost.big_int_sign)?;
 
@@ -241,8 +258,6 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             Ordering::Greater => Ok(1),
         }
     }
-
-    unary_op_method! {bi_sqrt, sqrt, big_int_sqrt}
 
     pub fn bi_pow(
         &mut self,
@@ -267,11 +282,45 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         let bi_x = self.context.m_types_lock().bi_get(x);
         Ok(bi_x.bits() as i32 - 1)
     }
+}
 
+macro_rules! binary_bitwise_op_method {
+    ($method_name:ident, $rust_op_name:ident, $gas_cost_field:ident) => {
+        pub fn $method_name(
+            &mut self,
+            dest: RawHandle,
+            x: RawHandle,
+            y: RawHandle,
+        ) -> Result<(), VMHooksEarlyExit> {
+            self.use_gas(self.gas_schedule().big_int_api_cost.$gas_cost_field)?;
+
+            let bi_x = self.context.m_types_lock().bi_get(x);
+            if bi_x.sign() == num_bigint::Sign::Minus {
+                return Err(early_exit_vm_error(
+                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+                ));
+            }
+            let bi_y = self.context.m_types_lock().bi_get(y);
+            if bi_y.sign() == num_bigint::Sign::Minus {
+                return Err(early_exit_vm_error(
+                    vm_err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
+                ));
+            }
+            let result = bi_x.$rust_op_name(bi_y);
+            self.context.m_types_lock().bi_overwrite(dest, result);
+
+            Ok(())
+        }
+    };
+}
+
+impl<C: VMHooksContext> VMHooksHandler<C> {
     binary_bitwise_op_method! {bi_and, bitand, big_int_and}
     binary_bitwise_op_method! {bi_or, bitor, big_int_or}
     binary_bitwise_op_method! {bi_xor, bitxor, big_int_xor}
+}
 
+impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn bi_shr(
         &mut self,
         dest: RawHandle,

@@ -1,6 +1,7 @@
 use core::convert::TryFrom;
 
 use alloc::format;
+use multiversx_chain_core::types::H256;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -10,7 +11,7 @@ use crate::{
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
         TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
+    formatter::{FormatByteReceiver, SCLowerHex, hex_util::encode_bytes_as_hex},
     types::{ManagedBuffer, ManagedType},
 };
 
@@ -36,8 +37,10 @@ where
 
     #[inline]
     unsafe fn from_handle(handle: M::ManagedBufferHandle) -> Self {
-        ManagedByteArray {
-            buffer: ManagedBuffer::from_handle(handle),
+        unsafe {
+            ManagedByteArray {
+                buffer: ManagedBuffer::from_handle(handle),
+            }
         }
     }
 
@@ -46,7 +49,7 @@ where
     }
 
     unsafe fn forget_into_handle(self) -> Self::OwnHandle {
-        self.buffer.forget_into_handle()
+        unsafe { self.buffer.forget_into_handle() }
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -95,8 +98,10 @@ where
     ///
     /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
     pub unsafe fn new_uninit() -> Self {
-        ManagedByteArray {
-            buffer: ManagedBuffer::new_uninit(),
+        unsafe {
+            ManagedByteArray {
+                buffer: ManagedBuffer::new_uninit(),
+            }
         }
     }
 
@@ -119,7 +124,7 @@ where
     #[inline]
     pub fn to_byte_array(&self) -> [u8; N] {
         let mut result = [0u8; N];
-        let _ = self.buffer.load_slice(0, &mut result[..]);
+        self.buffer.load_slice(0, &mut result[..]);
         result
     }
 }
@@ -225,9 +230,14 @@ where
 }
 
 impl<M, const N: usize> TypeAbiFrom<ManagedByteArray<M, N>> for [u8; N] where M: ManagedTypeApi {}
+impl<M, const N: usize> TypeAbiFrom<[u8; N]> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+impl<M, const N: usize> TypeAbiFrom<&[u8; N]> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TypeAbiFrom<Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 impl<M, const N: usize> TypeAbiFrom<&Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+
+impl<M> TypeAbiFrom<H256> for ManagedByteArray<M, 32> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&H256> for ManagedByteArray<M, 32> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where

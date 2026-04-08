@@ -11,7 +11,7 @@ mod trait_prop_names;
 mod util;
 
 pub use argument_attr::*;
-pub use doc_attr::{extract_doc, extract_macro_attributes, OutputNameAttribute, TitleAttribute};
+pub use doc_attr::{OutputNameAttribute, TitleAttribute, extract_doc, extract_macro_attributes};
 pub use endpoint_attr::*;
 pub use event_attr::*;
 pub use label_attr::*;

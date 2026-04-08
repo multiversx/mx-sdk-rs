@@ -696,7 +696,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:incorrect number of ESDT transfers",
+                "message": "str:incorrect number of transfers",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

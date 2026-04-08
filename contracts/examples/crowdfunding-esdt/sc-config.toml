@@ -1,2 +1,0 @@
-[[proxy]]
-path = "src/crowdfunding_esdt_proxy.rs"

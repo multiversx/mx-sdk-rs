@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           11
+// Endpoints:                           10
 // Async Callback (empty):               1
-// Total number of exported functions:  13
+// Total number of exported functions:  12
 
 #![no_std]
 
@@ -18,14 +18,13 @@ multiversx_sc_wasm_adapter::endpoints! {
     digital_cash
     (
         init => init
-        whitelistFeeToken => whitelist_fee_token
-        blacklistFeeToken => blacklist_fee_token
+        setFeesDisabled => set_fees_disabled
+        setFee => set_fee
         claimFees => claim_fees
-        getAmount => get_amount
         payFeeAndFund => pay_fee_and_fund
         fund => fund
         depositFees => deposit_fees
-        withdraw => withdraw
+        withdrawExpired => withdraw_expired
         claim => claim
         forward => forward
         deposit => deposit

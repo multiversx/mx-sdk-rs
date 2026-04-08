@@ -1,7 +1,7 @@
 use crate::{
-    top_decode_from_nested_or_handle_err, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
-    NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput,
-    TopEncode, TopEncodeOutput,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    top_decode_from_nested_or_handle_err,
 };
 use alloc::boxed::Box;
 use arrayvec::ArrayVec;
@@ -82,7 +82,7 @@ impl<T: NestedDecode, const N: usize> TopDecode for [T; N] {
 
 #[cfg(test)]
 mod tests {
-    use crate::test_util::check_top_encode;
+    use crate::test_util::{check_dep_encode_decode, check_top_encode, check_top_encode_decode};
 
     use super::*;
     use alloc::vec::Vec;
@@ -107,5 +107,36 @@ mod tests {
         for byte in deserialized {
             assert_eq!(byte, 7i32);
         }
+    }
+
+    #[test]
+    fn test_top_array_u8() {
+        check_top_encode_decode([1u8, 2u8, 3u8], &[1, 2, 3]);
+    }
+
+    #[test]
+    fn test_top_array_u8_empty() {
+        check_top_encode_decode([0u8; 0], &[]);
+    }
+
+    #[test]
+    fn test_top_array_i32() {
+        check_top_encode_decode([1i32, 2i32], &[0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_dep_array_u8() {
+        check_dep_encode_decode([1u8, 2u8, 3u8], &[1, 2, 3]);
+    }
+
+    #[test]
+    fn test_dep_array_i32() {
+        check_dep_encode_decode([1i32, 2i32], &[0, 0, 0, 1, 0, 0, 0, 2]);
+    }
+
+    #[test]
+    fn test_top_array_32_bytes() {
+        let arr = [0xABu8; 32];
+        check_top_encode_decode(arr, &[0xAB; 32]);
     }
 }

@@ -6,24 +6,22 @@ use multiversx_chain_vm_executor::{InstanceState, MemLength, MemPtr, VMHooksEarl
 use num_bigint::BigUint;
 use num_traits::Zero;
 
+use crate::blockchain::state::BlockConfig;
 use crate::host::runtime::RuntimeInstanceCallLambdaDefault;
 use crate::schedule::GasSchedule;
 use crate::{
-    blockchain::{
-        reserved::STORAGE_RESERVED_PREFIX,
-        state::{AccountData, BlockInfo},
-    },
+    blockchain::{reserved::STORAGE_RESERVED_PREFIX, state::AccountData},
     host::context::{
-        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType,
-        ManagedTypeContainer, TxCache, TxContextRef, TxFunctionName, TxInput, TxResult,
+        AsyncCallTxData, BackTransfers, BlockchainUpdate, CallType, ManagedTypeContainer, TxCache,
+        TxContextRef, TxFunctionName, TxInput, TxResult, async_call_tx_input,
     },
     host::execution,
-    types::{VMAddress, VMCodeMetadata},
+    types::{Address, VMCodeMetadata},
     vm_err_msg,
 };
 
-use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
 use super::VMHooksContext;
+use super::vh_early_exit::{early_exit_async_call, early_exit_vm_error};
 
 pub struct TxVMHooksContext<S: InstanceState> {
     tx_context_ref: TxContextRef,
@@ -58,7 +56,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
             .expect("error writing to wasmer instance memory");
     }
 
-    fn m_types_lock(&self) -> MutexGuard<ManagedTypeContainer> {
+    fn m_types_lock(&self) -> MutexGuard<'_, ManagedTypeContainer> {
         self.tx_context_ref.m_types_lock()
     }
 
@@ -95,11 +93,11 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.tx_context_ref.rng_lock().next_bytes(length)
     }
 
-    fn result_lock(&self) -> MutexGuard<TxResult> {
+    fn result_lock(&self) -> MutexGuard<'_, TxResult> {
         self.tx_context_ref.result_lock()
     }
 
-    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
         self.tx_context_ref.with_account_mut(address, |account| {
             account.storage.get(key).cloned().unwrap_or_default()
         })
@@ -115,24 +113,20 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         Ok(())
     }
 
-    fn get_previous_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().previous_block_info
+    fn get_block_config(&self) -> &BlockConfig {
+        &self.tx_context_ref.blockchain_ref().block_config
     }
 
-    fn get_current_block_info(&self) -> &BlockInfo {
-        &self.tx_context_ref.blockchain_ref().current_block_info
-    }
-
-    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+    fn back_transfers_lock(&self) -> MutexGuard<'_, BackTransfers> {
         self.tx_context_ref.back_transfers_lock()
     }
 
-    fn account_data(&self, address: &VMAddress) -> Option<AccountData> {
+    fn account_data(&self, address: &Address) -> Option<AccountData> {
         self.tx_context_ref
             .with_account_or_else(address, |account| Some(account.clone()), || None)
     }
 
-    fn account_code(&self, address: &VMAddress) -> Vec<u8> {
+    fn account_code(&self, address: &Address) -> Vec<u8> {
         self.tx_context_ref
             .blockchain_cache()
             .with_account(address, |account| account.contract_path.clone())
@@ -141,7 +135,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_async_call(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -156,11 +150,11 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_execute_on_dest_context(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
-    ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
+    ) -> Result<TxResult, VMHooksEarlyExit> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.tx_context_ref.blockchain_cache_arc());
@@ -172,17 +166,17 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
+            self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
         } else {
-            // also kill current execution
-            Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
-                .with_message(tx_result.result_message.clone()))
+            self.sync_call_post_processing_err(&tx_result);
         }
+
+        Ok(tx_result)
     }
 
     fn perform_execute_on_dest_context_readonly(
         &mut self,
-        to: VMAddress,
+        to: Address,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) -> Result<Vec<Vec<u8>>, VMHooksEarlyExit> {
@@ -199,8 +193,11 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         if tx_result.result_status.is_success() {
-            Ok(self.sync_call_post_processing(tx_result, blockchain_updates))
+            self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
+            Ok(tx_result.result_values)
         } else {
+            self.sync_call_post_processing_err(&tx_result);
+
             // also kill current execution
             Err(VMHooksEarlyExit::new(tx_result.result_status.as_u64())
                 .with_message(tx_result.result_message.clone()))
@@ -213,12 +210,12 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         contract_code: Vec<u8>,
         code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> Result<(VMAddress, Vec<Vec<u8>>), VMHooksEarlyExit> {
+    ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
             from: contract_address.clone(),
-            to: VMAddress::zero(),
+            to: Address::zero(),
             egld_value,
             esdt_values: Vec::new(),
             func_name: TxFunctionName::INIT,
@@ -241,15 +238,17 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         );
 
         match tx_result.result_status {
-            ReturnCode::Success => Ok((
-                new_address,
-                self.sync_call_post_processing(tx_result, blockchain_updates),
-            )),
+            ReturnCode::Success => {
+                self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
+                Ok((new_address, tx_result.result_values))
+            }
             ReturnCode::ExecutionFailed => {
+                self.sync_call_post_processing_err(&tx_result);
+
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
@@ -257,7 +256,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 
     fn perform_transfer_execute(
         &mut self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -283,14 +282,16 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
                     .all_calls
                     .push(async_call_data);
 
-                let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
+                self.sync_call_post_processing_ok(&tx_result, blockchain_updates);
                 Ok(())
-            },
+            }
             ReturnCode::ExecutionFailed => {
+                self.sync_call_post_processing_err(&tx_result);
+
                 // TODO: not sure it's the right condition, it catches insufficient funds
                 Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                     .with_message(tx_result.result_message.clone()))
-            },
+            }
             _ => Err(VMHooksEarlyExit::new(ReturnCode::ExecutionFailed.as_u64())
                 .with_const_message(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT)),
         }
@@ -300,7 +301,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
 impl<S: InstanceState> TxVMHooksContext<S> {
     fn create_async_call_data(
         &self,
-        to: VMAddress,
+        to: Address,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -317,25 +318,33 @@ impl<S: InstanceState> TxVMHooksContext<S> {
         }
     }
 
-    fn sync_call_post_processing(
+    fn sync_call_post_processing_ok(
         &self,
-        tx_result: TxResult,
+        tx_result: &TxResult,
         blockchain_updates: BlockchainUpdate,
-    ) -> Vec<Vec<u8>> {
+    ) {
         self.tx_context_ref
             .blockchain_cache()
             .commit_updates(blockchain_updates);
 
         self.tx_context_ref
             .result_lock()
-            .merge_after_sync_call(&tx_result);
+            .merge_after_sync_call(tx_result);
 
         let contract_address = &self.tx_context_ref.input_ref().to;
         let builtin_functions = &self.tx_context_ref.runtime_ref.vm_ref.builtin_functions;
         self.back_transfers_lock()
-            .new_from_result(contract_address, &tx_result, builtin_functions);
+            .new_from_result(contract_address, tx_result, builtin_functions);
+    }
 
-        tx_result.result_values
+    fn sync_call_post_processing_err(&self, tx_result: &TxResult) {
+        let mut own_tx_result = self.tx_context_ref.result_lock();
+        if let Some(transfer_log) = &tx_result.esdt_transfer_log {
+            own_tx_result.result_logs.push(transfer_log.clone());
+        }
+        own_tx_result
+            .error_trace
+            .extend_from_slice(&tx_result.error_trace);
     }
 
     fn check_reserved_key(&mut self, key: &[u8]) -> Result<(), VMHooksEarlyExit> {
