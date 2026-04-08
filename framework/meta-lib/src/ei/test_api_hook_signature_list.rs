@@ -2,7 +2,7 @@ use wasmparser::ValType;
 
 use super::VmHookSignature;
 
-/// Singatures for the parametric test API.
+/// Signatures for the parametric test API.
 /// 
 /// Unlike the other signatures, not auto-generated.
 /// 
