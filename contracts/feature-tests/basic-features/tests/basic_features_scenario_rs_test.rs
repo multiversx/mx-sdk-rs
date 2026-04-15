@@ -103,7 +103,6 @@ fn block_info_ms_rs() {
 }
 
 #[test]
-#[ignore = "not yet supported"]
 fn code_hash_rs() {
     world().run("scenarios/code_hash.scen.json");
 }

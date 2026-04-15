@@ -4,6 +4,7 @@ use crate::{
     host::vm_hooks::VMHooksContext,
     types::{Address, EsdtLocalRole, EsdtLocalRoleFlags, RawHandle},
 };
+use blake2::{Blake2b, Digest, digest::consts::U32};
 use multiversx_chain_core::types::{EsdtTokenType, ReturnCode};
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use num_bigint::BigInt;
@@ -375,6 +376,30 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .m_types_lock()
             .mb_set(response_handle, code_metadata_bytes.to_vec());
 
+        Ok(())
+    }
+
+    fn get_code_hash(&mut self, address: &Address) -> Vec<u8> {
+        let Some(data) = self.context.account_data(address) else {
+            return vec![];
+        };
+        let Some(code) = &data.contract_path else {
+            return vec![];
+        };
+        let hash = Blake2b::<U32>::digest(code);
+        hash.to_vec()
+    }
+
+    pub fn managed_get_code_hash(
+        &mut self,
+        address_handle: i32,
+        code_hash_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let code_hash = self.get_code_hash(&address);
+        self.context
+            .m_types_lock()
+            .mb_set(code_hash_handle, code_hash);
         Ok(())
     }
 
