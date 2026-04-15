@@ -163,3 +163,7 @@ pub fn print_wasm_opt_not_installed(wasm_opt_name: &str) {
         format!("Warning: {wasm_opt_name} not installed.").yellow(),
     );
 }
+
+pub fn print_generate_codehash(codehash_path: &str) {
+    println_green(format!("Generating codehash to {codehash_path} ..."));
+}
