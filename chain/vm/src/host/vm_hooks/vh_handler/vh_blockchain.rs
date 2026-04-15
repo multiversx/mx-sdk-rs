@@ -41,11 +41,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_caller)?;
 
         self.context
             .m_types_lock()
@@ -54,11 +50,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn managed_sc_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_sc_address)?;
 
         self.context
             .m_types_lock()
@@ -70,11 +62,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         &mut self,
         dest_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_owner_address)?;
 
         self.context.m_types_lock().mb_set(
             dest_handle,
@@ -393,6 +381,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         address_handle: i32,
         code_hash_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_code_hash)?;
+
         let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
         let code_hash = self.get_code_hash(&address);
         self.context

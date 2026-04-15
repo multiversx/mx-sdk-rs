@@ -7,6 +7,11 @@ use super::VMHooksHandler;
 
 impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn signal_error(&mut self, message: &[u8]) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.signal_error)?;
+        self.use_gas(
+            message.len() as u64 * self.gas_schedule().base_operation_cost.persist_per_byte,
+        )?;
+
         let message_string = String::from_utf8_lossy(message);
         self.context.log_error_trace(&message_string);
         Err(VMHooksEarlyExit::new(ReturnCode::UserError.as_u64())
