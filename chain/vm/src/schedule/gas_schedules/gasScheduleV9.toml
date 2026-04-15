@@ -223,7 +223,7 @@
     EncodeDERSig            = 10000000
     VerifySecp256r1         = 2000000
     VerifyBLSSignatureShare = 2000000
-    VerifyBLSMultiSig      = 2000000
+    VerifyBLSMultiSig       = 2000000
 
 [ManagedBufferAPICost]
     MBufferNew                   = 2000
@@ -271,6 +271,13 @@
     BigFloatSetBigInt       = 3000
     BigFloatSetInt64        = 1000
     BigFloatGetConst        = 1000
+
+[ManagedMapAPICost]
+    ManagedMapNew      = 10000
+    ManagedMapPut      = 10000
+    ManagedMapGet      = 10000
+    ManagedMapRemove   = 10000
+    ManagedMapContains = 10000
 
 [WASMOpcodeCost]
     Unreachable = 5

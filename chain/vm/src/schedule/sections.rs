@@ -104,6 +104,12 @@ pub struct MetaChainSystemSCsCost {
     pub revoke_vote: u64,
     #[serde(rename = "CloseProposal")]
     pub close_proposal: u64,
+    #[serde(rename = "ClearProposal")]
+    pub clear_proposal: u64,
+    #[serde(rename = "ClaimAccumulatedFees")]
+    pub claim_accumulated_fees: u64,
+    #[serde(rename = "ChangeConfig")]
+    pub change_config: u64,
     #[serde(rename = "GetAllNodeStates")]
     pub get_all_node_states: u64,
     #[serde(rename = "UnstakeTokens")]
@@ -238,10 +244,20 @@ pub struct BaseOpsAPICost {
     pub get_callback_closure: u64,
     #[serde(rename = "GetCodeMetadata")]
     pub get_code_metadata: u64,
+    #[serde(rename = "GetCodeHash")]
+    pub get_code_hash: u64,
     #[serde(rename = "IsBuiltinFunction")]
     pub is_builtin_function: u64,
     #[serde(rename = "IsReservedFunctionName")]
     pub is_reserved_function_name: u64,
+    #[serde(rename = "GetRoundTime")]
+    pub get_round_time: u64,
+    #[serde(rename = "EpochStartBlockTimeStamp")]
+    pub epoch_start_block_time_stamp: u64,
+    #[serde(rename = "EpochStartBlockNonce")]
+    pub epoch_start_block_nonce: u64,
+    #[serde(rename = "EpochStartBlockRound")]
+    pub epoch_start_block_round: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
@@ -494,6 +510,14 @@ pub struct ManagedBufferAPICost {
     pub m_buffer_to_big_float: u64,
     #[serde(rename = "MBufferFromBigFloat")]
     pub m_buffer_from_big_float: u64,
+    #[serde(rename = "MBufferToSmallIntUnsigned")]
+    pub m_buffer_to_small_int_unsigned: u64,
+    #[serde(rename = "MBufferToSmallIntSigned")]
+    pub m_buffer_to_small_int_signed: u64,
+    #[serde(rename = "MBufferFromSmallIntUnsigned")]
+    pub m_buffer_from_small_int_unsigned: u64,
+    #[serde(rename = "MBufferFromSmallIntSigned")]
+    pub m_buffer_from_small_int_signed: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
@@ -523,6 +547,8 @@ pub struct BigFloatAPICost {
     pub big_float_sqrt: u64,
     #[serde(rename = "BigFloatPow")]
     pub big_float_pow: u64,
+    #[serde(rename = "BigFloatPowPerIteration")]
+    pub big_float_pow_per_iteration: u64,
     #[serde(rename = "BigFloatFloor")]
     pub big_float_floor: u64,
     #[serde(rename = "BigFloatCeil")]
@@ -535,6 +561,21 @@ pub struct BigFloatAPICost {
     pub big_float_set_int_64: u64,
     #[serde(rename = "BigFloatGetConst")]
     pub big_float_get_const: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
+#[serde(default)]
+pub struct ManagedMapAPICost {
+    #[serde(rename = "ManagedMapNew")]
+    pub managed_map_new: u64,
+    #[serde(rename = "ManagedMapPut")]
+    pub managed_map_put: u64,
+    #[serde(rename = "ManagedMapGet")]
+    pub managed_map_get: u64,
+    #[serde(rename = "ManagedMapRemove")]
+    pub managed_map_remove: u64,
+    #[serde(rename = "ManagedMapContains")]
+    pub managed_map_contains: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
