@@ -3125,6 +3125,7 @@ version = "0.22.1"
 dependencies = [
  "bech32",
  "bitflags 2.11.0",
+ "blake2",
  "hex",
  "multiversx-sc-codec",
  "serde",
@@ -3149,7 +3150,6 @@ version = "0.22.1"
 dependencies = [
  "anyhow",
  "bitflags 2.11.0",
- "blake2",
  "colored 3.1.1",
  "ed25519-dalek",
  "hex",
@@ -3300,7 +3300,6 @@ dependencies = [
 name = "multiversx-sc-meta-lib"
 version = "0.65.1"
 dependencies = [
- "blake2",
  "clap",
  "colored 3.1.1",
  "convert_case 0.11.0",

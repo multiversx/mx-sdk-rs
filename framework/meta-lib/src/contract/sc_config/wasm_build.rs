@@ -1,6 +1,4 @@
 use crate::tools::{build_target, wasm_opt};
-use blake2::digest::consts::U32;
-use blake2::{Blake2b, Digest};
 use core::panic;
 use std::{
     collections::HashMap,
@@ -348,7 +346,7 @@ impl ContractVariant {
         print_generate_codehash(&output_codehash_path.to_string_lossy());
 
         let wasm_bytes = fs::read(&output_wasm_path).expect("failed to read compiled contract");
-        let hash = Blake2b::<U32>::digest(&wasm_bytes);
+        let hash = multiversx_sc::chain_core::std::code_hash(&wasm_bytes);
         let hex_hash = hex::encode(hash);
         fs::write(&output_codehash_path, hex_hash).expect("failed to write codehash file");
     }

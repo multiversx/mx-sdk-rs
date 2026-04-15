@@ -26,7 +26,6 @@ colored = "3.0"
 lazy_static = "1.4.0"
 convert_case = "0.11"
 hex = "0.4"
-blake2 = "0.10"
 wasmparser = "0.245"
 wasmprinter = "0.245"
 semver = "1.0.20"
@@ -35,7 +34,7 @@ wat = "1.217.0"
 [dependencies.multiversx-sc]
 version = "=0.65.1"
 path = "../base"
-features = ["alloc", "num-bigint"]
+features = ["alloc", "num-bigint", "std"]
 
 [dependencies.multiversx-chain-scenario-format]
 version = "0.26.0"
