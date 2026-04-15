@@ -378,6 +378,29 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         Ok(())
     }
 
+    fn get_code_hash(&mut self, address: &Address) -> Vec<u8> {
+        let Some(data) = self.context.account_data(address) else {
+            return vec![];
+        };
+        let Some(code) = &data.contract_path else {
+            return vec![];
+        };
+        multiversx_chain_core::std::code_hash(code).to_vec()
+    }
+
+    pub fn managed_get_code_hash(
+        &mut self,
+        address_handle: i32,
+        code_hash_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let code_hash = self.get_code_hash(&address);
+        self.context
+            .m_types_lock()
+            .mb_set(code_hash_handle, code_hash);
+        Ok(())
+    }
+
     pub fn managed_is_builtin_function(
         &mut self,
         function_name_handle: i32,

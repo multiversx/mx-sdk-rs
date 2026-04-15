@@ -17,13 +17,14 @@ keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
-std = ["bech32", "serde", "hex"]
+std = ["bech32", "serde", "hex", "blake2"]
 
 [dependencies]
 bitflags = "2.9"
 bech32 = { version = "0.11", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 hex = { version = "0.4", optional = true }
+blake2 = { version = "0.10", optional = true }
 
 [dependencies.multiversx-sc-codec]
 version = "=0.25.0"

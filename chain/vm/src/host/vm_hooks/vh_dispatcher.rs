@@ -1130,7 +1130,8 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         address_handle: i32,
         code_hash_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("Unavailable: managed_get_code_hash")
+        self.handler
+            .managed_get_code_hash(address_handle, code_hash_handle)
     }
 
     fn managed_is_builtin_function(

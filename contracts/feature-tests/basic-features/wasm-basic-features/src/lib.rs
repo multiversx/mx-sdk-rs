@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          673
+// Endpoints:                          676
 // Async Callback:                       1
-// Total number of exported functions: 675
+// Total number of exported functions: 678
 
 #![no_std]
 
@@ -691,6 +691,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         mm_contains => mm_contains
         mm_remove_get => mm_remove_get
         mm_mutable_input_test => mm_mutable_input_test
+        math_weighted_average => math_weighted_average
+        math_weighted_average_round_up => math_weighted_average_round_up
+        math_linear_interpolation => math_linear_interpolation
     )
 }
 

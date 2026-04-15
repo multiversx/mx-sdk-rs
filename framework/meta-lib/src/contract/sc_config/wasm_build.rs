@@ -117,6 +117,7 @@ impl ContractVariant {
         self.run_wasm2wat(build_args, output_path);
         let report = self.extract_wasm_info(build_args, output_path);
         self.run_twiggy(build_args, output_path);
+        self.generate_codehash(build_args, output_path);
         self.pack_mxsc_file(build_args, output_path, &report);
     }
 
@@ -332,6 +333,22 @@ impl ContractVariant {
                 );
             }
         }
+    }
+
+    fn generate_codehash(&self, build_args: &BuildArgs, output_path: &Path) {
+        if !build_args.codehash {
+            return;
+        }
+
+        let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
+        let output_codehash_path = output_path.join(self.codehash_output_name(build_args));
+
+        print_generate_codehash(&output_codehash_path.to_string_lossy());
+
+        let wasm_bytes = fs::read(&output_wasm_path).expect("failed to read compiled contract");
+        let hash = multiversx_sc::chain_core::std::code_hash(&wasm_bytes);
+        let hex_hash = hex::encode(hash);
+        fs::write(&output_codehash_path, hex_hash).expect("failed to write codehash file");
     }
 }
 
