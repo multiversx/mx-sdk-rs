@@ -63,7 +63,11 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         map_handle: RawHandle,
         key_handle: RawHandle,
     ) -> Result<bool, VMHooksEarlyExit> {
-        self.use_gas(self.gas_schedule().managed_map_api_cost.managed_map_contains)?;
+        self.use_gas(
+            self.gas_schedule()
+                .managed_map_api_cost
+                .managed_map_contains,
+        )?;
         let key = self.context.m_types_lock().mb_get(key_handle).to_vec();
         Ok(self
             .context
