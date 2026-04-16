@@ -3,9 +3,13 @@ use multiversx_chain_vm::schedule::GasScheduleVersion;
 
 use crate::{get_file_path, parse_toml_sections};
 
-pub fn generate_file_content(toml_version: u16) {
-    let content = GasScheduleVersion::from_version_num(toml_version).toml_str();
-    let rust_code = generate_structs(content);
+pub fn generate_to_string() -> String {
+    let content = GasScheduleVersion::default().toml_str();
+    generate_structs(content)
+}
+
+pub fn generate_file_content() {
+    let rust_code = generate_to_string();
     let output_file = get_file_path();
 
     std::fs::write(&output_file, rust_code).unwrap();
@@ -26,13 +30,13 @@ fn generate_structs(toml_content: &str) -> String {
     );
 
     // add header
-    output.push_str("use serde::{Deserialize, Serialize};\n\n");
+    output.push_str("use serde::{Deserialize, Serialize};\n");
 
     let sections = parse_toml_sections(toml_content);
 
     for (section_name, section_entries) in &sections {
-        output.push_str(&generate_section_struct(section_name, section_entries));
         output.push('\n');
+        output.push_str(&generate_section_struct(section_name, section_entries));
     }
 
     output

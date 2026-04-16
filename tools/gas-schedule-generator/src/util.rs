@@ -1,16 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
-const SECTIONS_FILE_NAME: &str = "sections.rs";
-const OUTPUT_FILE_PATH_NAME: &str = "output_file_path.txt";
+const SECTIONS_FILE: &str = "../../chain/vm/src/schedule/gas_schedule_sections.rs";
 
 pub(crate) fn get_file_path() -> PathBuf {
-    match std::fs::read_to_string(OUTPUT_FILE_PATH_NAME) {
-        Ok(output_file_path) => PathBuf::from(output_file_path.trim()),
-        Err(_) => {
-            let output_dir = Path::new("output");
-            std::fs::create_dir_all(output_dir).unwrap();
-
-            output_dir.join(SECTIONS_FILE_NAME)
-        }
-    }
+    PathBuf::from(SECTIONS_FILE)
 }
