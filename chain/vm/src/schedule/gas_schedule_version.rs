@@ -14,21 +14,21 @@ pub const GAS_SCHEDULE_V9_TOML: &str = include_str!("versions/gasScheduleV9.toml
 
 #[derive(Clone, Copy, Default, Debug)]
 pub enum GasScheduleVersion {
-    V1,
-    V2,
-    V3,
-    V4,
-    V5,
-    V6,
-    V7,
-    V8,
+    V1 = 1,
+    V2 = 2,
+    V3 = 3,
+    V4 = 4,
+    V5 = 5,
+    V6 = 6,
+    V7 = 7,
+    V8 = 8,
     #[default]
-    V9,
+    V9 = 9,
 }
 
 impl fmt::Display for GasScheduleVersion {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "gasScheduleV{}.toml", *self as u8 + 1)
+        write!(f, "gasScheduleV{}.toml", *self as u8)
     }
 }
 
