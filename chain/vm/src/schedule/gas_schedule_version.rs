@@ -32,12 +32,8 @@ impl fmt::Display for GasScheduleVersion {
     }
 }
 
-pub fn parse_gas_schedule(content: &str) -> GasSchedule {
-    GasSchedule::from_toml_str(content).expect("error parsing gas schedule toml")
-}
-
 impl GasScheduleVersion {
-    pub fn from_version_num(version: u16) -> Self {
+    pub fn from_version_num(version: usize) -> Self {
         match version {
             1 => GasScheduleVersion::V1,
             2 => GasScheduleVersion::V2,
@@ -67,6 +63,6 @@ impl GasScheduleVersion {
     }
 
     pub fn load_gas_schedule(&self) -> GasSchedule {
-        parse_gas_schedule(self.toml_str())
+        GasSchedule::from_toml_str(self.toml_str()).expect("error parsing gas schedule toml")
     }
 }
