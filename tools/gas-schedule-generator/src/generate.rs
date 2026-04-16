@@ -1,19 +1,23 @@
+use std::path::Path;
+
 use convert_case::{Case, Casing};
 use multiversx_chain_vm::schedule::GasScheduleVersion;
 
-use crate::{get_file_path, parse_toml_sections};
+use crate::parse_toml_sections;
 
 pub fn generate_to_string() -> String {
     let content = GasScheduleVersion::default().toml_str();
     generate_structs(content)
 }
 
-pub fn generate_file_content() {
+pub fn generate_file_content(output_sections_file_path: &Path) {
     let rust_code = generate_to_string();
-    let output_file = get_file_path();
 
-    std::fs::write(&output_file, rust_code).unwrap();
-    println!("Generated Rust structs written to {:#?}", output_file);
+    std::fs::write(output_sections_file_path, rust_code).unwrap();
+    println!(
+        "Generated Rust structs written to {:#?}",
+        output_sections_file_path
+    );
 }
 
 fn generate_structs(toml_content: &str) -> String {
