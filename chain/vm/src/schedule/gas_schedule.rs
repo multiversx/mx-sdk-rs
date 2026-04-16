@@ -3,9 +3,9 @@ use std::mem::MaybeUninit;
 use multiversx_chain_vm_executor::OpcodeCost;
 use serde::{Deserialize, Serialize};
 
-use crate::schedule::sections::ManagedMapAPICost;
+use crate::schedule::gas_schedule_sections::ManagedMapAPICost;
 
-use super::sections::{
+use super::gas_schedule_sections::{
     BaseOperationCost, BaseOpsAPICost, BigFloatAPICost, BigIntAPICost, BuiltInCost, CryptoAPICost,
     DynamicStorageLoad, EthAPICost, ManagedBufferAPICost, MaxPerTransaction,
     MetaChainSystemSCsCost,

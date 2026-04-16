@@ -2,6 +2,16 @@ use std::fmt;
 
 use super::GasSchedule;
 
+pub const GAS_SCHEDULE_V1_TOML: &str = include_str!("versions/gasScheduleV1.toml");
+pub const GAS_SCHEDULE_V2_TOML: &str = include_str!("versions/gasScheduleV2.toml");
+pub const GAS_SCHEDULE_V3_TOML: &str = include_str!("versions/gasScheduleV3.toml");
+pub const GAS_SCHEDULE_V4_TOML: &str = include_str!("versions/gasScheduleV4.toml");
+pub const GAS_SCHEDULE_V5_TOML: &str = include_str!("versions/gasScheduleV5.toml");
+pub const GAS_SCHEDULE_V6_TOML: &str = include_str!("versions/gasScheduleV6.toml");
+pub const GAS_SCHEDULE_V7_TOML: &str = include_str!("versions/gasScheduleV7.toml");
+pub const GAS_SCHEDULE_V8_TOML: &str = include_str!("versions/gasScheduleV8.toml");
+pub const GAS_SCHEDULE_V9_TOML: &str = include_str!("versions/gasScheduleV9.toml");
+
 #[derive(Clone, Copy, Default, Debug)]
 pub enum GasScheduleVersion {
     V1,
@@ -44,15 +54,15 @@ impl GasScheduleVersion {
 
     pub fn toml_str(&self) -> &'static str {
         match self {
-            GasScheduleVersion::V1 => super::GAS_SCHEDULE_V1_TOML,
-            GasScheduleVersion::V2 => super::GAS_SCHEDULE_V2_TOML,
-            GasScheduleVersion::V3 => super::GAS_SCHEDULE_V3_TOML,
-            GasScheduleVersion::V4 => super::GAS_SCHEDULE_V4_TOML,
-            GasScheduleVersion::V5 => super::GAS_SCHEDULE_V5_TOML,
-            GasScheduleVersion::V6 => super::GAS_SCHEDULE_V6_TOML,
-            GasScheduleVersion::V7 => super::GAS_SCHEDULE_V7_TOML,
-            GasScheduleVersion::V8 => super::GAS_SCHEDULE_V8_TOML,
-            GasScheduleVersion::V9 => super::GAS_SCHEDULE_V9_TOML,
+            GasScheduleVersion::V1 => GAS_SCHEDULE_V1_TOML,
+            GasScheduleVersion::V2 => GAS_SCHEDULE_V2_TOML,
+            GasScheduleVersion::V3 => GAS_SCHEDULE_V3_TOML,
+            GasScheduleVersion::V4 => GAS_SCHEDULE_V4_TOML,
+            GasScheduleVersion::V5 => GAS_SCHEDULE_V5_TOML,
+            GasScheduleVersion::V6 => GAS_SCHEDULE_V6_TOML,
+            GasScheduleVersion::V7 => GAS_SCHEDULE_V7_TOML,
+            GasScheduleVersion::V8 => GAS_SCHEDULE_V8_TOML,
+            GasScheduleVersion::V9 => GAS_SCHEDULE_V9_TOML,
         }
     }
 
