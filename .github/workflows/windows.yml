@@ -28,6 +28,9 @@ jobs:
       - name: Install sc-meta
         run: cargo install multiversx-sc-meta
 
+      - name: Install sc-meta dependencies
+        run: sc-meta install all
+
       - name: Run sc-meta commands
         run: |
           cd contracts/feature-tests/basic-features

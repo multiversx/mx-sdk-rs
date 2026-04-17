@@ -40,6 +40,7 @@ fn select_zip_name() -> String {
     match get_system_info() {
         SystemInfo::Linux => "mx_scenario_go_linux_amd64.zip".to_string(),
         SystemInfo::MacOs => "mx_scenario_go_darwin_amd64.zip".to_string(),
+        SystemInfo::Windows => String::new(),
     }
 }
 
@@ -57,6 +58,11 @@ impl ScenarioGoInstaller {
     }
 
     pub async fn install(&self) {
+        if get_system_info() == SystemInfo::Windows {
+            println!("mx-scenario-go is not supported on Windows, skipping.");
+            return;
+        }
+
         let release_raw = self
             .get_scenario_go_release_json()
             .await
