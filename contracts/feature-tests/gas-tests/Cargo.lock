@@ -1373,7 +1373,7 @@ dependencies = [
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer"
 version = "0.5.1"
-source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=379107f244bf288de44ed389dec5429846466456#379107f244bf288de44ed389dec5429846466456"
+source = "git+https://github.com/multiversx/mx-vm-executor-rs?rev=4af36a92fc0c883eabd391389877ef3d6b8e67b3#4af36a92fc0c883eabd391389877ef3d6b8e67b3"
 dependencies = [
  "log",
  "loupe",
