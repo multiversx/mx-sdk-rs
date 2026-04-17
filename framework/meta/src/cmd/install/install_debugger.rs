@@ -13,7 +13,6 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
-    remove_old_lldb_extension();
     let _ = install_lldb_extension();
     install_script(custom_path).await;
     if !testing {
@@ -29,26 +28,6 @@ fn home_dir() -> PathBuf {
     std::env::home_dir().expect("Could not find home directory")
 }
 
-fn remove_old_lldb_extension() {
-    let extension_id = "vadimcn.vscode-lldb";
-
-    // Run the VSCode command to remove the previous installed extension
-    let _ = Command::new("code")
-        .arg("--uninstall-extension")
-        .arg(extension_id)
-        .status();
-
-    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
-    let extensions_dir = home_dir().join(".vscode").join("extensions");
-    if let Ok(entries) = fs::read_dir(&extensions_dir) {
-        for entry in entries.flatten() {
-            let name = entry.file_name();
-            if name.to_string_lossy().starts_with("vadim") {
-                let _ = fs::remove_dir_all(entry.path());
-            }
-        }
-    }
-}
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
 
@@ -56,6 +35,7 @@ fn install_lldb_extension() -> io::Result<()> {
     let install_lldb_command = Command::new("code")
         .arg("--install-extension")
         .arg(extension_id)
+        .arg("--force")
         .status()?;
 
     if install_lldb_command.success() {
