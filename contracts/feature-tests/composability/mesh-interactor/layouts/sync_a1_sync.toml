@@ -1,0 +1,63 @@
+[[start]]
+to = "s00_A"
+shard = 0
+gas_limit = 43000000
+
+[[start]]
+to = "s01_A"
+shard = 0
+gas_limit = 43000000
+
+[contracts.s00_A]
+shard = 0
+
+[[contracts.s00_A.calls]]
+to = "s00_B"
+call_type = "sync"
+gas_limit = 31000000
+
+[contracts.s00_B]
+shard = 0
+
+[[contracts.s00_B.calls]]
+to = "s00_C"
+call_type = "async_v1"
+gas_limit = 19000000
+
+[contracts.s00_C]
+shard = 0
+
+[[contracts.s00_C.calls]]
+to = "s00_D"
+call_type = "sync"
+gas_limit = 7000000
+
+[contracts.s00_D]
+shard = 0
+
+[contracts.s01_A]
+shard = 0
+
+[[contracts.s01_A.calls]]
+to = "s01_B"
+call_type = "sync"
+gas_limit = 31000000
+
+[contracts.s01_B]
+shard = 0
+
+[[contracts.s01_B.calls]]
+to = "s01_C"
+call_type = "async_v1"
+gas_limit = 19000000
+
+[contracts.s01_C]
+shard = 1
+
+[[contracts.s01_C.calls]]
+to = "s01_D"
+call_type = "sync"
+gas_limit = 7000000
+
+[contracts.s01_D]
+shard = 1
