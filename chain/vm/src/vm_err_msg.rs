@@ -28,3 +28,5 @@ pub const PROMISES_TOKENIZE_FAILED: &str = "tokenize failed";
 
 pub const CRYPTO_INVALID_SIGNATURE: &str = "invalid signature";
 pub const CRYPTO_ED25519_ERROR: &str = "ed25519 verify error";
+
+pub const MULTIPLICATION_OVERFLOW: &str = "multiplication overflow";

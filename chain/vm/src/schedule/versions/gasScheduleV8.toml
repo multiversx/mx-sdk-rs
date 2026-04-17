@@ -46,6 +46,9 @@
     DelegateVote          = 50000000
     RevokeVote            = 50000000
     CloseProposal         = 50000000
+    ClearProposal         = 50000000
+    ClaimAccumulatedFees  = 1000000
+    ChangeConfig          = 50000000
     GetAllNodeStates      = 20000000
     UnstakeTokens         = 5000000
     UnbondTokens          = 5000000
@@ -62,27 +65,27 @@
     GetCode           = 1000000
 
 [BaseOpsAPICost]
-    GetSCAddress       = 100
+    GetSCAddress       = 1000
     GetOwnerAddress    = 5000
     IsSmartContract    = 5000
     GetShardOfAddress  = 5000
     GetExternalBalance = 7000
     GetBlockHash       = 10000
     TransferValue      = 100000
-    GetArgument        = 100
-    GetFunction        = 100
-    GetNumArguments    = 100
+    GetArgument        = 1000
+    GetFunction        = 1000
+    GetNumArguments    = 1000
     StorageStore       = 75000
     StorageLoad        = 50000
     CachedStorageLoad  = 1000
-    GetCaller          = 100
-    GetCallValue       = 100
+    GetCaller          = 1000
+    GetCallValue       = 1000
     Log                = 3750
     Finish             = 1
     SignalError        = 1
     GetBlockTimeStamp  = 10000
-    GetGasLeft         = 100
-    Int64GetArgument   = 100
+    GetGasLeft         = 1000
+    Int64GetArgument   = 1000
     Int64StorageStore  = 75000
     Int64StorageLoad   = 50000
     Int64Finish        = 1000
@@ -98,12 +101,12 @@
     AsyncCallbackGasLock = 4000000
     ExecuteReadOnly      = 160000
     CreateContract       = 300000
-    GetReturnData        = 100
-    GetNumReturnData     = 100
-    GetReturnDataSize    = 100
+    GetReturnData        = 1000
+    GetNumReturnData     = 1000
+    GetReturnDataSize    = 1000
     GetOriginalTxHash    = 10000
-    CleanReturnData      = 100
-    DeleteFromReturnData = 100
+    CleanReturnData      = 1000
+    DeleteFromReturnData = 1000
     GetPrevTxHash      = 10000
     GetCurrentTxHash   = 10000
     CreateAsyncCall      = 200000
@@ -112,9 +115,14 @@
     SetAsyncContextCallback = 100000
     GetCallbackClosure   = 10000
     GetCodeMetadata      = 10000
+    GetCodeHash          = 10000
     IsBuiltinFunction    = 10000
     IsReservedFunctionName = 10000
-    
+    GetRoundTime    = 10000
+    EpochStartBlockTimeStamp = 10000
+    EpochStartBlockNonce = 10000
+    EpochStartBlockRound = 10000
+
 [EthAPICost]
     UseGas              = 100
     GetAddress          = 100000
@@ -196,24 +204,24 @@
     CopyPerByteForTooBig        = 1000
 
 [CryptoAPICost]
-    SHA256                 = 1000000
-    Keccak256              = 1000000
-    Ripemd160              = 1000000
-    VerifyBLS              = 5000000
-    VerifyEd25519          = 2000000
-    VerifySecp256k1        = 2000000
-    EllipticCurveNew       = 10000
-    AddECC                 = 75000
-    DoubleECC              = 65000
-    IsOnCurveECC           = 10000
-    ScalarMultECC          = 400000
-    MarshalECC             = 13000
-    MarshalCompressedECC   = 15000
-    UnmarshalECC           = 20000
-    UnmarshalCompressedECC = 270000
-    GenerateKeyECC         = 7000000
-    EncodeDERSig           = 10000000
-    VerifySecp256r1        = 2000000
+    SHA256                  = 1000000
+    Keccak256               = 1000000
+    Ripemd160               = 1000000
+    VerifyBLS               = 5000000
+    VerifyEd25519           = 2000000
+    VerifySecp256k1         = 2000000
+    EllipticCurveNew        = 10000
+    AddECC                  = 75000
+    DoubleECC               = 65000
+    IsOnCurveECC            = 10000
+    ScalarMultECC           = 400000
+    MarshalECC              = 13000
+    MarshalCompressedECC    = 15000
+    UnmarshalECC            = 20000
+    UnmarshalCompressedECC  = 270000
+    GenerateKeyECC          = 7000000
+    EncodeDERSig            = 10000000
+    VerifySecp256r1         = 2000000
     VerifyBLSSignatureShare = 2000000
     VerifyBLSMultiSig      = 2000000
 
@@ -238,26 +246,31 @@
     MBufferSetRandom             = 6000
     MBufferToBigFloat            = 2000
     MBufferFromBigFloat          = 2000
+    MBufferToSmallIntUnsigned    = 10000
+    MBufferToSmallIntSigned      = 10000
+    MBufferFromSmallIntUnsigned  = 10000
+    MBufferFromSmallIntSigned    = 10000
 
 [BigFloatAPICost]
-    BigFloatNewFromParts = 3000
-    BigFloatAdd          = 7000
-    BigFloatSub          = 7000
-    BigFloatMul          = 7000
-    BigFloatDiv          = 7000
-    BigFloatTruncate     = 5000
-    BigFloatNeg          = 5000
-    BigFloatClone        = 5000
-    BigFloatCmp          = 4000
-    BigFloatAbs          = 5000
-    BigFloatSqrt         = 7000
-    BigFloatPow          = 10000
-    BigFloatFloor        = 5000
-    BigFloatCeil         = 5000
-    BigFloatIsInt        = 3000
-    BigFloatSetBigInt    = 3000
-    BigFloatSetInt64     = 1000
-    BigFloatGetConst     = 1000
+    BigFloatNewFromParts    = 3000
+    BigFloatAdd             = 7000
+    BigFloatSub             = 7000
+    BigFloatMul             = 7000
+    BigFloatDiv             = 7000
+    BigFloatTruncate        = 5000
+    BigFloatNeg             = 5000
+    BigFloatClone           = 5000
+    BigFloatCmp             = 4000
+    BigFloatAbs             = 5000
+    BigFloatSqrt            = 7000
+    BigFloatPow             = 10000
+    BigFloatPowPerIteration = 10000
+    BigFloatFloor           = 5000
+    BigFloatCeil            = 5000
+    BigFloatIsInt           = 3000
+    BigFloatSetBigInt       = 3000
+    BigFloatSetInt64        = 1000
+    BigFloatGetConst        = 1000
 
 [WASMOpcodeCost]
     Unreachable = 5
