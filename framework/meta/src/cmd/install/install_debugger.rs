@@ -39,10 +39,15 @@ fn remove_old_lldb_extension() {
         .status();
 
     // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
-    let _ = Command::new("rm")
-        .arg("-rf")
-        .arg("~/.vscode/extensions/vadim*")
-        .status();
+    let extensions_dir = home_dir().join(".vscode").join("extensions");
+    if let Ok(entries) = fs::read_dir(&extensions_dir) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            if name.to_string_lossy().starts_with("vadim") {
+                let _ = fs::remove_dir_all(entry.path());
+            }
+        }
+    }
 }
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
@@ -114,6 +119,14 @@ fn get_path_to_settings() -> PathBuf {
             // For Linux
             Path::new(&user_home)
                 .join(".config")
+                .join("Code")
+                .join("User")
+                .join("settings.json")
+        }
+        "windows" => {
+            // For Windows
+            let appdata = env::var("APPDATA").expect("Could not find APPDATA environment variable");
+            Path::new(&appdata)
                 .join("Code")
                 .join("User")
                 .join("settings.json")
