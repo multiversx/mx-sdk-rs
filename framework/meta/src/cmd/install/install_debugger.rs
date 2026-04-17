@@ -1,6 +1,7 @@
 use colored::Colorize;
 
 use crate::cmd::template::RepoSource;
+use super::system_info::{get_system_info, SystemInfo};
 use std::fs::{self};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -83,10 +84,9 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 }
 
 fn get_path_to_settings() -> PathBuf {
-    let os = env::consts::OS;
     let user_home = home_dir();
-    match os {
-        "macos" => {
+    match get_system_info() {
+        SystemInfo::MacOs => {
             // For macOS
             Path::new(&user_home)
                 .join("Library")
@@ -95,7 +95,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        "linux" => {
+        SystemInfo::Linux => {
             // For Linux
             Path::new(&user_home)
                 .join(".config")
@@ -103,7 +103,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        "windows" => {
+        SystemInfo::Windows => {
             // For Windows
             let appdata = env::var("APPDATA").expect("Could not find APPDATA environment variable");
             Path::new(&appdata)
@@ -111,7 +111,6 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        _ => panic!("OS not supported"),
     }
 }
 
