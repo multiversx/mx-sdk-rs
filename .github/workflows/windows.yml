@@ -26,7 +26,7 @@ jobs:
           rustflags: ""
 
       - name: Install sc-meta
-        run: cargo install multiversx-sc-meta
+        run: cargo install --path framework/meta
 
       - name: Install sc-meta dependencies
         run: sc-meta install all
