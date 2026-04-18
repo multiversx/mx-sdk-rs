@@ -6,8 +6,8 @@ use super::{
     },
     upgrade_print::*,
 };
-use crate::folder_structure::{DirectoryType, RelevantDirectory};
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
+use multiversx_sc_meta_lib::folder_structure::{DirectoryType, RelevantDirectory};
 use ruplacer::Query;
 use toml::{Value, value::Table};
 

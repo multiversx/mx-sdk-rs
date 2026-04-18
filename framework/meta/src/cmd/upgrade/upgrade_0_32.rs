@@ -1,5 +1,5 @@
 use super::upgrade_common::{replace_in_files, version_bump_in_cargo_toml};
-use crate::folder_structure::RelevantDirectory;
+use multiversx_sc_meta_lib::folder_structure::RelevantDirectory;
 use ruplacer::Query;
 use std::path::Path;
 

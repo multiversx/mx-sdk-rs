@@ -3,9 +3,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{folder_structure::RelevantDirectories, version::FrameworkVersion};
+use crate::version::FrameworkVersion;
 
 use super::{RepoSource, copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata};
+
+use multiversx_sc_meta_lib::folder_structure::RelevantDirectories;
 
 const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";
 

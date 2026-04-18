@@ -1,5 +1,5 @@
+use crate::cargo_toml::{CargoTomlContents, DependencyReference};
 use crate::version::FrameworkVersion;
-use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, DependencyReference};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
