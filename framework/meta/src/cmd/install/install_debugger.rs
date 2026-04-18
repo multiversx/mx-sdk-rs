@@ -1,7 +1,7 @@
 use colored::Colorize;
 
+use super::system_info::{SystemInfo, get_system_info};
 use crate::cmd::template::RepoSource;
-use super::system_info::{get_system_info, SystemInfo};
 use std::fs::{self};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -15,6 +15,13 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
     let _ = install_lldb_extension();
+    if get_system_info() == SystemInfo::Windows {
+        println!(
+            "{}",
+            "On Windows, the VS Code window opened by this tool can be safely closed after installation."
+                .yellow()
+        );
+    }
     install_script(custom_path).await;
     if !testing {
         // if we are testing we skip the configuration path, not to mess up with the current vscode configuration
