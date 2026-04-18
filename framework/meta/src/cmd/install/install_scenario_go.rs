@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use colored::Colorize;
 use core::time;
 use serde_json::Value;
 use std::{
@@ -59,7 +60,10 @@ impl ScenarioGoInstaller {
 
     pub async fn install(&self) {
         if get_system_info() == SystemInfo::Windows {
-            println!("mx-scenario-go is not supported on Windows, skipping.");
+            println!(
+                "{}",
+                "mx-scenario-go is not supported on Windows, skipping.".yellow()
+            );
             return;
         }
 
