@@ -35,11 +35,16 @@ impl RepoTempDownload {
     }
 
     async fn download_binaries(&self) -> Result<(), reqwest::Error> {
-        let response = reqwest::get(self.version.url()).await?.bytes().await?;
-        if response.len() < 10000 {
+        let url = self.version.url();
+        let response = reqwest::get(&url).await?;
+        let status = response.status();
+        let bytes = response.bytes().await?;
+        if !status.is_success() {
             panic!(
-                "Could not download artifact: {}",
-                String::from_utf8_lossy(&response)
+                "Could not download artifact from {} (HTTP {}): {}",
+                url,
+                status,
+                String::from_utf8_lossy(&bytes)
             );
         }
 
@@ -47,7 +52,7 @@ impl RepoTempDownload {
             Err(why) => panic!("couldn't create {why}"),
             Ok(file) => file,
         };
-        file.write_all(&response).unwrap();
+        file.write_all(&bytes).unwrap();
         Ok(())
     }
 
