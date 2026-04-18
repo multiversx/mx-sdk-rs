@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
+use multiversx_sc_meta_lib::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
     WriteTestFn, process_code,

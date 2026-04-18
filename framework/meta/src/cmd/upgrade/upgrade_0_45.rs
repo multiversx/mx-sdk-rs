@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use super::upgrade_common::version_bump_in_cargo_toml;
-use crate::folder_structure::{DirectoryType, RelevantDirectory};
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
+use multiversx_sc_meta_lib::folder_structure::{DirectoryType, RelevantDirectory};
 use toml::Value;
 
 /// Migrate `0.44.0` to `0.45.0`, including the version bump.

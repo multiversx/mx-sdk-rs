@@ -4,10 +4,8 @@ use super::{
     check_wasmer_dependencies::check_wasmer_dependencies,
     print_util::{print_all_command, print_all_count, print_all_index},
 };
-use crate::{
-    cli::AllArgs,
-    folder_structure::{RelevantDirectories, dir_pretty_print},
-};
+use crate::cli::AllArgs;
+use multiversx_sc_meta_lib::folder_structure::{RelevantDirectories, dir_pretty_print};
 use std::{path::Path, process::Command};
 
 pub fn call_all_meta(args: &AllArgs) {

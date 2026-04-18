@@ -11,9 +11,11 @@ mod test_generator;
 mod tx_gen;
 
 use crate::cli::ScenBlackboxArgs;
-use crate::folder_structure::{RelevantDirectories, RelevantDirectory, dir_pretty_print};
 use colored::Colorize;
 use multiversx_sc::abi::ContractAbi;
+use multiversx_sc_meta_lib::folder_structure::{
+    RelevantDirectories, RelevantDirectory, dir_pretty_print,
+};
 use std::fs;
 use std::path::Path;
 

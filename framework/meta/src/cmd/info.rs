@@ -1,14 +1,12 @@
 use std::path::Path;
 
-use crate::{
-    cli::InfoArgs,
-    folder_structure::{RelevantDirectories, dir_pretty_print},
-    version_history::LAST_UPGRADE_VERSION,
-};
+use crate::{cli::InfoArgs, version_history::LAST_UPGRADE_VERSION};
 
 use super::{
     check_wasmer_dependencies::check_wasmer_dependencies, print_util::print_tree_dir_metadata,
 };
+
+use multiversx_sc_meta_lib::folder_structure::{RelevantDirectories, dir_pretty_print};
 
 pub fn call_info(args: &InfoArgs) {
     let path = if let Some(some_path) = &args.path {

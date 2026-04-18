@@ -5,7 +5,6 @@
 
 pub mod cli;
 pub mod cmd;
-pub mod folder_structure;
 
 pub use multiversx_sc_meta_lib::abi_json;
 pub use multiversx_sc_meta_lib::ei;

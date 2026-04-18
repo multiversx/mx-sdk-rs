@@ -1,6 +1,8 @@
-use crate::{folder_structure::RelevantDirectory, version::FrameworkVersion};
+use crate::version::FrameworkVersion;
 use colored::Colorize;
-use multiversx_sc_meta_lib::cargo_toml::DependencyReference;
+use multiversx_sc_meta_lib::{
+    cargo_toml::DependencyReference, folder_structure::RelevantDirectory,
+};
 use std::path::Path;
 
 pub fn print_upgrading(dir: &RelevantDirectory) {

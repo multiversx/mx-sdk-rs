@@ -3,11 +3,13 @@ use std::path::Path;
 use crate::{
     cli::UpgradeArgs,
     cmd::{print_util::print_tree_dir_metadata, upgrade::upgrade_settings::UpgradeSettings},
-    folder_structure::{RelevantDirectories, RelevantDirectory, dir_pretty_print},
     version::FrameworkVersion,
     version_history::{CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, versions_iter},
 };
-use multiversx_sc_meta_lib::framework_version;
+use multiversx_sc_meta_lib::{
+    folder_structure::{RelevantDirectories, RelevantDirectory, dir_pretty_print},
+    framework_version,
+};
 
 use super::{
     upgrade_0_31::upgrade_to_31_0,

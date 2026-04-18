@@ -3,11 +3,12 @@ use multiversx_sc::abi::RustcAbi;
 use multiversx_sc_meta_lib::{
     abi_json::deserialize_abi_from_json,
     cli::ContractCliAction,
+    folder_structure::RelevantDirectory,
     tools::{RustcVersion, rustc_version_warning},
 };
 use semver::Version;
 
-use crate::{cli::AllArgs, folder_structure::RelevantDirectory};
+use crate::cli::AllArgs;
 use std::{path::Path, process::Command};
 
 fn should_perform_rustc_version_check(args: &AllArgs) -> bool {

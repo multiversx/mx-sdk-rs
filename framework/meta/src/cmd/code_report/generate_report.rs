@@ -4,13 +4,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{
-    cli::{CompareArgs, CompileArgs, ConvertArgs, matches_extension},
-    folder_structure::RelevantDirectories,
-};
+use crate::cli::{CompareArgs, CompileArgs, ConvertArgs, matches_extension};
 
 use multiversx_sc_meta_lib::{
-    self, code_report_json::CodeReportJson, mxsc_file_json::MxscFileJson,
+    self, code_report_json::CodeReportJson, folder_structure::RelevantDirectories,
+    mxsc_file_json::MxscFileJson,
 };
 
 use super::render_code_report::CodeReportRender;
