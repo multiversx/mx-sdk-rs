@@ -12,6 +12,7 @@ pub mod ei;
 pub mod ei_check_json;
 pub mod esdt_attr_file_json;
 pub mod folder_structure;
+pub mod local_deps;
 pub mod mxsc_file_json;
 pub mod print_util;
 pub mod report_info_json;

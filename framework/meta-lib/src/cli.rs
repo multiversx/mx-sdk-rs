@@ -1,9 +1,11 @@
 mod cli_args_build;
 mod cli_args_contract;
+mod cli_args_local_deps;
 mod cli_contract_main;
 
 pub use cli_args_build::*;
 pub use cli_args_contract::*;
+pub use cli_args_local_deps::*;
 pub use cli_contract_main::*;
 
 pub trait CliArgsToRaw {

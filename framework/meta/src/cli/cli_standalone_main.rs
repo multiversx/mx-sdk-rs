@@ -9,11 +9,11 @@ use crate::cmd::all::call_all_meta;
 use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
-use crate::cmd::local_deps::local_deps;
 use crate::cmd::scen_test_gen::test_gen_tool;
 use crate::cmd::template::{create_contract, print_template_names};
 use crate::cmd::test::test;
 use crate::cmd::test_coverage::test_coverage;
+use multiversx_sc_meta_lib::local_deps::local_deps;
 
 use crate::cmd::upgrade::upgrade_sc;
 

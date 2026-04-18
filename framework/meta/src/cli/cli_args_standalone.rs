@@ -1,7 +1,7 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
+use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction, LocalDepsArgs};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -358,19 +358,6 @@ pub struct UpgradeArgs {
     /// Skips 'cargo check' after upgrade
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub no_check: bool,
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct LocalDepsArgs {
-    /// Target directory where to generate local deps reports.
-    /// Will be current directory if not specified.
-    #[arg(long, verbatim_doc_comment)]
-    pub path: Option<String>,
-
-    /// Ignore all directories with these names.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true, default_value = "target")]
-    pub ignore: Vec<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

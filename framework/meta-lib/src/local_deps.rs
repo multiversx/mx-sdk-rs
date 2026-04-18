@@ -1,11 +1,11 @@
-use crate::cli::LocalDepsArgs;
-use common_path::common_path_all;
-use multiversx_sc_meta_lib::{
+use crate::{
     cargo_toml::CargoTomlContents,
+    cli::LocalDepsArgs,
     folder_structure::{
         CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES, RelevantDirectories, dir_pretty_print,
     },
 };
+use common_path::common_path_all;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, LinkedList},

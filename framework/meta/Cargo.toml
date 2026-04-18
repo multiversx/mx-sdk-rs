@@ -37,8 +37,7 @@ ruplacer = { version = "0.10", default-features = false }
 regex = "1.11"
 reqwest = { version = "0.13", features = ["rustls", "blocking", "json"] }
 copy_dir = "0.1.2"
-pathdiff = "0.2.1"
-common-path = "1.0.0"
+pathdiff = "0.2"
 bip39 = { version = "2.0", features = ["rand"] }
 anyhow = "1.0"
 hex = "0.4.3"
