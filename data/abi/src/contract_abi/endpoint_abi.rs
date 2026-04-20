@@ -1,4 +1,5 @@
-use super::*;
+use crate::{TypeAbi, TypeNames};
+
 use alloc::{
     borrow::ToOwned,
     string::{String, ToString},
