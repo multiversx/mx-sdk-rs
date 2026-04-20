@@ -7,6 +7,7 @@ use std::{
 use super::RepoVersion;
 
 const ZIP_NAME: &str = "mx-sdk-rs-download.zip";
+const ZIP_MAGIC_HEADER: &[u8] = &[0x50, 0x4B, 0x03, 0x04];
 
 pub struct RepoTempDownload {
     pub version: RepoVersion,
@@ -46,6 +47,11 @@ impl RepoTempDownload {
                 status,
                 String::from_utf8_lossy(&bytes)
             );
+        }
+
+        // ZIP local file header magic: PK\x03\x04
+        if !bytes.starts_with(ZIP_MAGIC_HEADER) {
+            panic!("Downloaded artifact from {} is not a valid ZIP file", url);
         }
 
         let mut file = match File::create(self.zip_path()) {
