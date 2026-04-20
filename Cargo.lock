@@ -47,6 +47,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "adder-pt"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "adder-pt-meta"
+version = "0.0.0"
+dependencies = [
+ "adder-pt",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
+name = "addercaller"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "addercaller-meta"
+version = "0.0.0"
+dependencies = [
+ "addercaller",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -490,6 +524,40 @@ name = "bytes"
 version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e748733b7cbc798e1434b6ac524f0c1ff2ab456fe201501e6497c8417a4fc33"
+
+[[package]]
+name = "callee"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "callee-meta"
+version = "0.0.0"
+dependencies = [
+ "callee",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
+name = "caller"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "caller-meta"
+version = "0.0.0"
+dependencies = [
+ "caller",
+ "multiversx-sc-meta-lib",
+]
 
 [[package]]
 name = "cast"
@@ -3093,6 +3161,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "multisig-pt"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "multisig-pt-meta"
+version = "0.0.0"
+dependencies = [
+ "multisig-pt",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "multiversx-bls"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5272,6 +5357,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06794f8f6c5c898b3275aebefa6b8a1cb24cd2c6c79397ab15774837a0bc5755"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "test-testapi"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "num-bigint",
+]
+
+[[package]]
+name = "test-testapi-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "test-testapi",
 ]
 
 [[package]]

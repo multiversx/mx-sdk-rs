@@ -19,3 +19,6 @@ path = "src/multisig_proxy.rs"
 path = "src/multisig_view_proxy.rs"
 add-unlabelled = false
 add-labels = ["multisig-external-view"]
+
+[[proxy]]
+path = "../../parametric-tests/multisig-pt/src/multisig_proxy.rs"
