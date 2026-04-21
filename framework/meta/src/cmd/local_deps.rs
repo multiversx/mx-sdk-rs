@@ -14,6 +14,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+pub const LOCAL_DEPS_FILE_NAME: &str = "local_deps.txt";
+
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalDeps {
@@ -49,6 +51,22 @@ pub fn local_deps(args: &LocalDepsArgs) {
     perform_local_deps(path, args.ignore.as_slice());
 }
 
+pub fn compute_local_deps(contract_dir: &Path) -> LocalDeps {
+    let contract_dir = contract_dir.canonicalize().unwrap();
+    let mut dep_map: BTreeMap<PathBuf, LocalDep> = BTreeMap::new();
+    expand_deps(&contract_dir, contract_dir.clone(), &mut dep_map);
+
+    let common_dependency_path = common_path_all(dep_map.keys().map(|p| p.as_path()));
+
+    LocalDeps {
+        root: contract_dir.clone(),
+        contract_path: contract_dir,
+        common_dependency_path: common_dependency_path
+            .map(|p| p.to_string_lossy().to_string()),
+        dependencies: dep_map.values().cloned().collect(),
+    }
+}
+
 fn perform_local_deps(root_path: &Path, ignore: &[String]) {
     let dirs = RelevantDirectories::find_all(root_path, ignore);
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
@@ -71,12 +89,12 @@ fn perform_local_deps(root_path: &Path, ignore: &[String]) {
             dependencies: dep_map.values().cloned().collect(),
         };
 
-        let mut deps_file = File::create(output_dir_path.join("local_deps.txt")).unwrap();
+        let mut deps_file = File::create(output_dir_path.join(LOCAL_DEPS_FILE_NAME)).unwrap();
         writeln!(deps_file, "{}", serialize_local_deps_json(&deps_contents)).unwrap();
     }
 }
 
-fn expand_deps(
+pub fn expand_deps(
     root_path: &Path,
     starting_path: PathBuf,
     dep_map: &mut BTreeMap<PathBuf, LocalDep>,
@@ -111,7 +129,7 @@ fn expand_deps(
     }
 }
 
-fn serialize_local_deps_json(deps_contents: &LocalDeps) -> String {
+pub fn serialize_local_deps_json(deps_contents: &LocalDeps) -> String {
     let buf = Vec::new();
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut ser = serde_json::Serializer::with_formatter(buf, formatter);

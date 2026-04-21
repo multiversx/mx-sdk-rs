@@ -3269,6 +3269,7 @@ name = "multiversx-sc-meta"
 version = "0.65.1"
 dependencies = [
  "anyhow",
+ "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3352,7 +3353,6 @@ name = "multiversx-sc-snippets"
 version = "0.65.1"
 dependencies = [
  "anyhow",
- "base64",
  "colored 3.1.1",
  "env_logger",
  "futures",

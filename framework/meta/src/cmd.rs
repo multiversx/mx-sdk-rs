@@ -9,6 +9,7 @@ pub mod print_util;
 pub mod retrieve_address;
 pub mod scen_blackbox;
 pub mod scen_test_gen;
+pub mod source;
 pub mod template;
 pub mod test;
 pub mod test_coverage;
