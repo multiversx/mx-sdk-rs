@@ -86,6 +86,12 @@ pub enum StandaloneCliAction {
     LocalDeps(LocalDepsArgs),
 
     #[command(
+        name = "source",
+        about = "Source code packaging and local dependency analysis."
+    )]
+    Source(SourceArgs),
+
+    #[command(
         name = "wallet",
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
@@ -358,6 +364,40 @@ pub struct UpgradeArgs {
     /// Skips 'cargo check' after upgrade
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub no_check: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct SourceArgs {
+    #[command(subcommand)]
+    pub command: SourceCliAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum SourceCliAction {
+    #[command(
+        name = "local-deps",
+        about = "Generates a report on the local dependencies of the contract."
+    )]
+    LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "pack",
+        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
+    )]
+    Pack(PackArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct PackArgs {
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Only pack the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are packed.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
