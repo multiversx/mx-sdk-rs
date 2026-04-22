@@ -34,6 +34,8 @@ fn perform_call_all_meta(path: &Path, args: &AllArgs) {
         return;
     }
 
+    dirs.warn_duplicate_contract_names();
+
     for (i, contract_crate) in dirs.iter_contract_crates().enumerate() {
         print_all_index(i + 1, num_contract_crates);
 

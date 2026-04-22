@@ -8,8 +8,9 @@ use std::{
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 
 use crate::cli::LocalBuildArgs;
+use crate::folder_structure::RelevantDirectories;
 
-use super::source::{find_contract_folders, source_pack_contract};
+use super::source::source_pack_contract;
 
 /// Mirrors the Python `build_project` pipeline, but runs locally instead of inside Docker.
 ///
@@ -41,8 +42,8 @@ pub fn local_build(args: &LocalBuildArgs) {
     };
 
     // 1. Discover contracts
-    let contract_folders = find_contract_folders(&project_folder);
-    if contract_folders.is_empty() {
+    let dirs = RelevantDirectories::find_all(&project_folder, &["target".to_string()]);
+    if dirs.iter_contract_crates().count() == 0 {
         println!(
             "No contracts found (no multiversx.json) under: {}",
             project_folder.display()
@@ -50,7 +51,7 @@ pub fn local_build(args: &LocalBuildArgs) {
         return;
     }
 
-    ensure_distinct_contract_names(&contract_folders);
+    dirs.ensure_distinct_contract_names();
 
     // 2. Copy project to build root (wipes first, skips target/)
     println!("Copying project to build root: {}", build_root.display());
@@ -64,8 +65,8 @@ pub fn local_build(args: &LocalBuildArgs) {
     let locks_before = snapshot_cargo_locks(&build_root);
 
     // 4. Build each contract
-    for contract_folder in &contract_folders {
-        let cargo_toml = CargoTomlContents::load_from_file(contract_folder.join("Cargo.toml"));
+    for dir in dirs.iter_contract_crates() {
+        let cargo_toml = CargoTomlContents::load_from_file(dir.path.join("Cargo.toml"));
         let contract_name = cargo_toml.package_name();
 
         if let Some(filter) = args.contract.as_deref() {
@@ -75,7 +76,7 @@ pub fn local_build(args: &LocalBuildArgs) {
             }
         }
 
-        let relative = contract_folder.strip_prefix(&project_folder).unwrap();
+        let relative = dir.path.strip_prefix(&project_folder).unwrap();
         let build_contract_folder = build_root.join(relative);
         let output_subfolder = output_folder.join(&contract_name);
         fs::create_dir_all(&output_subfolder).unwrap();
@@ -114,17 +115,6 @@ fn resolve_path(path: Option<&str>) -> PathBuf {
     Path::new(p)
         .canonicalize()
         .unwrap_or_else(|_| PathBuf::from(p))
-}
-
-fn ensure_distinct_contract_names(contract_folders: &[PathBuf]) {
-    let mut names = std::collections::HashSet::new();
-    for folder in contract_folders {
-        let cargo_toml = CargoTomlContents::load_from_file(folder.join("Cargo.toml"));
-        let name = cargo_toml.package_name();
-        if !names.insert(name.clone()) {
-            panic!("Duplicate contract name: {name}");
-        }
-    }
 }
 
 /// Wipes `build_root` and copies the entire `project_folder` into it.
