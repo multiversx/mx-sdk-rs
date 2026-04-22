@@ -92,6 +92,12 @@ pub enum StandaloneCliAction {
     Source(SourceArgs),
 
     #[command(
+        name = "rb",
+        about = "Reproducible build operations."
+    )]
+    Rb(RbArgs),
+
+    #[command(
         name = "wallet",
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
@@ -398,6 +404,53 @@ pub struct PackArgs {
     /// If not specified, all contracts under the project folder are packed.
     #[arg(long, verbatim_doc_comment)]
     pub contract: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct RbArgs {
+    #[command(subcommand)]
+    pub command: RbCliAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum RbCliAction {
+    #[command(
+        name = "local-build",
+        about = "Builds all contracts locally, mirroring the Docker reproducible build pipeline."
+    )]
+    LocalBuild(LocalBuildArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct LocalBuildArgs {
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Output folder where build artifacts and source JSON files will be placed.
+    /// A subfolder per contract name will be created inside it.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: String,
+
+    /// Cargo target directory for compilation.
+    /// Defaults to /tmp/sc-target if not specified.
+    #[arg(long = "target-dir", verbatim_doc_comment)]
+    pub target_dir: Option<String>,
+
+    /// Folder where the project will be copied before building.
+    /// Defaults to /tmp/sc-build if not specified.
+    #[arg(long = "build-root", verbatim_doc_comment)]
+    pub build_root: Option<String>,
+
+    /// Only build the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are built.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
+
+    /// Do not optimize wasm files after the build.
+    #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
+    pub no_wasm_opt: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

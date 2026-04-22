@@ -3326,7 +3326,6 @@ dependencies = [
 name = "multiversx-sc-scenario"
 version = "0.65.1"
 dependencies = [
- "base64",
  "colored 3.1.1",
  "hex",
  "hex-literal",

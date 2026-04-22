@@ -1,4 +1,4 @@
-use crate::cli::{SourceCliAction, StandaloneCliAction, StandaloneCliArgs};
+use crate::cli::{RbCliAction, SourceCliAction, StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::chain_simulator::chain_simulator;
 use crate::cmd::retrieve_address::retrieve_address;
 use crate::cmd::scen_blackbox::scen_blackbox_tool;
@@ -10,6 +10,7 @@ use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
 use crate::cmd::local_deps::local_deps;
+use crate::cmd::reproduce::local_build;
 use crate::cmd::scen_test_gen::test_gen_tool;
 use crate::cmd::source::source_pack;
 use crate::cmd::template::{create_contract, print_template_names};
@@ -65,6 +66,11 @@ pub async fn cli_main_standalone() {
             match &source_args.command {
                 SourceCliAction::LocalDeps(args) => local_deps(args),
                 SourceCliAction::Pack(args) => source_pack(args),
+            }
+        }
+        Some(StandaloneCliAction::Rb(rb_args)) => {
+            match &rb_args.command {
+                RbCliAction::LocalBuild(args) => local_build(args),
             }
         }
         Some(StandaloneCliAction::Wallet(args)) => {

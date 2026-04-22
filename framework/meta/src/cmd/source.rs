@@ -107,7 +107,7 @@ pub fn source_pack(args: &PackArgs) {
 
 /// Discovers all contract folders by recursively scanning for `multiversx.json`,
 /// mirroring Python's `get_contracts_folders`.
-fn find_contract_folders(project_folder: &Path) -> Vec<PathBuf> {
+pub(crate) fn find_contract_folders(project_folder: &Path) -> Vec<PathBuf> {
     let mut result = Vec::new();
     find_contract_folders_recursive(project_folder, &mut result);
     result.sort();
@@ -131,7 +131,7 @@ fn find_contract_folders_recursive(current: &Path, result: &mut Vec<PathBuf>) {
 
 /// Packs source for one contract, with all paths relative to `project_folder`.
 /// If `specific_contract` is `Some`, skips contracts whose name doesn't match.
-fn source_pack_contract(
+pub(crate) fn source_pack_contract(
     project_folder: &Path,
     contract_folder: &Path,
     specific_contract: Option<&str>,
