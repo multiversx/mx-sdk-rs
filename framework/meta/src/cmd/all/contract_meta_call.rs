@@ -6,47 +6,67 @@ use crate::{
     cli::MetaLibArgs, cmd::print_util::print_all_command, folder_structure::RelevantDirectory,
 };
 
-/// Formatted cargo arguments for calling a contract's meta crate.
+/// Holds the arguments for calling a contract's meta crate via `cargo run`.
 ///
-/// Wraps the `Vec<String>` produced by combining a [`ContractCliAction`] with
-/// [`MetaLibArgs`], applying the `--target-dir-all` overrides before serialising.
-pub struct ContractMetaCall(Vec<String>);
+/// Separates cargo-level args (e.g. `--target-dir`, placed before `--`)
+/// from binary-level args (the subcommand and its flags, placed after `--`).
+pub struct ContractMetaCall {
+    /// Args passed to `cargo run` itself (e.g. `--target-dir <dir>`).
+    cargo_args: Vec<String>,
+    /// Args passed to the compiled meta binary (e.g. `build --locked`).
+    binary_args: Vec<String>,
+}
 
 impl ContractMetaCall {
     pub fn new(mut command: ContractCliAction, meta_lib_args: &MetaLibArgs) -> Self {
         apply_target_dir_all_to_wasm(&mut command, meta_lib_args);
 
-        let mut raw = Vec::new();
+        let mut cargo_args = Vec::new();
         if let Some(target_dir_meta) = effective_target_dir_meta(meta_lib_args) {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
+            cargo_args.push("--target-dir".to_string());
+            cargo_args.push(target_dir_meta.clone());
         }
-        raw.append(&mut command.to_raw());
+
+        let mut binary_args = command.to_raw();
         if !meta_lib_args.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
+            binary_args.push("--no-abi-git-version".to_string());
         }
 
-        ContractMetaCall(raw)
+        ContractMetaCall {
+            cargo_args,
+            binary_args,
+        }
     }
 
-    /// Creates a `ContractMetaCallArgs` directly from a raw argument list,
-    /// bypassing the standard construction logic.
-    pub fn from_raw(args: Vec<String>) -> Self {
-        ContractMetaCall(args)
+    /// Creates a `ContractMetaCall` from a raw binary argument list,
+    /// with no cargo-level args.
+    pub fn from_raw(binary_args: Vec<String>) -> Self {
+        ContractMetaCall {
+            cargo_args: Vec::new(),
+            binary_args,
+        }
     }
 
-    pub fn args(&self) -> &[String] {
-        &self.0
+    pub fn binary_args(&self) -> &[String] {
+        &self.binary_args
+    }
+
+    /// Returns the full argument list for `cargo`, starting with `run`.
+    fn all_cargo_args(&self) -> Vec<String> {
+        let mut all = vec!["run".to_string()];
+        all.extend_from_slice(&self.cargo_args);
+        all.push("--".to_string());
+        all.extend_from_slice(&self.binary_args);
+        all
     }
 
     pub fn call_in_dir(&self, meta_path: &Path) {
-        print_all_command(meta_path, self.args());
+        let all = self.all_cargo_args();
+        print_all_command(meta_path, &all);
 
         let exit_status = Command::new("cargo")
             .current_dir(meta_path)
-            .arg("run")
-            .arg("--")
-            .args(self.args())
+            .args(&all)
             .spawn()
             .expect("failed to spawn cargo run process in meta crate")
             .wait()
