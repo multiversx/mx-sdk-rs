@@ -11,13 +11,13 @@ use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use crate::cli::PackArgs;
 use crate::folder_structure::RelevantDirectories;
 
-use super::local_deps::compute_local_deps;
+use super::local_deps::{DependencyDepth, compute_local_deps};
 
 const SCHEMA_VERSION: &str = "2.0.0";
 const SOURCE_JSON_EXTENSION: &str = ".source.json";
 
 /// Sentinel depth for project-level files (mirrors Python's `sys.maxsize`).
-const SYS_MAXSIZE: usize = i64::MAX as usize;
+const SYS_MAXSIZE: DependencyDepth = i64::MAX as DependencyDepth;
 
 /// File names (regardless of extension) that are included as source files.
 const NAMED_SOURCE_FILES: &[&str] = &[
@@ -34,7 +34,7 @@ struct SourceFileEntry {
     path: String,
     content: String,
     module: String,
-    dependency_depth: usize,
+    dependency_depth: DependencyDepth,
     is_test_file: bool,
 }
 
@@ -130,7 +130,7 @@ pub(crate) fn source_pack_contract(
     // 1. Files from the contract folder itself (depth 0, module = contract relative to project)
     let contract_module = module_path(project_folder, contract_folder);
     for file in collect_source_files(contract_folder) {
-        entries.push(make_entry(&file, project_folder, &contract_module, 0));
+        entries.push(make_entry(&file, project_folder, &contract_module, 0u64));
         added.insert(file);
     }
 
@@ -207,7 +207,12 @@ fn module_path(project_folder: &Path, folder: &Path) -> String {
         .replace('\\', "/")
 }
 
-fn make_entry(file: &Path, project_folder: &Path, module: &str, depth: usize) -> SourceFileEntry {
+fn make_entry(
+    file: &Path,
+    project_folder: &Path,
+    module: &str,
+    depth: DependencyDepth,
+) -> SourceFileEntry {
     let rel = pathdiff::diff_paths(file, project_folder).unwrap();
     let path_str = rel.to_string_lossy().replace('\\', "/");
     let content = BASE64.encode(fs::read(file).unwrap());

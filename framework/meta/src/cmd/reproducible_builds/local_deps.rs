@@ -16,6 +16,8 @@ use std::{
 
 pub const LOCAL_DEPS_FILE_NAME: &str = "local_deps.txt";
 
+pub type DependencyDepth = u64;
+
 #[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct LocalDeps {
@@ -28,11 +30,11 @@ pub struct LocalDeps {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct LocalDep {
     pub path: String,
-    pub depth: usize,
+    pub depth: DependencyDepth,
 }
 
 impl LocalDep {
-    fn new(path: &Path, depth: usize) -> Self {
+    fn new(path: &Path, depth: DependencyDepth) -> Self {
         LocalDep {
             path: path.to_string_lossy().to_string(),
             depth,
@@ -110,7 +112,7 @@ pub fn expand_deps(
             let parent_depth = if let Some(parent_dep) = dep_map.get(&parent) {
                 parent_dep.depth
             } else {
-                0
+                0u64
             };
             let child_depth = parent_depth + 1;
             if let Some(local_dep) = dep_map.get_mut(&full_path) {
