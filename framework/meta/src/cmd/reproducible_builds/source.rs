@@ -9,6 +9,7 @@ use std::{
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 
 use crate::cli::PackArgs;
+use crate::folder_structure::RelevantDirectories;
 
 use super::local_deps::compute_local_deps;
 
@@ -91,8 +92,8 @@ pub fn source_pack(args: &PackArgs) {
         Path::new(".").canonicalize().unwrap()
     };
 
-    let contract_folders = find_contract_folders(&project_folder);
-    if contract_folders.is_empty() {
+    let dirs = RelevantDirectories::find_all(&project_folder, &["target".to_string()]);
+    if dirs.iter_contract_crates().count() == 0 {
         println!(
             "No contracts found (no multiversx.json) under: {}",
             project_folder.display()
@@ -100,32 +101,8 @@ pub fn source_pack(args: &PackArgs) {
         return;
     }
 
-    for contract_folder in &contract_folders {
-        source_pack_contract(&project_folder, contract_folder, args.contract.as_deref());
-    }
-}
-
-/// Discovers all contract folders by recursively scanning for `multiversx.json`,
-/// mirroring Python's `get_contracts_folders`.
-pub(crate) fn find_contract_folders(project_folder: &Path) -> Vec<PathBuf> {
-    let mut result = Vec::new();
-    find_contract_folders_recursive(project_folder, &mut result);
-    result.sort();
-    result
-}
-
-fn find_contract_folders_recursive(current: &Path, result: &mut Vec<PathBuf>) {
-    if current.join("multiversx.json").is_file() {
-        result.push(current.to_path_buf());
-        return; // don't recurse into nested contracts
-    }
-    if let Ok(read_dir) = fs::read_dir(current) {
-        for entry in read_dir.flatten() {
-            let path = entry.path();
-            if path.is_dir() && path.file_name().map(|n| n != "target").unwrap_or(true) {
-                find_contract_folders_recursive(&path, result);
-            }
-        }
+    for dir in dirs.iter_contract_crates() {
+        source_pack_contract(&project_folder, &dir.path, args.contract.as_deref());
     }
 }
 

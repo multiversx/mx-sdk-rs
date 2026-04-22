@@ -1,6 +1,7 @@
 use crate::version::FrameworkVersion;
 use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, DependencyReference};
 use std::{
+    collections::HashMap,
     fs::{self, DirEntry},
     path::{Path, PathBuf},
 };
@@ -137,6 +138,52 @@ impl RelevantDirectories {
                 }
                 dir.upgrade_in_progress = None;
             }
+        }
+    }
+
+    /// Returns a map of contract package name → list of paths for names that appear more than once.
+    pub fn find_duplicate_contract_names(&self) -> HashMap<String, Vec<PathBuf>> {
+        let mut seen: HashMap<String, Vec<PathBuf>> = HashMap::new();
+        for dir in self.iter_contract_crates() {
+            if let Some(cargo_toml) = load_cargo_toml_contents(&dir.path) {
+                seen.entry(cargo_toml.package_name())
+                    .or_default()
+                    .push(dir.path.clone());
+            }
+        }
+        seen.retain(|_, paths| paths.len() > 1);
+        seen
+    }
+
+    /// Prints a warning to stderr for each contract package name that appears in more than one crate.
+    pub fn warn_duplicate_contract_names(&self) {
+        let duplicates = self.find_duplicate_contract_names();
+        if !duplicates.is_empty() {
+            let mut names: Vec<_> = duplicates.keys().collect();
+            names.sort();
+            for name in &names {
+                eprintln!("Warning: duplicate contract name '{name}' found in:");
+                for path in &duplicates[*name] {
+                    eprintln!("  - {}", path.display());
+                }
+            }
+        }
+    }
+
+    /// Panics if any two contract crates share the same package name.
+    pub fn ensure_distinct_contract_names(&self) {
+        let duplicates = self.find_duplicate_contract_names();
+        if !duplicates.is_empty() {
+            let mut msg = String::from("Duplicate contract names found:");
+            let mut names: Vec<_> = duplicates.keys().collect();
+            names.sort();
+            for name in names {
+                msg.push_str(&format!("\n  {name}:"));
+                for path in &duplicates[name] {
+                    msg.push_str(&format!("\n    - {}", path.display()));
+                }
+            }
+            panic!("{msg}");
         }
     }
 }
