@@ -4,7 +4,6 @@ mod check_wasmer_dependencies;
 pub mod code_report;
 pub mod info;
 pub mod install;
-pub mod local_deps;
 pub mod print_util;
 pub mod reproducible_builds;
 pub mod retrieve_address;

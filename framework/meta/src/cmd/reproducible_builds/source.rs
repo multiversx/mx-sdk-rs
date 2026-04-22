@@ -1,16 +1,16 @@
+use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
+use serde::Serialize;
 use std::{
     collections::HashSet,
     fs,
     path::{Path, PathBuf},
 };
 
-use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
-use serde::Serialize;
-
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 
 use crate::cli::PackArgs;
-use crate::cmd::local_deps::compute_local_deps;
+
+use super::local_deps::compute_local_deps;
 
 const SCHEMA_VERSION: &str = "2.0.0";
 const SOURCE_JSON_EXTENSION: &str = ".source.json";
