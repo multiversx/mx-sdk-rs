@@ -7,8 +7,8 @@ use multiversx_sc_meta_lib::{
 };
 use semver::Version;
 
-use crate::{cli::AllArgs, folder_structure::RelevantDirectory};
-use std::{path::Path, process::Command};
+use crate::{cli::AllArgs, cmd::all::ContractMetaCall, folder_structure::RelevantDirectory};
+use std::path::Path;
 
 fn should_perform_rustc_version_check(args: &AllArgs) -> bool {
     matches!(args.command, ContractCliAction::Build(_))
@@ -19,18 +19,8 @@ pub fn verify_rustc_version(contract_crate: &RelevantDirectory, args: &AllArgs) 
         return;
     }
 
-    let abi_args = args.to_cargo_abi_for_build();
-
-    let meta_path = contract_crate.meta_path();
-    let exit_status = Command::new("cargo")
-        .current_dir(&meta_path)
-        .args(abi_args)
-        .spawn()
-        .expect("failed to spawn cargo run process in meta crate")
-        .wait()
-        .expect("cargo run process in meta crate was not running");
-
-    assert!(exit_status.success(), "contract meta process failed");
+    ContractMetaCall::new(ContractCliAction::Abi, &args.meta_lib_args)
+        .call_for_contract(contract_crate);
 
     let output_path = contract_crate.output_path();
 

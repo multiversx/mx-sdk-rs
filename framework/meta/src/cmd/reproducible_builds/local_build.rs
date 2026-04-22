@@ -2,13 +2,14 @@ use std::{
     collections::HashMap,
     fs,
     path::{Path, PathBuf},
-    process::Command,
 };
 
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
+use multiversx_sc_meta_lib::cli::{BuildArgs, ContractCliAction};
 
-use crate::cli::LocalBuildArgs;
-use crate::folder_structure::RelevantDirectories;
+use crate::cli::{AllArgs, LocalBuildArgs, MetaLibArgs};
+use crate::cmd::all::call_contract_meta;
+use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::source::source_pack_contract;
 
@@ -64,6 +65,21 @@ pub fn local_build(args: &LocalBuildArgs) {
     // 3. Snapshot Cargo.lock files
     let locks_before = snapshot_cargo_locks(&build_root);
 
+    let target_dir_str = cargo_target_dir.to_string_lossy().into_owned();
+    let all_args = AllArgs {
+        command: ContractCliAction::Build(BuildArgs {
+            locked: true,
+            wasm_opt: !args.no_wasm_opt,
+            target_dir_wasm: Some(target_dir_str.clone()),
+            ..Default::default()
+        }),
+        meta_lib_args: MetaLibArgs {
+            target_dir_meta: Some(target_dir_str),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
     // 4. Build each contract
     for dir in dirs.iter_contract_crates() {
         let cargo_toml = CargoTomlContents::load_from_file(dir.path.join("Cargo.toml"));
@@ -87,7 +103,11 @@ pub fn local_build(args: &LocalBuildArgs) {
         clean_contract(&build_contract_folder, true);
 
         // b. Build
-        run_sc_meta_build(&build_contract_folder, &cargo_target_dir, args.no_wasm_opt);
+        let build_dir = RelevantDirectory {
+            path: build_contract_folder.clone(),
+            ..dir.clone()
+        };
+        call_contract_meta(&build_dir, &all_args);
 
         // c. Pack source into build_contract_folder/output/
         source_pack_contract(
@@ -178,30 +198,6 @@ fn clean_contract(contract_folder: &Path, clean_output: bool) {
     let _ = fs::remove_dir_all(contract_folder.join("meta").join("target"));
     if clean_output {
         let _ = fs::remove_dir_all(contract_folder.join("output"));
-    }
-}
-
-/// Runs `sc-meta all build` in `contract_folder`.
-fn run_sc_meta_build(contract_folder: &Path, cargo_target_dir: &Path, no_wasm_opt: bool) {
-    let mut cmd = Command::new("sc-meta");
-    cmd.current_dir(contract_folder);
-    cmd.args(["all", "build"]);
-    cmd.arg("--target-dir").arg(cargo_target_dir);
-    cmd.arg("--locked");
-    if no_wasm_opt {
-        cmd.arg("--no-wasm-opt");
-    }
-    // Reduces memory usage during git-based dependency fetches (mirrors Python builder).
-    cmd.env("CARGO_NET_GIT_FETCH_WITH_CLI", "true");
-
-    let status = cmd
-        .status()
-        .expect("failed to run sc-meta; is it installed?");
-    if !status.success() {
-        panic!(
-            "Build failed for contract at: {}",
-            contract_folder.display()
-        );
     }
 }
 

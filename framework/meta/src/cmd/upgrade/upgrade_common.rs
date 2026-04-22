@@ -1,13 +1,17 @@
 use super::{upgrade_print::*, upgrade_settings::UpgradeSettings};
 use crate::{
-    cmd::all::call_contract_meta,
+    cli::MetaLibArgs,
+    cmd::all::ContractMetaCall,
     folder_structure::{
         CARGO_TOML_FILE_NAME, DirectoryType, FRAMEWORK_CRATE_NAMES, RelevantDirectory,
     },
     version::FrameworkVersion,
 };
-use multiversx_sc_meta_lib::cargo_toml::{
-    CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES, CargoTomlContents, VersionReq,
+use multiversx_sc_meta_lib::{
+    cargo_toml::{
+        CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES, CargoTomlContents, VersionReq,
+    },
+    cli::ContractCliAction,
 };
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
 use std::{
@@ -194,14 +198,13 @@ fn change_version_string(
     );
 }
 
-pub fn re_generate_wasm_crate(dir: &RelevantDirectory) {
-    if dir.dir_type != DirectoryType::Contract {
+pub fn re_generate_wasm_crate(contract_crate: &RelevantDirectory) {
+    if contract_crate.dir_type != DirectoryType::Contract {
         return;
     }
-    call_contract_meta(
-        &dir.path,
-        &["abi".to_string(), "--no-abi-git-version".to_string()],
-    );
+
+    ContractMetaCall::new(ContractCliAction::Abi, &MetaLibArgs::default())
+        .call_for_contract(contract_crate);
 }
 
 pub fn cargo_check(dir: &RelevantDirectory, settings: &UpgradeSettings) {

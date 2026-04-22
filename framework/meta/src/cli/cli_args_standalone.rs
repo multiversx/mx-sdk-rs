@@ -257,21 +257,7 @@ pub struct ConvertArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct AllArgs {
-    #[command(subcommand)]
-    pub command: ContractCliAction,
-
-    /// Target directory where to call all contract meta crates.
-    /// Will be current directory if not specified.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true)]
-    pub path: Option<String>,
-
-    /// Ignore all directories with these names.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true, default_value = "target")]
-    pub ignore: Vec<String>,
-
+pub struct MetaLibArgs {
     #[arg(
         long = "no-abi-git-version",
         help = "Skips loading the Git version into the ABI",
@@ -292,11 +278,31 @@ pub struct AllArgs {
     pub target_dir_all: Option<String>,
 }
 
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AllArgs {
+    #[command(subcommand)]
+    pub command: ContractCliAction,
+
+    /// Target directory where to call all contract meta crates.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    #[command(flatten)]
+    pub meta_lib_args: MetaLibArgs,
+}
+
 impl AllArgs {
     pub fn target_dir_all_override(&self) -> Self {
         let mut result = self.clone();
-        if let Some(target_dir_all) = &self.target_dir_all {
-            result.target_dir_meta = Some(target_dir_all.clone());
+        if let Some(target_dir_all) = &self.meta_lib_args.target_dir_all {
+            result.meta_lib_args.target_dir_meta = Some(target_dir_all.clone());
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
@@ -311,37 +317,6 @@ impl AllArgs {
             }
         }
         result
-    }
-
-    pub fn to_cargo_run_args(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.append(&mut processed.command.to_raw());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
-    }
-
-    /// Produces the arguments for an abi call corresponding to a build.
-    ///
-    /// Used to get the rustc and framework versions configured for a build.
-    pub fn to_cargo_abi_for_build(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.push("abi".to_string());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
     }
 }
 
