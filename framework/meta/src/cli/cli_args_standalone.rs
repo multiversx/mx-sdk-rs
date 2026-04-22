@@ -91,10 +91,7 @@ pub enum StandaloneCliAction {
     )]
     Source(SourceArgs),
 
-    #[command(
-        name = "rb",
-        about = "Reproducible build operations."
-    )]
+    #[command(name = "rb", about = "Reproducible build operations.")]
     Rb(RbArgs),
 
     #[command(

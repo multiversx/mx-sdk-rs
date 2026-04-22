@@ -8,7 +8,8 @@ use std::{
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 
 use crate::cli::LocalBuildArgs;
-use crate::cmd::source::{find_contract_folders, source_pack_contract};
+
+use super::source::{find_contract_folders, source_pack_contract};
 
 /// Mirrors the Python `build_project` pipeline, but runs locally instead of inside Docker.
 ///
@@ -31,11 +32,7 @@ pub fn local_build(args: &LocalBuildArgs) {
         Path::new(&args.output).canonicalize().unwrap()
     };
 
-    let build_root = PathBuf::from(
-        args.build_root
-            .as_deref()
-            .unwrap_or("/tmp/sc-build"),
-    );
+    let build_root = PathBuf::from(args.build_root.as_deref().unwrap_or("/tmp/sc-build"));
 
     let cargo_target_dir = {
         let p = args.target_dir.as_deref().unwrap_or("/tmp/sc-target");
@@ -92,7 +89,11 @@ pub fn local_build(args: &LocalBuildArgs) {
         run_sc_meta_build(&build_contract_folder, &cargo_target_dir, args.no_wasm_opt);
 
         // c. Pack source into build_contract_folder/output/
-        source_pack_contract(&build_root, &build_contract_folder, args.contract.as_deref());
+        source_pack_contract(
+            &build_root,
+            &build_contract_folder,
+            args.contract.as_deref(),
+        );
 
         // d. Clean, keep output/
         clean_contract(&build_contract_folder, false);
@@ -150,8 +151,9 @@ fn copy_dir_skip_target(src: &Path, dst: &Path) {
         if path.is_symlink() {
             let link_target = fs::read_link(&path).unwrap();
             #[cfg(unix)]
-            std::os::unix::fs::symlink(&link_target, &dest)
-                .unwrap_or_else(|_| eprintln!("Warning: could not create symlink: {}", dest.display()));
+            std::os::unix::fs::symlink(&link_target, &dest).unwrap_or_else(|_| {
+                eprintln!("Warning: could not create symlink: {}", dest.display())
+            });
         } else if path.is_dir() {
             copy_dir_skip_target(&path, &dest);
         } else {
@@ -245,10 +247,7 @@ fn check_cargo_locks_unchanged(
     for (path, before_contents) in before {
         match after.get(path) {
             Some(after_contents) if before_contents != after_contents => {
-                eprintln!(
-                    "Error: Cargo.lock changed during build: {}",
-                    path.display()
-                );
+                eprintln!("Error: Cargo.lock changed during build: {}", path.display());
                 any_changed = true;
             }
             None => {

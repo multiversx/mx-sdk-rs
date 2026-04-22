@@ -174,7 +174,12 @@ pub(crate) fn source_pack_contract(
     //    This is a no-op when project_folder == contract_folder.
     for file in collect_source_files(project_folder) {
         if !added.contains(&file) {
-            entries.push(make_entry(&file, project_folder, &contract_module, SYS_MAXSIZE));
+            entries.push(make_entry(
+                &file,
+                project_folder,
+                &contract_module,
+                SYS_MAXSIZE,
+            ));
             added.insert(file);
         }
     }
@@ -203,8 +208,9 @@ pub(crate) fn source_pack_contract(
 
     let output_dir = contract_folder.join("output");
     fs::create_dir_all(&output_dir).unwrap();
-    let output_path =
-        output_dir.join(format!("{contract_name}-{contract_version}{SOURCE_JSON_EXTENSION}"));
+    let output_path = output_dir.join(format!(
+        "{contract_name}-{contract_version}{SOURCE_JSON_EXTENSION}"
+    ));
 
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut buf = Vec::new();

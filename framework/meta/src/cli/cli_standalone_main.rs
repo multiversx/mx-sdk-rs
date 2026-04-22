@@ -10,9 +10,8 @@ use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
 use crate::cmd::local_deps::local_deps;
-use crate::cmd::reproduce::local_build;
+use crate::cmd::reproducible_builds::{local_build, source_pack};
 use crate::cmd::scen_test_gen::test_gen_tool;
-use crate::cmd::source::source_pack;
 use crate::cmd::template::{create_contract, print_template_names};
 use crate::cmd::test::test;
 use crate::cmd::test_coverage::test_coverage;
@@ -62,17 +61,13 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::LocalDeps(args)) => {
             local_deps(args);
         }
-        Some(StandaloneCliAction::Source(source_args)) => {
-            match &source_args.command {
-                SourceCliAction::LocalDeps(args) => local_deps(args),
-                SourceCliAction::Pack(args) => source_pack(args),
-            }
-        }
-        Some(StandaloneCliAction::Rb(rb_args)) => {
-            match &rb_args.command {
-                RbCliAction::LocalBuild(args) => local_build(args),
-            }
-        }
+        Some(StandaloneCliAction::Source(source_args)) => match &source_args.command {
+            SourceCliAction::LocalDeps(args) => local_deps(args),
+            SourceCliAction::Pack(args) => source_pack(args),
+        },
+        Some(StandaloneCliAction::Rb(rb_args)) => match &rb_args.command {
+            RbCliAction::LocalBuild(args) => local_build(args),
+        },
         Some(StandaloneCliAction::Wallet(args)) => {
             wallet(args);
         }

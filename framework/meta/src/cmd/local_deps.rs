@@ -61,8 +61,7 @@ pub fn compute_local_deps(contract_dir: &Path) -> LocalDeps {
     LocalDeps {
         root: contract_dir.clone(),
         contract_path: contract_dir,
-        common_dependency_path: common_dependency_path
-            .map(|p| p.to_string_lossy().to_string()),
+        common_dependency_path: common_dependency_path.map(|p| p.to_string_lossy().to_string()),
         dependencies: dep_map.values().cloned().collect(),
     }
 }
