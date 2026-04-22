@@ -6,6 +6,7 @@ use std::{
 
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use multiversx_sc_meta_lib::cli::{BuildArgs, ContractCliAction};
+use multiversx_sc_meta_lib::tools::generate_codehashes_in_output;
 
 use crate::cli::{AllArgs, LocalBuildArgs, MetaLibArgs};
 use crate::cmd::all::call_contract_meta;
@@ -108,6 +109,9 @@ pub fn local_build(args: &LocalBuildArgs) {
             ..dir.clone()
         };
         call_contract_meta(&build_dir, &all_args);
+
+        // b2. Generate codehash for each .wasm in output/
+        generate_codehashes_in_output(&build_contract_folder.join("output"));
 
         // c. Pack source into build_contract_folder/output/
         source_pack_contract(

@@ -345,10 +345,7 @@ impl ContractVariant {
 
         print_generate_codehash(&output_codehash_path.to_string_lossy());
 
-        let wasm_bytes = fs::read(&output_wasm_path).expect("failed to read compiled contract");
-        let hash = multiversx_sc::chain_core::std::code_hash(&wasm_bytes);
-        let hex_hash = hex::encode(hash);
-        fs::write(&output_codehash_path, hex_hash).expect("failed to write codehash file");
+        tools::generate_codehash(&output_wasm_path, &output_codehash_path);
     }
 }
 
