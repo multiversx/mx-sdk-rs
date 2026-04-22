@@ -86,13 +86,11 @@ pub enum StandaloneCliAction {
     LocalDeps(LocalDepsArgs),
 
     #[command(
-        name = "source",
-        about = "Source code packaging and local dependency analysis."
+        name = "reproducible-build",
+        alias = "rb",
+        about = "Reproducible build operations."
     )]
-    Source(SourceArgs),
-
-    #[command(name = "rb", about = "Reproducible build operations.")]
-    Rb(RbArgs),
+    ReproducibleBuild(ReproducibleBuildArgs),
 
     #[command(
         name = "wallet",
@@ -369,27 +367,6 @@ pub struct UpgradeArgs {
     pub no_check: bool,
 }
 
-#[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct SourceArgs {
-    #[command(subcommand)]
-    pub command: SourceCliAction,
-}
-
-#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
-pub enum SourceCliAction {
-    #[command(
-        name = "local-deps",
-        about = "Generates a report on the local dependencies of the contract."
-    )]
-    LocalDeps(LocalDepsArgs),
-
-    #[command(
-        name = "pack",
-        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
-    )]
-    Pack(PackArgs),
-}
-
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct PackArgs {
     /// Project folder (workspace root or single contract folder).
@@ -404,18 +381,30 @@ pub struct PackArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct RbArgs {
+pub struct ReproducibleBuildArgs {
     #[command(subcommand)]
-    pub command: RbCliAction,
+    pub command: ReproducibleBuildCliAction,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
-pub enum RbCliAction {
+pub enum ReproducibleBuildCliAction {
+    #[command(
+        name = "source-pack",
+        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
+    )]
+    SourcePack(PackArgs),
+
     #[command(
         name = "local-build",
         about = "Builds all contracts locally, mirroring the Docker reproducible build pipeline."
     )]
     LocalBuild(LocalBuildArgs),
+
+    #[command(
+        name = "local-deps",
+        about = "Generates a report on the local dependencies of the contract."
+    )]
+    LocalDeps(LocalDepsArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
