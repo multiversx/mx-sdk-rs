@@ -9,7 +9,7 @@ use crate::cmd::all::call_all_meta;
 use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
-use crate::cmd::reproducible_builds::{local_build, local_deps, source_pack};
+use crate::cmd::reproducible_builds::{docker_build, local_build, local_deps, source_pack};
 use crate::cmd::scen_test_gen::test_gen_tool;
 use crate::cmd::template::{create_contract, print_template_names};
 use crate::cmd::test::test;
@@ -63,6 +63,7 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::ReproducibleBuild(rb_args)) => match &rb_args.command {
             ReproducibleBuildCliAction::SourcePack(args) => source_pack(args),
             ReproducibleBuildCliAction::LocalBuild(args) => local_build(args),
+            ReproducibleBuildCliAction::DockerBuild(args) => docker_build(args),
             ReproducibleBuildCliAction::LocalDeps(args) => local_deps(args),
         },
         Some(StandaloneCliAction::Wallet(args)) => {

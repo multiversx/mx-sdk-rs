@@ -376,6 +376,12 @@ pub enum ReproducibleBuildCliAction {
     LocalBuild(LocalBuildArgs),
 
     #[command(
+        name = "docker-build",
+        about = "Runs the reproducible build inside a pinned Docker container."
+    )]
+    DockerBuild(DockerBuildArgs),
+
+    #[command(
         name = "local-deps",
         about = "Generates a report on the local dependencies of the contract."
     )]
@@ -412,6 +418,64 @@ pub struct LocalBuildArgs {
     /// Do not optimize wasm files after the build.
     #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
     pub no_wasm_opt: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DockerBuildArgs {
+    /// Pinned Docker image tag to run the build in.
+    /// e.g. `multiversx/sc-meta-reproducible-build:0.65.1`
+    #[arg(long = "docker-image", verbatim_doc_comment)]
+    pub docker_image: String,
+
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub project: Option<String>,
+
+    /// Output folder where build artifacts will be placed.
+    /// Defaults to `<project>/output-docker/`.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+
+    /// Only build the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are built.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
+
+    /// Do not optimize wasm files after the build.
+    #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
+    pub no_wasm_opt: bool,
+
+    /// Override the build root path inside the container.
+    /// Defaults to the container's built-in default (/tmp/sc-build).
+    #[arg(long = "build-root", verbatim_doc_comment)]
+    pub build_root: Option<String>,
+
+    /// Do not pass `--interactive` to `docker run`.
+    /// Required in non-interactive environments such as CI.
+    #[arg(
+        long = "no-docker-interactive",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub no_docker_interactive: bool,
+
+    /// Do not pass `--tty` to `docker run`.
+    /// Required in non-interactive environments such as CI.
+    #[arg(long = "no-docker-tty", default_value = "false", verbatim_doc_comment)]
+    pub no_docker_tty: bool,
+
+    /// Skip forcing `--platform linux/amd64` on the Docker run.
+    #[arg(
+        long = "no-default-platform",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub no_default_platform: bool,
+
+    /// Set CARGO_TERM_VERBOSE=true inside the container.
+    #[arg(long = "cargo-verbose", default_value = "false", verbatim_doc_comment)]
+    pub cargo_verbose: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

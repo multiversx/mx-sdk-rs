@@ -1,0 +1,69 @@
+FROM ubuntu:22.04
+
+# Toolchain versions — bump these together when upgrading.
+ARG VERSION_RUST="1.93.0"
+ARG VERSION_SC_META="0.65.1"
+ARG VERSION_WASM_OPT="0.116.1"
+ARG TARGETPLATFORM
+
+# Install system dependencies
+RUN apt-get update --fix-missing && apt-get install -y \
+    wget \
+    build-essential \
+    git \
+    pkg-config \
+    libssl-dev 
+
+# Install Rust
+RUN wget -O rustup.sh https://sh.rustup.rs && \
+    chmod +x rustup.sh && \
+    CARGO_HOME=/rust RUSTUP_HOME=/rust ./rustup.sh \
+        --verbose \
+        --default-toolchain ${VERSION_RUST} \
+        --profile minimal \
+        -y && \
+    rm rustup.sh && \
+    chmod -R 777 /rust && \
+    rm -rf /rust/registry
+
+# Install sc-meta from crates.io
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
+    cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
+    rm -rf /rust/registry
+
+# Install wasm32 target
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
+    sc-meta install wasm32
+
+# Install wasm-opt
+RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
+    cargo install wasm-opt --version ${VERSION_WASM_OPT} --locked && \
+    rm -rf /rust/registry
+
+ENV PATH="/rust/bin:${PATH}"
+ENV CARGO_HOME="/rust"
+ENV RUSTUP_HOME="/rust"
+
+# Exposed to sc-meta at runtime for embedding into .source.json build metadata.
+ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
+ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
+ENV BUILD_METADATA_VERSION_WASM_OPT=${VERSION_WASM_OPT}
+ENV BUILD_METADATA_TARGETPLATFORM=${TARGETPLATFORM}
+
+# /project  — mounted read-only by the caller (the contract source tree)
+# /output   — mounted read-write by the caller (build artifacts land here)
+# /rust/cargo-target-dir — optionally mounted for caching between runs
+
+# Additional arguments forwarded at "docker run" time:
+#   --project /project        (required; set automatically by docker-build)
+#   --contract <name>         (optional)
+#   --no-wasm-opt             (optional)
+#   --build-root <path>       (optional; defaults to /tmp/sc-build inside the container)
+ENTRYPOINT ["sc-meta", "reproducible-build", "local-build", \
+    "--output", "/output", \
+    "--target-dir", "/rust/cargo-target-dir"]
+
+LABEL frozen="yes"
+LABEL rust=${VERSION_RUST}
+LABEL sc_meta=${VERSION_SC_META}
+LABEL wasm_opt=${VERSION_WASM_OPT}
