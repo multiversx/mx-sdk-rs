@@ -3277,6 +3277,7 @@ dependencies = [
  "convert_case 0.11.0",
  "copy_dir",
  "hex",
+ "indexmap",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",

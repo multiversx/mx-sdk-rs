@@ -193,8 +193,9 @@ fn populate_directories(path: &Path, ignore: &[String], result: &mut Vec<Relevan
 
     if !is_contract && path.is_dir() {
         let read_dir = fs::read_dir(path).expect("error reading directory");
-        for child_result in read_dir {
-            let child = child_result.unwrap();
+        let mut children: Vec<_> = read_dir.flatten().collect();
+        children.sort_by_key(|e| e.file_name());
+        for child in children {
             if can_continue_recursion(&child, ignore) {
                 populate_directories(child.path().as_path(), ignore, result);
             }

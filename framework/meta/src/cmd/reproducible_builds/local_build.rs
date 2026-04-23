@@ -12,6 +12,7 @@ use crate::cli::{AllArgs, LocalBuildArgs, MetaLibArgs};
 use crate::cmd::all::call_contract_meta;
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
+use super::build_outcome::{ArtifactsBuildMetadata, ArtifactsBuildOptions, BuildOutcome};
 use super::source::source_pack_contract;
 
 /// Mirrors the Python `build_project` pipeline, but runs locally instead of inside Docker.
@@ -81,6 +82,16 @@ pub fn local_build(args: &LocalBuildArgs) {
         ..Default::default()
     };
 
+    let mut outcome = BuildOutcome::new(
+        ArtifactsBuildMetadata::detect(),
+        ArtifactsBuildOptions {
+            package_whole_project_src: true,
+            specific_contract: args.contract.clone(),
+            no_wasm_opt: args.no_wasm_opt,
+            build_root_folder: build_root.to_string_lossy().into_owned(),
+        },
+    );
+
     // 4. Build each contract
     for dir in dirs.iter_contract_crates() {
         let cargo_toml = CargoTomlContents::load_from_file(dir.path.join("Cargo.toml"));
@@ -126,12 +137,18 @@ pub fn local_build(args: &LocalBuildArgs) {
         // e. Copy output/ to parent output subfolder
         copy_dir_contents(&build_contract_folder.join("output"), &output_subfolder);
 
+        // f. Gather artifacts for artifacts.json
+        outcome.gather(&contract_name, &output_subfolder);
+
         println!("Output: {}", output_subfolder.display());
     }
 
     // 5. Verify Cargo.lock unchanged
     let locks_after = snapshot_cargo_locks(&build_root);
     check_cargo_locks_unchanged(&locks_before, &locks_after);
+
+    // 6. Write artifacts.json to the output folder root
+    outcome.save(&output_folder);
 }
 
 fn resolve_path(path: Option<&str>) -> PathBuf {

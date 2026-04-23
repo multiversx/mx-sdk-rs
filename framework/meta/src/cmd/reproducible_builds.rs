@@ -1,3 +1,4 @@
+mod build_outcome;
 mod docker_build;
 mod local_build;
 pub mod local_deps;
