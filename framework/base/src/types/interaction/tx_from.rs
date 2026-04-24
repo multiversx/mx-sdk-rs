@@ -12,7 +12,7 @@ where
 
 /// Marks the non-empty sender of a transaction.
 ///
-/// Enforces the reciipent to be explicitly specified.
+/// Enforces the recipient to be explicitly specified.
 #[diagnostic::on_unimplemented(
     message = "Type `{Self}` cannot be used as a sender value (does not implement `TxFromSpecified<{Env}>`)",
     label = "sender needs to be explicit",
