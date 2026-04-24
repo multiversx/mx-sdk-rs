@@ -386,6 +386,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Generates a report on the local dependencies of the contract."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "source-unpack",
+        about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
+    )]
+    SourceUnpack(SourceUnpackArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -422,6 +428,25 @@ pub struct LocalBuildArgs {
     /// If the output folder is not empty, wipe it before building instead of aborting.
     #[arg(long, default_value = "false", verbatim_doc_comment)]
     pub force: bool,
+
+    /// Path to a `.source.json` file produced by a previous build.
+    /// When set, the source is unpacked to /tmp/unwrapped/ and the build
+    /// proceeds from there, reproducing the original layout exactly.
+    /// Mutually exclusive with --path.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct SourceUnpackArgs {
+    /// Path to the `.source.json` file to unpack.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: String,
+
+    /// Folder where the source files will be extracted.
+    /// Defaults to /tmp/unwrapped if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]

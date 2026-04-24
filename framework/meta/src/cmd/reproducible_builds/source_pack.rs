@@ -12,12 +12,10 @@ use crate::cli::PackArgs;
 use crate::folder_structure::RelevantDirectories;
 
 use super::local_deps::{DependencyDepth, compute_local_deps};
-
-const SCHEMA_VERSION: &str = "2.0.0";
-const SOURCE_JSON_EXTENSION: &str = ".source.json";
-
-/// Sentinel depth for project-level files (mirrors Python's `sys.maxsize`).
-const SYS_MAXSIZE: DependencyDepth = i64::MAX as DependencyDepth;
+use super::source_json_model::{
+    PackedSource, SCHEMA_VERSION, SOURCE_JSON_EXTENSION, SYS_MAXSIZE, SourceBuildMetadata,
+    SourceBuildOptions, SourceFileEntry, SourceMetadata,
+};
 
 /// File names (regardless of extension) that are included as source files.
 const NAMED_SOURCE_FILES: &[&str] = &[
@@ -27,55 +25,6 @@ const NAMED_SOURCE_FILES: &[&str] = &[
     "sc-config.toml",
     "multiversx.json",
 ];
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SourceFileEntry {
-    path: String,
-    content: String,
-    module: String,
-    dependency_depth: DependencyDepth,
-    is_test_file: bool,
-}
-
-#[derive(Default, Serialize)]
-#[serde(rename_all = "camelCase")]
-struct BuildMetadata {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    version_rust: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    version_sc_tool: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    version_wasm_opt: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    target_platform: Option<String>,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct BuildOptions {
-    /// Kept for compatibility with the Python builder.
-    package_whole_project_src: bool,
-    specific_contract: Option<String>,
-    build_root_folder: String,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SourceMetadata {
-    contract_name: String,
-    contract_version: String,
-    build_metadata: BuildMetadata,
-    build_options: BuildOptions,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct PackedSource {
-    schema_version: String,
-    metadata: SourceMetadata,
-    entries: Vec<SourceFileEntry>,
-}
 
 /// Packages the source code for all contracts found in `project_folder`.
 ///
@@ -173,8 +122,8 @@ pub(crate) fn source_pack_contract(
         metadata: SourceMetadata {
             contract_name: contract_name.clone(),
             contract_version: contract_version.clone(),
-            build_metadata: BuildMetadata::default(),
-            build_options: BuildOptions {
+            build_metadata: SourceBuildMetadata::default(),
+            build_options: SourceBuildOptions {
                 package_whole_project_src: true,
                 specific_contract: specific_contract.map(|s| s.to_string()),
                 build_root_folder: project_folder.to_string_lossy().into_owned(),

@@ -13,7 +13,8 @@ use crate::cmd::all::call_contract_meta;
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::build_outcome::{ArtifactsBuildMetadata, ArtifactsBuildOptions, BuildOutcome};
-use super::source::source_pack_contract;
+use super::source_pack::source_pack_contract;
+use super::source_unpack::unpack_packaged_src;
 
 /// Mirrors the Python `build_project` pipeline, but runs locally instead of inside Docker.
 ///
@@ -29,7 +30,21 @@ use super::source::source_pack_contract;
 ///    e. Copy `output/` to `--output/<contract_name>/`.
 /// 5. Verify no `Cargo.lock` file changed (enforces `--locked`).
 pub fn local_build(args: &LocalBuildArgs) {
-    let project_folder = resolve_path(args.path.as_deref());
+    if args.path.is_some() && args.packaged_src.is_some() {
+        eprintln!("Error: --path and --packaged-src are mutually exclusive.");
+        std::process::exit(1);
+    }
+
+    // If --packaged-src is set, unpack to /tmp/unwrapped/ and derive project/build-root from it.
+    let (project_folder, build_root) = if let Some(src) = args.packaged_src.as_deref() {
+        let unwrap_folder = PathBuf::from(super::source_unpack::HARDCODED_UNWRAP_FOLDER);
+        let (folder, build_root_from_json) = unpack_packaged_src(Path::new(src), &unwrap_folder);
+        (folder, PathBuf::from(build_root_from_json))
+    } else {
+        let folder = resolve_path(args.path.as_deref());
+        let root = PathBuf::from(args.build_root.as_deref().unwrap_or("/tmp/sc-build"));
+        (folder, root)
+    };
 
     let output_folder = {
         fs::create_dir_all(&args.output).unwrap();
@@ -37,8 +52,6 @@ pub fn local_build(args: &LocalBuildArgs) {
         guard_output_folder(&p, args.force);
         p
     };
-
-    let build_root = PathBuf::from(args.build_root.as_deref().unwrap_or("/tmp/sc-build"));
 
     let cargo_target_dir = {
         let p = args.target_dir.as_deref().unwrap_or("/tmp/sc-target");

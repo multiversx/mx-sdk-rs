@@ -2,9 +2,12 @@ mod build_outcome;
 mod docker_build;
 mod local_build;
 pub mod local_deps;
-mod source;
+mod source_json_model;
+mod source_pack;
+mod source_unpack;
 
 pub use docker_build::docker_build;
 pub use local_build::local_build;
 pub use local_deps::local_deps;
-pub use source::source_pack;
+pub use source_pack::source_pack;
+pub use source_unpack::source_unpack;
