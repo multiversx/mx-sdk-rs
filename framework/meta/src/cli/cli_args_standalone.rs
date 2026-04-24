@@ -418,6 +418,10 @@ pub struct LocalBuildArgs {
     /// Do not optimize wasm files after the build.
     #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
     pub no_wasm_opt: bool,
+
+    /// If the output folder is not empty, wipe it before building instead of aborting.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub force: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]

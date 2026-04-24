@@ -33,7 +33,9 @@ pub fn local_build(args: &LocalBuildArgs) {
 
     let output_folder = {
         fs::create_dir_all(&args.output).unwrap();
-        Path::new(&args.output).canonicalize().unwrap()
+        let p = Path::new(&args.output).canonicalize().unwrap();
+        guard_output_folder(&p, args.force);
+        p
     };
 
     let build_root = PathBuf::from(args.build_root.as_deref().unwrap_or("/tmp/sc-build"));
@@ -156,6 +158,29 @@ fn resolve_path(path: Option<&str>) -> PathBuf {
     Path::new(p)
         .canonicalize()
         .unwrap_or_else(|_| PathBuf::from(p))
+}
+
+/// Checks that `output_folder` is empty before starting a build.
+/// If `force` is true, wipes the folder instead of aborting.
+fn guard_output_folder(output_folder: &Path, force: bool) {
+    let is_non_empty = output_folder
+        .read_dir()
+        .map(|mut rd| rd.next().is_some())
+        .unwrap_or(false);
+    if is_non_empty {
+        if force {
+            fs::remove_dir_all(output_folder).unwrap();
+            fs::create_dir_all(output_folder).unwrap();
+        } else {
+            eprintln!(
+                "Error: output folder is not empty: {}\nUse --force to wipe it before building.",
+                output_folder.display()
+            );
+            std::process::exit(1);
+        }
+    } else {
+        println!("Output empty");
+    }
 }
 
 /// Wipes `build_root` and copies the entire `project_folder` into it.
