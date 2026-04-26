@@ -301,24 +301,46 @@ class ManagedType(Handler):
     def extract_value_from_raw_handle(
         self, context: lldb.value, raw_handle: int, map_picker: Callable
     ) -> lldb.value:
-        weak_inner = context.ptr.pointer  # object is of Rust type: ArcInner
-
-        # Check the strong count to see if the object is still alive
-        # If strong count is 0, the object has been dropped
-        strong_atomic_usize = weak_inner.strong  # object is of Rust type: Atomic<usize>
-        strong_count = int(strong_atomic_usize.v.value)
-        if strong_count == 0:
-            raise InvalidWeakPointer(raw_handle)
-
-        # Handle Weak<TxContext> by accessing the ptr field directly
-        # context is Weak<TxContext>, which contains ptr that points to the WeakInner<TxContext>
-        # The WeakInner contains a pointer to the actual TxContext data
-        # In LLDB, we access: context.ptr.pointer (NonNull<WeakInner<T>>) -> pointer.data -> TxContext
-        tx_context = weak_inner.data
-        managed_types = tx_context.managed_types.data.value
-        chosen_map = map_picker(managed_types)
-        value = map_lookup(chosen_map, raw_handle)
-        return value
+        # context is Weak<TxContext>
+        # In Rust 1.87: Weak<T> { ptr: NonNull<ArcInner<T>> }
+        # NonNull<T> { pointer: *const T }
+        # ArcInner<T> { strong: AtomicUsize, weak: AtomicUsize, data: T }
+        
+        try:
+            # Step 1: Get NonNull<ArcInner<T>> from Weak<T>
+            non_null = context.ptr
+            
+            # Step 2: Get the raw pointer from NonNull
+            # NonNull has a 'pointer' field that's a raw pointer
+            raw_ptr = non_null.pointer
+            
+            # Step 3: Dereference the pointer to get ArcInner<T>
+            # We need to explicitly dereference it for LLDB to see the fields
+            arc_inner_sb = raw_ptr.sbvalue.Dereference()
+            arc_inner = lldb.value(arc_inner_sb)
+            
+            # Step 4: Access the 'data' field from ArcInner<T>
+            # In Rust 1.87, this is always named 'data'
+            tx_context = arc_inner.data
+            
+            # Step 5: Navigate to managed_types and get the value
+            managed_types = tx_context.managed_types.data.value
+            chosen_map = map_picker(managed_types)
+            value = map_lookup(chosen_map, raw_handle)
+            return value
+        except AttributeError as e:
+            # Provide detailed error information for debugging
+            try:
+                debug_info = []
+                debug_info.append(f"Error: {e}")
+                debug_info.append(f"context type: {context.sbvalue.GetType().GetName()}")
+                if hasattr(context, 'ptr'):
+                    debug_info.append(f"context.ptr type: {context.ptr.sbvalue.GetType().GetName()}")
+                    if hasattr(context.ptr, 'pointer'):
+                        debug_info.append(f"context.ptr.pointer type: {context.ptr.pointer.sbvalue.GetType().GetName()}")
+                raise Exception(f"Unable to access Weak<TxContext> internal structure. Debug info: {'; '.join(debug_info)}")
+            except:
+                raise Exception(f"Unable to access Weak<TxContext> internal structure: {e}. This may be a Rust version compatibility issue.")
 
     @check_invalid_handle
     def summary_from_raw_handle(
