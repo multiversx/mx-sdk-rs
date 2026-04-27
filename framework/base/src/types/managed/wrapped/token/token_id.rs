@@ -137,6 +137,24 @@ impl<M: ManagedTypeApi> TokenId<M> {
         EsdtTokenIdentifier { token_id: self }
     }
 
+    /// Returns a reference to this token as an `EsdtTokenIdentifier`, or `None` if it is the native token.
+    pub fn as_esdt(&self) -> Option<&EsdtTokenIdentifier<M>> {
+        if self.is_native() {
+            None
+        } else {
+            Some(unsafe { self.as_esdt_unchecked() })
+        }
+    }
+
+    /// Converts this token into an `EsdtTokenIdentifier`, or `None` if it is the native token.
+    pub fn into_esdt(self) -> Option<EsdtTokenIdentifier<M>> {
+        if self.is_native() {
+            None
+        } else {
+            Some(unsafe { self.into_esdt_unchecked() })
+        }
+    }
+
     #[inline]
     pub fn to_boxed_bytes(&self) -> crate::types::heap::BoxedBytes {
         self.buffer.to_boxed_bytes()

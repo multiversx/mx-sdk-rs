@@ -9,8 +9,6 @@ use crate::cli::{
     InstallWasmOptArgs,
 };
 
-use self::install_scenario_go::ScenarioGoInstaller;
-
 pub async fn install(args: &InstallArgs) {
     // validated before, can unwrap directly
     let command = args.command.as_ref().unwrap();
@@ -30,9 +28,7 @@ pub async fn install(args: &InstallArgs) {
 }
 
 async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
-    ScenarioGoInstaller::new(sg_args.tag.clone())
-        .install()
-        .await;
+    install_scenario_go::install(sg_args.tag.clone()).await;
 }
 
 fn install_wasm32(_wasm32_args: &InstallWasm32Args) {

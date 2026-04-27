@@ -7,6 +7,7 @@ use std::{
 use super::RepoVersion;
 
 const ZIP_NAME: &str = "mx-sdk-rs-download.zip";
+const ZIP_MAGIC_HEADER: &[u8] = &[0x50, 0x4B, 0x03, 0x04];
 
 pub struct RepoTempDownload {
     pub version: RepoVersion,
@@ -35,19 +36,29 @@ impl RepoTempDownload {
     }
 
     async fn download_binaries(&self) -> Result<(), reqwest::Error> {
-        let response = reqwest::get(self.version.url()).await?.bytes().await?;
-        if response.len() < 10000 {
+        let url = self.version.url();
+        let response = reqwest::get(&url).await?;
+        let status = response.status();
+        let bytes = response.bytes().await?;
+        if !status.is_success() {
             panic!(
-                "Could not download artifact: {}",
-                String::from_utf8_lossy(&response)
+                "Could not download artifact from {} (HTTP {}): {}",
+                url,
+                status,
+                String::from_utf8_lossy(&bytes)
             );
+        }
+
+        // ZIP local file header magic: PK\x03\x04
+        if !bytes.starts_with(ZIP_MAGIC_HEADER) {
+            panic!("Downloaded artifact from {} is not a valid ZIP file", url);
         }
 
         let mut file = match File::create(self.zip_path()) {
             Err(why) => panic!("couldn't create {why}"),
             Ok(file) => file,
         };
-        file.write_all(&response).unwrap();
+        file.write_all(&bytes).unwrap();
         Ok(())
     }
 

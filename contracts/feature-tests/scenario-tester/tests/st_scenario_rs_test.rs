@@ -12,6 +12,12 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[ignore = "TODO: fix the error message in wasmer-experimental"]
+fn forbidden_opcodes_rs() {
+    world().run("scenarios/forbidden-opcodes.scen.json");
+}
+
+#[test]
 fn interactor_trace_rs() {
     world().run("scenarios/interactor_trace.scen.json");
 }
