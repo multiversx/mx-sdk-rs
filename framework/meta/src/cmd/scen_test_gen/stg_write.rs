@@ -28,6 +28,12 @@ fn insert_ghost_accounts_snippet(insert_ghost_accounts: bool) -> &'static str {
     }
 }
 
+fn scenario_name_to_fn_name(scenario_file_name: &str) -> String {
+    scenario_file_name
+        .replace(['/', '\\'], "_")
+        .to_case(Case::Snake)
+}
+
 pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
     let ghost = insert_ghost_accounts_snippet(insert_ghost_accounts);
     format!(
@@ -35,7 +41,7 @@ pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) 
 fn {}_rs() {{
     world(){ghost}.run(\"scenarios/{}.scen.json\");
 }}",
-        scenario_file_name.to_case(Case::Snake),
+        scenario_name_to_fn_name(scenario_file_name),
         scenario_file_name,
     )
 }
@@ -47,7 +53,7 @@ pub fn format_test_fn_go(scenario_file_name: &str, insert_ghost_accounts: bool) 
 fn {}_go() {{
     world(){ghost}.run(\"scenarios/{}.scen.json\");
 }}",
-        scenario_file_name.to_case(Case::Snake),
+        scenario_name_to_fn_name(scenario_file_name),
         scenario_file_name,
     )
 }
