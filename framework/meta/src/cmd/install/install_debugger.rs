@@ -145,27 +145,9 @@ fn configure_vscode() {
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );
 
-    let init_commands = sub_values
-        .as_object_mut()
-        .unwrap()
-        .entry("lldb.launch.preRunCommands")
-        .or_insert_with(|| serde_json::Value::Array(Vec::new()));
-    let command_script_line =
-        "command script import ".to_owned() + script_full_path.to_str().unwrap();
-
-    if let serde_json::Value::Array(array) = init_commands {
-        if let Some(pos) = array.iter().position(|v| {
-            if let serde_json::Value::String(s) = v {
-                s.contains(SCRIPT_NAME) // Replace with your substring
-            } else {
-                false
-            }
-        }) {
-            array.remove(pos); // Remove the element if the substring is found
-        }
-
-        array.push(serde_json::Value::String(command_script_line));
-    }
+    let settings_obj = sub_values.as_object_mut().unwrap();
+    configure_debug_engine(settings_obj);
+    configure_pretty_printer_init_command(settings_obj, &script_full_path);
 
     let _ = fs::write(
         path_to_settings,
@@ -173,4 +155,48 @@ fn configure_vscode() {
     );
 
     println!("debugger script installed successfully");
+}
+
+/// Sets `rust-analyzer.debug.engine` to `vadimcn.vscode-lldb` in the VS Code user settings,
+/// unless already explicitly configured.
+///
+/// This is required on macOS, where rust-analyzer defaults to `lldb-dap` (Apple's Xcode-bundled
+/// DAP adapter), which does not support CodeLLDB's `initCommands`/`preRunCommands` settings.
+/// Without this, the pretty-printer script is not loaded when using the CodeLens "Debug" button.
+///
+/// On Linux, rust-analyzer already defaults to `vadimcn.vscode-lldb`, so this is a no-op there.
+fn configure_debug_engine(settings_obj: &mut serde_json::Map<String, serde_json::Value>) {
+    settings_obj
+        .entry("rust-analyzer.debug.engine")
+        .or_insert_with(|| serde_json::Value::String("vadimcn.vscode-lldb".to_owned()));
+}
+
+/// Adds the `command script import <script>` line to `lldb.launch.preRunCommands` in the
+/// VS Code user settings, so the MultiversX LLDB pretty-printer is loaded on every debug session.
+///
+/// If a previous entry referencing the script name already exists (e.g. from a prior install
+/// or a path change), it is replaced with the current path.
+fn configure_pretty_printer_init_command(
+    settings_obj: &mut serde_json::Map<String, serde_json::Value>,
+    script_full_path: &Path,
+) {
+    let command_script_line = format!("command script import {}", script_full_path.display(),);
+
+    let init_commands = settings_obj
+        .entry("lldb.launch.preRunCommands")
+        .or_insert_with(|| serde_json::Value::Array(Vec::new()));
+
+    if let serde_json::Value::Array(array) = init_commands {
+        if let Some(pos) = array.iter().position(|v| {
+            if let serde_json::Value::String(s) = v {
+                s.contains(SCRIPT_NAME)
+            } else {
+                false
+            }
+        }) {
+            array.remove(pos);
+        }
+
+        array.push(serde_json::Value::String(command_script_line));
+    }
 }
