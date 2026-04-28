@@ -42,6 +42,10 @@ common-path = "1.0.0"
 bip39 = { version = "2.0", features = ["rand"] }
 anyhow = "1.0"
 hex = "0.4.3"
+sha2 = "0.10"
+sha3 = "0.10"
+base64 = "0.22"
+indexmap = { version = "2", features = ["serde"] }
 # warning: newer versions require Rust 1.88, hence we are not upgrading yet
 zip = { version = "7.2", features = ["deflate"], default-features = false }
 

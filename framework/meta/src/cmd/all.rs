@@ -1,14 +1,17 @@
 mod all_rustc_check;
+mod contract_meta_call;
+
+pub use contract_meta_call::ContractMetaCall;
 
 use super::{
     check_wasmer_dependencies::check_wasmer_dependencies,
-    print_util::{print_all_command, print_all_count, print_all_index},
+    print_util::{print_all_count, print_all_index},
 };
 use crate::{
     cli::AllArgs,
-    folder_structure::{RelevantDirectories, dir_pretty_print},
+    folder_structure::{RelevantDirectories, RelevantDirectory, dir_pretty_print},
 };
-use std::{path::Path, process::Command};
+use std::path::Path;
 
 pub fn call_all_meta(args: &AllArgs) {
     let path = if let Some(some_path) = &args.path {
@@ -34,27 +37,17 @@ fn perform_call_all_meta(path: &Path, args: &AllArgs) {
         return;
     }
 
+    dirs.warn_duplicate_contract_names();
+
     for (i, contract_crate) in dirs.iter_contract_crates().enumerate() {
         print_all_index(i + 1, num_contract_crates);
-
-        contract_crate.assert_meta_path_exists();
-        let meta_path = contract_crate.meta_path();
-
-        all_rustc_check::verify_rustc_version(contract_crate, args);
-        call_contract_meta(&meta_path, &args.to_cargo_run_args());
+        call_contract_meta(contract_crate, args);
     }
 }
 
-pub fn call_contract_meta(meta_path: &Path, cargo_run_args: &[String]) {
-    print_all_command(meta_path, cargo_run_args);
-
-    let exit_status = Command::new("cargo")
-        .current_dir(meta_path)
-        .args(cargo_run_args)
-        .spawn()
-        .expect("failed to spawn cargo run process in meta crate")
-        .wait()
-        .expect("cargo run process in meta crate was not running");
-
-    assert!(exit_status.success(), "contract meta process failed");
+pub fn call_contract_meta(contract_crate: &RelevantDirectory, args: &AllArgs) {
+    contract_crate.assert_meta_path_exists();
+    all_rustc_check::verify_rustc_version(contract_crate, args);
+    ContractMetaCall::new(args.command.clone(), &args.meta_lib_args)
+        .call_for_contract(contract_crate);
 }

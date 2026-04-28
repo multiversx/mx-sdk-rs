@@ -72,22 +72,78 @@ impl CargoTomlContents {
     pub fn package_name(&self) -> String {
         self.toml_value
             .get(PACKAGE)
-            .expect("missing package in Cargo.toml")
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing [package] section in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .get("name")
-            .expect("missing package name in Cargo.toml")
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing package name in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .as_str()
-            .expect("package name not a string value")
+            .unwrap_or_else(|| {
+                panic!(
+                    "package name is not a string in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
+            .to_string()
+    }
+
+    pub fn package_version(&self) -> String {
+        self.toml_value
+            .get(PACKAGE)
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing [package] section in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
+            .get("version")
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing package version in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
+            .as_str()
+            .unwrap_or_else(|| {
+                panic!(
+                    "package version is not a string in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .to_string()
     }
 
     pub fn package_edition(&self) -> String {
         self.toml_value
             .get(PACKAGE)
-            .expect("missing package in Cargo.toml")
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing [package] section in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .get("edition")
-            .expect("missing package name in Cargo.toml")
+            .unwrap_or_else(|| {
+                panic!(
+                    "missing package edition in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .as_str()
-            .expect("package name not a string value")
+            .unwrap_or_else(|| {
+                panic!(
+                    "package edition is not a string in Cargo.toml: {}",
+                    self.path.display()
+                )
+            })
             .to_string()
     }
 

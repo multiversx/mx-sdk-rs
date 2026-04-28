@@ -86,6 +86,13 @@ pub enum StandaloneCliAction {
     LocalDeps(LocalDepsArgs),
 
     #[command(
+        name = "reproducible-build",
+        alias = "rb",
+        about = "Reproducible build operations."
+    )]
+    ReproducibleBuild(ReproducibleBuildArgs),
+
+    #[command(
         name = "wallet",
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
@@ -250,21 +257,7 @@ pub struct ConvertArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct AllArgs {
-    #[command(subcommand)]
-    pub command: ContractCliAction,
-
-    /// Target directory where to call all contract meta crates.
-    /// Will be current directory if not specified.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true)]
-    pub path: Option<String>,
-
-    /// Ignore all directories with these names.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true, default_value = "target")]
-    pub ignore: Vec<String>,
-
+pub struct MetaLibArgs {
     #[arg(
         long = "no-abi-git-version",
         help = "Skips loading the Git version into the ABI",
@@ -285,11 +278,31 @@ pub struct AllArgs {
     pub target_dir_all: Option<String>,
 }
 
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AllArgs {
+    #[command(subcommand)]
+    pub command: ContractCliAction,
+
+    /// Target directory where to call all contract meta crates.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    #[command(flatten)]
+    pub meta_lib_args: MetaLibArgs,
+}
+
 impl AllArgs {
     pub fn target_dir_all_override(&self) -> Self {
         let mut result = self.clone();
-        if let Some(target_dir_all) = &self.target_dir_all {
-            result.target_dir_meta = Some(target_dir_all.clone());
+        if let Some(target_dir_all) = &self.meta_lib_args.target_dir_all {
+            result.meta_lib_args.target_dir_meta = Some(target_dir_all.clone());
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
@@ -304,37 +317,6 @@ impl AllArgs {
             }
         }
         result
-    }
-
-    pub fn to_cargo_run_args(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.append(&mut processed.command.to_raw());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
-    }
-
-    /// Produces the arguments for an abi call corresponding to a build.
-    ///
-    /// Used to get the rustc and framework versions configured for a build.
-    pub fn to_cargo_abi_for_build(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.push("abi".to_string());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
     }
 }
 
@@ -358,6 +340,319 @@ pub struct UpgradeArgs {
     /// Skips 'cargo check' after upgrade
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub no_check: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct PackArgs {
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Only pack the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are packed.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct ReproducibleBuildArgs {
+    #[command(subcommand)]
+    pub command: ReproducibleBuildCliAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum ReproducibleBuildCliAction {
+    #[command(
+        name = "source-pack",
+        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
+    )]
+    SourcePack(PackArgs),
+
+    #[command(
+        name = "local-build",
+        about = "Builds all contracts locally, mirroring the Docker reproducible build pipeline."
+    )]
+    LocalBuild(LocalBuildArgs),
+
+    #[command(
+        name = "docker-build",
+        about = "Runs the reproducible build inside a pinned Docker container."
+    )]
+    DockerBuild(DockerBuildArgs),
+
+    #[command(
+        name = "local-deps",
+        about = "Generates a report on the local dependencies of the contract."
+    )]
+    LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "source-unpack",
+        about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
+    )]
+    SourceUnpack(SourceUnpackArgs),
+
+    #[command(
+        name = "verify",
+        about = "Submits a contract verification request to the verifier service."
+    )]
+    Verify(VerifyArgs),
+
+    #[command(
+        name = "unverify",
+        about = "Removes a previously verified Smart Contract from the verifier service."
+    )]
+    Unverify(UnverifyArgs),
+
+    #[command(
+        name = "check",
+        about = "Checks whether a contract is currently verified on the verifier service."
+    )]
+    Check(CheckArgs),
+
+    #[command(
+        name = "download",
+        about = "Downloads the ABI and source files of a verified contract from the verifier service."
+    )]
+    Download(DownloadArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct LocalBuildArgs {
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Output folder where build artifacts and source JSON files will be placed.
+    /// A subfolder per contract name will be created inside it.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: String,
+
+    /// Cargo target directory for compilation.
+    /// Defaults to /tmp/sc-target if not specified.
+    #[arg(long = "target-dir", verbatim_doc_comment)]
+    pub target_dir: Option<String>,
+
+    /// Folder where the project will be copied before building.
+    /// Defaults to /tmp/sc-build if not specified.
+    #[arg(long = "build-root", verbatim_doc_comment)]
+    pub build_root: Option<String>,
+
+    /// Only build the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are built.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
+
+    /// Do not optimize wasm files after the build.
+    #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
+    pub no_wasm_opt: bool,
+
+    /// If the output folder is not empty, wipe it before building instead of aborting.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub force: bool,
+
+    /// Path to a `.source.json` file produced by a previous build.
+    /// When set, the source is unpacked to /tmp/unwrapped/ and the build
+    /// proceeds from there, reproducing the original layout exactly.
+    /// Mutually exclusive with --path.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct SourceUnpackArgs {
+    /// Path to the `.source.json` file to unpack.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: String,
+
+    /// Folder where the source files will be extracted.
+    /// Defaults to /tmp/unwrapped if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct VerifyArgs {
+    /// The bech32 address of the deployed contract to verify.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// Path to the .source.json file produced by a previous build.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: String,
+
+    /// Docker image tag that was used to build the contract.
+    /// e.g. `multiversx/sdk-rust-contract-builder:v8.0.0`
+    #[arg(long = "docker-image", verbatim_doc_comment)]
+    pub docker_image: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// For multicontract repos: the specific contract variant to verify.
+    #[arg(long = "contract-variant", verbatim_doc_comment)]
+    pub contract_variant: Option<String>,
+
+    /// Path to a PEM wallet file used to sign the verification request.
+    /// Mutually exclusive with --keystore.
+    #[arg(long, verbatim_doc_comment)]
+    pub pem: Option<String>,
+
+    /// Path to a keystore JSON wallet file used to sign the verification request.
+    /// Mutually exclusive with --pem.
+    #[arg(long, verbatim_doc_comment)]
+    pub keystore: Option<String>,
+
+    /// Keystore password (plain text). If omitted, will prompt interactively.
+    #[arg(long = "keystore-password", verbatim_doc_comment)]
+    pub keystore_password: Option<String>,
+
+    /// Skip the confirmation prompt before submitting.
+    #[arg(
+        long = "skip-confirmation",
+        short = 'y',
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub skip_confirmation: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct UnverifyArgs {
+    /// The bech32 address of the deployed contract to unverify.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// The code hash of the contract to unverify.
+    #[arg(long = "code-hash", verbatim_doc_comment)]
+    pub code_hash: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// Path to a PEM wallet file used to sign the request.
+    /// Mutually exclusive with --keystore.
+    #[arg(long, verbatim_doc_comment)]
+    pub pem: Option<String>,
+
+    /// Path to a keystore JSON wallet file used to sign the request.
+    /// Mutually exclusive with --pem.
+    #[arg(long, verbatim_doc_comment)]
+    pub keystore: Option<String>,
+
+    /// Keystore password (plain text). If omitted, will prompt interactively.
+    #[arg(long = "keystore-password", verbatim_doc_comment)]
+    pub keystore_password: Option<String>,
+
+    /// Skip the confirmation prompt before submitting.
+    #[arg(
+        long = "skip-confirmation",
+        short = 'y',
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub skip_confirmation: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CheckArgs {
+    /// The bech32 address of the deployed contract to check.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DownloadArgs {
+    /// The bech32 address of the deployed contract to download.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// Output directory where the ABI and source files will be written.
+    /// Defaults to the current directory.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+
+    /// How many levels of dependencies to include (default: -1 = all).
+    #[arg(long, verbatim_doc_comment)]
+    pub depth: Option<i64>,
+
+    /// Include test files in the downloaded sources.
+    #[arg(
+        long = "include-test-files",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub include_test_files: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DockerBuildArgs {
+    /// Pinned Docker image tag to run the build in.
+    /// e.g. `multiversx/sc-meta-reproducible-build:0.65.1`
+    #[arg(long = "docker-image", verbatim_doc_comment)]
+    pub docker_image: String,
+
+    /// Project folder (workspace root or single contract folder).
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub project: Option<String>,
+
+    /// Output folder where build artifacts will be placed.
+    /// Defaults to `<project>/output-docker/`.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+
+    /// Only build the contract with this name (as found in Cargo.toml).
+    /// If not specified, all contracts under the project folder are built.
+    #[arg(long, verbatim_doc_comment)]
+    pub contract: Option<String>,
+
+    /// Do not optimize wasm files after the build.
+    #[arg(long = "no-wasm-opt", default_value = "false", verbatim_doc_comment)]
+    pub no_wasm_opt: bool,
+
+    /// Override the build root path inside the container.
+    /// Defaults to the container's built-in default (/tmp/sc-build).
+    #[arg(long = "build-root", verbatim_doc_comment)]
+    pub build_root: Option<String>,
+
+    /// Do not pass `--interactive` to `docker run`.
+    /// Required in non-interactive environments such as CI.
+    #[arg(
+        long = "no-docker-interactive",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub no_docker_interactive: bool,
+
+    /// Do not pass `--tty` to `docker run`.
+    /// Required in non-interactive environments such as CI.
+    #[arg(long = "no-docker-tty", default_value = "false", verbatim_doc_comment)]
+    pub no_docker_tty: bool,
+
+    /// Skip forcing `--platform linux/amd64` on the Docker run.
+    #[arg(
+        long = "no-default-platform",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub no_default_platform: bool,
+
+    /// Set CARGO_TERM_VERBOSE=true inside the container.
+    #[arg(long = "cargo-verbose", default_value = "false", verbatim_doc_comment)]
+    pub cargo_verbose: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

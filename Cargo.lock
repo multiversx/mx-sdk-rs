@@ -2853,6 +2853,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
+name = "lottery"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "lottery-erc20"
 version = "0.0.0"
 dependencies = [
@@ -2870,18 +2878,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "lottery-esdt"
+name = "lottery-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "lottery-esdt-meta"
-version = "0.0.0"
-dependencies = [
- "lottery-esdt",
+ "lottery",
  "multiversx-sc-meta-lib",
 ]
 
@@ -3269,6 +3269,7 @@ name = "multiversx-sc-meta"
 version = "0.65.1"
 dependencies = [
  "anyhow",
+ "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3276,6 +3277,7 @@ dependencies = [
  "convert_case 0.11.0",
  "copy_dir",
  "hex",
+ "indexmap",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
@@ -3288,6 +3290,8 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "sha2",
+ "sha3",
  "tokio",
  "toml",
  "zip",
@@ -3325,7 +3329,6 @@ dependencies = [
 name = "multiversx-sc-scenario"
 version = "0.65.1"
 dependencies = [
- "base64",
  "colored 3.1.1",
  "hex",
  "hex-literal",
@@ -3352,7 +3355,6 @@ name = "multiversx-sc-snippets"
 version = "0.65.1"
 dependencies = [
  "anyhow",
- "base64",
  "colored 3.1.1",
  "env_logger",
  "futures",
