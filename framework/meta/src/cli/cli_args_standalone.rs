@@ -392,6 +392,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
     )]
     SourceUnpack(SourceUnpackArgs),
+
+    #[command(
+        name = "verify",
+        about = "Submits a contract verification request to the verifier service."
+    )]
+    Verify(VerifyArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -447,6 +453,53 @@ pub struct SourceUnpackArgs {
     /// Defaults to /tmp/unwrapped if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub output: Option<String>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct VerifyArgs {
+    /// The bech32 address of the deployed contract to verify.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// Path to the .source.json file produced by a previous build.
+    #[arg(long = "packaged-src", verbatim_doc_comment)]
+    pub packaged_src: String,
+
+    /// Docker image tag that was used to build the contract.
+    /// e.g. `multiversx/sdk-rust-contract-builder:v8.0.0`
+    #[arg(long = "docker-image", verbatim_doc_comment)]
+    pub docker_image: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// For multicontract repos: the specific contract variant to verify.
+    #[arg(long = "contract-variant", verbatim_doc_comment)]
+    pub contract_variant: Option<String>,
+
+    /// Path to a PEM wallet file used to sign the verification request.
+    /// Mutually exclusive with --keystore.
+    #[arg(long, verbatim_doc_comment)]
+    pub pem: Option<String>,
+
+    /// Path to a keystore JSON wallet file used to sign the verification request.
+    /// Mutually exclusive with --pem.
+    #[arg(long, verbatim_doc_comment)]
+    pub keystore: Option<String>,
+
+    /// Keystore password (plain text). If omitted, will prompt interactively.
+    #[arg(long = "keystore-password", verbatim_doc_comment)]
+    pub keystore_password: Option<String>,
+
+    /// Skip the confirmation prompt before submitting.
+    #[arg(
+        long = "skip-confirmation",
+        short = 'y',
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub skip_confirmation: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]

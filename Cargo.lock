@@ -3290,6 +3290,8 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "sha2",
+ "sha3",
  "tokio",
  "toml",
  "zip",
