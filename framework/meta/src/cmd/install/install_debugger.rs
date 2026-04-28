@@ -1,5 +1,6 @@
 use colored::Colorize;
 
+use super::system_info::{SystemInfo, get_system_info};
 use crate::cmd::template::RepoSource;
 use std::fs::{self};
 use std::path::{Path, PathBuf};
@@ -13,8 +14,14 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
-    remove_old_lldb_extension();
     let _ = install_lldb_extension();
+    if get_system_info() == SystemInfo::Windows {
+        println!(
+            "{}",
+            "On Windows, the VS Code window opened by this tool can be safely closed after installation."
+                .yellow()
+        );
+    }
     install_script(custom_path).await;
     if !testing {
         // if we are testing we skip the configuration path, not to mess up with the current vscode configuration
@@ -29,21 +36,6 @@ fn home_dir() -> PathBuf {
     std::env::home_dir().expect("Could not find home directory")
 }
 
-fn remove_old_lldb_extension() {
-    let extension_id = "vadimcn.vscode-lldb";
-
-    // Run the VSCode command to remove the previous installed extension
-    let _ = Command::new("code")
-        .arg("--uninstall-extension")
-        .arg(extension_id)
-        .status();
-
-    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
-    let _ = Command::new("rm")
-        .arg("-rf")
-        .arg("~/.vscode/extensions/vadim*")
-        .status();
-}
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
 
@@ -51,6 +43,7 @@ fn install_lldb_extension() -> io::Result<()> {
     let install_lldb_command = Command::new("code")
         .arg("--install-extension")
         .arg(extension_id)
+        .arg("--force")
         .status()?;
 
     if install_lldb_command.success() {
@@ -98,10 +91,9 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 }
 
 fn get_path_to_settings() -> PathBuf {
-    let os = env::consts::OS;
     let user_home = home_dir();
-    match os {
-        "macos" => {
+    match get_system_info() {
+        SystemInfo::MacOs => {
             // For macOS
             Path::new(&user_home)
                 .join("Library")
@@ -110,7 +102,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        "linux" => {
+        SystemInfo::Linux => {
             // For Linux
             Path::new(&user_home)
                 .join(".config")
@@ -118,7 +110,14 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        _ => panic!("OS not supported"),
+        SystemInfo::Windows => {
+            // For Windows
+            let appdata = env::var("APPDATA").expect("Could not find APPDATA environment variable");
+            Path::new(&appdata)
+                .join("Code")
+                .join("User")
+                .join("settings.json")
+        }
     }
 }
 

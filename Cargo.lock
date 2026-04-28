@@ -2853,6 +2853,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
+name = "lottery"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "lottery-erc20"
 version = "0.0.0"
 dependencies = [
@@ -2870,18 +2878,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "lottery-esdt"
+name = "lottery-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "lottery-esdt-meta"
-version = "0.0.0"
-dependencies = [
- "lottery-esdt",
+ "lottery",
  "multiversx-sc-meta-lib",
 ]
 

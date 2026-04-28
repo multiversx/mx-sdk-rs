@@ -1,0 +1,114 @@
+{
+    "name": "determine winner EGLD lottery",
+    "gasSchedule": "dummy",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "buy-ticket-egld.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "buy-ticket-egld-2",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "egldValue": "100",
+                "function": "buy_ticket",
+                "arguments": [
+                    "str:egld_lottery"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestampMs": "123456789"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "determine-winner-egld",
+            "tx": {
+                "from": "address:other_shard_address#41",
+                "to": "sc:lottery#42",
+                "function": "determine_winner",
+                "arguments": [
+                    "str:egld_lottery"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claim-egld-rewards",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:lottery#42",
+                "function": "claim_rewards",
+                "arguments": [
+                    "str:EGLD-000000"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:my_address": {
+                    "nonce": "2",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:other_shard_address#41": {
+                    "nonce": "1",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc1": {
+                    "nonce": "3",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "sc:lottery#42": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:addressToIdMapper|str:lastId": "1",
+                        "str:addressToIdMapper|str:addr|address:acc1": "1",
+                        "str:addressToIdMapper|str:addrId|u64:1": "address:acc1"
+                    },
+                    "code": "*"
+                }
+            }
+        }
+    ]
+}
