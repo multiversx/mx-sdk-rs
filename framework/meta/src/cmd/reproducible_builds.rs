@@ -1,4 +1,5 @@
 mod build_outcome;
+mod check;
 mod docker_build;
 mod local_build;
 pub mod local_deps;
@@ -8,6 +9,7 @@ mod source_unpack;
 mod unverify;
 mod verify;
 
+pub use check::check_contract_verification;
 pub use docker_build::docker_build;
 pub use local_build::local_build;
 pub use local_deps::local_deps;

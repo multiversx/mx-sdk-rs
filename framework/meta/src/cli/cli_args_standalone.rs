@@ -404,6 +404,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Removes a previously verified Smart Contract from the verifier service."
     )]
     Unverify(UnverifyArgs),
+
+    #[command(
+        name = "check",
+        about = "Checks whether a contract is currently verified on the verifier service."
+    )]
+    Check(CheckArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -544,6 +550,17 @@ pub struct UnverifyArgs {
         verbatim_doc_comment
     )]
     pub skip_confirmation: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct CheckArgs {
+    /// The bech32 address of the deployed contract to check.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
