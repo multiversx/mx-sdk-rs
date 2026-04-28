@@ -1,0 +1,17 @@
+[package]
+name = "very-large-storage"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/very_large_storage.rs"
+
+[dependencies.multiversx-sc]
+version = "0.65.1"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.65.1"
+path = "../../../framework/scenario"

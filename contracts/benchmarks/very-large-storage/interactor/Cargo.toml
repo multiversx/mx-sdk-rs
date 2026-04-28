@@ -1,0 +1,30 @@
+[package]
+name = "very-large-storage-interactor"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "very-large-storage-interactor"
+path = "src/vls_interactor_main.rs"
+
+[lib]
+path = "src/vls_interactor.rs"
+
+[dependencies.very-large-storage]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.65.1"
+path = "../../../../framework/snippets"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "1.0"
+tokio = { version = "1.24" }
+serial_test = { version = "3.2.0" }
+
+[features]
+chain-simulator-tests = []
