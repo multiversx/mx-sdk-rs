@@ -145,7 +145,9 @@ fn configure_vscode() {
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );
 
-    let settings_obj = sub_values.as_object_mut().unwrap();
+    let settings_obj = sub_values
+        .as_object_mut()
+        .expect("VSCode settings.json is not a JSON object. Please ensure the file contains a valid JSON object at the top level.");
     configure_debug_engine(settings_obj);
     configure_pretty_printer_init_command(settings_obj, &script_full_path);
 
@@ -158,13 +160,11 @@ fn configure_vscode() {
 }
 
 /// Sets `rust-analyzer.debug.engine` to `vadimcn.vscode-lldb` in the VS Code user settings,
-/// unless already explicitly configured.
+/// if not already present.
 ///
 /// This is required on macOS, where rust-analyzer defaults to `lldb-dap` (Apple's Xcode-bundled
 /// DAP adapter), which does not support CodeLLDB's `initCommands`/`preRunCommands` settings.
 /// Without this, the pretty-printer script is not loaded when using the CodeLens "Debug" button.
-///
-/// On Linux, rust-analyzer already defaults to `vadimcn.vscode-lldb`, so this is a no-op there.
 fn configure_debug_engine(settings_obj: &mut serde_json::Map<String, serde_json::Value>) {
     settings_obj
         .entry("rust-analyzer.debug.engine")
@@ -180,7 +180,12 @@ fn configure_pretty_printer_init_command(
     settings_obj: &mut serde_json::Map<String, serde_json::Value>,
     script_full_path: &Path,
 ) {
-    let command_script_line = format!("command script import {}", script_full_path.display(),);
+    let escaped_path = script_full_path
+        .display()
+        .to_string()
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"");
+    let command_script_line = format!("command script import \"{escaped_path}\"");
 
     let init_commands = settings_obj
         .entry("lldb.launch.preRunCommands")
