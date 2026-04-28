@@ -33,7 +33,11 @@ pub async fn verify_contract(args: &VerifyArgs) {
         }
     }
 
-    let priv_key = load_private_key(args);
+    let priv_key = load_private_key(
+        args.pem.as_deref(),
+        args.keystore.as_deref(),
+        args.keystore_password.as_deref(),
+    );
 
     // Read source.json as a raw JSON value (to re-serialize compact with no extra whitespace).
     let source_json_text = std::fs::read_to_string(&args.packaged_src)
@@ -68,16 +72,20 @@ pub async fn verify_contract(args: &VerifyArgs) {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 /// Loads the private key from a PEM file or keystore, depending on CLI args.
-fn load_private_key(args: &VerifyArgs) -> PrivateKey {
-    match (&args.pem, &args.keystore) {
+pub(super) fn load_private_key(
+    pem: Option<&str>,
+    keystore: Option<&str>,
+    keystore_password: Option<&str>,
+) -> PrivateKey {
+    match (pem, keystore) {
         (Some(pem_path), None) => {
             let (priv_key_hex, _) = Wallet::get_wallet_keys_pem(pem_path);
             PrivateKey::from_hex_str(&priv_key_hex)
                 .unwrap_or_else(|e| panic!("Failed to parse PEM private key: {e}"))
         }
         (None, Some(keystore_path)) => {
-            let password = match &args.keystore_password {
-                Some(pw) => pw.clone(),
+            let password = match keystore_password {
+                Some(pw) => pw.to_string(),
                 None => Wallet::get_keystore_password(),
             };
             Wallet::get_private_key_from_keystore_secret(keystore_path, &password)
@@ -111,7 +119,7 @@ fn build_payload(
 /// 2. raw_data = "{contract_bech32}{hashed_payload}"
 /// 3. content = PREFIX + len(raw_data) + raw_data  (PREFIX = `\x17Elrond Signed Message:\n`)
 /// 4. return keccak256(content)
-fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str) -> Vec<u8> {
+pub(super) fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str) -> Vec<u8> {
     let hashed_payload: String = Sha256::digest(payload.as_bytes()).encode_hex();
     let raw_data = format!("{}{hashed_payload}", contract.to_bech32_str());
     let raw_data_bytes = raw_data.as_bytes();
@@ -126,7 +134,11 @@ fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str) -> Vec<u8>
 }
 
 /// Signs the payload using the MultiversX message signing protocol and returns the hex signature.
-fn sign_payload(priv_key: &PrivateKey, contract: &Bech32Address, payload: &str) -> String {
+pub(super) fn sign_payload(
+    priv_key: &PrivateKey,
+    contract: &Bech32Address,
+    payload: &str,
+) -> String {
     let bytes_to_sign = compute_bytes_for_signing(contract, payload);
     let signature: [u8; 64] = priv_key.sign(bytes_to_sign);
     signature.encode_hex()

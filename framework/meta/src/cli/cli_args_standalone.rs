@@ -398,6 +398,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Submits a contract verification request to the verifier service."
     )]
     Verify(VerifyArgs),
+
+    #[command(
+        name = "unverify",
+        about = "Removes a previously verified Smart Contract from the verifier service."
+    )]
+    Unverify(UnverifyArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -484,6 +490,44 @@ pub struct VerifyArgs {
     pub pem: Option<String>,
 
     /// Path to a keystore JSON wallet file used to sign the verification request.
+    /// Mutually exclusive with --pem.
+    #[arg(long, verbatim_doc_comment)]
+    pub keystore: Option<String>,
+
+    /// Keystore password (plain text). If omitted, will prompt interactively.
+    #[arg(long = "keystore-password", verbatim_doc_comment)]
+    pub keystore_password: Option<String>,
+
+    /// Skip the confirmation prompt before submitting.
+    #[arg(
+        long = "skip-confirmation",
+        short = 'y',
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub skip_confirmation: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct UnverifyArgs {
+    /// The bech32 address of the deployed contract to unverify.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// The code hash of the contract to unverify.
+    #[arg(long = "code-hash", verbatim_doc_comment)]
+    pub code_hash: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// Path to a PEM wallet file used to sign the request.
+    /// Mutually exclusive with --keystore.
+    #[arg(long, verbatim_doc_comment)]
+    pub pem: Option<String>,
+
+    /// Path to a keystore JSON wallet file used to sign the request.
     /// Mutually exclusive with --pem.
     #[arg(long, verbatim_doc_comment)]
     pub keystore: Option<String>,
