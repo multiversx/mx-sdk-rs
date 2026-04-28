@@ -1,6 +1,7 @@
 mod build_outcome;
 mod check;
 mod docker_build;
+mod download;
 mod local_build;
 pub mod local_deps;
 mod source_json_model;
@@ -11,6 +12,7 @@ mod verify;
 
 pub use check::check_contract_verification;
 pub use docker_build::docker_build;
+pub use download::download_contract_verification;
 pub use local_build::local_build;
 pub use local_deps::local_deps;
 pub use source_pack::source_pack;

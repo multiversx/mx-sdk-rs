@@ -10,8 +10,8 @@ use crate::cmd::code_report::report;
 use crate::cmd::info::call_info;
 use crate::cmd::install::install;
 use crate::cmd::reproducible_builds::{
-    check_contract_verification, docker_build, local_build, local_deps, source_pack,
-    source_unpack, unverify_contract, verify_contract,
+    check_contract_verification, docker_build, download_contract_verification, local_build,
+    local_deps, source_pack, source_unpack, unverify_contract, verify_contract,
 };
 use crate::cmd::scen_test_gen::test_gen_tool;
 use crate::cmd::template::{create_contract, print_template_names};
@@ -72,6 +72,9 @@ pub async fn cli_main_standalone() {
             ReproducibleBuildCliAction::Verify(args) => verify_contract(args).await,
             ReproducibleBuildCliAction::Unverify(args) => unverify_contract(args).await,
             ReproducibleBuildCliAction::Check(args) => check_contract_verification(args).await,
+            ReproducibleBuildCliAction::Download(args) => {
+                download_contract_verification(args).await
+            }
         },
         Some(StandaloneCliAction::Wallet(args)) => {
             wallet(args);

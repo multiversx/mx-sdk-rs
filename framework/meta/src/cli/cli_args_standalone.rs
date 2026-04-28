@@ -410,6 +410,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Checks whether a contract is currently verified on the verifier service."
     )]
     Check(CheckArgs),
+
+    #[command(
+        name = "download",
+        about = "Downloads the ABI and source files of a verified contract from the verifier service."
+    )]
+    Download(DownloadArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -561,6 +567,34 @@ pub struct CheckArgs {
     /// URL of the verifier service.
     #[arg(long = "verifier-url", verbatim_doc_comment)]
     pub verifier_url: String,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DownloadArgs {
+    /// The bech32 address of the deployed contract to download.
+    #[arg(verbatim_doc_comment)]
+    pub contract: String,
+
+    /// URL of the verifier service.
+    #[arg(long = "verifier-url", verbatim_doc_comment)]
+    pub verifier_url: String,
+
+    /// Output directory where the ABI and source files will be written.
+    /// Defaults to the current directory.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
+
+    /// How many levels of dependencies to include (default: -1 = all).
+    #[arg(long, verbatim_doc_comment)]
+    pub depth: Option<i64>,
+
+    /// Include test files in the downloaded sources.
+    #[arg(
+        long = "include-test-files",
+        default_value = "false",
+        verbatim_doc_comment
+    )]
+    pub include_test_files: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
