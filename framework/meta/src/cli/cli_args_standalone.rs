@@ -614,6 +614,10 @@ pub struct DockerBuildArgs {
     #[arg(long, verbatim_doc_comment)]
     pub output: Option<String>,
 
+    /// If the output folder is not empty, wipe it before building instead of aborting.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub force: bool,
+
     /// Only build the contract with this name (as found in Cargo.toml).
     /// If not specified, all contracts under the project folder are built.
     #[arg(long, verbatim_doc_comment)]

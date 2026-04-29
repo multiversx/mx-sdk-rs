@@ -150,10 +150,11 @@ pub(crate) fn source_pack_contract(
 
 /// Returns the path of `folder` relative to `project_folder`, using forward slashes.
 fn module_path(project_folder: &Path, folder: &Path) -> String {
-    pathdiff::diff_paths(folder, project_folder)
+    let rel = pathdiff::diff_paths(folder, project_folder)
         .unwrap_or_else(|| folder.to_path_buf())
         .to_string_lossy()
-        .replace('\\', "/")
+        .replace('\\', "/");
+    if rel.is_empty() { ".".to_string() } else { rel }
 }
 
 fn make_entry(

@@ -30,6 +30,22 @@ pub fn docker_build(args: &DockerBuildArgs) {
     let output = resolve_output(&project, args.output.as_deref());
 
     fs::create_dir_all(&output).unwrap();
+    let is_non_empty = output
+        .read_dir()
+        .map(|mut rd| rd.next().is_some())
+        .unwrap_or(false);
+    if is_non_empty {
+        if args.force {
+            fs::remove_dir_all(&output).unwrap();
+            fs::create_dir_all(&output).unwrap();
+        } else {
+            eprintln!(
+                "Error: output folder is not empty: {}\nUse --force to wipe it before building.",
+                output.display()
+            );
+            std::process::exit(1);
+        }
+    }
     let output = output.canonicalize().unwrap();
 
     // Shared Cargo cache directories — created once, reused across runs.
