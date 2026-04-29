@@ -192,15 +192,15 @@ fn configure_pretty_printer_init_command(
         .or_insert_with(|| serde_json::Value::Array(Vec::new()));
 
     if let serde_json::Value::Array(array) = init_commands {
-        if let Some(pos) = array.iter().position(|v| {
+        // Remove all existing entries referencing the script,
+        // including accidental duplicates, if present
+        array.retain(|v| {
             if let serde_json::Value::String(s) = v {
-                s.contains(SCRIPT_NAME)
+                !s.contains(SCRIPT_NAME)
             } else {
-                false
+                true
             }
-        }) {
-            array.remove(pos);
-        }
+        });
 
         array.push(serde_json::Value::String(command_script_line));
     }
