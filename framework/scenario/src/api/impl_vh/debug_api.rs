@@ -1,11 +1,12 @@
 use multiversx_chain_vm::{
-    executor::{VMHooks, VMHooksEarlyExit},
+    executor::VMHooksEarlyExit,
     host::vm_hooks::{TxVMHooksContext, VMHooksDispatcher},
 };
-use multiversx_sc::{chain_core::types::ReturnCode, err_msg};
+use multiversx_sc::{api::HandleConstraints, chain_core::types::ReturnCode, err_msg};
 
 use crate::executor::debug::{
     ContractDebugInstance, ContractDebugInstanceState, ContractDebugStack, StaticVarData,
+    VMHooksDebugger,
 };
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
@@ -18,28 +19,39 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         let instance = ContractDebugStack::static_peek();
         let tx_context_ref = instance.tx_context_ref.clone();
         let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(vh_context);
-        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
+        let result = f(&mut dispatcher);
+        std::mem::drop(dispatcher);
+        result.unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
-        let tx_context_ref = handle.to_tx_context_ref();
+        let tx_context_ref = handle.to_opt_tx_context_ref().unwrap_or_else(|| {
+            panic!(
+                "TxContext is no longer valid for handle {}.
+The object was created on a VM execution stack frame that has already been popped.
+This can sometimes happen during whitebox testing if the objects are mixed between execution contexts.",
+                handle.get_raw_handle()
+            )
+        });
         let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
         let mut dispatcher = VMHooksDispatcher::new(vh_context);
-        f(&mut dispatcher).unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
+        let result = f(&mut dispatcher);
+        std::mem::drop(dispatcher);
+        result.unwrap_or_else(|err| ContractDebugInstanceState::early_exit_panic(err))
     }
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -52,11 +64,25 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);
         Self::with_vm_hooks_ctx_1(handle1, f)
+    }
+
+    fn with_vm_hooks_ctx_if_active<F>(handle: Self::HandleType, f: F)
+    where
+        F: FnOnce(&mut dyn VMHooksDebugger),
+    {
+        let Some(tx_context_ref) = handle.to_opt_tx_context_ref() else {
+            // context is not live, skip the call
+            return;
+        };
+        let vh_context = TxVMHooksContext::new(tx_context_ref, ContractDebugInstanceState);
+        let mut dispatcher = VMHooksDispatcher::new(vh_context);
+        f(&mut dispatcher);
+        std::mem::drop(dispatcher);
     }
 
     fn assert_live_handle(handle: &Self::HandleType) {
@@ -67,12 +93,17 @@ impl VMHooksApiBackend for DebugApiBackend {
             );
         }
     }
+
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,
     {
         let top_static_vars = ContractDebugStack::static_peek().static_var_ref;
         f(&top_static_vars)
+    }
+
+    fn backend_requires_managed_type_drop() -> bool {
+        false
     }
 }
 

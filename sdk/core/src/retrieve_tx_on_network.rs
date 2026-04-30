@@ -1,5 +1,5 @@
 use crate::{
-    data::transaction::{ApiLogs, Events, LogData, TransactionOnNetwork},
+    data::transaction::{ApiLogs, ApiTransactionResult, Events, LogData},
     gateway::{GetTxInfo, GetTxProcessStatus},
     utils::base64_encode,
 };
@@ -17,7 +17,7 @@ const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
     proxy: &GatewayProxy,
     tx_hash: String,
-) -> (TransactionOnNetwork, ReturnCode) {
+) -> (ApiTransactionResult, ReturnCode) {
     let mut retries = 0;
     let mut backoff_delay = INITIAL_BACKOFF_DELAY;
     let start_time = proxy.now();
@@ -42,7 +42,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                     "fail" => {
                         let (error_code, reason) = parse_reason(&reason);
 
-                        let mut failed_transaction: TransactionOnNetwork = proxy
+                        let mut failed_transaction: ApiTransactionResult = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
                             .unwrap();
@@ -83,7 +83,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
     );
 
     let error_message = ReturnCode::message(ReturnCode::NetworkTimeout);
-    let failed_transaction: TransactionOnNetwork = create_tx_failed(error_message);
+    let failed_transaction: ApiTransactionResult = create_tx_failed(error_message);
 
     (failed_transaction, ReturnCode::NetworkTimeout)
 }
@@ -144,8 +144,8 @@ pub fn extract_message_from_string_reason(reason: &str) -> String {
     contract_error.last().unwrap_or(&"").split(']').collect()
 }
 
-fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
-    let mut failed_transaction_info = TransactionOnNetwork::default();
+fn create_tx_failed(error_message: &str) -> ApiTransactionResult {
+    let mut failed_transaction_info = ApiTransactionResult::default();
 
     let log: ApiLogs = ApiLogs {
         address: Bech32Address::zero_default_hrp(),
@@ -162,7 +162,7 @@ fn create_tx_failed(error_message: &str) -> TransactionOnNetwork {
     failed_transaction_info
 }
 
-pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: &str) {
+pub fn replace_with_error_message(tx: &mut ApiTransactionResult, error_message: &str) {
     if error_message.is_empty() {
         return;
     }
@@ -176,7 +176,7 @@ pub fn replace_with_error_message(tx: &mut TransactionOnNetwork, error_message: 
     }
 }
 
-fn find_log(tx: &mut TransactionOnNetwork) -> Option<&mut Events> {
+fn find_log(tx: &mut ApiTransactionResult) -> Option<&mut Events> {
     if let Some(logs) = tx.logs.as_mut() {
         logs.events
             .iter_mut()

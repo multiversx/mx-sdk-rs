@@ -23,6 +23,11 @@ fn big_int_from_i_64_rs() {
 }
 
 #[test]
+fn big_int_neg_rs() {
+    world().run("scenarios/big_int_neg.scen.json");
+}
+
+#[test]
 fn big_int_to_i_64_rs() {
     world().run("scenarios/big_int_to_i64.scen.json");
 }
@@ -45,8 +50,15 @@ fn big_num_ops_bitwise_rs() {
 }
 
 #[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
 fn big_num_ops_cmp_rs() {
     world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
+#[ignore = "too slow with wasmer-experimental, run from basic_features_scenario_rs_slow_test.rs"]
+fn big_num_ops_saturating_sub_rs() {
+    world().run("scenarios/big_num_ops_saturating_sub.scen.json");
 }
 
 #[test]
@@ -91,7 +103,6 @@ fn block_info_ms_rs() {
 }
 
 #[test]
-#[ignore = "not yet supported"]
 fn code_hash_rs() {
     world().run("scenarios/code_hash.scen.json");
 }
@@ -349,6 +360,11 @@ fn managed_vec_address_push_rs() {
 #[test]
 fn managed_vec_biguint_push_rs() {
     world().run("scenarios/managed_vec_biguint_push.scen.json");
+}
+
+#[test]
+fn math_features_rs() {
+    world().run("scenarios/math_features.scen.json");
 }
 
 #[test]

@@ -13,7 +13,7 @@ fn factorial_gas_test(mut world: ScenarioWorld) {
     let (new_address, gas_used) = world
         .tx()
         .from(OWNER_ADDRESS)
-        .gas(1500)
+        .gas(2500)
         .typed(factorial_proxy::FactorialProxy)
         .init()
         .code(CODE_PATH)
@@ -22,7 +22,7 @@ fn factorial_gas_test(mut world: ScenarioWorld) {
         .returns(ReturnsGasUsed)
         .run();
 
-    assert_eq!(gas_used, 1045);
+    assert_eq!(gas_used, 2045);
     assert_eq!(new_address, SC_ADDRESS.to_address());
 }
 
@@ -33,11 +33,27 @@ fn factorial_user_error(mut world: ScenarioWorld) {
     world
         .tx()
         .from(OWNER_ADDRESS)
-        .gas(1500)
+        .gas(30000)
         .raw_deploy()
         .argument(&0)
         .code(CODE_PATH)
         .returns(ExpectError(4, "wrong number of arguments"))
+        .run();
+}
+
+#[allow(unused)]
+fn factorial_out_of_gas(mut world: ScenarioWorld) {
+    world.account(OWNER_ADDRESS).nonce(1);
+
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .gas(100)
+        .typed(factorial_proxy::FactorialProxy)
+        .init()
+        .code(CODE_PATH)
+        .new_address(SC_ADDRESS)
+        .returns(ExpectError(5, "not enough gas"))
         .run();
 }
 
@@ -60,6 +76,15 @@ fn factorial_user_error_wasmer_experimental() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "wasmer-experimental"), ignore)]
+fn factorial_out_of_gas_wasmer_experimental() {
+    let world = ScenarioWorld::new()
+        .executor_config(ExecutorConfig::Experimental)
+        .gas_schedule(GasScheduleVersion::V8);
+    factorial_out_of_gas(world);
+}
+
+#[test]
 #[cfg(feature = "wasmer-prod")]
 fn factorial_gas_wasmer_prod() {
     let world = ScenarioWorld::new()
@@ -79,4 +104,15 @@ fn factorial_user_error_wasmer_prod() {
         ))
         .gas_schedule(GasScheduleVersion::V8);
     factorial_user_error(world);
+}
+
+#[test]
+#[cfg(feature = "wasmer-prod")]
+fn factorial_out_of_gas_wasmer_prod() {
+    let world = ScenarioWorld::new()
+        .executor_config(ExecutorConfig::Custom(
+            multiversx_chain_vm_wasmer_prod::new_prod_executor,
+        ))
+        .gas_schedule(GasScheduleVersion::V8);
+    factorial_out_of_gas(world);
 }

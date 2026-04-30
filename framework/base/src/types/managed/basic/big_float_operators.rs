@@ -1,8 +1,5 @@
 use super::BigFloat;
-use crate::{
-    api::{BigFloatApiImpl, ManagedTypeApi},
-    types::managed::managed_type_trait::ManagedType,
-};
+use crate::api::{BigFloatApiImpl, ManagedTypeApi};
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 macro_rules! binary_operator {
@@ -25,13 +22,13 @@ macro_rules! binary_operator {
 
             fn $method(self, other: &BigFloat<M>) -> BigFloat<M> {
                 unsafe {
-                    let result = BigFloat::new_uninit();
-                    M::managed_type_impl().$api_func(
-                        result.get_handle(),
-                        self.handle.clone(),
-                        other.handle.clone(),
-                    );
-                    result
+                    BigFloat::new_init_handle(|result_handle| {
+                        M::managed_type_impl().$api_func(
+                            result_handle,
+                            self.handle.clone(),
+                            other.handle.clone(),
+                        );
+                    })
                 }
             }
         }
@@ -81,9 +78,9 @@ impl<M: ManagedTypeApi> Neg for BigFloat<M> {
 
     fn neg(self) -> Self::Output {
         unsafe {
-            let result = BigFloat::new_uninit();
-            M::managed_type_impl().bf_neg(result.get_handle(), self.handle.clone());
-            result
+            BigFloat::new_init_handle(|result_handle| {
+                M::managed_type_impl().bf_neg(result_handle, self.handle.clone());
+            })
         }
     }
 }

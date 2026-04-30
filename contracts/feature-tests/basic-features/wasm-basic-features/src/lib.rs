@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          660
+// Endpoints:                          676
 // Async Callback:                       1
-// Total number of exported functions: 662
+// Total number of exported functions: 678
 
 #![no_std]
 
@@ -46,6 +46,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         bigint_overwrite_i64 => bigint_overwrite_i64
         big_int_to_parts => big_int_to_parts
         big_int_from_biguint => big_int_from_biguint
+        big_int_neg => big_int_neg
         add_big_int_big_uint => add_big_int_big_uint
         add_big_uint_big_int => add_big_uint_big_int
         add_big_int_big_uint_ref => add_big_int_big_uint_ref
@@ -332,6 +333,18 @@ multiversx_sc_wasm_adapter::endpoints! {
         le_non_zero_big_uint_i64 => le_non_zero_big_uint_i64
         le_non_zero_big_uint_u32 => le_non_zero_big_uint_u32
         le_non_zero_big_uint_u64 => le_non_zero_big_uint_u64
+        saturating_sub_big_uint_big_uint => saturating_sub_big_uint_big_uint
+        saturating_sub_big_uint_big_uint_ref => saturating_sub_big_uint_big_uint_ref
+        saturating_sub_big_uint_ref_big_uint => saturating_sub_big_uint_ref_big_uint
+        saturating_sub_big_uint_ref_big_uint_ref => saturating_sub_big_uint_ref_big_uint_ref
+        saturating_sub_big_uint_u32 => saturating_sub_big_uint_u32
+        saturating_sub_big_uint_ref_u32 => saturating_sub_big_uint_ref_u32
+        saturating_sub_big_uint_u64 => saturating_sub_big_uint_u64
+        saturating_sub_big_uint_ref_u64 => saturating_sub_big_uint_ref_u64
+        saturating_sub_assign_big_uint_big_uint => saturating_sub_assign_big_uint_big_uint
+        saturating_sub_assign_big_uint_big_uint_ref => saturating_sub_assign_big_uint_big_uint_ref
+        saturating_sub_assign_big_uint_u32 => saturating_sub_assign_big_uint_u32
+        saturating_sub_assign_big_uint_u64 => saturating_sub_assign_big_uint_u64
         get_block_timestamp => get_block_timestamp
         get_block_nonce => get_block_nonce
         get_block_round => get_block_round
@@ -678,6 +691,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         mm_contains => mm_contains
         mm_remove_get => mm_remove_get
         mm_mutable_input_test => mm_mutable_input_test
+        math_weighted_average => math_weighted_average
+        math_weighted_average_round_up => math_weighted_average_round_up
+        math_linear_interpolation => math_linear_interpolation
     )
 }
 

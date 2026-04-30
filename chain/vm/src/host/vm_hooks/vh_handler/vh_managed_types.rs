@@ -48,7 +48,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         self.use_gas(
             self.gas_schedule()
                 .managed_buffer_api_cost
-                .m_buffer_to_big_int_unsigned,
+                .m_buffer_to_big_int_signed,
         )?;
 
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
@@ -94,9 +94,14 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn mb_to_small_int_unsigned(
-        &self,
+        &mut self,
         buffer_handle: RawHandle,
     ) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_to_small_int_unsigned,
+        )?;
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
         let bu = num_bigint::BigUint::from_bytes_be(&bytes);
         if let Some(small) = big_uint_to_u64(&bu) {
@@ -107,9 +112,14 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn mb_to_small_int_signed(
-        &self,
+        &mut self,
         buffer_handle: RawHandle,
     ) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_to_small_int_signed,
+        )?;
         let bytes = self.context.m_types_lock().mb_to_bytes(buffer_handle);
         let bi = num_bigint::BigInt::from_signed_bytes_be(&bytes);
         if let Some(small) = big_int_to_i64(&bi) {
@@ -120,10 +130,15 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn mb_from_small_int_unsigned(
-        &self,
+        &mut self,
         buffer_handle: RawHandle,
         value: u64,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_from_small_int_unsigned,
+        )?;
         let bu = num_bigint::BigUint::from(value);
         let bytes = big_uint_unsigned_bytes(&bu);
         self.context.m_types_lock().mb_set(buffer_handle, bytes);
@@ -136,10 +151,15 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     ///
     /// The framework avoids this VM hook, starting with v0.64.2.
     pub fn mb_from_small_int_signed(
-        &self,
+        &mut self,
         buffer_handle: RawHandle,
         value: i64,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .managed_buffer_api_cost
+                .m_buffer_from_small_int_signed,
+        )?;
         let bi = num_bigint::BigInt::from(value);
         // TODO: remove `.abs()` once the bug is fixed
         let bytes = big_int_signed_bytes(&bi.abs());

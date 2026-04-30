@@ -2,6 +2,7 @@
 pub enum BaseOperator {
     Add,
     Sub,
+    SaturatingSub,
     Mul,
     Div,
     Rem,
@@ -18,26 +19,6 @@ pub enum BaseOperator {
 }
 
 impl BaseOperator {
-    pub fn symbol(&self) -> &'static str {
-        match self {
-            BaseOperator::Add => "+",
-            BaseOperator::Sub => "-",
-            BaseOperator::Mul => "*",
-            BaseOperator::Div => "/",
-            BaseOperator::Rem => "%",
-            BaseOperator::BitAnd => "&",
-            BaseOperator::BitOr => "|",
-            BaseOperator::BitXor => "^",
-            BaseOperator::Shr => ">>",
-            BaseOperator::Shl => "<<",
-            BaseOperator::Eq => "==",
-            BaseOperator::Gt => ">",
-            BaseOperator::Ge => ">=",
-            BaseOperator::Lt => "<",
-            BaseOperator::Le => "<=",
-        }
-    }
-
     pub fn is_division(&self) -> bool {
         matches!(self, BaseOperator::Div | BaseOperator::Rem)
     }
@@ -76,12 +57,39 @@ impl OperatorInfo {
         }
     }
 
-    pub fn symbol(&self) -> String {
-        if self.assign {
-            format!("{}=", self.base_operator.symbol())
-        } else {
-            self.base_operator.symbol().to_string()
+    pub fn format_op(&self, a: &str, b: &str) -> String {
+        match self.base_operator {
+            BaseOperator::SaturatingSub => {
+                if self.assign {
+                    format!("{a}.saturating_sub_assign({b})")
+                } else {
+                    format!("{a}.saturating_sub({b})")
+                }
+            }
+            BaseOperator::Add => format_symbol(a, b, "+", self.assign),
+            BaseOperator::Sub => format_symbol(a, b, "-", self.assign),
+            BaseOperator::Mul => format_symbol(a, b, "*", self.assign),
+            BaseOperator::Div => format_symbol(a, b, "/", self.assign),
+            BaseOperator::Rem => format_symbol(a, b, "%", self.assign),
+            BaseOperator::BitAnd => format_symbol(a, b, "&", self.assign),
+            BaseOperator::BitOr => format_symbol(a, b, "|", self.assign),
+            BaseOperator::BitXor => format_symbol(a, b, "^", self.assign),
+            BaseOperator::Shr => format_symbol(a, b, ">>", self.assign),
+            BaseOperator::Shl => format_symbol(a, b, "<<", self.assign),
+            BaseOperator::Eq => format_symbol(a, b, "==", self.assign),
+            BaseOperator::Gt => format_symbol(a, b, ">", self.assign),
+            BaseOperator::Ge => format_symbol(a, b, ">=", self.assign),
+            BaseOperator::Lt => format_symbol(a, b, "<", self.assign),
+            BaseOperator::Le => format_symbol(a, b, "<=", self.assign),
         }
+    }
+}
+
+fn format_symbol(a: &str, b: &str, symbol: &str, assign: bool) -> String {
+    if assign {
+        format!("{a} {symbol}= {b}")
+    } else {
+        format!("{a} {symbol} {b}")
     }
 }
 
@@ -91,6 +99,7 @@ pub enum OperatorGroup {
     Bitwise,
     Shift,
     Cmp,
+    SaturatingSubMethods,
 }
 
 pub struct OperatorList(pub Vec<OperatorInfo>);
@@ -126,6 +135,18 @@ impl OperatorList {
             OperatorInfo::new("ge", BaseOperator::Ge, OperatorGroup::Cmp),
             OperatorInfo::new("lt", BaseOperator::Lt, OperatorGroup::Cmp),
             OperatorInfo::new("le", BaseOperator::Le, OperatorGroup::Cmp),
+            // Extra
+            OperatorInfo::new(
+                "saturating_sub",
+                BaseOperator::SaturatingSub,
+                OperatorGroup::SaturatingSubMethods,
+            ),
+            OperatorInfo::new(
+                "saturating_sub",
+                BaseOperator::SaturatingSub,
+                OperatorGroup::SaturatingSubMethods,
+            )
+            .assign(),
         ])
     }
 }

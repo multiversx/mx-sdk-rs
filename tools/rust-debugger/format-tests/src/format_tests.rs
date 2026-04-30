@@ -99,10 +99,6 @@ fn main() {
         "(32) 0x000000000000000000010000000000000000000000000000000000000002ffff"
     );
 
-    let managed_byte_array: ManagedByteArray<DebugApi, 4> =
-        ManagedByteArray::new_from_bytes(b"test");
-    push!(to_check, managed_byte_array, "\"test\" - (4) 0x74657374");
-
     let managed_option_some_token_identifier: ManagedOption<
         DebugApi,
         EsdtTokenIdentifier<DebugApi>,
@@ -209,14 +205,6 @@ fn main() {
         "(3) { [0] = \"ab\" - (2) 0x6162, [1] = \"abcd\" - (4) 0x61626364, [2] = \"abcdefghijkl\" - (12) 0x6162636465666768696a6b6c }"
     );
 
-    // 6. MultiversX codec - Multi-types
-    let optional_value_some: OptionalValue<BigUint<DebugApi>> =
-        OptionalValue::Some(BigUint::from(42u64));
-    push!(to_check, optional_value_some, "OptionalValue::Some(42)");
-
-    let optional_value_none: OptionalValue<BigUint<DebugApi>> = OptionalValue::None;
-    push!(to_check, optional_value_none, "OptionalValue::None");
-
     // Invalid handle tests
 
     let invalid_handle = DebugHandle::from(-1000);
@@ -250,14 +238,6 @@ fn main() {
         to_check,
         token_identifier_with_invalid_handle,
         "<invalid handle: raw_handle -1000 not found in managed_buffer_map>"
-    );
-
-    let optional_value_some_with_invalid_handle: OptionalValue<BigUint<DebugApi>> =
-        OptionalValue::Some(unsafe { BigUint::from_handle(invalid_handle.clone()) });
-    push!(
-        to_check,
-        optional_value_some_with_invalid_handle,
-        "OptionalValue::Some(<invalid handle: raw_handle -1000 not found in big_int_map>)"
     );
 
     // Invalid TxContext test - simulate access after context change

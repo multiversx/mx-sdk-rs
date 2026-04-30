@@ -377,6 +377,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "843867be96c8daad0d758b57df9392b6d8d271134fce549de6ce169ff98a92af"
 
 [[package]]
+name = "blake2"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46502ad458c9a52b69d4d4d32775c788b7a1b85e8bc9d482d92250fc0e3f8efe"
+dependencies = [
+ "digest",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1826,11 +1835,8 @@ dependencies = [
 name = "gas-schedule-generator"
 version = "0.0.0"
 dependencies = [
- "clap",
  "convert_case 0.11.0",
- "env_logger",
  "multiversx-chain-vm",
- "tokio",
 ]
 
 [[package]]
@@ -2926,6 +2932,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "managed-mem-bench"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "map-repeat"
 version = "0.0.0"
 dependencies = [
@@ -3108,6 +3122,7 @@ version = "0.22.1"
 dependencies = [
  "bech32",
  "bitflags 2.11.0",
+ "blake2",
  "hex",
  "multiversx-sc-codec",
  "serde",
@@ -3328,6 +3343,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "simple-error",
+ "static_assertions",
  "unwrap-infallible",
 ]
 

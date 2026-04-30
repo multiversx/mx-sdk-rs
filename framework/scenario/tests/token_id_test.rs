@@ -11,6 +11,10 @@ use multiversx_sc_scenario::{
     multiversx_sc, token_id,
 };
 
+// TokenId intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(TokenId::<StaticApi>: Send, Sync);
+
 #[test]
 fn test_egld() {
     assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_egld());

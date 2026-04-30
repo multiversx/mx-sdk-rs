@@ -1,5 +1,6 @@
 use crate::{
     abi::TypeAbiFrom,
+    api::ManagedTypeApiImpl,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecodeMulti,
         TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput, multi_types::MultiValue3,
@@ -45,8 +46,8 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        EsdtTokenPayment::read_from_payload(payload).into()
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { EsdtTokenPayment::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
@@ -55,6 +56,10 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.obj.save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }
 
