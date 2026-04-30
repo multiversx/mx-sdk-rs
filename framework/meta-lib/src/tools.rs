@@ -1,6 +1,6 @@
-pub mod build_target;
 mod find_workspace;
 mod git_describe;
+pub mod install_wasm_target;
 pub(crate) mod panic_report;
 mod rustc_version;
 mod rustc_version_warning;
