@@ -15,8 +15,7 @@ impl RustcVersion {
     /// Constructs a `RustcVersion` from an optional toolchain name.
     ///
     /// If `Some`, delegates to [`Self::from_toolchain`].
-    /// If `None`, falls back to [`Self::current_version`], which reflects the toolchain
-    /// that compiled the current binary.
+    /// If `None`, falls back to [`Self::current_version`], which reflects the current default toolchain.
     pub fn from_opt_toolchain(opt_toolchain_name: Option<&str>) -> Self {
         if let Some(toolchain_name) = opt_toolchain_name {
             Self::from_toolchain(toolchain_name)
@@ -41,9 +40,17 @@ impl RustcVersion {
         }
     }
 
-    /// Retrieves the current rustc version from crate `rustc_version`.
+    /// Retrieves the version of the currently active `rustc` by running `rustc -vV` at runtime.
     ///
-    /// The value is embedded into the binary at compile time.
+    /// Delegates to [`rustc_version::version_meta`], which invokes the binary pointed to by the
+    /// `$RUSTC` environment variable (falling back to `rustc` if unset), and additionally
+    /// respects `$RUSTC_WRAPPER`. No toolchain override (`+<name>`) is applied, so the result
+    /// reflects whichever toolchain is currently active in the shell environment.
+    ///
+    /// Unlike [`Self::from_toolchain`], which stores the caller-supplied name verbatim as
+    /// `short_string`, this method derives `short_string` from the parsed output and
+    /// includes the host triple (e.g. `"1.88-x86_64-unknown-linux-gnu"` for stable,
+    /// `"nightly-2024-01-01-x86_64-unknown-linux-gnu"` for nightly).
     pub fn current_version() -> RustcVersion {
         let version_meta =
             rustc_version::version_meta().expect("failed to get rustc version metadata");
