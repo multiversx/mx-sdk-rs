@@ -142,13 +142,9 @@ fn rustc_version_to_string(version_meta: &VersionMeta) -> String {
     }
 }
 
-/// Outputs major.minor if the other fields are zero or missing. Outputs the full string otherwise.
+/// Outputs the full major.minor.patch version string.
 fn version_to_string(version: &Version) -> String {
-    if version.patch == 0 && version.pre.is_empty() && version.build.is_empty() {
-        format!("{}.{}", version.major, version.minor)
-    } else {
-        version.to_string()
-    }
+    format!("{}.{}.{}", version.major, version.minor, version.patch)
 }
 
 /// Gets the VersionMeta for a specific toolchain identifier, by calling `rustc -vV` with that toolchain.
