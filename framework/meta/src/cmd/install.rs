@@ -2,7 +2,7 @@ pub mod install_debugger;
 mod install_scenario_go;
 mod system_info;
 
-use multiversx_sc_meta_lib::tools::{self, install_wasm_target::install_target};
+use multiversx_sc_meta_lib::tools;
 
 use crate::cli::{
     InstallArgs, InstallCommand, InstallDebuggerArgs, InstallMxScenarioGoArgs, InstallWasm32Args,
@@ -32,10 +32,7 @@ async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
 }
 
 fn install_wasm32(_wasm32_args: &InstallWasm32Args) {
-    install_target(None, tools::install_wasm_target::WASM32_TARGET);
-    if tools::install_wasm_target::is_wasm32v1_available() {
-        install_target(None, tools::install_wasm_target::WASM32V1_TARGET);
-    }
+    tools::install_wasm_target::install_all_wasm32_targets(None);
 }
 
 fn install_wasm_opt(_wasm_opt_args: &InstallWasmOptArgs) {
