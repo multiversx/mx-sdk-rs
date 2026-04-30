@@ -1,4 +1,4 @@
-use crate::tools::{build_target, wasm_opt};
+use crate::tools::{install_wasm_target, wasm_opt};
 use core::panic;
 use std::{
     collections::HashMap,
@@ -101,11 +101,14 @@ impl ContractVariant {
     }
 
     fn is_target_installed(&self) -> bool {
-        build_target::is_target_installed(&self.settings.rustc_version, &self.settings.rustc_target)
+        install_wasm_target::is_target_installed(
+            &self.settings.rustc_version,
+            &self.settings.rustc_target,
+        )
     }
 
     fn install_wasm_target(&self) {
-        build_target::install_target(
+        install_wasm_target::install_target(
             Some(&self.settings.rustc_version),
             &self.settings.rustc_target,
         );

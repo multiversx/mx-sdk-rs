@@ -90,7 +90,7 @@ impl ContractVariantBuilder {
                     rustc_target: cms
                         .rustc_target
                         .clone()
-                        .unwrap_or_else(|| tools::build_target::default_target().to_owned()),
+                        .unwrap_or_else(|| tools::install_wasm_target::default_target().to_owned()),
                     opcode_version: cms.opcode_version.as_ref().map_or(
                         default.settings.opcode_version,
                         |v| OpcodeVersion::from_settings_str(v).expect("Invalid opcode version in contract variant settings; allowed values are '1' and '2'")
