@@ -81,3 +81,10 @@ pub fn install_target(rustc_version: Option<&RustcVersion>, target_name: &str) {
 
     print_util::print_rustup_install_target_success(target_name);
 }
+
+pub fn install_all_wasm32_targets(rustc_version: Option<&RustcVersion>) {
+    install_target(rustc_version, WASM32_TARGET);
+    if is_wasm32v1_available() {
+        install_target(rustc_version, WASM32V1_TARGET);
+    }
+}
