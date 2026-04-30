@@ -484,7 +484,12 @@ pub struct InstallMxScenarioGoArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct InstallWasm32Args {}
+pub struct InstallWasm32Args {
+    /// The Rust toolchain to install the wasm32 target for (e.g. `nightly-2024-01-01`, `stable`).
+    /// If not specified, the current toolchain is used.
+    #[arg(long, verbatim_doc_comment)]
+    pub toolchain: Option<String>,
+}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasmOptArgs {}

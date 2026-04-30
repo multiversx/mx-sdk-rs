@@ -12,20 +12,32 @@ pub struct RustcVersion {
 }
 
 impl RustcVersion {
-    /// Parses the rustc version from sc-config.toml.
-    pub fn from_opt_sc_config_serde(opt_serde_version: &Option<String>) -> Self {
-        if let Some(serde_version) = opt_serde_version {
-            Self::from_sc_config_serde(serde_version)
+    /// Constructs a `RustcVersion` from an optional toolchain name.
+    ///
+    /// If `Some`, delegates to [`Self::from_toolchain`].
+    /// If `None`, falls back to [`Self::current_version`], which reflects the toolchain
+    /// that compiled the current binary.
+    pub fn from_opt_toolchain(opt_toolchain_name: Option<&str>) -> Self {
+        if let Some(toolchain_name) = opt_toolchain_name {
+            Self::from_toolchain(toolchain_name)
         } else {
             Self::current_version()
         }
     }
 
-    pub fn from_sc_config_serde(serde_version: &str) -> Self {
-        let version_meta = get_version_meta_for_toolchain(serde_version);
+    /// Constructs a `RustcVersion` from a toolchain name (e.g. `"nightly-2024-01-01"` or `"stable"`).
+    ///
+    /// The name is passed verbatim as the `+<toolchain>` argument to `rustc -vV`
+    /// (i.e. `rustc +nightly-2024-01-01 -vV`), which rustup intercepts to select the
+    /// appropriate installed toolchain. The same string is stored in `short_string` and
+    /// later used to build `+<toolchain>` arguments for `cargo` and `rustup` commands.
+    ///
+    /// Panics if the toolchain is not installed or if `rustc -vV` output cannot be parsed.
+    pub fn from_toolchain(toolchain_name: &str) -> Self {
+        let version_meta = get_version_meta_for_toolchain(toolchain_name);
         RustcVersion {
             version_meta,
-            short_string: serde_version.to_owned(),
+            short_string: toolchain_name.to_owned(),
         }
     }
 
