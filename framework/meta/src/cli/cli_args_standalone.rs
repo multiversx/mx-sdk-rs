@@ -394,16 +394,16 @@ pub enum ReproducibleBuildCliAction {
     SourceUnpack(SourceUnpackArgs),
 
     #[command(
-        name = "verify",
-        about = "Submits a contract verification request to the verifier service."
+        name = "publish",
+        about = "Submits a contract publication request to the verifier service."
     )]
-    Verify(VerifyArgs),
+    Publish(PublishArgs),
 
     #[command(
-        name = "unverify",
-        about = "Removes a previously verified Smart Contract from the verifier service."
+        name = "unpublish",
+        about = "Removes a previously published Smart Contract from the verifier service."
     )]
-    Unverify(UnverifyArgs),
+    Unpublish(UnpublishArgs),
 
     #[command(
         name = "check",
@@ -474,8 +474,8 @@ pub struct SourceUnpackArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct VerifyArgs {
-    /// The bech32 address of the deployed contract to verify.
+pub struct PublishArgs {
+    /// The bech32 address of the deployed contract to publish.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
 
@@ -492,7 +492,7 @@ pub struct VerifyArgs {
     #[arg(long = "verifier-url", verbatim_doc_comment)]
     pub verifier_url: String,
 
-    /// For multicontract repos: the specific contract variant to verify.
+    /// For multicontract repos: the specific contract variant to publish.
     #[arg(long = "contract-variant", verbatim_doc_comment)]
     pub contract_variant: Option<String>,
 
@@ -521,12 +521,12 @@ pub struct VerifyArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct UnverifyArgs {
-    /// The bech32 address of the deployed contract to unverify.
+pub struct UnpublishArgs {
+    /// The bech32 address of the deployed contract to unpublish.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
 
-    /// The code hash of the contract to unverify.
+    /// The code hash of the contract to unpublish.
     #[arg(long = "code-hash", verbatim_doc_comment)]
     pub code_hash: String,
 
@@ -600,7 +600,7 @@ pub struct DownloadArgs {
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct DockerBuildArgs {
     /// Pinned Docker image tag to run the build in.
-    /// e.g. `multiversx/sc-meta-reproducible-build:0.65.1`
+    /// e.g. `multiversx/sdk-rust-contract-builder:v12.0.0`
     #[arg(long = "docker-image", verbatim_doc_comment)]
     pub docker_image: String,
 

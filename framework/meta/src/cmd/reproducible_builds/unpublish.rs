@@ -5,15 +5,15 @@ use multiversx_sc_snippets::imports::Bech32Address;
 
 use crate::cli::UnpublishArgs;
 
-use super::verify::{compute_bytes_for_signing, load_private_key};
+use super::publish::{compute_bytes_for_signing, load_private_key};
 
-/// CLI entry point for `sc-meta reproducible-build unverify`.
+/// CLI entry point for `sc-meta reproducible-build unpublish`.
 pub async fn unpublish_contract(args: &UnpublishArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
 
     if !args.skip_confirmation {
         print!(
-            "Are you sure you want to unverify contract {}? (y/n): ",
+            "Are you sure you want to unpublish contract sources {}? (y/n): ",
             contract.to_bech32_str()
         );
         io::stdout().flush().unwrap();

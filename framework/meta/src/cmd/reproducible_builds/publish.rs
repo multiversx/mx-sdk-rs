@@ -14,13 +14,13 @@ const ELROND_SIGNED_MESSAGE_PREFIX: &[u8] = b"\x17Elrond Signed Message:\n";
 const HTTP_STATUS_OK: u16 = 200;
 const HTTP_STATUS_TIMEOUT: u16 = 408;
 
-/// CLI entry point for `sc-meta reproducible-build verify`.
+/// CLI entry point for `sc-meta reproducible-build publish`.
 pub async fn publish_contract(args: &PublishArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
 
     if !args.skip_confirmation {
         print!(
-            "Are you sure you want to verify contract {}? \
+            "Are you sure you want to publish contract sources {}? \
              This will publish the contract's source code (y/n): ",
             contract.to_bech32_str()
         );
