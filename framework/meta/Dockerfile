@@ -1,13 +1,14 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Toolchain versions — bump these together when upgrading.
 ARG VERSION_RUST="1.93.0"
-ARG VERSION_SC_META="0.65.1"
+ARG VERSION_SC_META="0.66.0"
 ARG VERSION_WASM_OPT="0.116.1"
 ARG TARGETPLATFORM
 
 # Install system dependencies
-RUN apt-get update --fix-missing && apt-get install -y \
+RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
+    ca-certificates \
     wget \
     build-essential \
     git \

@@ -8,5 +8,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 docker build \
   --platform linux/amd64 \
   -f "$SCRIPT_DIR/Dockerfile" \
-  -t multiversx/sc-meta-reproducible-build:0.65.1 \
+  -t multiversx/sdk-rust-contract-builder:v12.0.0-alpha \
   "$SCRIPT_DIR"

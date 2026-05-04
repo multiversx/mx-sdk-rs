@@ -11,6 +11,11 @@ WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 docker build \
   --platform linux/amd64 \
+  --progress=plain \
+  --no-cache \
   -f "$SCRIPT_DIR/Dockerfile.local" \
-  -t multiversx/sc-meta-reproducible-build:local \
+  -t multiversx/sdk-rust-contract-builder:v12.0.0-alpha \
   "$WORKSPACE_ROOT"
+
+
+docker push multiversx/sdk-rust-contract-builder:v12.0.0-alpha
