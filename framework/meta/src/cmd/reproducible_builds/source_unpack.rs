@@ -53,5 +53,5 @@ pub fn unpack_packaged_src(src_path: &Path, unwrap_folder: &Path) -> (PathBuf, S
     );
 
     let folder = unwrap_folder.canonicalize().unwrap();
-    (folder, packed.metadata.build_options.build_root_folder)
+    (folder, packed.metadata.build_root_folder().to_string())
 }

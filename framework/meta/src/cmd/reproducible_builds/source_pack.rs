@@ -13,8 +13,8 @@ use crate::folder_structure::RelevantDirectories;
 
 use super::local_deps::{DependencyDepth, compute_local_deps};
 use super::source_json_model::{
-    PackedSource, SCHEMA_VERSION, SOURCE_JSON_EXTENSION, SYS_MAXSIZE, SourceBuildMetadata,
-    SourceBuildOptions, SourceFileEntry, SourceMetadata,
+    PackedSource, SCHEMA_VERSION, SOURCE_JSON_EXTENSION, SYS_MAXSIZE, SourceBuildOptions,
+    SourceFileEntry, SourceMetadata,
 };
 
 /// File names (regardless of extension) that are included as source files.
@@ -122,12 +122,12 @@ pub(crate) fn source_pack_contract(
         metadata: SourceMetadata {
             contract_name: contract_name.clone(),
             contract_version: contract_version.clone(),
-            build_metadata: SourceBuildMetadata::default(),
-            build_options: SourceBuildOptions {
+            build_metadata: None,
+            build_options: Some(SourceBuildOptions {
                 package_whole_project_src: true,
                 specific_contract: specific_contract.map(|s| s.to_string()),
                 build_root_folder: project_folder.to_string_lossy().into_owned(),
-            },
+            }),
         },
         entries,
     };
