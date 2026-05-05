@@ -4,7 +4,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use crate::cli::DockerBuildArgs;
+use crate::cli::ReproducibleBuildBuildArgs;
 
 /// Host directory used for Cargo caches that are shared across Docker runs.
 const CARGO_CACHE_BASE: &str = "/tmp/multiversx_sc_meta_builder";
@@ -23,7 +23,7 @@ const CARGO_CACHE_BASE: &str = "/tmp/multiversx_sc_meta_builder";
 ///   cargo-target-dir    → /rust/cargo-target-dir  (optional cache)
 ///   cargo-registry      → /rust/registry          (optional cache)
 ///   cargo-git           → /rust/git               (optional cache)
-pub fn docker_build(args: &DockerBuildArgs) {
+pub fn docker_build(args: &ReproducibleBuildBuildArgs) {
     check_docker_available();
 
     let project = resolve_project(args.project.as_deref());

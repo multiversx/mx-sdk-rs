@@ -66,7 +66,7 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::ReproducibleBuild(rb_args)) => match &rb_args.command {
             ReproducibleBuildCliAction::SourcePack(args) => source_pack(args),
             ReproducibleBuildCliAction::LocalBuild(args) => local_build(args),
-            ReproducibleBuildCliAction::DockerBuild(args) => docker_build(args),
+            ReproducibleBuildCliAction::Build(args) => docker_build(args),
             ReproducibleBuildCliAction::LocalDeps(args) => local_deps(args),
             ReproducibleBuildCliAction::SourceUnpack(args) => source_unpack(args),
             ReproducibleBuildCliAction::Publish(args) => publish_contract(args).await,

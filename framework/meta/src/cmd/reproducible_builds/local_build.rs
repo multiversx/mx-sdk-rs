@@ -8,7 +8,7 @@ use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 use multiversx_sc_meta_lib::cli::{BuildArgs, ContractCliAction};
 use multiversx_sc_meta_lib::tools::generate_codehashes_in_output;
 
-use crate::cli::{AllArgs, LocalBuildArgs, MetaLibArgs};
+use crate::cli::{AllArgs, MetaLibArgs, ReproducibleBuildLocalBuildArgs};
 use crate::cmd::all::call_contract_meta;
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
@@ -29,7 +29,7 @@ use super::source_unpack::unpack_packaged_src;
 ///    d. Clean again, keeping `output/`.
 ///    e. Copy `output/` to `--output/<contract_name>/`.
 /// 5. Verify no `Cargo.lock` file changed (enforces `--locked`).
-pub fn local_build(args: &LocalBuildArgs) {
+pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
     if args.path.is_some() && args.packaged_src.is_some() {
         eprintln!("Error: --path and --packaged-src are mutually exclusive.");
         std::process::exit(1);

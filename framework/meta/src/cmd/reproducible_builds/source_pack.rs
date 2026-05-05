@@ -8,7 +8,7 @@ use std::{
 
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
 
-use crate::cli::PackArgs;
+use crate::cli::SourcePackArgs;
 use crate::folder_structure::RelevantDirectories;
 
 use super::local_deps::{DependencyDepth, compute_local_deps};
@@ -34,7 +34,7 @@ const NAMED_SOURCE_FILES: &[&str] = &[
 ///
 /// For each contract, writes:
 ///   `<contract_dir>/output/<name>-<version>.source.json`
-pub fn source_pack(args: &PackArgs) {
+pub fn source_pack(args: &SourcePackArgs) {
     let project_folder = if let Some(p) = &args.path {
         Path::new(p).canonicalize().unwrap()
     } else {

@@ -6,7 +6,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::cli::DownloadArgs;
+use crate::cli::ReproducibleBuildDownloadArgs;
 
 use super::source_json_model::{PackedSource, SourceFileEntry};
 
@@ -35,7 +35,7 @@ struct ContractVerifierSource {
 // ---------------------------------------------------------------------------
 
 /// CLI entry point for `sc-meta reproducible-build download`.
-pub async fn download_contract_verification(args: &DownloadArgs) {
+pub async fn download_contract_verification(args: &ReproducibleBuildDownloadArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
     let bech32 = contract.to_bech32_str().to_string();
 

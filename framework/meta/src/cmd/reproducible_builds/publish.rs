@@ -8,14 +8,14 @@ use sha3::Keccak256;
 
 use multiversx_sc_snippets::imports::Bech32Address;
 
-use crate::cli::PublishArgs;
+use crate::cli::ReproducibleBuildPublishArgs;
 
 const ELROND_SIGNED_MESSAGE_PREFIX: &[u8] = b"\x17Elrond Signed Message:\n";
 const HTTP_STATUS_OK: u16 = 200;
 const HTTP_STATUS_TIMEOUT: u16 = 408;
 
 /// CLI entry point for `sc-meta reproducible-build publish`.
-pub async fn publish_contract(args: &PublishArgs) {
+pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
 
     if !args.skip_confirmation {

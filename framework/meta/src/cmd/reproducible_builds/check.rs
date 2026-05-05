@@ -1,12 +1,12 @@
 use multiversx_sc_snippets::imports::Bech32Address;
 
-use crate::cli::CheckArgs;
+use crate::cli::ReproducibleBuildCheckArgs;
 
 /// CLI entry point for `sc-meta reproducible-build check`.
 ///
 /// GETs the verified-contracts list from the verifier service and reports
 /// whether the given contract address is currently verified.
-pub async fn check_contract_verification(args: &CheckArgs) {
+pub async fn check_contract_verification(args: &ReproducibleBuildCheckArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
 

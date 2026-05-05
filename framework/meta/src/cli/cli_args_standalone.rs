@@ -343,7 +343,7 @@ pub struct UpgradeArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct PackArgs {
+pub struct SourcePackArgs {
     /// Project folder (workspace root or single contract folder).
     /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
@@ -364,22 +364,16 @@ pub struct ReproducibleBuildArgs {
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum ReproducibleBuildCliAction {
     #[command(
-        name = "source-pack",
-        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
+        name = "build",
+        about = "Runs the reproducible build inside a pinned Docker container."
     )]
-    SourcePack(PackArgs),
+    Build(ReproducibleBuildBuildArgs),
 
     #[command(
         name = "local-build",
         about = "Builds all contracts locally, mirroring the Docker reproducible build pipeline."
     )]
-    LocalBuild(LocalBuildArgs),
-
-    #[command(
-        name = "docker-build",
-        about = "Runs the reproducible build inside a pinned Docker container."
-    )]
-    DockerBuild(DockerBuildArgs),
+    LocalBuild(ReproducibleBuildLocalBuildArgs),
 
     #[command(
         name = "local-deps",
@@ -388,38 +382,44 @@ pub enum ReproducibleBuildCliAction {
     LocalDeps(LocalDepsArgs),
 
     #[command(
-        name = "source-unpack",
-        about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
-    )]
-    SourceUnpack(SourceUnpackArgs),
-
-    #[command(
         name = "publish",
         about = "Submits a contract publication request to the verifier service."
     )]
-    Publish(PublishArgs),
+    Publish(ReproducibleBuildPublishArgs),
 
     #[command(
         name = "unpublish",
         about = "Removes a previously published Smart Contract from the verifier service."
     )]
-    Unpublish(UnpublishArgs),
+    Unpublish(ReproducibleBuildUnpublishArgs),
 
     #[command(
         name = "check",
         about = "Checks whether a contract is currently verified on the verifier service."
     )]
-    Check(CheckArgs),
+    Check(ReproducibleBuildCheckArgs),
 
     #[command(
         name = "download",
         about = "Downloads the ABI and source files of a verified contract from the verifier service."
     )]
-    Download(DownloadArgs),
+    Download(ReproducibleBuildDownloadArgs),
+
+    #[command(
+        name = "source-pack",
+        about = "Packages the contract source code into a self-contained JSON file, suitable for reproducible builds."
+    )]
+    SourcePack(SourcePackArgs),
+
+    #[command(
+        name = "source-unpack",
+        about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
+    )]
+    SourceUnpack(SourceUnpackArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct LocalBuildArgs {
+pub struct ReproducibleBuildLocalBuildArgs {
     /// Project folder (workspace root or single contract folder).
     /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
@@ -474,7 +474,7 @@ pub struct SourceUnpackArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct PublishArgs {
+pub struct ReproducibleBuildPublishArgs {
     /// The bech32 address of the deployed contract to publish.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
@@ -521,7 +521,7 @@ pub struct PublishArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct UnpublishArgs {
+pub struct ReproducibleBuildUnpublishArgs {
     /// The bech32 address of the deployed contract to unpublish.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
@@ -559,7 +559,7 @@ pub struct UnpublishArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct CheckArgs {
+pub struct ReproducibleBuildCheckArgs {
     /// The bech32 address of the deployed contract to check.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
@@ -570,7 +570,7 @@ pub struct CheckArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct DownloadArgs {
+pub struct ReproducibleBuildDownloadArgs {
     /// The bech32 address of the deployed contract to download.
     #[arg(verbatim_doc_comment)]
     pub contract: String,
@@ -598,7 +598,7 @@ pub struct DownloadArgs {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct DockerBuildArgs {
+pub struct ReproducibleBuildBuildArgs {
     /// Pinned Docker image tag to run the build in.
     /// e.g. `multiversx/sdk-rust-contract-builder:v12.0.0`
     #[arg(long = "docker-image", verbatim_doc_comment)]

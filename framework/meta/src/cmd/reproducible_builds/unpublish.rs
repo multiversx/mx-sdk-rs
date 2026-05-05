@@ -3,12 +3,12 @@ use std::io::{self, Write};
 use hex::ToHex;
 use multiversx_sc_snippets::imports::Bech32Address;
 
-use crate::cli::UnpublishArgs;
+use crate::cli::ReproducibleBuildUnpublishArgs;
 
 use super::publish::{compute_bytes_for_signing, load_private_key};
 
 /// CLI entry point for `sc-meta reproducible-build unpublish`.
-pub async fn unpublish_contract(args: &UnpublishArgs) {
+pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
     let contract = Bech32Address::from_bech32_str(&args.contract);
 
     if !args.skip_confirmation {
