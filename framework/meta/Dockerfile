@@ -1,7 +1,10 @@
 FROM ubuntu:24.04
 
 # Toolchain versions — bump these together when upgrading.
-ARG VERSION_RUST="1.93.0"
+ARG VERSION_RUST="1.95.0"
+# Set VERSION_SC_META=local to install sc-meta from the local source tree instead of
+# crates.io. When building locally, the build context must be the workspace root:
+#   docker build --build-arg VERSION_SC_META=local -f framework/meta/Dockerfile .
 ARG VERSION_SC_META="0.66.0"
 ARG VERSION_WASM_OPT="0.116.1"
 ARG TARGETPLATFORM
@@ -27,10 +30,19 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod -R 777 /rust && \
     rm -rf /rust/registry
 
-# Install sc-meta from crates.io
-RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
-    cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked && \
-    rm -rf /rust/registry
+# Install sc-meta: from crates.io when VERSION_SC_META is a version string,
+# or from the local source tree when VERSION_SC_META=local.
+# The bind mount is only accessed in the local branch; no source is baked
+# into the image in either case.
+RUN --mount=type=bind,source=.,target=/mx-sdk-rs,readonly \
+    if [ "${VERSION_SC_META}" = "local" ]; then \
+        PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust CARGO_TARGET_DIR=/tmp/sc-meta-build-target \
+        cargo install --path /mx-sdk-rs/framework/meta --locked; \
+    else \
+        PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
+        cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked; \
+    fi && \
+    rm -rf /rust/registry /tmp/sc-meta-build-target
 
 # Install wasm32 target
 RUN PATH="/rust/bin:${PATH}" CARGO_HOME=/rust RUSTUP_HOME=/rust \
@@ -68,7 +80,6 @@ ENTRYPOINT ["sc-meta", "reproducible-build", "local-build", \
     "--output", "/output", \
     "--target-dir", "/rust/cargo-target-dir"]
 
-LABEL frozen="yes"
 LABEL rust=${VERSION_RUST}
 LABEL sc_meta=${VERSION_SC_META}
 LABEL wasm_opt=${VERSION_WASM_OPT}

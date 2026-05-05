@@ -13,7 +13,8 @@ docker build \
   --platform linux/amd64 \
   --progress=plain \
   --no-cache \
-  -f "$SCRIPT_DIR/Dockerfile.local" \
+  --build-arg VERSION_SC_META=local \
+  -f "$SCRIPT_DIR/Dockerfile" \
   -t multiversx/sdk-rust-contract-builder:v12.0.0-alpha \
   "$WORKSPACE_ROOT"
 
