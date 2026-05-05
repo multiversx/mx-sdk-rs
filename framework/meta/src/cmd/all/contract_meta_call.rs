@@ -62,12 +62,11 @@ impl ContractMetaCall {
 
     /// Runs `cargo run -- <binary_args>` in the given `meta_path` directory.
     ///
-    /// Sets `CARGO_NET_GIT_FETCH_WITH_CLI=true` on the subprocess to instruct Cargo
-    /// to use the system `git` binary for registry index and git-dependency fetches
-    /// instead of the built-in `libgit2`. This avoids excessive memory usage during
-    /// large fetches (see https://github.com/rust-lang/cargo/issues/10583), which is
-    /// especially relevant inside the reproducible-build Docker container where memory
-    /// is constrained.
+    /// To reduce memory usage during Cargo registry/git fetches you can set
+    /// `CARGO_NET_GIT_FETCH_WITH_CLI=true` in the environment before invoking
+    /// `sc-meta`. This makes Cargo use the system `git` binary instead of the
+    /// built-in `libgit2` (see https://github.com/rust-lang/cargo/issues/10583).
+    /// The reproducible-build Dockerfile sets this variable automatically.
     pub fn call_in_dir(&self, meta_path: &Path) {
         let all = self.all_cargo_args();
         print_all_command(meta_path, &all);
@@ -75,7 +74,6 @@ impl ContractMetaCall {
         let exit_status = Command::new("cargo")
             .current_dir(meta_path)
             .args(&all)
-            .env("CARGO_NET_GIT_FETCH_WITH_CLI", "true")
             .spawn()
             .expect("failed to spawn cargo run process in meta crate")
             .wait()

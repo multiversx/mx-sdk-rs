@@ -45,6 +45,10 @@ ENV PATH="/rust/bin:${PATH}"
 ENV CARGO_HOME="/rust"
 ENV RUSTUP_HOME="/rust"
 
+# Use system git for Cargo fetches to avoid libgit2 memory spikes on large indexes.
+# See https://github.com/rust-lang/cargo/issues/10583
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+
 # Exposed to sc-meta at runtime for embedding into .source.json build metadata.
 ENV BUILD_METADATA_VERSION_RUST=${VERSION_RUST}
 ENV BUILD_METADATA_VERSION_SC_META=${VERSION_SC_META}
