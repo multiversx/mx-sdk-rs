@@ -34,13 +34,14 @@ pub enum TxCliAction {
 /// Gateway / network arguments shared by commands that talk to the blockchain.
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct GatewayArgs {
-    /// MultiversX gateway URL (e.g. https://devnet-gateway.multiversx.com).
-    #[arg(long)]
-    pub gateway: String,
+    /// MultiversX proxy URL (e.g. https://devnet-gateway.multiversx.com).
+    #[arg(long = "proxy")]
+    pub proxy: String,
 
-    /// Chain ID (e.g. D for devnet, T for testnet, 1 for mainnet).
-    #[arg(long)]
-    pub chain_id: String,
+    /// Chain ID override (e.g. D for devnet, T for testnet, 1 for mainnet).
+    /// If omitted, the chain ID is taken from the network config automatically.
+    #[arg(long = "chain")]
+    pub chain: Option<String>,
 }
 
 /// Wallet / sender arguments shared by commands that sign transactions.
@@ -66,9 +67,10 @@ pub struct TxArgs {
     #[arg(long)]
     pub gas_limit: u64,
 
-    /// Gas price in smallest EGLD denomination (default: 1_000_000_000).
-    #[arg(long, default_value = "1000000000")]
-    pub gas_price: u64,
+    /// Gas price override in smallest EGLD denomination.
+    /// If omitted, the minimum gas price is taken from the network config automatically.
+    #[arg(long)]
+    pub gas_price: Option<u64>,
 
     /// Explicit nonce to use. If omitted, the current account nonce is fetched automatically.
     #[arg(long)]
@@ -240,9 +242,9 @@ pub struct NewArgs {
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct SendArgs {
-    /// MultiversX gateway URL.
-    #[arg(long)]
-    pub gateway: String,
+    /// MultiversX proxy URL.
+    #[arg(long = "proxy")]
+    pub proxy: String,
 
     /// Path to the signed tx JSON file to broadcast.
     #[arg(long)]

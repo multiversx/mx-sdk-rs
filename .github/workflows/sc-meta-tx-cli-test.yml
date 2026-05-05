@@ -1,0 +1,54 @@
+name: sc-meta tx CLI CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  sc_meta_tx_cli_chain_simulator_tests:
+    name: sc-meta tx CLI chain simulator tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.95
+
+      - name: Install sc-meta
+        env:
+          RUSTFLAGS: ""
+        run: cargo install --path framework/meta
+
+      - name: Pull latest chain simulator docker image
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta cs install
+
+      - name: Run sc-meta tx CLI tests
+        env:
+          RUSTFLAGS: ""
+        run: |
+          sc-meta cs start &
+
+          sleep 5
+
+          cd framework/meta
+          cargo test --features chain-simulator-tests || TEST_RESULT=$?
+
+          sc-meta cs stop
+
+          exit ${TEST_RESULT:-0}
+
+      - name: Cleanup
+        if: always()
+        run: sc-meta cs stop 2>/dev/null || true
