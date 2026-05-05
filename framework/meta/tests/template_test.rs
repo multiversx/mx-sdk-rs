@@ -231,15 +231,20 @@ fn try_build_contract(target: &ContractCreatorTarget, locked: bool) -> bool {
         args.push("--locked");
     }
 
-    let exit_status = Command::new("cargo")
+    let output = Command::new("cargo")
         .args(args)
         .current_dir(target.contract_dir().join("meta"))
-        .spawn()
-        .expect("failed to spawn contract build process")
-        .wait()
-        .expect("contract build process was not running");
+        .output()
+        .expect("failed to run contract build process");
 
-    exit_status.success()
+    if !output.status.success() {
+        eprintln!("--- contract build stdout ---");
+        eprintln!("{}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("--- contract build stderr ---");
+        eprintln!("{}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    output.status.success()
 }
 
 pub fn build_contract(target: &ContractCreatorTarget) {
