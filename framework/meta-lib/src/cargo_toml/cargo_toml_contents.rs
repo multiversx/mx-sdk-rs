@@ -356,6 +356,31 @@ impl CargoTomlContents {
 
         toml_string
     }
+
+    /// Removes `path = "..."` from the given named dependencies in both
+    /// `[dependencies]` and `[dev-dependencies]`.
+    /// Returns `true` if any change was made.
+    pub fn strip_dependency_paths(&mut self, crate_names: &[&str]) -> bool {
+        let mut changed = false;
+        for section in [CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES] {
+            if let Some(deps) = self
+                .toml_value
+                .get_mut(section)
+                .and_then(|v| v.as_table_mut())
+            {
+                for &crate_name in crate_names {
+                    if let Some(dep) = deps.get_mut(crate_name) {
+                        if let Some(table) = dep.as_table_mut() {
+                            if table.remove("path").is_some() {
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        changed
+    }
 }
 
 /// Checks that path == ".." in a dependency.

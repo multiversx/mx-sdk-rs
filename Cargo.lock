@@ -5181,6 +5181,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "strip-path"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc-meta",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

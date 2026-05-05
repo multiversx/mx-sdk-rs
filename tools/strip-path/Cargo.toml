@@ -1,0 +1,15 @@
+[package]
+name = "strip-path"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+description = "Strips path = \"...\" entries from framework dependencies in Cargo.toml files"
+
+[[bin]]
+name = "strip-path"
+path = "src/main.rs"
+
+[dependencies.multiversx-sc-meta]
+version = "0.65.1"
+path = "../../framework/meta"
