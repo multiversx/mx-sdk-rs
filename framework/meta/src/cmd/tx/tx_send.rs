@@ -1,8 +1,10 @@
 use std::fs;
 
 use anyhow::{Context, Result, anyhow};
-use multiversx_sc_snippets::sdk::data::transaction::{ApiTransactionResult, Transaction};
-use serde::Deserialize;
+use multiversx_sc_snippets::{
+    imports::GatewayHttpProxy,
+    sdk::data::transaction::{ApiTransactionResult, Transaction},
+};
 use serde_json::Value;
 
 use super::tx_cli_args::SendArgs;
@@ -17,8 +19,11 @@ pub async fn tx_send(args: &SendArgs) {
 async fn tx_send_inner(args: &SendArgs) -> Result<()> {
     let tx = load_transaction_from_file(&args.infile)?;
 
-    let client = reqwest::Client::new();
-    let tx_hash = broadcast_transaction(&client, &args.proxy, &tx).await?;
+    let proxy = GatewayHttpProxy::new(args.proxy.clone());
+    let tx_hash = proxy
+        .send_transaction(&tx)
+        .await
+        .context("failed to broadcast transaction")?;
     println!("Transaction hash: {tx_hash}");
 
     let result_json = if args.wait_result {
@@ -62,43 +67,6 @@ fn load_transaction_from_file(path: &std::path::Path) -> Result<Transaction> {
 
     serde_json::from_value(tx_value.clone())
         .with_context(|| format!("failed to deserialize transaction from {}", path.display()))
-}
-
-// ---------------------------------------------------------------------------
-// Broadcast
-// ---------------------------------------------------------------------------
-
-#[derive(Deserialize)]
-struct SendTxResponseData {
-    #[serde(rename = "txHash")]
-    tx_hash: String,
-}
-
-#[derive(Deserialize)]
-struct SendTxResponse {
-    data: Option<SendTxResponseData>,
-    error: String,
-}
-
-async fn broadcast_transaction(
-    client: &reqwest::Client,
-    gateway: &str,
-    tx: &Transaction,
-) -> Result<String> {
-    let url = format!("{gateway}/transaction/send");
-    let resp: SendTxResponse = client
-        .post(&url)
-        .json(tx)
-        .send()
-        .await
-        .with_context(|| format!("POST {url}"))?
-        .json()
-        .await
-        .with_context(|| format!("parsing response from {url}"))?;
-
-    resp.data
-        .map(|d| d.tx_hash)
-        .ok_or_else(|| anyhow!("broadcast error: {}", resp.error))
 }
 
 // ---------------------------------------------------------------------------

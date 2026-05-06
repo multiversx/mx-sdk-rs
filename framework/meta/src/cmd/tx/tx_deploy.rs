@@ -1,64 +1,97 @@
 use std::fs;
 
 use anyhow::{Context, Result, anyhow};
+use multiversx_sc_scenario::multiversx_sc::types::CodeMetadata;
 use multiversx_sc_snippets::{
     hex,
-    imports::{Bech32Address, GatewayHttpProxy, Interactor, InteractorRunAsync},
-    sdk::{data::keystore::InsertPassword, utils::base64_encode, wallet::Wallet},
+    imports::{
+        BytesValue, GatewayHttpProxy, Interactor, InteractorRunAsync, InterpretableFrom,
+        InterpreterContext,
+    },
+    sdk::{utils::base64_decode, wallet::Wallet},
+};
+use multiversx_sdk::data::keystore::InsertPassword;
+
+use crate::cmd::tx::tx_send::fetch_tx_on_network;
+
+use super::{
+    output::TxOutputFile,
+    tx_cli_args::{DeployArgs, MetadataArgs, SenderArgs},
 };
 
-use super::{output::TxOutputFile, tx_cli_args::NewArgs, tx_send::fetch_tx_on_network};
-
-pub async fn tx_new(args: &NewArgs) {
-    if let Err(e) = tx_new_inner(args).await {
+pub async fn tx_deploy(args: &DeployArgs) {
+    if let Err(e) = tx_deploy_inner(args).await {
         eprintln!("Error: {e:#}");
         std::process::exit(1);
     }
 }
 
-async fn tx_new_inner(args: &NewArgs) -> Result<()> {
-    let wallet = load_wallet(args)?;
-    let receiver = Bech32Address::from_bech32_string(args.receiver.clone());
+async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
+    let wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
     let sender_address = interactor.register_wallet(wallet).await;
-    let sender = sender_address.to_bech32(interactor.get_hrp());
+    let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
 
-    // Determine nonce (explicit override or recalled from network).
+    // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {
         n
     } else {
         interactor.recall_nonce(&sender_address).await
     };
 
-    // Build data field.
-    let data_raw = build_data_bytes(args)?;
-    let decoded_data = String::from_utf8_lossy(&data_raw).into_owned();
-    let data_b64 = if data_raw.is_empty() {
-        None
-    } else {
-        Some(base64_encode(&data_raw))
-    };
+    // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
+    let bytecode = fs::read(&args.bytecode)
+        .with_context(|| format!("failed to read bytecode from {}", args.bytecode.display()))?;
+    let code = BytesValue::from(bytecode);
 
-    // Build Transaction via unified Tx syntax (resembles interactor code).
-    let mut tx = interactor
+    // Build CodeMetadata from flags.
+    let code_metadata = build_code_metadata(&args.metadata);
+
+    // Interpret constructor arguments (mandos expression format, e.g. "0x1a", "str:hello", "42").
+    let context =
+        InterpreterContext::new().with_dir(std::env::current_dir().context("failed to get cwd")?);
+    let encoded_args: Vec<BytesValue> = args
+        .arguments
+        .iter()
+        .map(|s| BytesValue::interpret_from(s.as_str(), &context))
+        .collect();
+
+    // Build the deploy transaction using the interactor Tx builder syntax,
+    // then fold in constructor arguments, and finally call into_sdk_transaction().
+    let tx_builder = interactor
         .tx()
-        .from(&sender)
-        .to(&receiver)
+        .from(&sender_bech32)
         .gas(args.tx.gas_limit)
         .egld(args.tx.value)
-        .into_sdk_transaction();
+        .raw_deploy()
+        .code(code)
+        .code_metadata(code_metadata);
 
-    // Apply the fields that the Tx builder delegates to the caller.
+    let tx_builder = encoded_args
+        .iter()
+        .fold(tx_builder, |b, arg| b.argument(arg));
+
+    // Convert to SDK transaction (populates chain_id, gas_price, version, data from network config).
+    let mut tx = tx_builder.into_sdk_transaction();
+
+    // Apply caller-controlled overrides and set nonce.
     tx.nonce = nonce;
-    tx.data = data_b64;
     if let Some(gas_price) = args.tx.gas_price {
         tx.gas_price = gas_price;
     }
     if let Some(chain_id) = &args.gateway.chain {
         tx.chain_id = chain_id.clone();
     }
+
+    // The deploy data field is already base64-encoded inside tx.data by into_sdk_transaction();
+    // decode it for the human-readable TxOutputFile field.
+    let decoded_data = tx
+        .data
+        .as_ref()
+        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
+        .unwrap_or_default();
 
     let sig = wallet.sign_tx(&tx);
     tx.signature = Some(hex::encode(sig));
@@ -90,7 +123,6 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
             .context("failed to broadcast transaction")?;
         println!("Transaction hash: {tx_hash}");
 
-        // Update output file with the hash if we have one.
         let mut output_with_hash = TxOutputFile {
             emitted_transaction_hash: tx_hash.clone(),
             ..output
@@ -107,7 +139,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         if let Some(outfile) = &args.tx.outfile {
             fs::write(outfile, &json)
                 .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        } else if args.tx.wait_result {
+        } else {
             println!("{json}");
         }
     }
@@ -116,11 +148,10 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
 }
 
 // ---------------------------------------------------------------------------
-// Wallet loading
+// Helpers
 // ---------------------------------------------------------------------------
 
-fn load_wallet(args: &NewArgs) -> Result<Wallet> {
-    let sender = &args.sender;
+fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
         Wallet::from_pem_file(pem.to_str().context("invalid pem path")?)
             .context("failed to load PEM wallet")
@@ -135,22 +166,19 @@ fn load_wallet(args: &NewArgs) -> Result<Wallet> {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Data field helpers
-// ---------------------------------------------------------------------------
-
-fn build_data_bytes(args: &NewArgs) -> Result<Vec<u8>> {
-    if let Some(data) = &args.data {
-        Ok(data.as_bytes().to_vec())
-    } else if let Some(data_file) = &args.data_file {
-        fs::read(data_file)
-            .with_context(|| format!("failed to read data file {}", data_file.display()))
-    } else {
-        Ok(Vec::new())
+fn build_code_metadata(meta: &MetadataArgs) -> CodeMetadata {
+    let mut flags = CodeMetadata::DEFAULT;
+    if !meta.metadata_not_upgradeable {
+        flags |= CodeMetadata::UPGRADEABLE;
     }
+    if !meta.metadata_not_readable {
+        flags |= CodeMetadata::READABLE;
+    }
+    if meta.metadata_payable {
+        flags |= CodeMetadata::PAYABLE;
+    }
+    if meta.metadata_payable_by_sc {
+        flags |= CodeMetadata::PAYABLE_BY_SC;
+    }
+    flags
 }
-
-// ---------------------------------------------------------------------------
-// Broadcast
-// ---------------------------------------------------------------------------
-// (handled via GatewayHttpProxy::send_transaction from sdk/http)
