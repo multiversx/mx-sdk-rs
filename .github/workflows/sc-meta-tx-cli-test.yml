@@ -1,4 +1,4 @@
-name: sc-meta tx CLI CI
+name: sc-meta CI
 
 on:
   push:

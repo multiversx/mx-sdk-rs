@@ -1,4 +1,4 @@
-name: Templates CI
+name: sc-meta CI
 
 on:
   push:
