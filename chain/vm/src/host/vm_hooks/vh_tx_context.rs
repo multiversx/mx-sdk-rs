@@ -76,7 +76,8 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         // println!("use gas {gas}: {prev_gas_used} -> {next_gas_used}");
 
         if next_gas_used > gas_limit {
-            Err(VMHooksEarlyExit::new(ReturnCode::OutOfGas.as_u64()))
+            Err(VMHooksEarlyExit::new(ReturnCode::OutOfGas.as_u64())
+                .with_const_message(vm_err_msg::NOT_ENOUGH_GAS))
         } else {
             state_ref
                 .set_points_used(next_gas_used)

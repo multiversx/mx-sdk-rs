@@ -1,5 +1,6 @@
 use colored::Colorize;
 
+use super::system_info::{SystemInfo, get_system_info};
 use crate::cmd::template::RepoSource;
 use std::fs::{self};
 use std::path::{Path, PathBuf};
@@ -13,8 +14,14 @@ pub const TARGET_PATH: &str = ".vscode/extensions/";
 
 pub async fn install_debugger(custom_path: Option<PathBuf>) {
     let testing = custom_path.is_some();
-    remove_old_lldb_extension();
     let _ = install_lldb_extension();
+    if get_system_info() == SystemInfo::Windows {
+        println!(
+            "{}",
+            "On Windows, the VS Code window opened by this tool can be safely closed after installation."
+                .yellow()
+        );
+    }
     install_script(custom_path).await;
     if !testing {
         // if we are testing we skip the configuration path, not to mess up with the current vscode configuration
@@ -29,21 +36,6 @@ fn home_dir() -> PathBuf {
     std::env::home_dir().expect("Could not find home directory")
 }
 
-fn remove_old_lldb_extension() {
-    let extension_id = "vadimcn.vscode-lldb";
-
-    // Run the VSCode command to remove the previous installed extension
-    let _ = Command::new("code")
-        .arg("--uninstall-extension")
-        .arg(extension_id)
-        .status();
-
-    // Run to clean .vscode/extensions/ folder of the remains of previous extension installations
-    let _ = Command::new("rm")
-        .arg("-rf")
-        .arg("~/.vscode/extensions/vadim*")
-        .status();
-}
 fn install_lldb_extension() -> io::Result<()> {
     let extension_id = "vadimcn.vscode-lldb";
 
@@ -51,6 +43,7 @@ fn install_lldb_extension() -> io::Result<()> {
     let install_lldb_command = Command::new("code")
         .arg("--install-extension")
         .arg(extension_id)
+        .arg("--force")
         .status()?;
 
     if install_lldb_command.success() {
@@ -98,10 +91,9 @@ fn get_script_path(path: PathBuf) -> PathBuf {
 }
 
 fn get_path_to_settings() -> PathBuf {
-    let os = env::consts::OS;
     let user_home = home_dir();
-    match os {
-        "macos" => {
+    match get_system_info() {
+        SystemInfo::MacOs => {
             // For macOS
             Path::new(&user_home)
                 .join("Library")
@@ -110,7 +102,7 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        "linux" => {
+        SystemInfo::Linux => {
             // For Linux
             Path::new(&user_home)
                 .join(".config")
@@ -118,7 +110,14 @@ fn get_path_to_settings() -> PathBuf {
                 .join("User")
                 .join("settings.json")
         }
-        _ => panic!("OS not supported"),
+        SystemInfo::Windows => {
+            // For Windows
+            let appdata = env::var("APPDATA").expect("Could not find APPDATA environment variable");
+            Path::new(&appdata)
+                .join("Code")
+                .join("User")
+                .join("settings.json")
+        }
     }
 }
 
@@ -146,27 +145,11 @@ fn configure_vscode() {
         |err: serde_json::Error| panic!("Incorrectly formatted VSCode settings.json file. The error is located at line {}, column {}. This error might be caused either by a trailing comma in the settings file (which is, actually, pretty usual), or the settings file was not correctly edited and saved. Please check your file via a JSON linter and fix the settings file before attempting to run the install command again.", err.line(), err.column())
     );
 
-    let init_commands = sub_values
+    let settings_obj = sub_values
         .as_object_mut()
-        .unwrap()
-        .entry("lldb.launch.preRunCommands")
-        .or_insert_with(|| serde_json::Value::Array(Vec::new()));
-    let command_script_line =
-        "command script import ".to_owned() + script_full_path.to_str().unwrap();
-
-    if let serde_json::Value::Array(array) = init_commands {
-        if let Some(pos) = array.iter().position(|v| {
-            if let serde_json::Value::String(s) = v {
-                s.contains(SCRIPT_NAME) // Replace with your substring
-            } else {
-                false
-            }
-        }) {
-            array.remove(pos); // Remove the element if the substring is found
-        }
-
-        array.push(serde_json::Value::String(command_script_line));
-    }
+        .expect("VSCode settings.json is not a JSON object. Please ensure the file contains a valid JSON object at the top level.");
+    configure_debug_engine(settings_obj);
+    configure_pretty_printer_init_command(settings_obj, &script_full_path);
 
     let _ = fs::write(
         path_to_settings,
@@ -174,4 +157,51 @@ fn configure_vscode() {
     );
 
     println!("debugger script installed successfully");
+}
+
+/// Sets `rust-analyzer.debug.engine` to `vadimcn.vscode-lldb` in the VS Code user settings,
+/// if not already present.
+///
+/// This is required on macOS, where rust-analyzer defaults to `lldb-dap` (Apple's Xcode-bundled
+/// DAP adapter), which does not support CodeLLDB's `initCommands`/`preRunCommands` settings.
+/// Without this, the pretty-printer script is not loaded when using the CodeLens "Debug" button.
+fn configure_debug_engine(settings_obj: &mut serde_json::Map<String, serde_json::Value>) {
+    settings_obj
+        .entry("rust-analyzer.debug.engine")
+        .or_insert_with(|| serde_json::Value::String("vadimcn.vscode-lldb".to_owned()));
+}
+
+/// Adds the `command script import <script>` line to `lldb.launch.preRunCommands` in the
+/// VS Code user settings, so the MultiversX LLDB pretty-printer is loaded on every debug session.
+///
+/// If a previous entry referencing the script name already exists (e.g. from a prior install
+/// or a path change), it is replaced with the current path.
+fn configure_pretty_printer_init_command(
+    settings_obj: &mut serde_json::Map<String, serde_json::Value>,
+    script_full_path: &Path,
+) {
+    let escaped_path = script_full_path
+        .display()
+        .to_string()
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"");
+    let command_script_line = format!("command script import \"{escaped_path}\"");
+
+    let init_commands = settings_obj
+        .entry("lldb.launch.preRunCommands")
+        .or_insert_with(|| serde_json::Value::Array(Vec::new()));
+
+    if let serde_json::Value::Array(array) = init_commands {
+        // Remove all existing entries referencing the script,
+        // including accidental duplicates, if present
+        array.retain(|v| {
+            if let serde_json::Value::String(s) = v {
+                !s.contains(SCRIPT_NAME)
+            } else {
+                true
+            }
+        });
+
+        array.push(serde_json::Value::String(command_script_line));
+    }
 }

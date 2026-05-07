@@ -300,6 +300,33 @@ fn test_managed_token_id_macro() {
 }
 
 #[test]
+fn test_token_id_as_esdt() {
+    // ESDT token produces Some
+    let esdt = TokenId::<StaticApi>::from("ALC-6258d2");
+    assert!(esdt.as_esdt().is_some());
+    assert_eq!(
+        *esdt.as_esdt().unwrap(),
+        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2"),
+    );
+
+    // native token produces None
+    assert!(TokenId::<StaticApi>::native().as_esdt().is_none());
+}
+
+#[test]
+fn test_token_id_into_esdt() {
+    // ESDT token produces Some
+    let esdt = TokenId::<StaticApi>::from("ALC-6258d2");
+    assert_eq!(
+        esdt.into_esdt().unwrap(),
+        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2"),
+    );
+
+    // native token produces None
+    assert!(TokenId::<StaticApi>::native().into_esdt().is_none());
+}
+
+#[test]
 fn test_token_id_to_string() {
     assert_eq!(
         TokenId::<StaticApi>::from("ALC-6258d2").to_string(),

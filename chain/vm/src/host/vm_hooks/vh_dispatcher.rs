@@ -1130,7 +1130,8 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         address_handle: i32,
         code_hash_handle: i32,
     ) -> Result<(), VMHooksEarlyExit> {
-        panic!("Unavailable: managed_get_code_hash")
+        self.handler
+            .managed_get_code_hash(address_handle, code_hash_handle)
     }
 
     fn managed_is_builtin_function(
@@ -1962,7 +1963,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
     }
 
     fn managed_map_new(&mut self) -> Result<i32, VMHooksEarlyExit> {
-        Ok(self.handler.mm_new())
+        self.handler.mm_new()
     }
 
     fn managed_map_put(
@@ -1971,7 +1972,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         key_handle: i32,
         value_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        self.handler.mm_put(map_handle, key_handle, value_handle);
+        self.handler.mm_put(map_handle, key_handle, value_handle)?;
         Ok(RESULT_OK)
     }
 
@@ -1982,7 +1983,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         out_value_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
         self.handler
-            .mm_get(map_handle, key_handle, out_value_handle);
+            .mm_get(map_handle, key_handle, out_value_handle)?;
         Ok(RESULT_OK)
     }
 
@@ -1993,7 +1994,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         out_value_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
         self.handler
-            .mm_remove(map_handle, key_handle, out_value_handle);
+            .mm_remove(map_handle, key_handle, out_value_handle)?;
         Ok(RESULT_OK)
     }
 
@@ -2002,7 +2003,7 @@ impl<C: VMHooksContext> VMHooks for VMHooksDispatcher<C> {
         map_handle: i32,
         key_handle: i32,
     ) -> Result<i32, VMHooksEarlyExit> {
-        map_bool_to_i32(Ok(self.handler.mm_contains(map_handle, key_handle)))
+        map_bool_to_i32(self.handler.mm_contains(map_handle, key_handle))
     }
 
     fn small_int_get_unsigned_argument(&mut self, id: i32) -> Result<i64, VMHooksEarlyExit> {

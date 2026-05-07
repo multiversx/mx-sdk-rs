@@ -5,22 +5,22 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn generated_fund_go() {
+fn _generated_fund_go() {
     world().run("scenarios/_generated_fund.scen.json");
 }
 
 #[test]
-fn generated_init_go() {
+fn _generated_init_go() {
     world().run("scenarios/_generated_init.scen.json");
 }
 
 #[test]
-fn generated_query_status_go() {
+fn _generated_query_status_go() {
     world().run("scenarios/_generated_query_status.scen.json");
 }
 
 #[test]
-fn generated_sc_err_go() {
+fn _generated_sc_err_go() {
     world().run("scenarios/_generated_sc_err.scen.json");
 }
 

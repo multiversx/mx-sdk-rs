@@ -377,6 +377,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "843867be96c8daad0d758b57df9392b6d8d271134fce549de6ce169ff98a92af"
 
 [[package]]
+name = "blake2"
+version = "0.10.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46502ad458c9a52b69d4d4d32775c788b7a1b85e8bc9d482d92250fc0e3f8efe"
+dependencies = [
+ "digest",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1826,11 +1835,8 @@ dependencies = [
 name = "gas-schedule-generator"
 version = "0.0.0"
 dependencies = [
- "clap",
  "convert_case 0.11.0",
- "env_logger",
  "multiversx-chain-vm",
- "tokio",
 ]
 
 [[package]]
@@ -2847,6 +2853,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
+name = "lottery"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
 name = "lottery-erc20"
 version = "0.0.0"
 dependencies = [
@@ -2864,18 +2878,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "lottery-esdt"
+name = "lottery-meta"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-scenario",
-]
-
-[[package]]
-name = "lottery-esdt-meta"
-version = "0.0.0"
-dependencies = [
- "lottery-esdt",
+ "lottery",
  "multiversx-sc-meta-lib",
 ]
 
@@ -3116,9 +3122,12 @@ version = "0.22.1"
 dependencies = [
  "bech32",
  "bitflags 2.11.0",
+ "blake2",
  "hex",
  "multiversx-sc-codec",
  "serde",
+ "sha2",
+ "sha3",
 ]
 
 [[package]]
@@ -3154,8 +3163,6 @@ dependencies = [
  "rand 0.10.0",
  "rand_seeder",
  "serde",
- "sha2",
- "sha3",
  "toml",
 ]
 
@@ -3334,7 +3341,6 @@ dependencies = [
  "pathdiff",
  "serde",
  "serde_json",
- "sha2",
  "simple-error",
  "static_assertions",
  "unwrap-infallible",

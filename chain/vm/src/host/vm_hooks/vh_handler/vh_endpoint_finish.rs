@@ -35,17 +35,15 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn finish_managed_buffer_raw(&mut self, handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_get_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().managed_buffer_api_cost.m_buffer_finish)?;
 
         let bytes = self.context.m_types_lock().mb_get_owned(handle);
         self.finish_slice_u8(&bytes)
     }
 
     pub fn finish_i64(&mut self, value: i64) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.int_64_finish)?;
+
         if value == 0 {
             self.finish_slice_u8(&[])
         } else {
@@ -54,6 +52,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn finish_u64(&mut self, value: u64) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.int_64_finish)?;
+
         if value == 0 {
             self.finish_slice_u8(&[])
         } else {

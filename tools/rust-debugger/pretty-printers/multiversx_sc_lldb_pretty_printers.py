@@ -40,9 +40,6 @@ NON_ZERO_BIG_UINT_TYPE = f"{MANAGED_WRAPPED_PATH}::num::non_zero_big_uint::NonZe
 MANAGED_ADDRESS_TYPE = (
     f"{MANAGED_WRAPPED_PATH}::managed_address::ManagedAddress<{DEBUG_API_TYPE} ?>"
 )
-MANAGED_BYTE_ARRAY_TYPE = (
-    f"{MANAGED_WRAPPED_PATH}::managed_byte_array::ManagedByteArray<{DEBUG_API_TYPE} ?>"
-)
 ## 3b. tokens & payments
 MANAGED_WRAPPED_TOKEN_PATH = "multiversx_sc::types::managed::wrapped::token"
 ESDT_TOKEN_IDENTIFIER_TYPE = f"{MANAGED_WRAPPED_TOKEN_PATH}::esdt_token_identifier::EsdtTokenIdentifier<{DEBUG_API_TYPE} ?>"
@@ -77,12 +74,6 @@ TEST_TOKEN_IDENTIFIER_TYPE = (
     f"{INTERACTION_EXPR_PATH}::test_token_id::TestTokenId"
 )
 
-# 7. MultiversX codec - Multi-types
-MULTI_TYPES_PATH = "multiversx_sc_codec::multi_types"
-
-OPTIONAL_VALUE_TYPE = (
-    f"{MULTI_TYPES_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>"
-)
 
 
 class InvalidHandle(Exception):
@@ -451,16 +442,6 @@ class ManagedAddress(PlainManagedVecItem, ManagedType):
         return mixed_representation(buffer)
 
 
-class ManagedByteArray(PlainManagedVecItem, ManagedType):
-    def lookup(self, managed_byte_array: lldb.value) -> lldb.value:
-        return managed_byte_array.buffer
-
-    def value_summary(
-        self, buffer: lldb.value, context: lldb.value, type_info: lldb.SBType
-    ) -> str:
-        return mixed_representation(buffer)
-
-
 class ManagedOption(PlainManagedVecItem, ManagedType):
     def summary_from_raw_handle(
         self, raw_handle: int, context: lldb.value, type_info: lldb.SBType
@@ -603,19 +584,6 @@ class TestTokenId(Handler):
         return interaction_type_as_string(buffer, "str")
 
 
-class OptionalValue(Handler):
-    def summary(self, optional_value: lldb.value) -> str:
-        base_type = optional_value.sbvalue.GetType().GetName()
-        if (
-            optional_value.value.sbvalue.GetType()
-            .GetName()
-            .startswith(f"{base_type}::Some")
-        ):
-            summary = optional_value.value.sbvalue.GetChildAtIndex(0).GetSummary()
-            return f"OptionalValue::Some({summary})"
-        return "OptionalValue::None"
-
-
 MULTIVERSX_WASM_TYPE_HANDLERS = [
     # 1. num_bigint library
     (NUM_BIG_INT_TYPE, NumBigInt),
@@ -629,7 +597,6 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (NON_ZERO_BIG_UINT_TYPE, BigUint),
     (ESDT_TOKEN_IDENTIFIER_TYPE, EsdtTokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
-    (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),
     (EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE, EgldOrEsdtTokenIdentifier),
     (MANAGED_OPTION_TYPE, ManagedOption),
@@ -642,8 +609,6 @@ MULTIVERSX_WASM_TYPE_HANDLERS = [
     (TEST_SC_ADDRESS_TYPE, TestSCAddress),
     (TEST_ADDRESS_TYPE, TestAddress),
     (TEST_TOKEN_IDENTIFIER_TYPE, TestTokenId),
-    # 7. MultiversX codec - Multi-types
-    (OPTIONAL_VALUE_TYPE, OptionalValue),
 ]
 
 

@@ -299,6 +299,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
+
         let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let code = self.context.m_types_lock().mb_get(code_handle).to_vec();
         let code_metadata = self
@@ -330,6 +332,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.create_contract)?;
+
         let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
             .context
@@ -430,6 +434,12 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(ReturnCode, String), VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .base_ops_api_cost
+                .execute_on_dest_context,
+        )?;
+
         let to = self.context.m_types_lock().mb_to_address(to_handle);
         let egld_value = self.context.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
@@ -511,6 +521,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.execute_read_only)?;
+
         let to = self.context.m_types_lock().mb_to_address(to_handle);
         let endpoint_name = self
             .context
@@ -554,12 +566,20 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn clean_return_data(&mut self) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.clean_return_data)?;
+
         let mut tx_result = self.context.result_lock();
         tx_result.result_values.clear();
         Ok(())
     }
 
     pub fn delete_from_return_data(&mut self, index: usize) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(
+            self.gas_schedule()
+                .base_ops_api_cost
+                .delete_from_return_data,
+        )?;
+
         let mut tx_result = self.context.result_lock();
         if index > tx_result.result_values.len() {
             return Ok(());
