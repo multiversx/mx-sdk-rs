@@ -1,6 +1,5 @@
 use multiversx_chain_core::std::crypto;
 
-
 pub fn sha256(data: &[u8]) -> [u8; crypto::SHA256_RESULT_LEN] {
     crypto::sha256(data)
 }
