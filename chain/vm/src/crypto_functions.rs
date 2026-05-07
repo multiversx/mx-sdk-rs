@@ -1,19 +1,12 @@
-use sha2::Sha256;
-use sha3::{Digest, Keccak256};
+use multiversx_chain_core::std::crypto;
 
-pub const SHA256_RESULT_LEN: usize = 32;
-pub const KECCAK256_RESULT_LEN: usize = 32;
 
-pub fn sha256(data: &[u8]) -> [u8; SHA256_RESULT_LEN] {
-    let mut hasher = Sha256::new();
-    hasher.update(data);
-    hasher.finalize().into()
+pub fn sha256(data: &[u8]) -> [u8; crypto::SHA256_RESULT_LEN] {
+    crypto::sha256(data)
 }
 
-pub fn keccak256(data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
-    let mut hasher = Keccak256::new();
-    hasher.update(data);
-    hasher.finalize().into()
+pub fn keccak256(data: &[u8]) -> [u8; crypto::KECCAK256_RESULT_LEN] {
+    crypto::keccak256(data)
 }
 
 pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {

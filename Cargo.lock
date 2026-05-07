@@ -3126,6 +3126,8 @@ dependencies = [
  "hex",
  "multiversx-sc-codec",
  "serde",
+ "sha2",
+ "sha3",
 ]
 
 [[package]]
@@ -3161,8 +3163,6 @@ dependencies = [
  "rand 0.10.0",
  "rand_seeder",
  "serde",
- "sha2",
- "sha3",
  "toml",
 ]
 
@@ -3341,7 +3341,6 @@ dependencies = [
  "pathdiff",
  "serde",
  "serde_json",
- "sha2",
  "simple-error",
  "static_assertions",
  "unwrap-infallible",
