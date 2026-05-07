@@ -1,5 +1,5 @@
 use crate::multiversx_sc::types::heap::Address;
-use sha2::{Digest, Sha256};
+use multiversx_chain_vm::chain_core::std::crypto;
 
 const ADDRESS_LEN: usize = 32;
 const SC_ADDR_LEADING_ZEROES: usize = 8;
@@ -35,12 +35,8 @@ impl AddressFactory {
     }
 
     fn new_address_raw(&mut self) -> [u8; ADDRESS_LEN] {
-        let mut hasher = Sha256::new();
-        hasher.update(self.last_generated_address);
-        let result: [u8; ADDRESS_LEN] = hasher.finalize().into();
-
+        let result = crypto::sha256(&self.last_generated_address);
         self.last_generated_address = result;
-
         result
     }
 }
