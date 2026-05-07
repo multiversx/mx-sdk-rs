@@ -4,7 +4,8 @@ use crate::sdk::{
 };
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress, ReturnCode},
-    multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
+    multiversx_chain_vm::types::H256,
+    multiversx_sc::chain_core::std::new_address::compute_new_address,
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 
@@ -132,22 +133,7 @@ fn process_new_deployed_address(tx: &ApiTransactionResult) -> Option<Address> {
         return None;
     }
 
-    let sender_address_bytes = tx.sender.address.as_bytes();
-    let sender_nonce_bytes = tx.nonce.to_le_bytes();
-    let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(sender_address_bytes);
-    bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
-
-    let address_keccak = keccak256(&bytes_to_hash);
-
-    let mut address = [0u8; 32];
-
-    address[0..8].copy_from_slice(&[0u8; 8]);
-    address[8..10].copy_from_slice(&[5, 0]);
-    address[10..30].copy_from_slice(&address_keccak[10..30]);
-    address[30..32].copy_from_slice(&sender_address_bytes[30..32]);
-
-    Some(Address::from(address))
+    Some(compute_new_address(&tx.sender.address, tx.nonce))
 }
 
 fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<String> {
