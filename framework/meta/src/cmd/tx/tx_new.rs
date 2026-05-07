@@ -67,6 +67,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         emitted_transaction: tx,
         emitted_transaction_data: decoded_data,
         emitted_transaction_hash: String::new(),
+        contract_address: None,
         transaction_on_network: None,
     };
 

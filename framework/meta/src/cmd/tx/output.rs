@@ -18,6 +18,10 @@ pub struct TxOutputFile {
     #[serde(rename = "emittedTransactionHash")]
     pub emitted_transaction_hash: String,
 
+    /// Populated for deploy transactions: the deterministically-computed contract address.
+    #[serde(rename = "contractAddress", skip_serializing_if = "Option::is_none")]
+    pub contract_address: Option<String>,
+
     /// Populated after waiting for the transaction result on-network.
     #[serde(
         rename = "transactionOnNetwork",
