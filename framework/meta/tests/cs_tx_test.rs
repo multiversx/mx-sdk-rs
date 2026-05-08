@@ -2,14 +2,137 @@ use std::process::Command;
 
 use multiversx_sc_meta_lib::tools::find_current_workspace;
 use multiversx_sc_snippets::{Interactor, test_wallets};
+use multiversx_sdk::wallet::Wallet;
 
 const CHAIN_SIMULATOR_URL: &str = "http://localhost:8085";
+const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
 
 /// 0.1 EGLD in the smallest denomination (10^17).
 const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
 
 /// Minimum gas for a plain EGLD transfer.
 const GAS_LIMIT: u64 = 50_000;
+
+/// Deploys the adder contract, calls `add`, and verifies `getSum` returns the expected value.
+/// Mirrors the deploy / add / getSum flow from the adder snippets.sh.
+#[tokio::test]
+#[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
+async fn test_adder_deploy_add_get_sum() {
+    let workspace = find_current_workspace().unwrap();
+    let wallet_pem_path = workspace.join("framework/meta/tests/cs_tx_test_adder.pem");
+    let wasm_path = workspace.join("contracts/examples/adder/output/adder.wasm");
+    let outfile = std::env::temp_dir().join("adder-deploy-cs.interaction.json");
+
+    let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
+
+    let mut interactor = Interactor::new(CHAIN_SIMULATOR_URL)
+        .await
+        .use_chain_simulator(true);
+
+    let wallet_address = interactor
+        .register_wallet(Wallet::from_pem_file(&wallet_pem_path).unwrap())
+        .await;
+
+    interactor
+        .send_user_funds(&wallet_address.to_bech32_default())
+        .await
+        .unwrap();
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    // ── deploy ────────────────────────────────────────────────────────────────
+    let status = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "deploy",
+            "--bytecode",
+            wasm_path.to_str().unwrap(),
+            "--pem",
+            wallet_pem_path.to_str().unwrap(),
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--chain",
+            CHAIN_SIMULATOR_CHAIN_ID,
+            "--gas-limit",
+            "50000000",
+            "--arguments",
+            "0",
+            "--send",
+            "--outfile",
+            outfile.to_str().unwrap(),
+        ])
+        .status()
+        .expect("failed to execute sc-meta tx deploy");
+
+    assert!(status.success(), "deploy failed");
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    // Read the deployed contract address from the interaction output file.
+    let outfile_content = std::fs::read_to_string(&outfile).expect("failed to read outfile");
+    let outfile_json: serde_json::Value =
+        serde_json::from_str(&outfile_content).expect("failed to parse outfile JSON");
+    let contract_address = outfile_json["contractAddress"]
+        .as_str()
+        .expect("contractAddress not found in outfile");
+
+    println!("Deployed adder at: {contract_address}");
+
+    // ── add(5) ────────────────────────────────────────────────────────────────
+    let status = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "call",
+            contract_address,
+            "--pem",
+            wallet_pem_path.to_str().unwrap(),
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--chain",
+            CHAIN_SIMULATOR_CHAIN_ID,
+            "--gas-limit",
+            "5000000",
+            "--function",
+            "add",
+            "--arguments",
+            "5",
+            "--send",
+        ])
+        .status()
+        .expect("failed to execute sc-meta tx call");
+
+    assert!(status.success(), "add call failed");
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    // ── getSum ────────────────────────────────────────────────────────────────
+    let query_output = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "query",
+            contract_address,
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--function",
+            "getSum",
+        ])
+        .output()
+        .expect("failed to execute sc-meta tx query");
+
+    assert!(query_output.status.success(), "getSum query failed");
+
+    let stdout = String::from_utf8_lossy(&query_output.stdout);
+    println!("getSum result: {stdout}");
+
+    // The result is a JSON array of hex-encoded values, e.g. ["05"].
+    // 5 decimal = 0x05.
+    let result: Vec<String> =
+        serde_json::from_str(stdout.trim()).expect("failed to parse query output as JSON");
+    assert_eq!(result, vec!["05"], "getSum returned unexpected value");
+
+    // ── clean up ──────────────────────────────────────────────────────────────
+    let _ = std::fs::remove_file(&outfile);
+}
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
 /// and verifies that both balances change as expected.
@@ -78,7 +201,7 @@ async fn test_egld_transfer_alice_to_bob() {
     assert!(status.success(), "sc-meta tx new command failed");
 
     // Allow the transfer transaction to settle.
-    interactor.generate_blocks(10).await.unwrap();
+    interactor.generate_blocks(20).await.unwrap();
 
     // ── balances after transfer ───────────────────────────────────────────────
     let alice_balance_after: u128 = interactor
