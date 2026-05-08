@@ -25,13 +25,12 @@ async fn test_adder_deploy_add_get_sum() {
 
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
-    let mut interactor = Interactor::new(CHAIN_SIMULATOR_URL)
+    let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
         .await
         .use_chain_simulator(true);
 
-    let wallet_address = interactor
-        .register_wallet(Wallet::from_pem_file(&wallet_pem_path).unwrap())
-        .await;
+    let wallet = Wallet::from_pem_file(&wallet_pem_path).unwrap();
+    let wallet_address = wallet.to_address();
 
     interactor
         .send_user_funds(&wallet_address.to_bech32_default())
@@ -143,14 +142,20 @@ async fn test_egld_transfer_alice_to_bob() {
     let alice_pem_path = workspace.join("framework/meta/tests/alice.pem");
 
     // Connect to the chain simulator.
-    let mut interactor = Interactor::new(CHAIN_SIMULATOR_URL)
+    let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
         .await
         .use_chain_simulator(true);
 
     // Register wallets – `register_wallet` automatically funds each account via
     // the chain simulator's `send_user_funds` endpoint.
-    let alice_address = interactor.register_wallet(test_wallets::alice()).await;
-    let bob_address = interactor.register_wallet(test_wallets::bob()).await;
+    let alice_address = test_wallets::alice().to_address();
+    let bob_address = test_wallets::bob().to_address();
+
+    // fund alice
+    interactor
+        .send_user_funds(&alice_address.to_bech32_default())
+        .await
+        .unwrap();
 
     // Allow the funding transactions to settle.
     interactor.generate_blocks(10).await.unwrap();
