@@ -2,6 +2,7 @@ use core::str;
 use std::{
     fs::{self},
     io::{self, Read},
+    path::Path,
 };
 
 use aes::{Aes128, cipher::KeyIvInit};
@@ -118,7 +119,10 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn from_pem_file(file_path: &str) -> Result<Self> {
+    pub fn from_pem_file<P>(file_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let contents = std::fs::read_to_string(file_path)?;
         Self::from_pem_file_contents(contents)
     }
