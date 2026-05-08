@@ -1,5 +1,6 @@
 use crate::cli::{StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::chain_simulator::chain_simulator;
+use crate::cmd::data::data_cli;
 use crate::cmd::retrieve_address::retrieve_address;
 use crate::cmd::scen_blackbox::scen_blackbox_tool;
 use crate::cmd::tx::tx_cli;
@@ -69,6 +70,9 @@ pub async fn cli_main_standalone() {
         }
         Some(StandaloneCliAction::Tx(args)) => {
             tx_cli(args).await;
+        }
+        Some(StandaloneCliAction::Data(args)) => {
+            data_cli(args);
         }
         None => {}
     }
