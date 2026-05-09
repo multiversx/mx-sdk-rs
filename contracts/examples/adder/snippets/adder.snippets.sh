@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NETWORK=devnet      # choose: devnet, testnet, mainnet
+NETWORK=chain-simulator      # choose: devnet, testnet, mainnet, chain-simulator
 TOOL_VARIANT=source # choose: sc-meta, source, mxpy
 
 # ── Tool selection ─────────────────────────────────────────────────────────────
@@ -17,9 +17,10 @@ DATA_TOOL=("${BASE[@]}" data)
 ALICE="../../../../sdk/core/src/test_wallets/alice.pem"
 
 case "${NETWORK}" in
-    devnet)   PROXY=https://devnet-gateway.multiversx.com;  CHAIN=D ;;
-    testnet)  PROXY=https://testnet-gateway.multiversx.com; CHAIN=T ;;
-    mainnet)  PROXY=https://gateway.multiversx.com;         CHAIN=1 ;;
+    devnet)           PROXY=https://devnet-gateway.multiversx.com;  CHAIN=D ;;
+    testnet)          PROXY=https://testnet-gateway.multiversx.com; CHAIN=T ;;
+    mainnet)          PROXY=https://gateway.multiversx.com;         CHAIN=1 ;;
+    chain-simulator)  PROXY=http://localhost:8085;                  CHAIN=chain  ;;
 esac
 
 ADDRESS=$("${DATA_TOOL[@]}" load --partition "${NETWORK}" --key="address-${NETWORK}")
