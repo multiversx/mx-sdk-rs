@@ -7,6 +7,14 @@ use multiversx_sdk::wallet::Wallet;
 const CHAIN_SIMULATOR_URL: &str = "http://localhost:8085";
 const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
 
+/// Address of the wallet in `cs_tx_test_adder.pem`.
+const ADDER_DEPLOYER_ADDRESS: &str =
+    "erd1m4fxscsqj2ftv60uu3eayeyu8s68q9frgc6exuwx4anln6wnal8sfy6d27";
+
+/// The zero SC address used as receiver in every deploy transaction.
+const DEPLOY_RECEIVER: &str =
+    "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu";
+
 /// 0.1 EGLD in the smallest denomination (10^17).
 const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
 
@@ -21,7 +29,10 @@ async fn test_adder_deploy_add_get_sum() {
     let workspace = find_current_workspace().unwrap();
     let wallet_pem_path = workspace.join("framework/meta/tests/cs_tx_test_adder.pem");
     let wasm_path = workspace.join("contracts/examples/adder/output/adder.wasm");
-    let outfile = std::env::temp_dir().join("adder-deploy-cs.interaction.json");
+    let outfiles_dir = workspace.join("framework/meta/tests/cs_tx_outfiles");
+    std::fs::create_dir_all(&outfiles_dir).unwrap();
+    let outfile_deploy = outfiles_dir.join("adder-deploy-cs.interaction.json");
+    let outfile_call = outfiles_dir.join("adder-call-cs.interaction.json");
 
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
@@ -58,7 +69,7 @@ async fn test_adder_deploy_add_get_sum() {
             "0",
             "--send",
             "--outfile",
-            outfile.to_str().unwrap(),
+            outfile_deploy.to_str().unwrap(),
         ])
         .status()
         .expect("failed to execute sc-meta tx deploy");
@@ -68,12 +79,35 @@ async fn test_adder_deploy_add_get_sum() {
     interactor.generate_blocks(10).await.unwrap();
 
     // Read the deployed contract address from the interaction output file.
-    let outfile_content = std::fs::read_to_string(&outfile).expect("failed to read outfile");
-    let outfile_json: serde_json::Value =
-        serde_json::from_str(&outfile_content).expect("failed to parse outfile JSON");
-    let contract_address = outfile_json["contractAddress"]
+    let outfile_content =
+        std::fs::read_to_string(&outfile_deploy).expect("failed to read deploy outfile");
+    let deploy_json: serde_json::Value =
+        serde_json::from_str(&outfile_content).expect("failed to parse deploy outfile JSON");
+
+    // Verify deterministic deploy fields.
+    assert_eq!(
+        deploy_json["emittedTransaction"]["sender"].as_str().unwrap(),
+        ADDER_DEPLOYER_ADDRESS,
+        "deploy sender mismatch"
+    );
+    assert_eq!(
+        deploy_json["emittedTransaction"]["receiver"]
+            .as_str()
+            .unwrap(),
+        DEPLOY_RECEIVER,
+        "deploy receiver mismatch"
+    );
+    assert!(
+        deploy_json["emittedTransactionData"]
+            .as_str()
+            .unwrap()
+            .ends_with("@0500@0500@"),
+        "deploy emittedTransactionData does not end with @0500@0500@"
+    );
+
+    let contract_address = deploy_json["contractAddress"]
         .as_str()
-        .expect("contractAddress not found in outfile");
+        .expect("contractAddress not found in deploy outfile");
 
     println!("Deployed adder at: {contract_address}");
 
@@ -96,6 +130,8 @@ async fn test_adder_deploy_add_get_sum() {
             "--arguments",
             "5",
             "--send",
+            "--outfile",
+            outfile_call.to_str().unwrap(),
         ])
         .status()
         .expect("failed to execute sc-meta tx call");
@@ -103,6 +139,30 @@ async fn test_adder_deploy_add_get_sum() {
     assert!(status.success(), "add call failed");
 
     interactor.generate_blocks(10).await.unwrap();
+
+    // Read and verify deterministic call fields.
+    let call_content =
+        std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
+    let call_json: serde_json::Value =
+        serde_json::from_str(&call_content).expect("failed to parse call outfile JSON");
+
+    assert_eq!(
+        call_json["emittedTransaction"]["sender"].as_str().unwrap(),
+        ADDER_DEPLOYER_ADDRESS,
+        "call sender mismatch"
+    );
+    assert_eq!(
+        call_json["emittedTransaction"]["receiver"]
+            .as_str()
+            .unwrap(),
+        contract_address,
+        "call receiver mismatch"
+    );
+    assert_eq!(
+        call_json["emittedTransactionData"].as_str().unwrap(),
+        "add@05",
+        "call emittedTransactionData mismatch"
+    );
 
     // ── getSum ────────────────────────────────────────────────────────────────
     let query_output = Command::new(sc_meta_bin)
@@ -130,7 +190,8 @@ async fn test_adder_deploy_add_get_sum() {
     assert_eq!(result, vec!["05"], "getSum returned unexpected value");
 
     // ── clean up ──────────────────────────────────────────────────────────────
-    let _ = std::fs::remove_file(&outfile);
+    let _ = std::fs::remove_file(&outfile_deploy);
+    let _ = std::fs::remove_file(&outfile_call);
 }
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
