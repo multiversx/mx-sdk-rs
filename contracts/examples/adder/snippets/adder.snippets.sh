@@ -24,7 +24,8 @@ case "${NETWORK}" in
 esac
 
 ADDRESS=$("${DATA_TOOL[@]}" load --partition "${NETWORK}" --key="address-${NETWORK}")
-OUTFILE="deploy-${NETWORK}.interaction.json"
+OUTFILE_DEPLOY="deploy-${NETWORK}.interaction.json"
+OUTFILE_CALL="call-${NETWORK}.interaction.json"
 
 export RUST_BACKTRACE=1
 
@@ -37,11 +38,11 @@ deploy() {
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --send \
-        --outfile="${OUTFILE}" \
+        --outfile="${OUTFILE_DEPLOY}" \
         || return
 
-    ADDRESS=$("${DATA_TOOL[@]}" parse --file="${OUTFILE}" --expression="data['contractAddress']" 2>/dev/null)
-    DEPLOY_TRANSACTION=$("${DATA_TOOL[@]}" parse --file="${OUTFILE}" --expression="data['emittedTransactionHash']" 2>/dev/null)
+    ADDRESS=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['contractAddress']" 2>/dev/null)
+    DEPLOY_TRANSACTION=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['emittedTransactionHash']" 2>/dev/null)
     "${DATA_TOOL[@]}" store --partition "${NETWORK}" --key="address-${NETWORK}"           --value="${ADDRESS}"            2>/dev/null || true
     "${DATA_TOOL[@]}" store --partition "${NETWORK}" --key="deployTransaction-${NETWORK}" --value="${DEPLOY_TRANSACTION}" 2>/dev/null || true
 
@@ -58,11 +59,14 @@ add() {
         --arguments "${NUMBER}" \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
-        --send
+        --send \
+        --outfile="${OUTFILE_CALL}" \
+        || return
 }
 
 getSum() {
     "${TX_TOOL[@]}" query "${ADDRESS}" \
         --function="getSum" \
-        --proxy="${PROXY}"
+        --proxy="${PROXY}" \
+        || return
 }
