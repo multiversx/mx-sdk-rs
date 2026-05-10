@@ -3,6 +3,7 @@ use std::process::Command;
 use multiversx_sc_meta_lib::tools::find_current_workspace;
 use multiversx_sc_snippets::{Interactor, imports::Bech32Address, test_wallets};
 use multiversx_sdk::wallet::Wallet;
+use serial_test::serial;
 
 const CHAIN_SIMULATOR_URL: &str = "http://localhost:8085";
 const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
@@ -16,6 +17,7 @@ const GAS_LIMIT: u64 = 50_000;
 /// Deploys the adder contract, calls `add`, and verifies `getSum` returns the expected value.
 /// Mirrors the deploy / add / getSum flow from the adder snippets.sh.
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_adder_deploy_add_get_sum() {
     let workspace = find_current_workspace().unwrap();
@@ -191,6 +193,7 @@ async fn test_adder_deploy_add_get_sum() {
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
 /// and verifies that both balances change as expected.
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_egld_transfer_alice_to_bob() {
     let workspace = find_current_workspace().unwrap();

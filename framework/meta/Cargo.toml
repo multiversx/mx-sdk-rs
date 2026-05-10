@@ -67,3 +67,6 @@ path = "../scenario"
 version = "=0.15.1"
 path = "../../sdk/core"
 features = ["wallet-full"]
+
+[dev-dependencies]
+serial_test = "3.2"

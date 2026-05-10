@@ -3288,6 +3288,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "serial_test",
  "tokio",
  "toml",
  "zip",
