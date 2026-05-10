@@ -40,7 +40,7 @@ async fn test_adder_deploy_add_get_sum() {
     interactor.generate_blocks(10).await.unwrap();
 
     // ── deploy ────────────────────────────────────────────────────────────────
-    let status = Command::new(sc_meta_bin)
+    let deploy_output = Command::new(sc_meta_bin)
         .args([
             "tx",
             "deploy",
@@ -60,10 +60,18 @@ async fn test_adder_deploy_add_get_sum() {
             "--outfile",
             outfile_deploy.to_str().unwrap(),
         ])
-        .status()
+        .output()
         .expect("failed to execute sc-meta tx deploy");
 
-    assert!(status.success(), "deploy failed");
+    println!(
+        "deploy stdout:\n{}",
+        String::from_utf8_lossy(&deploy_output.stdout)
+    );
+    println!(
+        "deploy stderr:\n{}",
+        String::from_utf8_lossy(&deploy_output.stderr)
+    );
+    assert!(deploy_output.status.success(), "deploy failed");
 
     interactor.generate_blocks(10).await.unwrap();
 
