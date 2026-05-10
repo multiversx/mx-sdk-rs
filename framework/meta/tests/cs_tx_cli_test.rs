@@ -1,19 +1,11 @@
 use std::process::Command;
 
 use multiversx_sc_meta_lib::tools::find_current_workspace;
-use multiversx_sc_snippets::{Interactor, test_wallets};
+use multiversx_sc_snippets::{Interactor, imports::Bech32Address, test_wallets};
 use multiversx_sdk::wallet::Wallet;
 
 const CHAIN_SIMULATOR_URL: &str = "http://localhost:8085";
 const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
-
-/// Address of the wallet in `cs_tx_test_adder.pem`.
-const ADDER_DEPLOYER_ADDRESS: &str =
-    "erd1m4fxscsqj2ftv60uu3eayeyu8s68q9frgc6exuwx4anln6wnal8sfy6d27";
-
-/// The zero SC address used as receiver in every deploy transaction.
-const DEPLOY_RECEIVER: &str =
-    "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu";
 
 /// 0.1 EGLD in the smallest denomination (10^17).
 const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
@@ -27,9 +19,10 @@ const GAS_LIMIT: u64 = 50_000;
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_adder_deploy_add_get_sum() {
     let workspace = find_current_workspace().unwrap();
-    let wallet_pem_path = workspace.join("framework/meta/tests/cs_tx_test_adder.pem");
-    let wasm_path = workspace.join("contracts/examples/adder/output/adder.wasm");
-    let outfiles_dir = workspace.join("framework/meta/tests/cs_tx_outfiles");
+    let test_artefacts_dir = workspace.join("framework/meta/tests/cs_tx_cli_test");
+    let wallet_pem_path = test_artefacts_dir.join("cs_tx_test_owner.pem");
+    let wasm_path = test_artefacts_dir.join("adder.wasm");
+    let outfiles_dir = test_artefacts_dir.join("outfiles");
     std::fs::create_dir_all(&outfiles_dir).unwrap();
     let outfile_deploy = outfiles_dir.join("adder-deploy-cs.interaction.json");
     let outfile_call = outfiles_dir.join("adder-call-cs.interaction.json");
@@ -41,12 +34,8 @@ async fn test_adder_deploy_add_get_sum() {
         .use_chain_simulator(true);
 
     let wallet = Wallet::from_pem_file(&wallet_pem_path).unwrap();
-    let wallet_address = wallet.to_address();
-
-    interactor
-        .send_user_funds(&wallet_address.to_bech32_default())
-        .await
-        .unwrap();
+    let wallet_address = wallet.to_address().to_bech32_default();
+    interactor.send_user_funds(&wallet_address).await.unwrap();
 
     interactor.generate_blocks(10).await.unwrap();
 
@@ -86,15 +75,17 @@ async fn test_adder_deploy_add_get_sum() {
 
     // Verify deterministic deploy fields.
     assert_eq!(
-        deploy_json["emittedTransaction"]["sender"].as_str().unwrap(),
-        ADDER_DEPLOYER_ADDRESS,
+        deploy_json["emittedTransaction"]["sender"]
+            .as_str()
+            .unwrap(),
+        wallet_address.to_bech32_str(),
         "deploy sender mismatch"
     );
     assert_eq!(
         deploy_json["emittedTransaction"]["receiver"]
             .as_str()
             .unwrap(),
-        DEPLOY_RECEIVER,
+        Bech32Address::zero_default_hrp().to_bech32_str(),
         "deploy receiver mismatch"
     );
     assert!(
@@ -141,14 +132,13 @@ async fn test_adder_deploy_add_get_sum() {
     interactor.generate_blocks(10).await.unwrap();
 
     // Read and verify deterministic call fields.
-    let call_content =
-        std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
+    let call_content = std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
     let call_json: serde_json::Value =
         serde_json::from_str(&call_content).expect("failed to parse call outfile JSON");
 
     assert_eq!(
         call_json["emittedTransaction"]["sender"].as_str().unwrap(),
-        ADDER_DEPLOYER_ADDRESS,
+        wallet_address.to_bech32_str(),
         "call sender mismatch"
     );
     assert_eq!(
@@ -188,10 +178,6 @@ async fn test_adder_deploy_add_get_sum() {
     let result: Vec<String> =
         serde_json::from_str(stdout.trim()).expect("failed to parse query output as JSON");
     assert_eq!(result, vec!["05"], "getSum returned unexpected value");
-
-    // ── clean up ──────────────────────────────────────────────────────────────
-    let _ = std::fs::remove_file(&outfile_deploy);
-    let _ = std::fs::remove_file(&outfile_call);
 }
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
