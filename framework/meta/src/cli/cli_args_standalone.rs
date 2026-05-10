@@ -416,6 +416,24 @@ pub enum ReproducibleBuildCliAction {
         about = "Unpacks a .source.json file produced by a previous build back to the filesystem."
     )]
     SourceUnpack(SourceUnpackArgs),
+
+    #[command(
+        name = "init-config",
+        about = "Creates a default sc-reproducible-build.toml in the current (or specified) directory."
+    )]
+    InitConfig(InitConfigArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InitConfigArgs {
+    /// Directory where sc-reproducible-build.toml will be written.
+    /// Defaults to the current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Overwrite the file if it already exists.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub overwrite: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]

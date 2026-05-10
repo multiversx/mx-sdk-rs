@@ -2,6 +2,7 @@ mod build;
 mod build_outcome;
 mod check;
 mod download;
+mod init_config;
 mod local_build;
 pub mod local_deps;
 mod project_config;
@@ -18,6 +19,7 @@ pub use project_config::{
 pub use build::docker_build;
 pub use check::check_contract_verification;
 pub use download::download_contract_verification;
+pub use init_config::init_config;
 pub use local_build::local_build;
 pub use local_deps::local_deps;
 pub use publish::publish_contract;
