@@ -1,11 +1,13 @@
 use std::fs;
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use multiversx_sc_snippets::{
     hex,
     imports::{Bech32Address, GatewayHttpProxy, Interactor, InteractorRunAsync},
-    sdk::{data::keystore::InsertPassword, utils::base64_encode, wallet::Wallet},
+    sdk::utils::base64_encode,
 };
+
+use crate::cmd::tx::tx_common::load_wallet;
 
 use super::{output::TxOutputFile, tx_cli_args::NewArgs, tx_send::fetch_tx_on_network};
 
@@ -17,7 +19,7 @@ pub async fn tx_new(args: &NewArgs) {
 }
 
 async fn tx_new_inner(args: &NewArgs) -> Result<()> {
-    let wallet = load_wallet(args)?;
+    let wallet = load_wallet(&args.sender)?;
     let receiver = Bech32Address::try_from_bech32_string(args.receiver.clone())?;
 
     // Create the interactor – this fetches the network config in the process.
@@ -114,26 +116,6 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
 
     Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// Wallet loading
-// ---------------------------------------------------------------------------
-
-fn load_wallet(args: &NewArgs) -> Result<Wallet> {
-    let sender = &args.sender;
-    if let Some(pem) = &sender.pem {
-        Wallet::from_pem_file(pem.to_str().context("invalid pem path")?)
-            .context("failed to load PEM wallet")
-    } else if let Some(keyfile) = &sender.keyfile {
-        Wallet::from_keystore_secret(
-            keyfile.to_str().context("invalid keyfile path")?,
-            InsertPassword::StandardInput,
-        )
-        .context("failed to load keystore wallet")
-    } else {
-        Err(anyhow!("a wallet is required: use --pem or --keyfile"))
-    }
 }
 
 // ---------------------------------------------------------------------------
