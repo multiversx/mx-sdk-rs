@@ -427,8 +427,9 @@ pub struct ReproducibleBuildLocalBuildArgs {
 
     /// Output folder where build artifacts and source JSON files will be placed.
     /// A subfolder per contract name will be created inside it.
+    /// If not specified, taken from [general] output in sc-reproducible-build.toml.
     #[arg(long, verbatim_doc_comment)]
-    pub output: String,
+    pub output: Option<String>,
 
     /// Cargo target directory for compilation.
     /// Defaults to /tmp/sc-target if not specified.
@@ -451,7 +452,7 @@ pub struct ReproducibleBuildLocalBuildArgs {
 
     /// If the output folder is not empty, wipe it before building instead of aborting.
     #[arg(long, default_value = "false", verbatim_doc_comment)]
-    pub force: bool,
+    pub overwrite: bool,
 
     /// Path to a `.source.json` file produced by a previous build.
     /// When set, the source is unpacked to /tmp/unwrapped/ and the build
@@ -601,8 +602,9 @@ pub struct ReproducibleBuildDownloadArgs {
 pub struct ReproducibleBuildBuildArgs {
     /// Pinned Docker image tag to run the build in.
     /// e.g. `multiversx/sdk-rust-contract-builder:v12.0.0`
+    /// If not specified, taken from [general] docker-image in sc-reproducible-build.toml.
     #[arg(long = "docker-image", verbatim_doc_comment)]
-    pub docker_image: String,
+    pub docker_image: Option<String>,
 
     /// Project folder (workspace root or single contract folder).
     /// Will be current directory if not specified.
@@ -616,7 +618,7 @@ pub struct ReproducibleBuildBuildArgs {
 
     /// If the output folder is not empty, wipe it before building instead of aborting.
     #[arg(long, default_value = "false", verbatim_doc_comment)]
-    pub force: bool,
+    pub overwrite: bool,
 
     /// Only build the contract with this name (as found in Cargo.toml).
     /// If not specified, all contracts under the project folder are built.

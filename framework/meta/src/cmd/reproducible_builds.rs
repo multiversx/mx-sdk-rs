@@ -4,11 +4,16 @@ mod check;
 mod download;
 mod local_build;
 pub mod local_deps;
+mod project_config;
 mod publish;
 mod source_json_model;
 mod source_pack;
 mod source_unpack;
 mod unpublish;
+
+pub use project_config::{
+    BuildConfig, GeneralConfig, PublishConfig, ReproducibleBuildProjectConfig,
+};
 
 pub use build::docker_build;
 pub use check::check_contract_verification;

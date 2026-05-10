@@ -13,8 +13,79 @@ use crate::cmd::all::call_contract_meta;
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::build_outcome::{ArtifactsBuildMetadata, ArtifactsBuildOptions, BuildOutcome};
+use super::project_config::{CONFIG_FILE_NAME, ReproducibleBuildProjectConfig};
 use super::source_pack::source_pack_contract;
 use super::source_unpack::unpack_packaged_src;
+
+/// Resolved, ready-to-use configuration for a local build run.
+pub struct LocalBuildConfig {
+    /// Base project folder (from `--path` or cwd). Overridden by `packaged_src` if set.
+    pub project: PathBuf,
+    /// Resolved output directory (relative paths are anchored to `project`).
+    pub output: PathBuf,
+    /// Folder where the project is copied before building. Defaults to `/tmp/sc-build`.
+    /// Overridden by the `buildRootFolder` stored inside `packaged_src` if set.
+    pub build_root: PathBuf,
+    /// Cargo target directory. Defaults to `/tmp/sc-target`.
+    pub target_dir: PathBuf,
+    pub contract: Option<String>,
+    pub no_wasm_opt: bool,
+    pub overwrite: bool,
+    /// Path to a `.source.json` file; when set, `project` and `build_root` are derived
+    /// from the unpacked JSON rather than from the fields above.
+    pub packaged_src: Option<String>,
+}
+
+impl LocalBuildConfig {
+    pub fn from_args(args: &ReproducibleBuildLocalBuildArgs) -> Self {
+        let project = resolve_path(args.path.as_deref());
+
+        let config = ReproducibleBuildProjectConfig::load_from_dir(&project);
+        let build_config = config.build.unwrap_or_default();
+
+        let contract = args.contract.clone().or(build_config.contract);
+        let no_wasm_opt = args.no_wasm_opt || build_config.no_wasm_opt.unwrap_or(false);
+        let overwrite = args.overwrite || build_config.overwrite.unwrap_or(false);
+
+        let build_root = PathBuf::from(
+            args.build_root
+                .as_deref()
+                .or(build_config.build_root.as_deref())
+                .unwrap_or("/tmp/sc-build"),
+        );
+
+        let target_dir = PathBuf::from(args.target_dir.as_deref().unwrap_or("/tmp/sc-target"));
+
+        let output = resolve_output(
+            &project,
+            args.output
+                .as_deref()
+                .or(build_config.output.as_deref())
+                .unwrap_or_else(|| {
+                    eprintln!(
+                        "Error: --output is required (or set 'output' under [build] in {CONFIG_FILE_NAME})"
+                    );
+                    std::process::exit(1);
+                }),
+        );
+
+        LocalBuildConfig {
+            project,
+            output,
+            build_root,
+            target_dir,
+            contract,
+            no_wasm_opt,
+            overwrite,
+            packaged_src: args.packaged_src.clone(),
+        }
+    }
+}
+
+fn resolve_output(project: &Path, output: &str) -> PathBuf {
+    let p = PathBuf::from(output);
+    if p.is_absolute() { p } else { project.join(p) }
+}
 
 /// Mirrors the Python `build_project` pipeline, but runs locally instead of inside Docker.
 ///
@@ -34,29 +105,41 @@ pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
         eprintln!("Error: --path and --packaged-src are mutually exclusive.");
         std::process::exit(1);
     }
+    run_local_build(LocalBuildConfig::from_args(args));
+}
+
+fn run_local_build(cfg: LocalBuildConfig) {
+    println!("Local build configuration:");
+    println!("  project:    {}", cfg.project.display());
+    println!("  output:     {}", cfg.output.display());
+    println!("  build-root: {}", cfg.build_root.display());
+    println!("  target-dir: {}", cfg.target_dir.display());
+    if let Some(c) = &cfg.contract {
+        println!("  contract:   {c}");
+    }
+    if cfg.no_wasm_opt {
+        println!("  no-wasm-opt: true");
+    }
 
     // If --packaged-src is set, unpack to /tmp/unwrapped/ and derive project/build-root from it.
-    let (project_folder, build_root) = if let Some(src) = args.packaged_src.as_deref() {
+    let (project_folder, build_root) = if let Some(src) = cfg.packaged_src.as_deref() {
         let unwrap_folder = PathBuf::from(super::source_unpack::HARDCODED_UNWRAP_FOLDER);
         let (folder, build_root_from_json) = unpack_packaged_src(Path::new(src), &unwrap_folder);
         (folder, PathBuf::from(build_root_from_json))
     } else {
-        let folder = resolve_path(args.path.as_deref());
-        let root = PathBuf::from(args.build_root.as_deref().unwrap_or("/tmp/sc-build"));
-        (folder, root)
+        (cfg.project.clone(), cfg.build_root.clone())
     };
 
     let output_folder = {
-        fs::create_dir_all(&args.output).unwrap();
-        let p = Path::new(&args.output).canonicalize().unwrap();
-        guard_output_folder(&p, args.force);
+        fs::create_dir_all(&cfg.output).unwrap();
+        let p = cfg.output.canonicalize().unwrap();
+        guard_output_folder(&p, cfg.overwrite);
         p
     };
 
     let cargo_target_dir = {
-        let p = args.target_dir.as_deref().unwrap_or("/tmp/sc-target");
-        fs::create_dir_all(p).unwrap();
-        Path::new(p).canonicalize().unwrap()
+        fs::create_dir_all(&cfg.target_dir).unwrap();
+        cfg.target_dir.canonicalize().unwrap()
     };
 
     // 1. Discover contracts
@@ -86,7 +169,7 @@ pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
     let all_args = AllArgs {
         command: ContractCliAction::Build(BuildArgs {
             locked: true,
-            wasm_opt: !args.no_wasm_opt,
+            wasm_opt: !cfg.no_wasm_opt,
             target_dir_wasm: Some(target_dir_str.clone()),
             ..Default::default()
         }),
@@ -101,8 +184,8 @@ pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
         ArtifactsBuildMetadata::detect(),
         ArtifactsBuildOptions {
             package_whole_project_src: true,
-            specific_contract: args.contract.clone(),
-            no_wasm_opt: args.no_wasm_opt,
+            specific_contract: cfg.contract.clone(),
+            no_wasm_opt: cfg.no_wasm_opt,
             build_root_folder: build_root.to_string_lossy().into_owned(),
         },
     );
@@ -112,7 +195,7 @@ pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
         let cargo_toml = CargoTomlContents::load_from_file(dir.path.join("Cargo.toml"));
         let contract_name = cargo_toml.package_name();
 
-        if let Some(filter) = args.contract.as_deref() {
+        if let Some(filter) = cfg.contract.as_deref() {
             if contract_name != filter {
                 println!("Skipping: {contract_name}");
                 continue;
@@ -140,11 +223,7 @@ pub fn local_build(args: &ReproducibleBuildLocalBuildArgs) {
         generate_codehashes_in_output(&build_contract_folder.join("output"));
 
         // c. Pack source into build_contract_folder/output/
-        source_pack_contract(
-            &build_root,
-            &build_contract_folder,
-            args.contract.as_deref(),
-        );
+        source_pack_contract(&build_root, &build_contract_folder, cfg.contract.as_deref());
 
         // d. Clean, keep output/
         clean_contract(&build_contract_folder, false);
@@ -175,18 +254,18 @@ fn resolve_path(path: Option<&str>) -> PathBuf {
 
 /// Checks that `output_folder` is empty before starting a build.
 /// If `force` is true, wipes the folder instead of aborting.
-fn guard_output_folder(output_folder: &Path, force: bool) {
+fn guard_output_folder(output_folder: &Path, overwrite: bool) {
     let is_non_empty = output_folder
         .read_dir()
         .map(|mut rd| rd.next().is_some())
         .unwrap_or(false);
     if is_non_empty {
-        if force {
+        if overwrite {
             fs::remove_dir_all(output_folder).unwrap();
             fs::create_dir_all(output_folder).unwrap();
         } else {
             eprintln!(
-                "Error: output folder is not empty: {}\nUse --force to wipe it before building.",
+                "Error: output folder is not empty: {}\nUse --overwrite to wipe it before building.",
                 output_folder.display()
             );
             std::process::exit(1);

@@ -6,8 +6,64 @@ use std::{
 
 use crate::cli::ReproducibleBuildBuildArgs;
 
+use super::project_config::{CONFIG_FILE_NAME, ReproducibleBuildProjectConfig};
+
 /// Host directory used for Cargo caches that are shared across Docker runs.
 const CARGO_CACHE_BASE: &str = "/tmp/multiversx_sc_meta_builder";
+
+/// Resolved, ready-to-use configuration for a Docker build run.
+pub struct DockerBuildConfig {
+    pub project: PathBuf,
+    pub output: PathBuf,
+    pub docker_image: String,
+    pub contract: Option<String>,
+    pub no_wasm_opt: bool,
+    pub build_root: Option<String>,
+    pub overwrite: bool,
+    pub no_default_platform: bool,
+    pub no_docker_interactive: bool,
+    pub no_docker_tty: bool,
+    pub cargo_verbose: bool,
+}
+
+impl DockerBuildConfig {
+    pub fn from_args(args: &ReproducibleBuildBuildArgs) -> Self {
+        let project = resolve_project(args.project.as_deref());
+
+        let config = ReproducibleBuildProjectConfig::load_from_dir(&project);
+        let general = config.general.unwrap_or_default();
+        let build = config.build.unwrap_or_default();
+
+        let docker_image = args
+            .docker_image
+            .clone()
+            .or(general.docker_image)
+            .unwrap_or_else(|| {
+                eprintln!(
+                    "Error: --docker-image is required (or set 'docker-image' under [general] in {CONFIG_FILE_NAME})"
+                );
+                std::process::exit(1);
+            });
+
+        let contract = args.contract.clone().or(build.contract);
+        let no_wasm_opt = args.no_wasm_opt || build.no_wasm_opt.unwrap_or(false);
+        let output = resolve_output(&project, args.output.as_deref().or(build.output.as_deref()));
+
+        DockerBuildConfig {
+            project,
+            output,
+            docker_image,
+            contract,
+            no_wasm_opt,
+            build_root: args.build_root.clone().or(build.build_root),
+            overwrite: args.overwrite || build.overwrite.unwrap_or(false),
+            no_default_platform: args.no_default_platform,
+            no_docker_interactive: args.no_docker_interactive,
+            no_docker_tty: args.no_docker_tty,
+            cargo_verbose: args.cargo_verbose,
+        }
+    }
+}
 
 /// Runs the reproducible build inside Docker.
 ///
@@ -25,28 +81,40 @@ const CARGO_CACHE_BASE: &str = "/tmp/multiversx_sc_meta_builder";
 ///   cargo-git           → /rust/git               (optional cache)
 pub fn docker_build(args: &ReproducibleBuildBuildArgs) {
     check_docker_available();
+    run_docker_build(DockerBuildConfig::from_args(args));
+}
 
-    let project = resolve_project(args.project.as_deref());
-    let output = resolve_output(&project, args.output.as_deref());
+fn run_docker_build(cfg: DockerBuildConfig) {
+    println!("Docker build configuration:");
+    println!("  project:      {}", cfg.project.display());
+    println!("  output:       {}", cfg.output.display());
+    println!("  docker-image: {}", cfg.docker_image);
+    if let Some(c) = &cfg.contract {
+        println!("  contract:     {c}");
+    }
+    if cfg.no_wasm_opt {
+        println!("  no-wasm-opt:  true");
+    }
 
-    fs::create_dir_all(&output).unwrap();
-    let is_non_empty = output
+    fs::create_dir_all(&cfg.output).unwrap();
+    let is_non_empty = cfg
+        .output
         .read_dir()
         .map(|mut rd| rd.next().is_some())
         .unwrap_or(false);
     if is_non_empty {
-        if args.force {
-            fs::remove_dir_all(&output).unwrap();
-            fs::create_dir_all(&output).unwrap();
+        if cfg.overwrite {
+            fs::remove_dir_all(&cfg.output).unwrap();
+            fs::create_dir_all(&cfg.output).unwrap();
         } else {
             eprintln!(
-                "Error: output folder is not empty: {}\nUse --force to wipe it before building.",
-                output.display()
+                "Error: output folder is not empty: {}\nUse --overwrite to wipe it before building.",
+                cfg.output.display()
             );
             std::process::exit(1);
         }
     }
-    let output = output.canonicalize().unwrap();
+    let output = cfg.output.canonicalize().unwrap();
 
     // Shared Cargo cache directories — created once, reused across runs.
     let cache_base = Path::new(CARGO_CACHE_BASE);
@@ -60,13 +128,13 @@ pub fn docker_build(args: &ReproducibleBuildBuildArgs) {
     let mut cmd = Command::new("docker");
     cmd.arg("run");
 
-    if !args.no_default_platform {
+    if !cfg.no_default_platform {
         cmd.args(["--platform", "linux/amd64"]);
     }
-    if !args.no_docker_interactive {
+    if !cfg.no_docker_interactive {
         cmd.arg("--interactive");
     }
-    if !args.no_docker_tty {
+    if !cfg.no_docker_tty {
         cmd.arg("--tty");
     }
 
@@ -78,7 +146,7 @@ pub fn docker_build(args: &ReproducibleBuildBuildArgs) {
     cmd.arg("--rm");
 
     // Volume mounts
-    cmd.args(["--volume", &format!("{}:/project", project.display())]);
+    cmd.args(["--volume", &format!("{}:/project", cfg.project.display())]);
     cmd.args(["--volume", &format!("{}:/output", output.display())]);
     cmd.args([
         "--volume",
@@ -90,22 +158,22 @@ pub fn docker_build(args: &ReproducibleBuildBuildArgs) {
     ]);
     cmd.args(["--volume", &format!("{}:/rust/git", cargo_git.display())]);
 
-    let verbose = if args.cargo_verbose { "true" } else { "false" };
+    let verbose = if cfg.cargo_verbose { "true" } else { "false" };
     cmd.args(["--env", &format!("CARGO_TERM_VERBOSE={verbose}")]);
 
     // Image name
-    cmd.arg(&args.docker_image);
+    cmd.arg(&cfg.docker_image);
 
     // Entrypoint args — appended after the ENTRYPOINT baked into the image.
     // The image already provides: --output /output --target-dir /rust/cargo-target-dir
     cmd.args(["--path", "/project"]);
-    if let Some(contract) = &args.contract {
+    if let Some(contract) = &cfg.contract {
         cmd.args(["--contract", contract]);
     }
-    if args.no_wasm_opt {
+    if cfg.no_wasm_opt {
         cmd.arg("--no-wasm-opt");
     }
-    if let Some(build_root) = &args.build_root {
+    if let Some(build_root) = &cfg.build_root {
         cmd.args(["--build-root", build_root]);
     }
 
@@ -154,7 +222,10 @@ fn resolve_project(path: Option<&str>) -> PathBuf {
 
 fn resolve_output(project: &Path, output: Option<&str>) -> PathBuf {
     match output {
-        Some(o) => PathBuf::from(o),
+        Some(o) => {
+            let p = PathBuf::from(o);
+            if p.is_absolute() { p } else { project.join(p) }
+        }
         None => project.join("output-docker"),
     }
 }
