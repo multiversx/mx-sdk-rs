@@ -28,7 +28,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         interactor.recall_nonce(&sender_address).await
     };
 
-    let contract = Bech32Address::from_bech32_string(args.contract.clone());
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 
     // Build call transaction.
     let arg_buffer = build_arg_buffer(&args.arguments)?;

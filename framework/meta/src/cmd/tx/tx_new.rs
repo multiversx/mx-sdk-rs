@@ -18,7 +18,7 @@ pub async fn tx_new(args: &NewArgs) {
 
 async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     let wallet = load_wallet(args)?;
-    let receiver = Bech32Address::from_bech32_string(args.receiver.clone());
+    let receiver = Bech32Address::try_from_bech32_string(args.receiver.clone())?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;

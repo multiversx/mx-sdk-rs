@@ -16,7 +16,7 @@ pub async fn tx_query(args: &QueryArgs) {
 }
 
 async fn tx_query_inner(args: &QueryArgs) -> Result<()> {
-    let contract = Bech32Address::from_bech32_string(args.contract.clone());
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 
     // Encode arguments as hex strings (the gateway expects hex, no "0x" prefix).
     let arg_buffer = build_arg_buffer(&args.arguments)?;
