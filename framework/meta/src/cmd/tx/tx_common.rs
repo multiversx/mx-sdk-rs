@@ -38,14 +38,10 @@ pub use multiversx_sc_scenario::multiversx_sc::chain_core::std::new_address::com
 /// Load a wallet from a PEM file or JSON keystore.
 pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
-        Wallet::from_pem_file(pem.to_str().context("invalid pem path")?)
-            .context("failed to load PEM wallet")
+        Wallet::from_pem_file(pem).context("failed to load PEM wallet")
     } else if let Some(keyfile) = &sender.keyfile {
-        Wallet::from_keystore_secret(
-            keyfile.to_str().context("invalid keyfile path")?,
-            InsertPassword::StandardInput,
-        )
-        .context("failed to load keystore wallet")
+        Wallet::from_keystore_secret(keyfile, InsertPassword::StandardInput)
+            .context("failed to load keystore wallet")
     } else {
         Err(anyhow!("a wallet is required: use --pem or --keyfile"))
     }
