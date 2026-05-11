@@ -17,9 +17,11 @@ use serde::Serialize;
 
 use crate::cmd::tx::tx_send::fetch_tx_on_network;
 
+use multiversx_sc_scenario::multiversx_sc::types::CodeMetadata;
+
 use super::{
     output::TxOutputFile,
-    tx_cli_args::{GatewayArgs, SenderArgs, TxArgs},
+    tx_cli_args::{GatewayArgs, MetadataArgs, SenderArgs, TxArgs},
 };
 
 /// Serialize a value to a JSON string with 4-space indentation (matches mxpy output).
@@ -34,6 +36,23 @@ fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
 }
 
 pub use multiversx_sc_scenario::multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
+
+pub fn build_code_metadata(meta: &MetadataArgs) -> CodeMetadata {
+    let mut flags = CodeMetadata::DEFAULT;
+    if !meta.metadata_not_upgradeable {
+        flags |= CodeMetadata::UPGRADEABLE;
+    }
+    if !meta.metadata_not_readable {
+        flags |= CodeMetadata::READABLE;
+    }
+    if meta.metadata_payable {
+        flags |= CodeMetadata::PAYABLE;
+    }
+    if meta.metadata_payable_by_sc {
+        flags |= CodeMetadata::PAYABLE_BY_SC;
+    }
+    flags
+}
 
 /// Load a wallet from a PEM file or JSON keystore.
 pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {

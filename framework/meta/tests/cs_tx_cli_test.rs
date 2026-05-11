@@ -28,6 +28,7 @@ async fn test_adder_deploy_add_get_sum() {
     std::fs::create_dir_all(&outfiles_dir).unwrap();
     let outfile_deploy = outfiles_dir.join("adder-deploy-cs.interaction.json");
     let outfile_call = outfiles_dir.join("adder-call-cs.interaction.json");
+    let outfile_upgrade = outfiles_dir.join("adder-upgrade-cs.interaction.json");
 
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
@@ -188,6 +189,83 @@ async fn test_adder_deploy_add_get_sum() {
     let result: Vec<String> =
         serde_json::from_str(stdout.trim()).expect("failed to parse query output as JSON");
     assert_eq!(result, vec!["05"], "getSum returned unexpected value");
+
+    // ── upgrade ───────────────────────────────────────────────────────────────
+    let upgrade_output = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "upgrade",
+            contract_address,
+            "--bytecode",
+            wasm_path.to_str().unwrap(),
+            "--pem",
+            wallet_pem_path.to_str().unwrap(),
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--chain",
+            CHAIN_SIMULATOR_CHAIN_ID,
+            "--gas-limit",
+            "50000000",
+            "--send",
+            "--outfile",
+            outfile_upgrade.to_str().unwrap(),
+        ])
+        .output()
+        .expect("failed to execute sc-meta tx upgrade");
+
+    println!(
+        "upgrade stdout:\n{}",
+        String::from_utf8_lossy(&upgrade_output.stdout)
+    );
+    println!(
+        "upgrade stderr:\n{}",
+        String::from_utf8_lossy(&upgrade_output.stderr)
+    );
+    assert!(upgrade_output.status.success(), "upgrade failed");
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    // Verify the upgrade outfile references the same contract address.
+    let upgrade_content =
+        std::fs::read_to_string(&outfile_upgrade).expect("failed to read upgrade outfile");
+    let upgrade_json: serde_json::Value =
+        serde_json::from_str(&upgrade_content).expect("failed to parse upgrade outfile JSON");
+
+    assert_eq!(
+        upgrade_json["emittedTransaction"]["receiver"]
+            .as_str()
+            .unwrap(),
+        contract_address,
+        "upgrade receiver mismatch"
+    );
+
+    // getSum must still return 5 after the upgrade.
+    let query_after_upgrade = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "query",
+            contract_address,
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--function",
+            "getSum",
+        ])
+        .output()
+        .expect("failed to execute sc-meta tx query after upgrade");
+
+    assert!(
+        query_after_upgrade.status.success(),
+        "getSum query after upgrade failed"
+    );
+
+    let stdout_after = String::from_utf8_lossy(&query_after_upgrade.stdout);
+    let result_after: Vec<String> =
+        serde_json::from_str(stdout_after.trim()).expect("failed to parse query output as JSON");
+    assert_eq!(
+        result_after,
+        vec!["05"],
+        "getSum returned unexpected value after upgrade"
+    );
 }
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command

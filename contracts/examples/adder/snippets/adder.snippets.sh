@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NETWORK=chain-simulator      # choose: devnet, testnet, mainnet, chain-simulator
+NETWORK=devnet      # choose: devnet, testnet, mainnet, chain-simulator
 TOOL_VARIANT=source # choose: sc-meta, source, mxpy
 
 # ── Tool selection ─────────────────────────────────────────────────────────────
@@ -25,6 +25,7 @@ esac
 
 ADDRESS=$("${DATA_TOOL[@]}" load --partition "${NETWORK}" --key="address-${NETWORK}")
 OUTFILE_DEPLOY="deploy-${NETWORK}.interaction.json"
+OUTFILE_UPGRADE="upgrade-${NETWORK}.interaction.json"
 OUTFILE_CALL="call-${NETWORK}.interaction.json"
 
 export RUST_BACKTRACE=1
@@ -48,6 +49,18 @@ deploy() {
 
     echo ""
     echo "Smart contract address: ${ADDRESS}"
+}
+
+upgrade() {
+    "${TX_TOOL[@]}" upgrade "${ADDRESS}" \
+        --bytecode "../output/adder.wasm" \
+        --pem="${ALICE}" \
+        --gas-limit=50000000 \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --send \
+        --outfile="${OUTFILE_UPGRADE}" \
+        || return
 }
 
 add() {
