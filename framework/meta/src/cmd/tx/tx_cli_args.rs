@@ -54,10 +54,6 @@ pub struct SenderArgs {
     /// Path to a JSON keystore wallet file.
     #[arg(long, group = "wallet_source")]
     pub keyfile: Option<PathBuf>,
-
-    /// Wallet index used when deriving from a PEM with multiple entries (default: 0).
-    #[arg(long, default_value = "0")]
-    pub sender_wallet_index: u32,
 }
 
 /// Generic transaction arguments (gas, nonce, value, broadcast flags).
