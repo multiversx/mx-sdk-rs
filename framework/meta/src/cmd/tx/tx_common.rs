@@ -59,18 +59,13 @@ pub(super) async fn fetch_tx_on_network(
     Ok(tx_on_network)
 }
 
-/// Write `output` to `outfile` or print to stdout.
-/// `do_print` controls whether stdout is used when there is no outfile.
-pub(super) fn save_output(
-    output: &TxOutputFile,
-    outfile: Option<&std::path::Path>,
-    do_print: bool,
-) -> Result<()> {
+/// Write `output` to `outfile`, or print to stdout when no outfile is given.
+pub(super) fn save_output(output: &TxOutputFile, outfile: Option<&std::path::Path>) -> Result<()> {
     let json = to_json_pretty(output)?;
     if let Some(path) = outfile {
         fs::write(path, &json).with_context(|| format!("failed to write to {}", path.display()))?;
         println!("Transaction saved to {}", path.display());
-    } else if do_print {
+    } else {
         println!("{json}");
     }
     Ok(())
@@ -202,7 +197,6 @@ pub async fn sign_and_dispatch(
         transaction_on_network: None,
     };
 
-    save_output(&output, tx_args.outfile.as_deref(), !tx_args.send)?;
     if tx_args.send {
         broadcast_and_save(
             output,
@@ -211,6 +205,8 @@ pub async fn sign_and_dispatch(
             tx_args.wait_result,
         )
         .await?;
+    } else {
+        save_output(&output, tx_args.outfile.as_deref())?;
     }
     Ok(())
 }

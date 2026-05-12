@@ -49,7 +49,6 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         transaction_on_network: None,
     };
 
-    save_output(&output, args.outfile.as_deref(), !args.send)?;
     if args.send {
         broadcast_and_save(
             output,
@@ -58,6 +57,8 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
             args.wait_result,
         )
         .await?;
+    } else {
+        save_output(&output, args.outfile.as_deref())?;
     }
     Ok(())
 }

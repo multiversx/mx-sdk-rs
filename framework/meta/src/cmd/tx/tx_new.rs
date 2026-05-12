@@ -77,7 +77,6 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         transaction_on_network: None,
     };
 
-    save_output(&output, args.tx.outfile.as_deref(), !args.tx.send)?;
     if args.tx.send {
         broadcast_and_save(
             output,
@@ -86,6 +85,8 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
             args.tx.wait_result,
         )
         .await?;
+    } else {
+        save_output(&output, args.tx.outfile.as_deref())?;
     }
     Ok(())
 }
