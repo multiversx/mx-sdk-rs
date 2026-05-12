@@ -1,13 +1,12 @@
 use std::fs;
 
-use anyhow::{Context, Result, anyhow};
-use multiversx_sc_snippets::{
-    imports::GatewayHttpProxy,
-    sdk::data::transaction::{ApiTransactionResult, Transaction},
-};
-use serde_json::Value;
+use anyhow::{Context, Result};
+use multiversx_sc_snippets::imports::GatewayHttpProxy;
 
-use super::tx_cli_args::SendArgs;
+use super::{
+    tx_cli_args::SendArgs,
+    tx_common::{fetch_tx_on_network, load_transaction_from_file},
+};
 
 pub async fn tx_send(args: &SendArgs) {
     if let Err(e) = tx_send_inner(args).await {
@@ -42,43 +41,4 @@ async fn tx_send_inner(args: &SendArgs) -> Result<()> {
     }
 
     Ok(())
-}
-
-// ---------------------------------------------------------------------------
-// Load transaction from the mxpy-compatible JSON file
-// ---------------------------------------------------------------------------
-
-fn load_transaction_from_file(path: &std::path::Path) -> Result<Transaction> {
-    let content =
-        fs::read_to_string(path).with_context(|| format!("failed to read {}", path.display()))?;
-    let v: Value = serde_json::from_str(&content)
-        .with_context(|| format!("invalid JSON in {}", path.display()))?;
-
-    // Accept either the mxpy "emittedTransaction" wrapper or a raw "tx" key.
-    let tx_value = v
-        .get("emittedTransaction")
-        .or_else(|| v.get("tx"))
-        .ok_or_else(|| {
-            anyhow!(
-                "file {} must contain an \"emittedTransaction\" or \"tx\" key",
-                path.display()
-            )
-        })?;
-
-    serde_json::from_value(tx_value.clone())
-        .with_context(|| format!("failed to deserialize transaction from {}", path.display()))
-}
-
-// ---------------------------------------------------------------------------
-// Wait for result
-// ---------------------------------------------------------------------------
-
-pub(super) async fn fetch_tx_on_network(
-    gateway: &str,
-    tx_hash: &str,
-) -> Result<ApiTransactionResult> {
-    let proxy = multiversx_sc_snippets::imports::GatewayHttpProxy::new(gateway.to_string());
-    let (tx_on_network, _return_code) =
-        multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await;
-    Ok(tx_on_network)
 }

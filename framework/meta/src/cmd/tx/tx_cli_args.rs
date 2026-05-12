@@ -269,6 +269,10 @@ pub struct SignArgs {
     #[arg(long, default_value = "false")]
     pub send: bool,
 
+    /// Wait for the transaction result (only meaningful when --send is also set).
+    #[arg(long, default_value = "false")]
+    pub wait_result: bool,
+
     #[command(flatten)]
     pub sender: SenderArgs,
 

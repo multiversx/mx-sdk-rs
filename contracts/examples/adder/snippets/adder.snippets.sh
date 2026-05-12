@@ -83,3 +83,35 @@ getSum() {
         --proxy="${PROXY}" \
         || return
 }
+
+# Demonstrates the full sign + send pipeline:
+# 1. Build the call transaction (nonce auto-fetched, signed) and save — no broadcast.
+# 2. Re-sign the saved file with `tx sign`.
+# 3. Broadcast with `tx send`.
+add_v2() {
+    NUMBER=5
+    OUTFILE_CALL_PREPARED="call-prepared-${NETWORK}.interaction.json"
+    OUTFILE_CALL_SIGNED="call-signed-${NETWORK}.interaction.json"
+
+    "${TX_TOOL[@]}" call "${ADDRESS}" \
+        --pem="${ALICE}" \
+        --gas-limit=5000000 \
+        --function="add" \
+        --arguments "${NUMBER}" \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --outfile="${OUTFILE_CALL_PREPARED}" \
+        || return
+
+    "${BASE[@]}" tx sign \
+        --infile="${OUTFILE_CALL_PREPARED}" \
+        --pem="${ALICE}" \
+        --proxy="${PROXY}" \
+        --outfile="${OUTFILE_CALL_SIGNED}" \
+        || return
+
+    "${BASE[@]}" tx send \
+        --proxy="${PROXY}" \
+        --infile="${OUTFILE_CALL_SIGNED}" \
+        || return
+}

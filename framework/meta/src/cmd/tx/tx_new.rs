@@ -9,7 +9,7 @@ use multiversx_sc_snippets::{
 
 use crate::cmd::tx::tx_common::load_wallet;
 
-use super::{output::TxOutputFile, tx_cli_args::NewArgs, tx_send::fetch_tx_on_network};
+use super::{output::TxOutputFile, tx_cli_args::NewArgs, tx_common::fetch_tx_on_network};
 
 pub async fn tx_new(args: &NewArgs) {
     if let Err(e) = tx_new_inner(args).await {

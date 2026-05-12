@@ -8,24 +8,59 @@ use multiversx_sc_snippets::{
         ManagedBuffer, StaticApi,
     },
     sdk::{
-        data::{keystore::InsertPassword, transaction::Transaction},
+        data::{
+            keystore::InsertPassword,
+            transaction::{ApiTransactionResult, Transaction},
+        },
         utils::base64_decode,
         wallet::Wallet,
     },
 };
 use serde::Serialize;
 
-use crate::cmd::tx::tx_send::fetch_tx_on_network;
-
 use multiversx_sc_scenario::multiversx_sc::types::CodeMetadata;
+use serde_json::Value;
 
 use super::{
     output::TxOutputFile,
     tx_cli_args::{GatewayArgs, MetadataArgs, SenderArgs, TxArgs},
 };
 
+/// Load a transaction from an mxpy-compatible interaction JSON file.
+/// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
+pub(super) fn load_transaction_from_file(path: &std::path::Path) -> Result<Transaction> {
+    let content =
+        fs::read_to_string(path).with_context(|| format!("failed to read {}", path.display()))?;
+    let v: Value = serde_json::from_str(&content)
+        .with_context(|| format!("invalid JSON in {}", path.display()))?;
+
+    let tx_value = v
+        .get("emittedTransaction")
+        .or_else(|| v.get("tx"))
+        .ok_or_else(|| {
+            anyhow!(
+                "file {} must contain an \"emittedTransaction\" or \"tx\" key",
+                path.display()
+            )
+        })?;
+
+    serde_json::from_value(tx_value.clone())
+        .with_context(|| format!("failed to deserialize transaction from {}", path.display()))
+}
+
+/// Wait for a transaction result on the network.
+pub(super) async fn fetch_tx_on_network(
+    gateway: &str,
+    tx_hash: &str,
+) -> Result<ApiTransactionResult> {
+    let proxy = GatewayHttpProxy::new(gateway.to_string());
+    let (tx_on_network, _return_code) =
+        multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await;
+    Ok(tx_on_network)
+}
+
 /// Serialize a value to a JSON string with 4-space indentation (matches mxpy output).
-fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
+pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
     let mut buf = Vec::new();
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut ser = serde_json::Serializer::with_formatter(&mut buf, formatter);

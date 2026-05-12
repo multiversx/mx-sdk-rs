@@ -20,7 +20,7 @@ pub struct Transaction {
     #[serde(rename = "chainID")]
     pub chain_id: String,
     pub version: u32,
-    #[serde(skip_serializing_if = "is_zero")]
+    #[serde(skip_serializing_if = "is_zero", default)]
     pub options: u32,
 }
 
