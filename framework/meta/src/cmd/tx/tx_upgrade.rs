@@ -2,7 +2,9 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc_scenario::imports::NotPayable;
-use multiversx_sc_snippets::imports::{Bech32Address, BytesValue, Interactor, InteractorRunAsync};
+use multiversx_sc_snippets::imports::{
+    Bech32Address, BytesValue, Interactor, InteractorIntoSdkTransaction,
+};
 
 use super::{
     tx_cli_args::UpgradeArgs,

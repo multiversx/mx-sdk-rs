@@ -3,7 +3,7 @@ use std::fs;
 use anyhow::{Context, Result};
 use multiversx_sc_snippets::{
     hex,
-    imports::{Bech32Address, Interactor, InteractorRunAsync},
+    imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction},
     sdk::utils::base64_encode,
 };
 

@@ -48,7 +48,12 @@ pub trait InteractorRunAsync {
     /// Returns a future that resolves to [`Self::Result`] once the transaction has been
     /// confirmed and the response has been decoded.
     fn run(self) -> impl std::future::Future<Output = Self::Result>;
+}
 
+/// Trait for interactor steps that can be converted into a plain SDK [`Transaction`].
+///
+/// Not implemented for VM queries, which do not produce blockchain transactions.
+pub trait InteractorIntoSdkTransaction {
     /// Converts the transaction step into a plain SDK [`Transaction`] without broadcasting it.
     ///
     /// Useful for inspecting or signing the transaction externally before submission.

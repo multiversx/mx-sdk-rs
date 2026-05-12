@@ -47,10 +47,6 @@ where
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_query(self)
     }
-
-    fn into_sdk_transaction(self) -> Transaction {
-        unimplemented!("SC queries don't produce blockchain transactions")
-    }
 }
 
 impl<'w, GatewayProxy, To, Payment, RH> InteractorPrepareAsync

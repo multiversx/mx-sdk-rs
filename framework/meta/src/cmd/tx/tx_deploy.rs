@@ -1,7 +1,7 @@
 use std::fs;
 
 use anyhow::{Context, Result};
-use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorRunAsync};
+use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
 use super::{
     tx_cli_args::DeployArgs,

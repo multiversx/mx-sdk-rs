@@ -15,7 +15,10 @@ use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncServic
 
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
-use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
+use super::{
+    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
+    InteractorRunAsync,
+};
 
 #[allow(clippy::type_complexity)]
 async fn run_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
@@ -95,7 +98,27 @@ where
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_upgrade(self)
     }
+}
 
+impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorIntoSdkTransaction
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
     fn into_sdk_transaction(self) -> Transaction {
         let step_wrapper = self.tx_to_step();
         step_wrapper

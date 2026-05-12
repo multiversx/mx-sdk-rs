@@ -1,5 +1,5 @@
 use anyhow::Result;
-use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorRunAsync};
+use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use super::{
     tx_cli_args::CallArgs,

@@ -17,6 +17,7 @@ pub use interactor_exec_step::InteractorExecStep;
 pub use interactor_query_env::InteractorEnvQuery;
 pub use interactor_query_step::InteractorQueryStep;
 pub use interactor_run_trait::{
-    InteractorPrepareAsync, InteractorRunAsync, InteractorSimulateGasAsync,
+    InteractorIntoSdkTransaction, InteractorPrepareAsync, InteractorRunAsync,
+    InteractorSimulateGasAsync,
 };
 pub use simulate_gas_marker::SimulateGas;
