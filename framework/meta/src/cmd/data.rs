@@ -15,7 +15,14 @@ const STORAGE_FILE: &str = "sc-meta.data-storage.json";
 /// Global storage lives in ~/multiversx-sdk, same as mxpy.
 fn global_storage_path() -> PathBuf {
     let home = std::env::var_os("HOME")
+        .or_else(|| std::env::var_os("USERPROFILE"))
         .map(PathBuf::from)
+        .or_else(|| {
+            // Windows legacy: HOMEDRIVE + HOMEPATH
+            let drive = std::env::var_os("HOMEDRIVE")?;
+            let path = std::env::var_os("HOMEPATH")?;
+            Some(PathBuf::from(drive).join(path))
+        })
         .unwrap_or_else(|| PathBuf::from("."));
     home.join("multiversx-sdk").join(STORAGE_FILE)
 }
