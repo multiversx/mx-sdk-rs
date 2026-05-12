@@ -6,7 +6,7 @@ use multiversx_sc_snippets::{
 };
 
 use super::tx_cli_args::QueryArgs;
-use super::tx_common::build_arg_buffer;
+use super::tx_common::{build_arg_buffer, to_json_pretty};
 
 pub async fn tx_query(args: &QueryArgs) {
     if let Err(e) = tx_query_inner(args).await {
@@ -53,7 +53,7 @@ async fn tx_query_inner(args: &QueryArgs) -> Result<()> {
         .map(|bytes| hex::encode(&bytes))
         .collect();
 
-    let json = serde_json::to_string_pretty(&return_data).context("failed to serialize result")?;
+    let json = to_json_pretty(&return_data)?;
     println!("{json}");
     Ok(())
 }
