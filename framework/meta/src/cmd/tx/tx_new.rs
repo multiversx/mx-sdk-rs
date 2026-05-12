@@ -3,13 +3,17 @@ use std::fs;
 use anyhow::{Context, Result};
 use multiversx_sc_snippets::{
     hex,
-    imports::{Bech32Address, GatewayHttpProxy, Interactor, InteractorRunAsync},
+    imports::{Bech32Address, Interactor, InteractorRunAsync},
     sdk::utils::base64_encode,
 };
 
 use crate::cmd::tx::tx_common::load_wallet;
 
-use super::{output::TxOutputFile, tx_cli_args::NewArgs, tx_common::fetch_tx_on_network};
+use super::{
+    output::TxOutputFile,
+    tx_cli_args::NewArgs,
+    tx_common::{broadcast_and_save, save_output},
+};
 
 pub async fn tx_new(args: &NewArgs) {
     if let Err(e) = tx_new_inner(args).await {
@@ -73,48 +77,16 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         transaction_on_network: None,
     };
 
-    let json = serde_json::to_string_pretty(&output).context("failed to serialize transaction")?;
-
-    // Write / print signed tx.
-    if let Some(outfile) = &args.tx.outfile {
-        fs::write(outfile, &json)
-            .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        println!("Transaction saved to {}", outfile.display());
-    } else if !args.tx.send {
-        println!("{json}");
-    }
-
-    // Optionally broadcast.
+    save_output(&output, args.tx.outfile.as_deref(), !args.tx.send)?;
     if args.tx.send {
-        let proxy = GatewayHttpProxy::new(args.gateway.proxy.clone());
-        let tx_hash = proxy
-            .send_transaction(&output.emitted_transaction)
-            .await
-            .context("failed to broadcast transaction")?;
-        println!("Transaction hash: {tx_hash}");
-
-        // Update output file with the hash if we have one.
-        let mut output_with_hash = TxOutputFile {
-            emitted_transaction_hash: tx_hash.clone(),
-            ..output
-        };
-
-        if args.tx.wait_result {
-            println!("Waiting for transaction result...");
-            let result = fetch_tx_on_network(&args.gateway.proxy, &tx_hash).await?;
-            output_with_hash.transaction_on_network = Some(result);
-        }
-
-        let json = serde_json::to_string_pretty(&output_with_hash)
-            .context("failed to serialize transaction")?;
-        if let Some(outfile) = &args.tx.outfile {
-            fs::write(outfile, &json)
-                .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        } else if args.tx.wait_result {
-            println!("{json}");
-        }
+        broadcast_and_save(
+            output,
+            &args.gateway.proxy,
+            args.tx.outfile.as_deref(),
+            args.tx.wait_result,
+        )
+        .await?;
     }
-
     Ok(())
 }
 

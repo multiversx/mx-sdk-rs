@@ -1,12 +1,10 @@
-use std::fs;
-
-use anyhow::{Context, Result, anyhow};
-use multiversx_sc_snippets::{hex, imports::GatewayHttpProxy};
+use anyhow::{Result, anyhow};
+use multiversx_sc_snippets::{hex, sdk::utils::base64_decode};
 
 use super::{
     output::TxOutputFile,
     tx_cli_args::SignArgs,
-    tx_common::{fetch_tx_on_network, load_transaction_from_file, load_wallet, to_json_pretty},
+    tx_common::{broadcast_and_save, load_transaction_from_file, load_wallet, save_output},
 };
 
 pub async fn tx_sign(args: &SignArgs) {
@@ -30,20 +28,17 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         ));
     }
 
-    // Apply chain ID override if provided.
     if let Some(chain_id) = &args.gateway.chain {
         tx.chain_id = chain_id.clone();
     }
 
-    // Sign.
     let sig = wallet.sign_tx(&tx);
     tx.signature = Some(hex::encode(sig));
 
     let decoded_data = tx
         .data
         .as_ref()
-        .map(multiversx_sc_snippets::sdk::utils::base64_decode)
-        .map(|b| String::from_utf8_lossy(&b).into_owned())
+        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
         .unwrap_or_default();
 
     let output = TxOutputFile {
@@ -54,45 +49,15 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         transaction_on_network: None,
     };
 
-    let json = to_json_pretty(&output)?;
-
-    // Write / print the signed tx.
-    if let Some(outfile) = &args.outfile {
-        fs::write(outfile, &json)
-            .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        println!("Transaction saved to {}", outfile.display());
-    } else if !args.send {
-        println!("{json}");
-    }
-
-    // Optionally broadcast.
+    save_output(&output, args.outfile.as_deref(), !args.send)?;
     if args.send {
-        let proxy = GatewayHttpProxy::new(args.gateway.proxy.clone());
-        let tx_hash = proxy
-            .send_transaction(&output.emitted_transaction)
-            .await
-            .context("failed to broadcast transaction")?;
-        println!("Transaction hash: {tx_hash}");
-
-        let mut output_with_hash = TxOutputFile {
-            emitted_transaction_hash: tx_hash.clone(),
-            ..output
-        };
-
-        if args.wait_result {
-            println!("Waiting for transaction result...");
-            let result = fetch_tx_on_network(&args.gateway.proxy, &tx_hash).await?;
-            output_with_hash.transaction_on_network = Some(result);
-        }
-
-        let json = to_json_pretty(&output_with_hash)?;
-        if let Some(outfile) = &args.outfile {
-            fs::write(outfile, &json)
-                .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        } else {
-            println!("{json}");
-        }
+        broadcast_and_save(
+            output,
+            &args.gateway.proxy,
+            args.outfile.as_deref(),
+            args.wait_result,
+        )
+        .await?;
     }
-
     Ok(())
 }

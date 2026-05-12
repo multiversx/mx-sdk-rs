@@ -59,6 +59,58 @@ pub(super) async fn fetch_tx_on_network(
     Ok(tx_on_network)
 }
 
+/// Write `output` to `outfile` or print to stdout.
+/// `do_print` controls whether stdout is used when there is no outfile.
+pub(super) fn save_output(
+    output: &TxOutputFile,
+    outfile: Option<&std::path::Path>,
+    do_print: bool,
+) -> Result<()> {
+    let json = to_json_pretty(output)?;
+    if let Some(path) = outfile {
+        fs::write(path, &json).with_context(|| format!("failed to write to {}", path.display()))?;
+        println!("Transaction saved to {}", path.display());
+    } else if do_print {
+        println!("{json}");
+    }
+    Ok(())
+}
+
+/// Broadcast the transaction inside `output`, update the hash (and optionally
+/// the on-network result), then write/print the updated output.
+pub(super) async fn broadcast_and_save(
+    output: TxOutputFile,
+    proxy_url: &str,
+    outfile: Option<&std::path::Path>,
+    wait_result: bool,
+) -> Result<()> {
+    let proxy = GatewayHttpProxy::new(proxy_url.to_string());
+    let tx_hash = proxy
+        .send_transaction(&output.emitted_transaction)
+        .await
+        .context("failed to broadcast transaction")?;
+    println!("Transaction hash: {tx_hash}");
+
+    let mut output_with_hash = TxOutputFile {
+        emitted_transaction_hash: tx_hash.clone(),
+        ..output
+    };
+
+    if wait_result {
+        println!("Waiting for transaction result...");
+        let result = fetch_tx_on_network(proxy_url, &tx_hash).await?;
+        output_with_hash.transaction_on_network = Some(result);
+    }
+
+    let json = to_json_pretty(&output_with_hash)?;
+    if let Some(path) = outfile {
+        fs::write(path, &json).with_context(|| format!("failed to write to {}", path.display()))?;
+    } else {
+        println!("{json}");
+    }
+    Ok(())
+}
+
 /// Serialize a value to a JSON string with 4-space indentation (matches mxpy output).
 pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
     let mut buf = Vec::new();
@@ -125,7 +177,6 @@ pub async fn sign_and_dispatch(
     gateway_args: &GatewayArgs,
     contract_address: Option<String>,
 ) -> Result<()> {
-    // Apply caller-controlled overrides.
     tx.nonce = nonce;
     if let Some(gas_price) = tx_args.gas_price {
         tx.gas_price = gas_price;
@@ -151,45 +202,15 @@ pub async fn sign_and_dispatch(
         transaction_on_network: None,
     };
 
-    let json = to_json_pretty(&output)?;
-
-    // Write / print the signed tx.
-    if let Some(outfile) = &tx_args.outfile {
-        fs::write(outfile, &json)
-            .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        println!("Transaction saved to {}", outfile.display());
-    } else if !tx_args.send {
-        println!("{json}");
-    }
-
-    // Optionally broadcast.
+    save_output(&output, tx_args.outfile.as_deref(), !tx_args.send)?;
     if tx_args.send {
-        let proxy = GatewayHttpProxy::new(gateway_args.proxy.clone());
-        let tx_hash = proxy
-            .send_transaction(&output.emitted_transaction)
-            .await
-            .context("failed to broadcast transaction")?;
-        println!("Transaction hash: {tx_hash}");
-
-        let mut output_with_hash = TxOutputFile {
-            emitted_transaction_hash: tx_hash.clone(),
-            ..output
-        };
-
-        if tx_args.wait_result {
-            println!("Waiting for transaction result...");
-            let result = fetch_tx_on_network(&gateway_args.proxy, &tx_hash).await?;
-            output_with_hash.transaction_on_network = Some(result);
-        }
-
-        let json = to_json_pretty(&output_with_hash)?;
-        if let Some(outfile) = &tx_args.outfile {
-            fs::write(outfile, &json)
-                .with_context(|| format!("failed to write to {}", outfile.display()))?;
-        } else {
-            println!("{json}");
-        }
+        broadcast_and_save(
+            output,
+            &gateway_args.proxy,
+            tx_args.outfile.as_deref(),
+            tx_args.wait_result,
+        )
+        .await?;
     }
-
     Ok(())
 }
