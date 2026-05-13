@@ -137,7 +137,10 @@ fn process_new_deployed_address(tx: &ApiTransactionResult) -> Option<Address> {
 }
 
 fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<String> {
-    let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
+    let Some(data) = &tx.data else {
+        return None;
+    };
+    let original_tx_data = String::from_utf8(base64_decode(data)).unwrap_or_default();
 
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.address != ESDTSystemSCAddress.to_address() {
@@ -150,7 +153,7 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
             .find(|e| e.hash == scr.prev_tx_hash)
         {
             prev_tx.data.as_ref()
-        } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
+        } else if tx.hash.as_deref() == Some(scr.prev_tx_hash.as_str()) {
             &original_tx_data
         } else {
             continue;
@@ -178,11 +181,11 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
         }
 
         if scr.data.starts_with("ESDTTransfer@") {
-            let encoded_tid = scr.data.split('@').nth(1);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(1)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         } else if scr.data.starts_with("@00@") || scr.data.starts_with("@6f6b@") {
-            let encoded_tid = scr.data.split('@').nth(2);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(2)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         }
     }
     None

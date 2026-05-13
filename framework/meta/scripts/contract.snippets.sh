@@ -176,8 +176,9 @@ pay3() {
         --pem="${ALICE}" \
         --gas-limit=5000000 \
         --function="payable_all" \
-        --payments "USDC-350c4e" 0 "${USDC_AMOUNT}" \
-                   "EGLD-000000" 0 "${EGLD_VALUE}" \
+        --payments\
+            "USDC-350c4e" 0 "${USDC_AMOUNT}" \
+            "EGLD-000000" 0 "${EGLD_VALUE}" \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --outfile="${OUTFILE_CALL}" \
