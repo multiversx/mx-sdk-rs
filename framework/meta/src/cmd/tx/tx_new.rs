@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use multiversx_sc_snippets::{
     hex,
     imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction},
-    sdk::utils::base64_encode,
+    sdk::utils::{base64_decode, base64_encode},
 };
 
 use crate::cmd::tx::tx_common::load_wallet;
@@ -12,7 +12,7 @@ use crate::cmd::tx::tx_common::load_wallet;
 use super::{
     output::TxOutputFile,
     tx_cli_args::NewArgs,
-    tx_common::{broadcast_and_save, save_output},
+    tx_common::{broadcast_and_save, build_payments, save_output},
 };
 
 pub async fn tx_new(args: &NewArgs) {
@@ -38,27 +38,29 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         interactor.recall_nonce(&sender_address).await
     };
 
-    // Build data field.
-    let data_raw = build_data_bytes(args)?;
-    let decoded_data = String::from_utf8_lossy(&data_raw).into_owned();
-    let data_b64 = if data_raw.is_empty() {
-        None
-    } else {
-        Some(base64_encode(&data_raw))
-    };
-
     // Build Transaction via unified Tx syntax (resembles interactor code).
+    let payments = build_payments(&args.payment)?;
     let mut tx = interactor
         .tx()
         .from(&sender)
         .to(&receiver)
         .gas(args.tx.gas_limit)
-        .egld(args.tx.value)
+        .payment(payments)
         .into_sdk_transaction();
 
-    // Apply the fields that the Tx builder delegates to the caller.
+    // Data field (mutually exclusive with --token-transfers; overrides only when provided).
+    let data_raw = build_data_bytes(args)?;
+    if !data_raw.is_empty() {
+        tx.data = Some(base64_encode(&data_raw));
+    }
+
+    // Decode the data field for the human-readable output.
+    let decoded_data = tx
+        .data
+        .as_ref()
+        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
+        .unwrap_or_default();
     tx.nonce = nonce;
-    tx.data = data_b64;
     if let Some(gas_price) = args.tx.gas_price {
         tx.gas_price = gas_price;
     }

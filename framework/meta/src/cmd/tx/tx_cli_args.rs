@@ -72,10 +72,6 @@ pub struct TxArgs {
     #[arg(long)]
     pub nonce: Option<u64>,
 
-    /// EGLD value to send with the transaction, in smallest denomination (default: 0).
-    #[arg(long, default_value = "0")]
-    pub value: u64,
-
     /// If set, the transaction is broadcast to the network.
     /// Without this flag the signed tx JSON is written to --outfile or stdout.
     #[arg(long, default_value = "false")]
@@ -88,6 +84,18 @@ pub struct TxArgs {
     /// Path to write the signed tx JSON to. Defaults to stdout when --send is not set.
     #[arg(long)]
     pub outfile: Option<PathBuf>,
+}
+
+/// Payment arguments: EGLD value and optional ESDT token transfers.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct PaymentArgs {
+    /// EGLD value to send with the transaction, in smallest denomination (default: 0).
+    #[arg(long, default_value = "0")]
+    pub value: u128,
+
+    /// ESDT token transfers as a flat list: TOKEN-abc AMOUNT TOKEN-def AMOUNT ...
+    #[arg(long, num_args = 0..)]
+    pub token_transfers: Vec<String>,
 }
 
 /// Code metadata flags used by deploy and upgrade.
@@ -130,6 +138,9 @@ pub struct DeployArgs {
     pub tx: TxArgs,
 
     #[command(flatten)]
+    pub payment: PaymentArgs,
+
+    #[command(flatten)]
     pub metadata: MetadataArgs,
 }
 
@@ -146,10 +157,6 @@ pub struct CallArgs {
     #[arg(long, num_args = 0..)]
     pub arguments: Vec<String>,
 
-    /// ESDT token transfers as a flat list: TOKEN-abc AMOUNT TOKEN-def AMOUNT ...
-    #[arg(long, num_args = 0..)]
-    pub token_transfers: Vec<String>,
-
     #[command(flatten)]
     pub gateway: GatewayArgs,
 
@@ -158,6 +165,9 @@ pub struct CallArgs {
 
     #[command(flatten)]
     pub tx: TxArgs,
+
+    #[command(flatten)]
+    pub payment: PaymentArgs,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -185,6 +195,9 @@ pub struct UpgradeArgs {
 
     #[command(flatten)]
     pub tx: TxArgs,
+
+    #[command(flatten)]
+    pub payment: PaymentArgs,
 
     #[command(flatten)]
     pub metadata: MetadataArgs,
@@ -221,11 +234,6 @@ pub struct NewArgs {
     #[arg(long, conflicts_with = "token_transfers")]
     pub data_file: Option<PathBuf>,
 
-    /// ESDT token transfers as a flat list: TOKEN-abc AMOUNT TOKEN-def AMOUNT ...
-    /// Mutually exclusive with --data / --data-file.
-    #[arg(long, num_args = 0..)]
-    pub token_transfers: Vec<String>,
-
     #[command(flatten)]
     pub gateway: GatewayArgs,
 
@@ -234,6 +242,9 @@ pub struct NewArgs {
 
     #[command(flatten)]
     pub tx: TxArgs,
+
+    #[command(flatten)]
+    pub payment: PaymentArgs,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]

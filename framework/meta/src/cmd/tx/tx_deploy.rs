@@ -47,7 +47,7 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         .tx()
         .from(&sender_bech32)
         .gas(args.tx.gas_limit)
-        .egld(args.tx.value)
+        .egld(args.payment.value)
         .raw_deploy()
         .code(code)
         .code_metadata(code_metadata)

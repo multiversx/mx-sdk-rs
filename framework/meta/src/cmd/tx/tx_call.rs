@@ -3,7 +3,7 @@ use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoS
 
 use super::{
     tx_cli_args::CallArgs,
-    tx_common::{build_arg_buffer, load_wallet, sign_and_dispatch},
+    tx_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch},
 };
 
 pub async fn tx_call(args: &CallArgs) {
@@ -32,16 +32,17 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
 
     // Build call transaction.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
-    let tx_builder = interactor
+    let payments = build_payments(&args.payment)?;
+
+    let tx = interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
         .gas(args.tx.gas_limit)
-        .egld(args.tx.value)
+        .payment(payments)
         .raw_call(args.function.as_str())
-        .arguments_raw(arg_buffer);
-
-    let tx = tx_builder.into_sdk_transaction();
+        .arguments_raw(arg_buffer)
+        .into_sdk_transaction();
 
     sign_and_dispatch(wallet, tx, nonce, &args.tx, &args.gateway, None).await
 }

@@ -4,8 +4,8 @@ use anyhow::{Context, Result, anyhow};
 use multiversx_sc_snippets::{
     hex,
     imports::{
-        BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext, ManagedArgBuffer,
-        ManagedBuffer, StaticApi,
+        BigUint, BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext,
+        ManagedArgBuffer, ManagedBuffer, Payment, PaymentVec, RustBigUint, StaticApi, TokenId,
     },
     sdk::{
         data::{
@@ -18,12 +18,13 @@ use multiversx_sc_snippets::{
 };
 use serde::Serialize;
 
-use multiversx_sc_scenario::multiversx_sc::types::CodeMetadata;
+use multiversx_sc_scenario::{imports::ReturnCode, multiversx_sc::types::CodeMetadata};
+use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
 use super::{
     output::TxOutputFile,
-    tx_cli_args::{GatewayArgs, MetadataArgs, SenderArgs, TxArgs},
+    tx_cli_args::{GatewayArgs, MetadataArgs, PaymentArgs, SenderArgs, TxArgs},
 };
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
@@ -52,11 +53,10 @@ pub(super) fn load_transaction_from_file(path: &std::path::Path) -> Result<Trans
 pub(super) async fn fetch_tx_on_network(
     gateway: &str,
     tx_hash: &str,
-) -> Result<ApiTransactionResult> {
+) -> Result<(ApiTransactionResult, ReturnCode)> {
     let proxy = GatewayHttpProxy::new(gateway.to_string());
-    let (tx_on_network, _return_code) =
-        multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await;
-    Ok(tx_on_network)
+    let result = multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await;
+    Ok(result)
 }
 
 /// Write `output` to `outfile`, or print to stdout when no outfile is given.
@@ -93,8 +93,10 @@ pub(super) async fn broadcast_and_save(
 
     if wait_result {
         println!("Waiting for transaction result...");
-        let result = fetch_tx_on_network(proxy_url, &tx_hash).await?;
-        output_with_hash.transaction_on_network = Some(result);
+        let (tx_on_network, return_code) = fetch_tx_on_network(proxy_url, &tx_hash).await?;
+        let tx_response = network_response::parse_tx_response(tx_on_network.clone(), return_code);
+        print_tx_results(&tx_response);
+        output_with_hash.transaction_on_network = Some(tx_on_network);
     }
 
     let json = to_json_pretty(&output_with_hash)?;
@@ -118,6 +120,66 @@ pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
 }
 
 pub use multiversx_sc_scenario::multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
+
+/// Parse the flat token-transfer list (`TOKEN-ident AMOUNT TOKEN-ident AMOUNT …`)
+/// into a [`PaymentVec`] using the same extended-identifier format as mxpy:
+/// NFT/SFT identifiers append a hex-encoded nonce, e.g. `NFT-abc123-0a` (nonce = 10);
+/// fungible tokens are plain, e.g. `ESDT-abc123`.
+/// Build a [`PaymentVec`] from [`PaymentArgs`]: the flat `--token-transfers` list plus
+/// the `--value` EGLD amount (appended last as a native `EGLD-000000` payment).
+/// The interactor's `.payment()` normalises the vec into the correct transaction fields.
+pub fn build_payments(payment: &PaymentArgs) -> Result<PaymentVec<StaticApi>> {
+    let transfers = &payment.token_transfers;
+    let egld_value = payment.value;
+    if transfers.len() % 2 != 0 {
+        return Err(anyhow!(
+            "--token-transfers requires an even number of values (TOKEN-IDENT AMOUNT …)"
+        ));
+    }
+    let mut payments = PaymentVec::new();
+    for chunk in transfers.chunks(2) {
+        let extended_id = &chunk[0];
+        let amount_str = &chunk[1];
+        let (base_id, nonce) = split_extended_identifier(extended_id);
+        let rust_amount: RustBigUint = amount_str
+            .parse()
+            .with_context(|| format!("invalid token amount: {amount_str}"))?;
+        let amount = BigUint::<StaticApi>::from(rust_amount);
+        payments.push(
+            Payment::try_new(
+                TokenId::<StaticApi>::from(base_id.as_bytes()),
+                nonce,
+                amount,
+            )
+            .map_err(|_| anyhow!("token amount must be non-zero: {extended_id}"))?,
+        );
+    }
+    if egld_value > 0 {
+        let amount = BigUint::<StaticApi>::from(egld_value);
+        payments.push(
+            Payment::try_new(TokenId::native(), 0u64, amount)
+                .map_err(|_| anyhow!("EGLD value must be non-zero"))?,
+        );
+    }
+    Ok(payments)
+}
+
+/// Split an mxpy-style extended token identifier into `(base_identifier, nonce)`.
+///
+/// Format: `TOKEN-xxxxxx` (fungible, nonce = 0) or `TOKEN-xxxxxx-<hex>` (NFT/SFT).
+fn split_extended_identifier(extended_id: &str) -> (String, u64) {
+    let parts: Vec<&str> = extended_id.split('-').collect();
+    if parts.len() >= 3 {
+        let last = parts[parts.len() - 1];
+        if !last.is_empty() && last.bytes().all(|b| b.is_ascii_hexdigit()) {
+            if let Ok(nonce) = u64::from_str_radix(last, 16) {
+                let base = parts[..parts.len() - 1].join("-");
+                return (base, nonce);
+            }
+        }
+    }
+    (extended_id.to_string(), 0)
+}
 
 pub fn build_code_metadata(meta: &MetadataArgs) -> CodeMetadata {
     let mut flags = CodeMetadata::DEFAULT;
@@ -209,4 +271,16 @@ pub async fn sign_and_dispatch(
         save_output(&output, tx_args.outfile.as_deref())?;
     }
     Ok(())
+}
+
+/// Print the status and hex-encoded return values of a completed transaction.
+pub(super) fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_model::TxResponse) {
+    if tx_response.tx_error.is_success() {
+        println!("Transaction successful.");
+    } else {
+        println!("Transaction failed: {}", tx_response.tx_error);
+    }
+    for (i, result) in tx_response.out.iter().enumerate() {
+        println!("Result[{i}]: 0x{}", hex::encode(result));
+    }
 }
