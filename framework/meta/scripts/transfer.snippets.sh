@@ -52,7 +52,7 @@ transfer2() {
         --token-transfers \
             "USDC-350c4e" "${USDC_AMOUNT}" \
             "EGLD-000000" "${EGLD_VALUE}" \
-        --gas-limit=2000000 \
+        --gas-limit=800000 \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --outfile="${OUTFILE_TRANSFER}" \
@@ -72,8 +72,8 @@ transfer3() {
         --receiver="${RECEIVER}" \
         --payments \
             "USDC-350c4e" 0 "${USDC_AMOUNT}" \
-            "EGLD-000000" 0 "${EGLD_VALUE}" \
-        --gas-limit=2000000 \
+            "EGLD-000000" "${EGLD_VALUE}" \
+        --gas-limit=800000 \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --outfile="${OUTFILE_TRANSFER}" \
