@@ -5,9 +5,8 @@ TOOL_VARIANT=source # choose: sc-meta, source, mxpy
 
 # ── Tool selection ─────────────────────────────────────────────────────────────
 case "${TOOL_VARIANT}" in
-    sc-meta) BASE=(sc-meta)                                                              ; TX_CMD=tx       ;;
-    source)  BASE=(cargo run --manifest-path ../../../../framework/meta/Cargo.toml --)   ; TX_CMD=tx       ;;
-    mxpy)    BASE=(mxpy --verbose)                                                       ; TX_CMD=contract ;;
+    sc-meta) BASE=(sc-meta)        ; TX_CMD=tx       ;;
+    mxpy)    BASE=(mxpy --verbose) ; TX_CMD=contract ;;
 esac
 
 TX_TOOL=("${BASE[@]}" "${TX_CMD}")
