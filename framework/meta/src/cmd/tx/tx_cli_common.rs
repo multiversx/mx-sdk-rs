@@ -22,10 +22,8 @@ use multiversx_sc_scenario::{imports::ReturnCode, multiversx_sc::types::CodeMeta
 use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
-use super::{
-    output::TxOutputFile,
-    tx_cli_args::{GatewayArgs, MetadataArgs, PaymentArgs, SenderArgs, TxArgs},
-};
+use super::output::TxOutputFile;
+use crate::cli::cli_args_tx::{GatewayArgs, MetadataArgs, PaymentArgs, SenderArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.

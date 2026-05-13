@@ -3,9 +3,9 @@ use multiversx_sc_snippets::{hex, sdk::utils::base64_decode};
 
 use super::{
     output::TxOutputFile,
-    tx_cli_args::SignArgs,
     tx_cli_common::{broadcast_and_save, load_transaction_from_file, load_wallet, save_output},
 };
+use crate::cli::cli_args_tx::SignArgs;
 
 pub async fn tx_sign(args: &SignArgs) {
     if let Err(e) = tx_sign_inner(args).await {

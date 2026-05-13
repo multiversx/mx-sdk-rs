@@ -1,7 +1,7 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
-use crate::cmd::tx::tx_cli_args::TxCliArgs;
+use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
 /// Parsed arguments of the meta crate CLI.

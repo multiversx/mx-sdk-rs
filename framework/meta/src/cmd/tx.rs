@@ -1,5 +1,4 @@
 mod output;
-pub mod tx_cli_args;
 mod tx_cli_call;
 mod tx_cli_common;
 mod tx_cli_deploy;
@@ -9,7 +8,7 @@ mod tx_cli_send;
 mod tx_cli_sign;
 mod tx_cli_upgrade;
 
-use tx_cli_args::{TxCliAction, TxCliArgs};
+use crate::cli::cli_args_tx::{TxCliAction, TxCliArgs};
 use tx_cli_call::tx_call;
 use tx_cli_deploy::tx_deploy;
 use tx_cli_new::tx_new;

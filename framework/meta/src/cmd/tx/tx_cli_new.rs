@@ -7,11 +7,11 @@ use multiversx_sc_snippets::{
     sdk::utils::{base64_decode, base64_encode},
 };
 
+use crate::cli::cli_args_tx::NewArgs;
 use crate::cmd::tx::tx_cli_common::load_wallet;
 
 use super::{
     output::TxOutputFile,
-    tx_cli_args::NewArgs,
     tx_cli_common::{broadcast_and_save, build_payments, save_output},
 };
 

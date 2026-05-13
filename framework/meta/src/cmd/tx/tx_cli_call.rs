@@ -1,10 +1,8 @@
 use anyhow::Result;
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
-use super::{
-    tx_cli_args::CallArgs,
-    tx_cli_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch},
-};
+use super::tx_cli_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch};
+use crate::cli::cli_args_tx::CallArgs;
 
 pub async fn tx_call(args: &CallArgs) {
     if let Err(e) = tx_call_inner(args).await {

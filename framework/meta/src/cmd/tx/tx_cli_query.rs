@@ -5,8 +5,8 @@ use multiversx_sc_snippets::{
     sdk::data::vm::VMQueryInput,
 };
 
-use super::tx_cli_args::QueryArgs;
 use super::tx_cli_common::{build_arg_buffer, to_json_pretty};
+use crate::cli::cli_args_tx::QueryArgs;
 
 pub async fn tx_query(args: &QueryArgs) {
     if let Err(e) = tx_query_inner(args).await {

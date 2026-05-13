@@ -6,10 +6,8 @@ use multiversx_sc_snippets::imports::{
     Bech32Address, BytesValue, Interactor, InteractorIntoSdkTransaction,
 };
 
-use super::{
-    tx_cli_args::UpgradeArgs,
-    tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch},
-};
+use super::tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch};
+use crate::cli::cli_args_tx::UpgradeArgs;
 
 pub async fn tx_upgrade(args: &UpgradeArgs) {
     if let Err(e) = tx_upgrade_inner(args).await {

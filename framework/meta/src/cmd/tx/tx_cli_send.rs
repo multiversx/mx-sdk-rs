@@ -3,9 +3,9 @@ use multiversx_sc_snippets::sdk::utils::base64_decode;
 
 use super::{
     output::TxOutputFile,
-    tx_cli_args::SendArgs,
     tx_cli_common::{broadcast_and_save, load_transaction_from_file},
 };
+use crate::cli::cli_args_tx::SendArgs;
 
 pub async fn tx_send(args: &SendArgs) {
     if let Err(e) = tx_send_inner(args).await {
