@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 
 const BECH32_PREFIX: &str = "bech32:";
 
+const ERR_ADDRESS_EMPTY: &str = "address string is empty";
+
 const DEFAULT_HRP: &str = "erd";
 
 /// Error type returned by [`Bech32Address::try_from_bech32_string`].
@@ -55,6 +57,11 @@ impl Bech32Address {
     /// Returns an error if the string is not valid bech32 or if the decoded
     /// payload is not exactly 32 bytes.
     pub fn try_from_bech32_string(bech32_string: String) -> Result<Self, Bech32AddressError> {
+        if bech32_string.is_empty() {
+            return Err(Bech32AddressError::DecodeError(
+                ERR_ADDRESS_EMPTY.to_string(),
+            ));
+        }
         let (hrp, dest_address_bytes) = bech32::decode(&bech32_string)
             .map_err(|err| Bech32AddressError::DecodeError(format!("{bech32_string}: {err}")))?;
         if dest_address_bytes.len() != 32 {
@@ -290,9 +297,17 @@ mod tests {
     }
 
     #[test]
+    fn test_try_from_bech32_string_empty() {
+        let result = Bech32Address::try_from_bech32_string(String::new());
+        assert!(
+            matches!(result, Err(Bech32AddressError::DecodeError(msg)) if msg == ERR_ADDRESS_EMPTY)
+        );
+    }
+
+    #[test]
     fn test_try_from_bech32_string_wrong_length() {
         // Encode a payload that is not 32 bytes to trigger the length check.
-        let hrp = bech32::Hrp::parse("erd").unwrap();
+        let hrp = bech32::Hrp::parse(DEFAULT_HRP).unwrap();
         let short_payload = [0u8; 10];
         let bad_bech32 = bech32::encode::<bech32::Bech32>(hrp, &short_payload).unwrap();
         let result = Bech32Address::try_from_bech32_string(bad_bech32);
