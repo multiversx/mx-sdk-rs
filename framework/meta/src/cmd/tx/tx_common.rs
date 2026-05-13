@@ -129,8 +129,22 @@ pub use multiversx_sc_scenario::multiversx_sc::chain_core::std::new_address::com
 /// the `--value` EGLD amount (appended last as a native `EGLD-000000` payment).
 /// The interactor's `.payment()` normalises the vec into the correct transaction fields.
 pub fn build_payments(payment: &PaymentArgs) -> Result<PaymentVec<StaticApi>> {
-    let transfers = &payment.token_transfers;
-    let egld_value = payment.value;
+    let mut payments = PaymentVec::new();
+    payments.append_vec(parse_token_transfers(&payment.token_transfers)?);
+    payments.append_vec(parse_payments(&payment.payments)?);
+    if payment.value > 0 {
+        let amount = BigUint::<StaticApi>::from(payment.value);
+        payments.push(
+            Payment::try_new(TokenId::native(), 0u64, amount)
+                .map_err(|_| anyhow!("EGLD value must be non-zero"))?,
+        );
+    }
+    Ok(payments)
+}
+
+/// Parse a flat `--token-transfers` list (`TOKEN-IDENT AMOUNT …` pairs) into payments.
+/// The token identifier may include a hex nonce suffix for NFT/SFT: `TOKEN-abc-0a`.
+fn parse_token_transfers(transfers: &[String]) -> Result<PaymentVec<StaticApi>> {
     if transfers.len() % 2 != 0 {
         return Err(anyhow!(
             "--token-transfers requires an even number of values (TOKEN-IDENT AMOUNT …)"
@@ -154,11 +168,36 @@ pub fn build_payments(payment: &PaymentArgs) -> Result<PaymentVec<StaticApi>> {
             .map_err(|_| anyhow!("token amount must be non-zero: {extended_id}"))?,
         );
     }
-    if egld_value > 0 {
-        let amount = BigUint::<StaticApi>::from(egld_value);
+    Ok(payments)
+}
+
+/// Parse a flat `--payments` list (`TOKEN-IDENT NONCE AMOUNT …` triples) into payments.
+/// Nonce is an explicit decimal `u64`; use 0 for fungible tokens.
+fn parse_payments(explicit: &[String]) -> Result<PaymentVec<StaticApi>> {
+    if explicit.len() % 3 != 0 {
+        return Err(anyhow!(
+            "--payments requires a multiple of 3 values (TOKEN-IDENT NONCE AMOUNT …)"
+        ));
+    }
+    let mut payments = PaymentVec::new();
+    for chunk in explicit.chunks(3) {
+        let token_id_str = &chunk[0];
+        let nonce_str = &chunk[1];
+        let amount_str = &chunk[2];
+        let nonce: u64 = nonce_str
+            .parse()
+            .with_context(|| format!("invalid nonce: {nonce_str}"))?;
+        let rust_amount: RustBigUint = amount_str
+            .parse()
+            .with_context(|| format!("invalid token amount: {amount_str}"))?;
+        let amount = BigUint::<StaticApi>::from(rust_amount);
         payments.push(
-            Payment::try_new(TokenId::native(), 0u64, amount)
-                .map_err(|_| anyhow!("EGLD value must be non-zero"))?,
+            Payment::try_new(
+                TokenId::<StaticApi>::from(token_id_str.as_bytes()),
+                nonce,
+                amount,
+            )
+            .map_err(|_| anyhow!("token amount must be non-zero: {token_id_str}"))?,
         );
     }
     Ok(payments)

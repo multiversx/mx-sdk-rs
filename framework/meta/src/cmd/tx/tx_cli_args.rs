@@ -93,9 +93,15 @@ pub struct PaymentArgs {
     #[arg(long, default_value = "0")]
     pub value: u128,
 
-    /// ESDT token transfers as a flat list: TOKEN-abc AMOUNT TOKEN-def AMOUNT ...
+    /// ESDT token transfers as a flat list of pairs: TOKEN-abc AMOUNT TOKEN-def AMOUNT ...
+    /// The token identifier may include a hex nonce suffix for NFT/SFT: TOKEN-abc-0a AMOUNT
     #[arg(long, num_args = 0..)]
     pub token_transfers: Vec<String>,
+
+    /// Payments as a flat list of triples: TOKEN-abc NONCE AMOUNT TOKEN-def NONCE AMOUNT ...
+    /// Explicit nonce field; use 0 for fungible tokens.
+    #[arg(long, num_args = 0..)]
+    pub payments: Vec<String>,
 }
 
 /// Code metadata flags used by deploy and upgrade.
@@ -226,12 +232,12 @@ pub struct NewArgs {
     #[arg(long)]
     pub receiver: String,
 
-    /// Raw data payload (mutually exclusive with --token-transfers).
-    #[arg(long, conflicts_with = "token_transfers")]
+    /// Raw data payload (mutually exclusive with --token-transfers and --payments).
+    #[arg(long, conflicts_with_all = ["token_transfers", "payments"])]
     pub data: Option<String>,
 
     /// Path to a file whose contents are used as the data payload.
-    #[arg(long, conflicts_with = "token_transfers")]
+    #[arg(long, conflicts_with_all = ["token_transfers", "payments"])]
     pub data_file: Option<PathBuf>,
 
     #[command(flatten)]

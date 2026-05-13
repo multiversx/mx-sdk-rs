@@ -46,7 +46,6 @@ deployAdder() {
         || return
 
     ADDRESS_ADDER=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['contractAddress']" 2>/dev/null)
-    DEPLOY_TRANSACTION=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['emittedTransactionHash']" 2>/dev/null)
     "${DATA_TOOL[@]}" store --partition "${NETWORK}" --key="adder-address" --value="${ADDRESS_ADDER}" 2>/dev/null || true
 
     echo ""
@@ -161,7 +160,24 @@ pay2() {
         --token-transfers \
             "USDC-350c4e" "${USDC_AMOUNT}" \
             "EGLD-000000" "${EGLD_VALUE}" \
-        --value="${EGLD_VALUE}" \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --outfile="${OUTFILE_CALL}" \
+        --send \
+        --wait-result \
+        || return
+}
+
+# pay3 uses --payments (TOKEN-ID NONCE AMOUNT triples), which is sc-meta only and NOT supported by mxpy.
+pay3() {
+    USDC_AMOUNT=10000 # 0.01 USDC (6 decimals), nonce 0 (fungible)
+    EGLD_VALUE=10000000000000000 # 0.01 EGLD
+    "${TX_TOOL[@]}" call "${ADDRESS_PAYABLE_FEATURES}" \
+        --pem="${ALICE}" \
+        --gas-limit=5000000 \
+        --function="payable_all" \
+        --payments "USDC-350c4e" 0 "${USDC_AMOUNT}" \
+                   "EGLD-000000" 0 "${EGLD_VALUE}" \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --outfile="${OUTFILE_CALL}" \
