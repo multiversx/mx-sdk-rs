@@ -36,9 +36,7 @@ jobs:
           mx-scenario-go --version
 
       - name: Run template tool test
-        run: |
-          cd framework/meta
-          cargo test --features template-test-current
+        run: cargo test -p multiversx-sc-meta --features template-test-current --test template_test
 
   template_test_released:
     name: Template tool test - released templates
@@ -66,9 +64,7 @@ jobs:
           mx-scenario-go --version
 
       - name: Run template tool test
-        run: |
-          cd framework/meta
-          cargo test --features template-test-released
+        run: cargo test -p multiversx-sc-meta --features template-test-released --test template_test
 
   sc_meta_tx_cli_chain_simulator_tests:
     name: sc-meta tx CLI chain simulator tests
@@ -101,8 +97,7 @@ jobs:
 
           sleep 5
 
-          cd framework/meta
-          cargo test --features chain-simulator-tests || TEST_RESULT=$?
+          cargo test -p multiversx-sc-meta --features chain-simulator-tests --test cs_tx_cli_test || TEST_RESULT=$?
 
           sc-meta cs stop
 
