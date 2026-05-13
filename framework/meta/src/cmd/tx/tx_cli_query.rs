@@ -6,7 +6,7 @@ use multiversx_sc_snippets::{
 };
 
 use super::tx_cli_args::QueryArgs;
-use super::tx_common::{build_arg_buffer, to_json_pretty};
+use super::tx_cli_common::{build_arg_buffer, to_json_pretty};
 
 pub async fn tx_query(args: &QueryArgs) {
     if let Err(e) = tx_query_inner(args).await {

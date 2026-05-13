@@ -8,7 +8,7 @@ use multiversx_sc_snippets::imports::{
 
 use super::{
     tx_cli_args::UpgradeArgs,
-    tx_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch},
+    tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch},
 };
 
 pub async fn tx_upgrade(args: &UpgradeArgs) {

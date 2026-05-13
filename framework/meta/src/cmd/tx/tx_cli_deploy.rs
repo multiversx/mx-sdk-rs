@@ -5,7 +5,7 @@ use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkT
 
 use super::{
     tx_cli_args::DeployArgs,
-    tx_common::{
+    tx_cli_common::{
         build_arg_buffer, build_code_metadata, compute_new_address_bech32, load_wallet,
         sign_and_dispatch,
     },

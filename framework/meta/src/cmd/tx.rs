@@ -1,22 +1,22 @@
 mod output;
-mod tx_call;
 pub mod tx_cli_args;
-mod tx_common;
-mod tx_deploy;
-mod tx_new;
-mod tx_query;
-mod tx_send;
-mod tx_sign;
-mod tx_upgrade;
+mod tx_cli_call;
+mod tx_cli_common;
+mod tx_cli_deploy;
+mod tx_cli_new;
+mod tx_cli_query;
+mod tx_cli_send;
+mod tx_cli_sign;
+mod tx_cli_upgrade;
 
-use tx_call::tx_call;
 use tx_cli_args::{TxCliAction, TxCliArgs};
-use tx_deploy::tx_deploy;
-use tx_new::tx_new;
-use tx_query::tx_query;
-use tx_send::tx_send;
-use tx_sign::tx_sign;
-use tx_upgrade::tx_upgrade;
+use tx_cli_call::tx_call;
+use tx_cli_deploy::tx_deploy;
+use tx_cli_new::tx_new;
+use tx_cli_query::tx_query;
+use tx_cli_send::tx_send;
+use tx_cli_sign::tx_sign;
+use tx_cli_upgrade::tx_upgrade;
 
 pub async fn tx_cli(args: &TxCliArgs) {
     match &args.command {

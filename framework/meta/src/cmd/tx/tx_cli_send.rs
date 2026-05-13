@@ -4,7 +4,7 @@ use multiversx_sc_snippets::sdk::utils::base64_decode;
 use super::{
     output::TxOutputFile,
     tx_cli_args::SendArgs,
-    tx_common::{broadcast_and_save, load_transaction_from_file},
+    tx_cli_common::{broadcast_and_save, load_transaction_from_file},
 };
 
 pub async fn tx_send(args: &SendArgs) {

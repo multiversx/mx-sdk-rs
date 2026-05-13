@@ -3,7 +3,7 @@ use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoS
 
 use super::{
     tx_cli_args::CallArgs,
-    tx_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch},
+    tx_cli_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch},
 };
 
 pub async fn tx_call(args: &CallArgs) {
