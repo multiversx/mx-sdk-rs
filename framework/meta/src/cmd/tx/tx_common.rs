@@ -79,6 +79,12 @@ pub(super) async fn broadcast_and_save(
     outfile: Option<&std::path::Path>,
     wait_result: bool,
 ) -> Result<()> {
+    if output.emitted_transaction.signature.is_none() {
+        return Err(anyhow!(
+            "transaction is not signed; sign it before broadcasting"
+        ));
+    }
+
     let proxy = GatewayHttpProxy::new(proxy_url.to_string());
     let tx_hash = proxy
         .send_transaction(&output.emitted_transaction)
