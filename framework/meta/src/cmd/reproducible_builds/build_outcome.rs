@@ -5,7 +5,7 @@ use std::{
 };
 
 use indexmap::IndexMap;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// Mirrors the Python `BuildMetadata`, `BuildOptions`, `BuildOutcome`, and
 /// `BuildOutcomeEntry` classes from `mx-sdk-rust-contract-builder`.
@@ -14,7 +14,7 @@ use serde::Serialize;
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ArtifactsBuildMetadata {
     pub version_rust: Option<String>,
@@ -46,7 +46,7 @@ impl ArtifactsBuildMetadata {
 
 // ─── Options ─────────────────────────────────────────────────────────────────
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ArtifactsBuildOptions {
     /// Kept for compatibility with the Python builder output.
@@ -58,7 +58,7 @@ pub struct ArtifactsBuildOptions {
 
 // ─── Per-contract artifacts ───────────────────────────────────────────────────
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct ContractArtifactFiles {
     pub bytecode: String,
     pub abi: String,
@@ -66,7 +66,7 @@ pub struct ContractArtifactFiles {
     pub src_package: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContractOutcomeEntry {
     pub version: String,
@@ -76,7 +76,7 @@ pub struct ContractOutcomeEntry {
 
 // ─── Top-level outcome ────────────────────────────────────────────────────────
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BuildOutcome {
     pub build_metadata: ArtifactsBuildMetadata,

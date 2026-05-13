@@ -422,6 +422,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Creates a default sc-reproducible-build.toml in the current (or specified) directory."
     )]
     InitConfig(InitConfigArgs),
+
+    #[command(
+        name = "release-notes",
+        about = "Generates a Markdown release-notes fragment from an artifacts.json produced by a previous build."
+    )]
+    ReleaseNotes(ReleaseNotesArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -434,6 +440,24 @@ pub struct InitConfigArgs {
     /// Overwrite the file if it already exists.
     #[arg(long, default_value = "false", verbatim_doc_comment)]
     pub overwrite: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct ReleaseNotesArgs {
+    /// Path to the artifacts.json file produced by a previous reproducible build.
+    /// Defaults to "artifacts.json" in the current directory.
+    #[arg(long, default_value = "artifacts.json", verbatim_doc_comment)]
+    pub artifacts: String,
+
+    /// Docker image name (including tag) used for the build, e.g.
+    /// "multiversx/sdk-rust-contract-builder:v8.0.0".
+    /// When provided, a "Built using Docker image" header line is emitted.
+    #[arg(long, verbatim_doc_comment)]
+    pub docker_image: Option<String>,
+
+    /// Write the release notes to this file instead of stdout.
+    #[arg(long, verbatim_doc_comment)]
+    pub output: Option<String>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
