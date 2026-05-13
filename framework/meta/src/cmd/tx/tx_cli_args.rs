@@ -77,8 +77,8 @@ pub struct TxArgs {
     #[arg(long, default_value = "false")]
     pub send: bool,
 
-    /// Wait for the transaction result (only meaningful when --send is also set).
-    #[arg(long, default_value = "false")]
+    /// Wait for the transaction result. Requires --send.
+    #[arg(long, default_value = "false", requires = "send")]
     pub wait_result: bool,
 
     /// Path to write the signed tx JSON to. Defaults to stdout when --send is not set.
@@ -286,8 +286,8 @@ pub struct SignArgs {
     #[arg(long, default_value = "false")]
     pub send: bool,
 
-    /// Wait for the transaction result (only meaningful when --send is also set).
-    #[arg(long, default_value = "false")]
+    /// Wait for the transaction result. Requires --send.
+    #[arg(long, default_value = "false", requires = "send")]
     pub wait_result: bool,
 
     #[command(flatten)]
