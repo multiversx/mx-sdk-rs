@@ -55,8 +55,7 @@ pub(super) async fn fetch_tx_on_network(
     tx_hash: &str,
 ) -> Result<(ApiTransactionResult, ReturnCode)> {
     let proxy = GatewayHttpProxy::new(gateway.to_string());
-    let result = multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await;
-    Ok(result)
+    multiversx_sdk::retrieve_tx_on_network(&proxy, tx_hash.to_string()).await
 }
 
 /// Write `output` to `outfile`, or print to stdout when no outfile is given.

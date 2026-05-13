@@ -40,7 +40,9 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash)
+            .await
+            .expect("failed to fetch transaction result");
 
         sc_call_step.save_response(network_response::parse_tx_response(tx, return_code));
 
