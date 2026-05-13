@@ -8,7 +8,9 @@ use multiversx_sc_meta::{
 };
 use multiversx_sc_meta_lib::tools::find_current_workspace;
 
-const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
+const CONTRACTS_DIR_NAME: &str = "contracts";
+const TEMPLATE_TEST_CURRENT_SUB_PATH: &str = "test-template-current";
+const TEMPLATE_TEST_RELEASED_SUB_PATH: &str = "test-template-released";
 const BUILD_CONTRACTS: bool = true;
 
 #[test]
@@ -31,33 +33,45 @@ fn test_template_list() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
-    template_test_current("adder", "examples", "new-adder");
+    template_test_current("adder", TEMPLATE_TEST_CURRENT_SUB_PATH, "new-adder");
 
-    cargo_check_interactor("examples", "new-adder");
+    cargo_check_interactor(TEMPLATE_TEST_CURRENT_SUB_PATH, "new-adder");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_crypto_zombies() {
-    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
+    template_test_current(
+        "crypto-zombies",
+        TEMPLATE_TEST_CURRENT_SUB_PATH,
+        "new-crypto-zombies",
+    );
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_empty() {
-    template_test_current("empty", "examples", "new-empty");
+    template_test_current("empty", TEMPLATE_TEST_CURRENT_SUB_PATH, "new-empty");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_ping_pong_egld() {
-    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
+    template_test_current(
+        "ping-pong-egld",
+        TEMPLATE_TEST_CURRENT_SUB_PATH,
+        "new-ping-pong-egld",
+    );
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn test_correct_naming() {
-    let target = setup_template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+    let target = setup_template_test_current(
+        "empty",
+        TEMPLATE_TEST_CURRENT_SUB_PATH,
+        "my1New2_3-correct_Empty",
+    );
     assert_eq!(target.new_name, "my-1-new-2-3-correct-empty");
     cargo_test(&target, false);
 }
@@ -65,7 +79,8 @@ fn test_correct_naming() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_locked_test() {
-    let target = setup_template_test_current("empty", "examples", "new-empty-locked");
+    let target =
+        setup_template_test_current("empty", TEMPLATE_TEST_CURRENT_SUB_PATH, "new-empty-locked");
 
     // Build once to generate Cargo.lock
     build_contract(&target);
@@ -97,7 +112,7 @@ fn setup_template_test_current(
 ) -> ContractCreatorTarget {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget::new(
-        workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
+        workspace_path.join(CONTRACTS_DIR_NAME).join(sub_path),
         new_name,
     );
 
@@ -133,7 +148,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 async fn template_released_adder() {
     template_test_released("adder", "released-adder").await;
 
-    cargo_check_interactor("", "released-adder");
+    cargo_check_interactor(TEMPLATE_TEST_RELEASED_SUB_PATH, "released-adder");
 }
 
 #[tokio::test]
@@ -155,10 +170,16 @@ async fn template_released_empty() {
 /// - run all tests (including Go scenarios) on them.
 async fn template_test_released(template_name: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
-    let target = ContractCreatorTarget::new(workspace_path.join(TEMPLATE_TEMP_DIR_NAME), new_name);
+    let target = ContractCreatorTarget::new(
+        workspace_path
+            .join(CONTRACTS_DIR_NAME)
+            .join(TEMPLATE_TEST_RELEASED_SUB_PATH),
+        new_name,
+    );
 
     let temp_dir_path = workspace_path
-        .join(TEMPLATE_TEMP_DIR_NAME)
+        .join(CONTRACTS_DIR_NAME)
+        .join(TEMPLATE_TEST_RELEASED_SUB_PATH)
         .join("temp-download")
         .join(new_name);
     let repo_source = RepoSource::download_from_github(
@@ -257,7 +278,7 @@ pub fn build_contract(target: &ContractCreatorTarget) {
 fn cargo_check_interactor(sub_path: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target_path = workspace_path
-        .join(TEMPLATE_TEMP_DIR_NAME)
+        .join(CONTRACTS_DIR_NAME)
         .join(sub_path)
         .join(new_name)
         .join("interactor");
