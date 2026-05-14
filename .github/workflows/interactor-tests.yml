@@ -1,0 +1,38 @@
+name: Interactor Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  interactor-tests:
+    name: Interactor tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+
+      - name: Install sc-meta
+        run: cargo install --path framework/meta --locked
+
+      - name: Install wasm-opt
+        run: cargo install wasm-opt
+
+      - name: Pull latest chain simulator docker image
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta cs install
+
+      - name: Run the interactor tests
+        env:
+          RUSTFLAGS: ""
+        run: cargo run -p cs-test-runner

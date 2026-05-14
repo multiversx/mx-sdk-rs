@@ -1,7 +1,9 @@
 use multiversx_sc_snippets::imports::{DurationMillis, RustBigUint, TimestampMillis};
 use ping_pong_egld_interact::{Config, PingPongEgldInteract};
+use serial_test::serial;
 
 #[tokio::test]
+#[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_ping_pong_egld() {
     let mut interact = PingPongEgldInteract::init(Config::chain_simulator_config()).await;
