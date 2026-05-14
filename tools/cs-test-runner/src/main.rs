@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::process::{Child, Command, ExitCode, Stdio};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use multiversx_sc_meta_lib::tools::find_current_workspace;
 
@@ -103,7 +103,23 @@ impl Drop for ChainSimulatorGuard<'_> {
             .args(["cs", "stop"])
             .current_dir(self.workspace)
             .status();
-        let _ = self.child.wait();
+
+        // Poll for up to 10 s, then force-kill to avoid hanging CI.
+        let deadline = Instant::now() + Duration::from_secs(10);
+        loop {
+            match self.child.try_wait() {
+                Ok(Some(_)) => return,
+                Ok(None) if Instant::now() < deadline => {
+                    std::thread::sleep(Duration::from_millis(200));
+                }
+                _ => {
+                    eprintln!("WARNING: chain simulator did not exit after stop; force-killing");
+                    let _ = self.child.kill();
+                    let _ = self.child.wait();
+                    return;
+                }
+            }
+        }
     }
 }
 
