@@ -18,12 +18,12 @@ use multiversx_sc_snippets::{
 };
 use serde::Serialize;
 
-use multiversx_sc_scenario::{imports::ReturnCode, multiversx_sc::types::CodeMetadata};
+use multiversx_sc_scenario::imports::ReturnCode;
 use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
 use super::output::TxOutputFile;
-use crate::cli::cli_args_tx::{GatewayArgs, MetadataArgs, SenderArgs, TxArgs};
+use crate::cli::cli_args_tx::{GatewayArgs, SenderArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
@@ -120,23 +120,6 @@ pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
         .serialize(&mut ser)
         .context("failed to serialize transaction")?;
     String::from_utf8(buf).context("non-UTF8 in serialized JSON")
-}
-
-pub fn build_code_metadata(meta: &MetadataArgs) -> CodeMetadata {
-    let mut flags = CodeMetadata::DEFAULT;
-    if !meta.metadata_not_upgradeable {
-        flags |= CodeMetadata::UPGRADEABLE;
-    }
-    if !meta.metadata_not_readable {
-        flags |= CodeMetadata::READABLE;
-    }
-    if meta.metadata_payable {
-        flags |= CodeMetadata::PAYABLE;
-    }
-    if meta.metadata_payable_by_sc {
-        flags |= CodeMetadata::PAYABLE_BY_SC;
-    }
-    flags
 }
 
 /// Load a wallet from a PEM file or JSON keystore.

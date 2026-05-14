@@ -4,7 +4,8 @@ use anyhow::{Context, Result};
 use multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
-use super::tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch};
+use super::parse_code_metadata::parse_code_metadata;
+use super::tx_cli_common::{build_arg_buffer, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::DeployArgs;
 
 pub async fn tx_deploy(args: &DeployArgs) {
@@ -35,7 +36,7 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     let code = BytesValue::from(bytecode);
 
     // Build CodeMetadata from flags.
-    let code_metadata = build_code_metadata(&args.metadata);
+    let code_metadata = parse_code_metadata(&args.metadata);
 
     // Build deploy transaction.
     let arg_buffer = build_arg_buffer(&args.arguments)?;

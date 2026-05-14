@@ -6,7 +6,8 @@ use multiversx_sc_snippets::imports::{
     Bech32Address, BytesValue, Interactor, InteractorIntoSdkTransaction,
 };
 
-use super::tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch};
+use super::parse_code_metadata::parse_code_metadata;
+use super::tx_cli_common::{build_arg_buffer, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::UpgradeArgs;
 
 pub async fn tx_upgrade(args: &UpgradeArgs) {
@@ -38,7 +39,7 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
         .with_context(|| format!("failed to read bytecode from {}", args.bytecode.display()))?;
     let code = BytesValue::from(bytecode);
 
-    let code_metadata = build_code_metadata(&args.metadata);
+    let code_metadata = parse_code_metadata(&args.metadata);
 
     // Build upgrade transaction — same layout as deploy but sent to the existing contract address.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
