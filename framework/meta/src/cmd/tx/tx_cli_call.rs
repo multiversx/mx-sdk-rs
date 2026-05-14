@@ -1,7 +1,8 @@
 use anyhow::Result;
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
-use super::tx_cli_common::{build_arg_buffer, build_payments, load_wallet, sign_and_dispatch};
+use super::parse_payments::parse_all_payment_args;
+use super::tx_cli_common::{build_arg_buffer, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::CallArgs;
 
 pub async fn tx_call(args: &CallArgs) {
@@ -30,7 +31,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
 
     // Build call transaction.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
-    let payments = build_payments(&args.payment)?;
+    let payments = parse_all_payment_args(&args.payment)?;
 
     let tx = interactor
         .tx()

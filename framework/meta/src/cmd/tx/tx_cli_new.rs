@@ -12,7 +12,8 @@ use crate::cmd::tx::tx_cli_common::load_wallet;
 
 use super::{
     output::TxOutputFile,
-    tx_cli_common::{broadcast_and_save, build_payments, save_output},
+    parse_payments::parse_all_payment_args,
+    tx_cli_common::{broadcast_and_save, save_output},
 };
 
 pub async fn tx_new(args: &NewArgs) {
@@ -39,7 +40,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     };
 
     // Build Transaction via unified Tx syntax (resembles interactor code).
-    let payments = build_payments(&args.payment)?;
+    let payments = parse_all_payment_args(&args.payment)?;
     let mut tx = interactor
         .tx()
         .from(&sender)

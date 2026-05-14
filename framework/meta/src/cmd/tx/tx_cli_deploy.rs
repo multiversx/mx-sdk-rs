@@ -1,12 +1,10 @@
 use std::fs;
 
 use anyhow::{Context, Result};
+use multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
-use super::tx_cli_common::{
-    build_arg_buffer, build_code_metadata, compute_new_address_bech32, load_wallet,
-    sign_and_dispatch,
-};
+use super::tx_cli_common::{build_arg_buffer, build_code_metadata, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::DeployArgs;
 
 pub async fn tx_deploy(args: &DeployArgs) {

@@ -4,8 +4,8 @@ use anyhow::{Context, Result, anyhow};
 use multiversx_sc_snippets::{
     hex,
     imports::{
-        BigUint, BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext,
-        ManagedArgBuffer, ManagedBuffer, Payment, PaymentVec, RustBigUint, StaticApi, TokenId,
+        BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext, ManagedArgBuffer,
+        ManagedBuffer, StaticApi,
     },
     sdk::{
         data::{
@@ -23,7 +23,7 @@ use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
 use super::output::TxOutputFile;
-use crate::cli::cli_args_tx::{GatewayArgs, MetadataArgs, PaymentArgs, SenderArgs, TxArgs};
+use crate::cli::cli_args_tx::{GatewayArgs, MetadataArgs, SenderArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
@@ -120,107 +120,6 @@ pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
         .serialize(&mut ser)
         .context("failed to serialize transaction")?;
     String::from_utf8(buf).context("non-UTF8 in serialized JSON")
-}
-
-pub use multiversx_sc_scenario::multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
-
-/// Parse the flat token-transfer list (`TOKEN-ident AMOUNT TOKEN-ident AMOUNT …`)
-/// into a [`PaymentVec`] using the same extended-identifier format as mxpy:
-/// NFT/SFT identifiers append a hex-encoded nonce, e.g. `NFT-abc123-0a` (nonce = 10);
-/// fungible tokens are plain, e.g. `ESDT-abc123`.
-/// Build a [`PaymentVec`] from [`PaymentArgs`]: the flat `--token-transfers` list plus
-/// the `--value` EGLD amount (appended last as a native `EGLD-000000` payment).
-/// The interactor's `.payment()` normalises the vec into the correct transaction fields.
-pub fn build_payments(payment: &PaymentArgs) -> Result<PaymentVec<StaticApi>> {
-    let mut payments = PaymentVec::new();
-    payments.append_vec(parse_token_transfers(&payment.token_transfers)?);
-    payments.append_vec(parse_payments(&payment.payments)?);
-    if payment.value > 0 {
-        let amount = BigUint::<StaticApi>::from(payment.value);
-        payments.push(
-            Payment::try_new(TokenId::native(), 0u64, amount)
-                .map_err(|_| anyhow!("EGLD value must be non-zero"))?,
-        );
-    }
-    Ok(payments)
-}
-
-/// Parse a flat `--token-transfers` list (`TOKEN-IDENT AMOUNT …` pairs) into payments.
-/// The token identifier may include a hex nonce suffix for NFT/SFT: `TOKEN-abc-0a`.
-fn parse_token_transfers(transfers: &[String]) -> Result<PaymentVec<StaticApi>> {
-    if transfers.len() % 2 != 0 {
-        return Err(anyhow!(
-            "--token-transfers requires an even number of values (TOKEN-IDENT AMOUNT …)"
-        ));
-    }
-    let mut payments = PaymentVec::new();
-    for chunk in transfers.chunks(2) {
-        let extended_id = &chunk[0];
-        let amount_str = &chunk[1];
-        let (base_id, nonce) = split_extended_identifier(extended_id);
-        let rust_amount: RustBigUint = amount_str
-            .parse()
-            .with_context(|| format!("invalid token amount: {amount_str}"))?;
-        let amount = BigUint::<StaticApi>::from(rust_amount);
-        payments.push(
-            Payment::try_new(
-                TokenId::<StaticApi>::from(base_id.as_bytes()),
-                nonce,
-                amount,
-            )
-            .map_err(|_| anyhow!("token amount must be non-zero: {extended_id}"))?,
-        );
-    }
-    Ok(payments)
-}
-
-/// Parse a flat `--payments` list (`TOKEN-IDENT NONCE AMOUNT …` triples) into payments.
-/// Nonce is an explicit decimal `u64`; use 0 for fungible tokens.
-fn parse_payments(explicit: &[String]) -> Result<PaymentVec<StaticApi>> {
-    if explicit.len() % 3 != 0 {
-        return Err(anyhow!(
-            "--payments requires a multiple of 3 values (TOKEN-IDENT NONCE AMOUNT …)"
-        ));
-    }
-    let mut payments = PaymentVec::new();
-    for chunk in explicit.chunks(3) {
-        let token_id_str = &chunk[0];
-        let nonce_str = &chunk[1];
-        let amount_str = &chunk[2];
-        let nonce: u64 = nonce_str
-            .parse()
-            .with_context(|| format!("invalid nonce: {nonce_str}"))?;
-        let rust_amount: RustBigUint = amount_str
-            .parse()
-            .with_context(|| format!("invalid token amount: {amount_str}"))?;
-        let amount = BigUint::<StaticApi>::from(rust_amount);
-        payments.push(
-            Payment::try_new(
-                TokenId::<StaticApi>::from(token_id_str.as_bytes()),
-                nonce,
-                amount,
-            )
-            .map_err(|_| anyhow!("token amount must be non-zero: {token_id_str}"))?,
-        );
-    }
-    Ok(payments)
-}
-
-/// Split an mxpy-style extended token identifier into `(base_identifier, nonce)`.
-///
-/// Format: `TOKEN-xxxxxx` (fungible, nonce = 0) or `TOKEN-xxxxxx-<hex>` (NFT/SFT).
-fn split_extended_identifier(extended_id: &str) -> (String, u64) {
-    let parts: Vec<&str> = extended_id.split('-').collect();
-    if parts.len() >= 3 {
-        let last = parts[parts.len() - 1];
-        if !last.is_empty() && last.bytes().all(|b| b.is_ascii_hexdigit()) {
-            if let Ok(nonce) = u64::from_str_radix(last, 16) {
-                let base = parts[..parts.len() - 1].join("-");
-                return (base, nonce);
-            }
-        }
-    }
-    (extended_id.to_string(), 0)
 }
 
 pub fn build_code_metadata(meta: &MetadataArgs) -> CodeMetadata {

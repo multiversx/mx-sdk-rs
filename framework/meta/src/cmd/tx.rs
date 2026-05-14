@@ -1,4 +1,5 @@
 mod output;
+mod parse_payments;
 mod tx_cli_call;
 mod tx_cli_common;
 mod tx_cli_deploy;
