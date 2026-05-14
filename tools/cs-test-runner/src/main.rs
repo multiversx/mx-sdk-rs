@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 use std::process::{Child, Command, ExitCode, Stdio};
 use std::time::Duration;
 
@@ -54,7 +54,18 @@ static CS_TESTS: &[CsTest] = &[
     },
 ];
 
-fn run(program: &str, args: &[&str], cwd: &PathBuf) -> bool {
+fn build_contract(path: &Path, cwd: &Path) -> bool {
+    println!("+ sc-meta all build --path {}", path.display());
+    Command::new("sc-meta")
+        .args(["all", "build", "--path"])
+        .arg(path)
+        .current_dir(cwd)
+        .status()
+        .unwrap_or_else(|e| panic!("failed to launch `sc-meta`: {e}"))
+        .success()
+}
+
+fn run(program: &str, args: &[&str], cwd: &Path) -> bool {
     println!("+ {program} {}", args.join(" "));
     Command::new(program)
         .args(args)
@@ -66,12 +77,12 @@ fn run(program: &str, args: &[&str], cwd: &PathBuf) -> bool {
 
 /// Starts the chain simulator and stops it when dropped, ensuring cleanup on both normal exit and panic.
 struct ChainSimulatorGuard<'a> {
-    workspace: &'a PathBuf,
+    workspace: &'a Path,
     child: Child,
 }
 
 impl<'a> ChainSimulatorGuard<'a> {
-    fn start(workspace: &'a PathBuf) -> Self {
+    fn start(workspace: &'a Path) -> Self {
         println!("\n=== Starting chain simulator ===");
         let child = Command::new("sc-meta")
             .args(["cs", "start"])
@@ -104,12 +115,7 @@ fn main() -> ExitCode {
     for test in CS_TESTS {
         for path in test.build_paths {
             let abs_path = workspace.join(path);
-            let abs_path_str = abs_path.to_str().unwrap();
-            if !run(
-                "sc-meta",
-                &["all", "build", "--path", abs_path_str],
-                &workspace,
-            ) {
+            if !build_contract(&abs_path, &workspace) {
                 eprintln!("ERROR: build failed for {path}");
                 failed += 1;
             }
