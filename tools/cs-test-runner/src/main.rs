@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use std::process::{Command, ExitCode, Stdio};
+use std::process::{Child, Command, ExitCode, Stdio};
 use std::time::Duration;
 
 use multiversx_sc_meta_lib::tools::find_current_workspace;
@@ -67,12 +67,13 @@ fn run(program: &str, args: &[&str], cwd: &PathBuf) -> bool {
 /// Starts the chain simulator and stops it when dropped, ensuring cleanup on both normal exit and panic.
 struct ChainSimulatorGuard<'a> {
     workspace: &'a PathBuf,
+    child: Child,
 }
 
 impl<'a> ChainSimulatorGuard<'a> {
     fn start(workspace: &'a PathBuf) -> Self {
         println!("\n=== Starting chain simulator ===");
-        Command::new("sc-meta")
+        let child = Command::new("sc-meta")
             .args(["cs", "start"])
             .current_dir(workspace)
             .stdout(Stdio::null())
@@ -80,7 +81,7 @@ impl<'a> ChainSimulatorGuard<'a> {
             .spawn()
             .expect("failed to start chain simulator");
         std::thread::sleep(Duration::from_secs(5));
-        Self { workspace }
+        Self { workspace, child }
     }
 }
 
@@ -91,6 +92,7 @@ impl Drop for ChainSimulatorGuard<'_> {
             .args(["cs", "stop"])
             .current_dir(self.workspace)
             .status();
+        let _ = self.child.wait();
     }
 }
 
@@ -103,7 +105,11 @@ fn main() -> ExitCode {
         for path in test.build_paths {
             let abs_path = workspace.join(path);
             let abs_path_str = abs_path.to_str().unwrap();
-            if !run("sc-meta", &["all", "build", "--path", abs_path_str], &workspace) {
+            if !run(
+                "sc-meta",
+                &["all", "build", "--path", abs_path_str],
+                &workspace,
+            ) {
                 eprintln!("ERROR: build failed for {path}");
                 failed += 1;
             }
