@@ -51,7 +51,7 @@ tags
 **/node_modules
 **/output/**
 **/testnet/**
-**/mxpy.data-storage.json
+**/*.data-storage.json
 **/*.interaction.json
 
 # Python scripts

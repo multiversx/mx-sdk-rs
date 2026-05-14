@@ -4,7 +4,8 @@ use crate::sdk::{
 };
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress, ReturnCode},
-    multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
+    multiversx_chain_vm::types::H256,
+    multiversx_sc::chain_core::std::new_address::compute_new_address,
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 
@@ -132,26 +133,14 @@ fn process_new_deployed_address(tx: &ApiTransactionResult) -> Option<Address> {
         return None;
     }
 
-    let sender_address_bytes = tx.sender.address.as_bytes();
-    let sender_nonce_bytes = tx.nonce.to_le_bytes();
-    let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(sender_address_bytes);
-    bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
-
-    let address_keccak = keccak256(&bytes_to_hash);
-
-    let mut address = [0u8; 32];
-
-    address[0..8].copy_from_slice(&[0u8; 8]);
-    address[8..10].copy_from_slice(&[5, 0]);
-    address[10..30].copy_from_slice(&address_keccak[10..30]);
-    address[30..32].copy_from_slice(&sender_address_bytes[30..32]);
-
-    Some(Address::from(address))
+    Some(compute_new_address(&tx.sender.address, tx.nonce))
 }
 
 fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<String> {
-    let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
+    let Some(data) = &tx.data else {
+        return None;
+    };
+    let original_tx_data = String::from_utf8(base64_decode(data)).unwrap_or_default();
 
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.address != ESDTSystemSCAddress.to_address() {
@@ -164,7 +153,7 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
             .find(|e| e.hash == scr.prev_tx_hash)
         {
             prev_tx.data.as_ref()
-        } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
+        } else if tx.hash.as_deref() == Some(scr.prev_tx_hash.as_str()) {
             &original_tx_data
         } else {
             continue;
@@ -192,11 +181,11 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
         }
 
         if scr.data.starts_with("ESDTTransfer@") {
-            let encoded_tid = scr.data.split('@').nth(1);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(1)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         } else if scr.data.starts_with("@00@") || scr.data.starts_with("@6f6b@") {
-            let encoded_tid = scr.data.split('@').nth(2);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(2)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         }
     }
     None
