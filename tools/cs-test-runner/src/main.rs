@@ -77,7 +77,7 @@ impl<'a> ChainSimulatorGuard<'a> {
             .args(["cs", "start"])
             .current_dir(workspace)
             .stdout(Stdio::null())
-            .stderr(Stdio::null())
+            .stderr(Stdio::inherit())
             .spawn()
             .expect("failed to start chain simulator");
         std::thread::sleep(Duration::from_secs(5));
