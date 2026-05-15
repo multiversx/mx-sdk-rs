@@ -1015,6 +1015,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cs-test-runner"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "ctr"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1676,6 +1683,7 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
+ "serial_test",
  "toml",
 ]
 
@@ -3852,6 +3860,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "ping-pong-egld",
  "serde",
+ "serial_test",
  "tokio",
  "toml",
 ]

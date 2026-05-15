@@ -22,6 +22,7 @@ members = [
   "sdk/http",
   "sdk/scenario-format",
 
+  "tools/cs-test-runner",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
   "tools/interactor-delegation-func-calls/",
