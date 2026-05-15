@@ -13,7 +13,8 @@ TX_TOOL=("${BASE[@]}" "${TX_CMD}")
 DATA_TOOL=("${BASE[@]}" data)
 # ──────────────────────────────────────────────────────────────────────────────
 
-ALICE="../../../../sdk/core/src/test_wallets/alice.pem"
+sc-meta wallet test-wallet --name alice
+ALICE="alice.pem"
 
 case "${NETWORK}" in
     devnet)           PROXY=https://devnet-gateway.multiversx.com;  CHAIN=D ;;

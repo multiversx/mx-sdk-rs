@@ -1,6 +1,9 @@
 use core::str;
 
-use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
+use crate::cli::{
+    WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
+    WalletTestWalletArgs,
+};
 use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
@@ -16,6 +19,7 @@ pub fn wallet(args: &WalletArgs) {
         WalletAction::New(new_args) => new(new_args),
         WalletAction::Bech32(bech32_args) => bech32_conversion(bech32_args),
         WalletAction::Convert(convert_args) => convert(convert_args),
+        WalletAction::TestWallet(test_wallet_args) => test_wallet_cmd(test_wallet_args),
     }
 }
 
@@ -235,4 +239,13 @@ fn new(new_args: &WalletNewArgs) {
         }
         None => {}
     }
+}
+
+fn test_wallet_cmd(args: &WalletTestWalletArgs) {
+    let name = &args.name;
+    let pem = multiversx_sc_snippets::test_wallets::pem_contents(name);
+    let path = args.path.clone().unwrap_or_else(|| format!("{name}.pem"));
+    let mut file = File::create(&path).unwrap();
+    file.write_all(pem.as_bytes()).unwrap();
+    println!("Saved test wallet '{name}' to '{path}'");
 }

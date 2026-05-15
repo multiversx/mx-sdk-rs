@@ -275,7 +275,24 @@ async fn test_adder_deploy_add_get_sum() {
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_egld_transfer_alice_to_bob() {
     let workspace = find_current_workspace().unwrap();
-    let alice_pem_path = workspace.join("framework/meta/tests/alice.pem");
+    let test_artefacts_dir = workspace.join("framework/meta/tests/cs_tx_cli_test");
+    let alice_pem_path = test_artefacts_dir.join("alice.pem");
+
+    let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
+
+    // Generate alice.pem via the CLI so the file is not stored in the repo.
+    let status = Command::new(sc_meta_bin)
+        .args([
+            "wallet",
+            "test-wallet",
+            "--name",
+            "alice",
+            "--path",
+            alice_pem_path.to_str().unwrap(),
+        ])
+        .status()
+        .expect("failed to generate alice.pem");
+    assert!(status.success(), "sc-meta wallet test-wallet failed");
 
     // Connect to the chain simulator.
     let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
@@ -318,8 +335,6 @@ async fn test_egld_transfer_alice_to_bob() {
     let bob_bech32 = bob_address.to_bech32_default();
 
     // ── execute the transfer via the sc-meta CLI ──────────────────────────────
-    let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
-
     let status = Command::new(sc_meta_bin)
         .args([
             "tx",
