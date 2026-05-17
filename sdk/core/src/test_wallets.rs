@@ -143,25 +143,16 @@ pub fn for_shard(shard_id: ShardId) -> Wallet {
     }
 }
 
-fn valid_names() -> Vec<&'static str> {
+pub fn valid_names() -> Vec<&'static str> {
     WALLETS.iter().map(|(n, _)| *n).collect()
 }
 
-/// Returns the raw PEM file contents for the named test wallet.
+/// Returns the raw PEM file contents for the named test wallet, or `None` if the name is unknown.
 ///
-/// Valid names: `alice`, `bob`, `carol`, `dan`, `eve`, `frank`, `grace`, `heidi`,
-/// `ivan`, `judy`, `mallory`, `mike`, `sophie`, `simon`, `szonja`.
-///
-/// Panics if the name is not one of the above.
-pub fn pem_contents(name: &str) -> &'static str {
+/// For the list of valid names see [`valid_names()`].
+pub fn pem_contents(name: &str) -> Option<&'static str> {
     WALLETS
         .iter()
         .find(|(n, _)| *n == name)
         .map(|(_, pem)| *pem)
-        .unwrap_or_else(|| {
-            panic!(
-                "Unknown test wallet name: '{name}'. Valid names: {}",
-                valid_names().join(", ")
-            )
-        })
 }

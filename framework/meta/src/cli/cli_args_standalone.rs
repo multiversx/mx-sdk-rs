@@ -667,7 +667,7 @@ pub struct WalletBech32Args {
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletTestWalletArgs {
     /// The name of the test wallet.
-    /// Allowed values: alice, bob, carol, dan, eve, frank, grace, heidi, ivan, judy, mallory, mike, sophie, simon, szonja.
+    /// Providing an invalid name will print the full list of valid names.
     #[arg(long = "name", verbatim_doc_comment)]
     pub name: String,
 

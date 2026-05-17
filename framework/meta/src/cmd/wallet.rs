@@ -243,7 +243,14 @@ fn new(new_args: &WalletNewArgs) {
 
 fn test_wallet_cmd(args: &WalletTestWalletArgs) {
     let name = &args.name;
-    let pem = multiversx_sc_snippets::test_wallets::pem_contents(name);
+    let pem = match multiversx_sc_snippets::test_wallets::pem_contents(name) {
+        Some(pem) => pem,
+        None => {
+            let valid = multiversx_sc_snippets::test_wallets::valid_names().join(", ");
+            eprintln!("Unknown test wallet name: '{name}'. Valid names: {valid}");
+            std::process::exit(1);
+        }
+    };
     let path = args.path.clone().unwrap_or_else(|| format!("{name}.pem"));
     let mut file = File::create(&path).unwrap();
     file.write_all(pem.as_bytes()).unwrap();

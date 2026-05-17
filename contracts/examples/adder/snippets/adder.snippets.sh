@@ -13,7 +13,9 @@ TX_TOOL=("${BASE[@]}" "${TX_CMD}")
 DATA_TOOL=("${BASE[@]}" data)
 # ──────────────────────────────────────────────────────────────────────────────
 
-sc-meta wallet test-wallet --name alice
+if [[ "${TOOL_VARIANT}" == "sc-meta" ]]; then
+    sc-meta wallet test-wallet --name alice
+fi
 ALICE="alice.pem"
 
 case "${NETWORK}" in
