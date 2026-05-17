@@ -598,8 +598,15 @@ pub enum WalletAction {
         about = "Encodes/decodes a bech32 address to/from hex"
     )]
     Bech32(WalletBech32Args),
+
     #[command(name = "convert", about = "Converts a wallet")]
     Convert(WalletConvertArgs),
+
+    #[command(
+        name = "test-wallet",
+        about = "Saves a test wallet PEM file to disk. Do not use on mainnet."
+    )]
+    TestWallet(WalletTestWalletArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Parser)]
@@ -655,4 +662,16 @@ pub struct WalletBech32Args {
     pub hex_address: Option<String>,
     #[arg(long = "decode", verbatim_doc_comment)]
     pub bech32_address: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletTestWalletArgs {
+    /// The name of the test wallet.
+    /// Providing an invalid name will print the full list of valid names.
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: String,
+
+    /// Output path for the PEM file. Defaults to ./<name>.pem in the current directory.
+    #[arg(long = "path", verbatim_doc_comment)]
+    pub path: Option<String>,
 }
