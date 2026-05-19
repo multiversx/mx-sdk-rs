@@ -83,7 +83,7 @@ fn preprocess_args(
     let mut post_processing = PostProcessing::default();
 
     if let ContractCliAction::Build(build_args) = &mut preprocessed {
-        if should_use_codehash_fallback(contract_crate) {
+        if build_args.codehash && should_use_codehash_fallback(contract_crate) {
             build_args.codehash = false;
             post_processing.codehash_fallback = true;
         }
