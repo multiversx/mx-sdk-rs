@@ -9,6 +9,7 @@ pub const CONFIG_FILE_NAME: &str = "sc-reproducible-build.toml";
 pub struct ReproducibleBuildProjectConfig {
     pub general: Option<GeneralConfig>,
     pub build: Option<BuildConfig>,
+    #[serde(default)]
     pub publish: Vec<PublishConfig>,
 }
 
