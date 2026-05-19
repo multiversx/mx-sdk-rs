@@ -1015,6 +1015,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "cs-test-runner"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "ctr"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1676,6 +1683,7 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
+ "serial_test",
  "toml",
 ]
 
@@ -3126,6 +3134,8 @@ dependencies = [
  "hex",
  "multiversx-sc-codec",
  "serde",
+ "sha2",
+ "sha3",
 ]
 
 [[package]]
@@ -3161,8 +3171,6 @@ dependencies = [
  "rand 0.10.0",
  "rand_seeder",
  "serde",
- "sha2",
- "sha3",
  "toml",
 ]
 
@@ -3290,6 +3298,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "serial_test",
  "sha2",
  "sha3",
  "tokio",
@@ -3344,7 +3353,6 @@ dependencies = [
  "pathdiff",
  "serde",
  "serde_json",
- "sha2",
  "simple-error",
  "static_assertions",
  "unwrap-infallible",
@@ -3854,6 +3862,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "ping-pong-egld",
  "serde",
+ "serial_test",
  "tokio",
  "toml",
 ]

@@ -44,7 +44,11 @@ where
         }
 
         self.generate_blocks(4).await.unwrap();
-        join_all(futures).await
+        join_all(futures)
+            .await
+            .into_iter()
+            .map(|r| r.expect("failed to fetch transaction result"))
+            .collect()
     }
 }
 

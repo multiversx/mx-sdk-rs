@@ -89,7 +89,9 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone())
+            .await
+            .expect("failed to fetch transaction result");
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;

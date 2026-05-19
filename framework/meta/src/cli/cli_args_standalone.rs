@@ -1,6 +1,7 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
 /// Parsed arguments of the meta crate CLI.
@@ -103,6 +104,84 @@ pub enum StandaloneCliAction {
         about = "Can install, start and stop a chain simulator configuration."
     )]
     ChainSimulator(ChainSimulatorArgs),
+
+    #[command(
+        name = "tx",
+        about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
+    )]
+    Tx(TxCliArgs),
+
+    #[command(
+        name = "data",
+        about = "Manages local key-value data storage (store / load / parse)."
+    )]
+    Data(DataArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataArgs {
+    #[command(subcommand)]
+    pub command: DataAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum DataAction {
+    #[command(about = "Persist a key-value pair to the local data storage file.")]
+    Store(DataStoreArgs),
+
+    #[command(about = "Print a value from the local data storage file.")]
+    Load(DataLoadArgs),
+
+    #[command(
+        about = "Extract a value from a JSON file using a Python-style expression.",
+        long_about = "Supports expressions of the form: data['key'] or data['key']['subkey']."
+    )]
+    Parse(DataParseArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataStoreArgs {
+    /// The key to store.
+    #[arg(long)]
+    pub key: String,
+
+    /// The value to store.
+    #[arg(long)]
+    pub value: String,
+
+    /// The storage partition (default: *).
+    #[arg(long, default_value = "*")]
+    pub partition: String,
+
+    /// Use the global storage instead of the current directory.
+    #[arg(long, default_value_t = false)]
+    pub use_global: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataLoadArgs {
+    /// The key to load.
+    #[arg(long)]
+    pub key: String,
+
+    /// The storage partition (default: *).
+    #[arg(long, default_value = "*")]
+    pub partition: String,
+
+    /// Use the global storage instead of the current directory.
+    #[arg(long, default_value_t = false)]
+    pub use_global: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataParseArgs {
+    /// Path to the JSON file to parse.
+    #[arg(long)]
+    pub file: PathBuf,
+
+    /// Expression to evaluate, e.g. `data['contractAddress']`.
+    #[arg(long)]
+    pub expression: String,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -862,8 +941,15 @@ pub enum WalletAction {
         about = "Encodes/decodes a bech32 address to/from hex"
     )]
     Bech32(WalletBech32Args),
+
     #[command(name = "convert", about = "Converts a wallet")]
     Convert(WalletConvertArgs),
+
+    #[command(
+        name = "test-wallet",
+        about = "Saves a test wallet PEM file to disk. Do not use on mainnet."
+    )]
+    TestWallet(WalletTestWalletArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Parser)]
@@ -919,4 +1005,16 @@ pub struct WalletBech32Args {
     pub hex_address: Option<String>,
     #[arg(long = "decode", verbatim_doc_comment)]
     pub bech32_address: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletTestWalletArgs {
+    /// The name of the test wallet.
+    /// Providing an invalid name will print the full list of valid names.
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: String,
+
+    /// Output path for the PEM file. Defaults to ./<name>.pem in the current directory.
+    #[arg(long = "path", verbatim_doc_comment)]
+    pub path: Option<String>,
 }

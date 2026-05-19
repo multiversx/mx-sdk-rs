@@ -3,6 +3,7 @@ use crate::{
     gateway::{GetTxInfo, GetTxProcessStatus},
     utils::base64_encode,
 };
+use anyhow::{Context, Result};
 use log::info;
 use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
 
@@ -17,7 +18,7 @@ const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
     proxy: &GatewayProxy,
     tx_hash: String,
-) -> (ApiTransactionResult, ReturnCode) {
+) -> Result<(ApiTransactionResult, ReturnCode)> {
     let mut retries = 0;
     let mut backoff_delay = INITIAL_BACKOFF_DELAY;
     let start_time = proxy.now();
@@ -32,12 +33,10 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let transaction_info_with_results = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
-                            .unwrap_or_else(|err| {
-                                panic!("Failed to retrieve transaction {tx_hash}: {err}")
-                            });
+                            .with_context(|| format!("failed to retrieve transaction {tx_hash}"))?;
 
                         log::info!("Transaction retrieved successfully, with status {status}",);
-                        return (transaction_info_with_results, ReturnCode::Success);
+                        return Ok((transaction_info_with_results, ReturnCode::Success));
                     }
                     "fail" => {
                         let (error_code, reason) = parse_reason(&reason);
@@ -45,7 +44,9 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                         let mut failed_transaction: ApiTransactionResult = proxy
                             .request(GetTxInfo::new(&tx_hash).with_results())
                             .await
-                            .unwrap();
+                            .with_context(|| {
+                                format!("failed to retrieve failed transaction {tx_hash}")
+                            })?;
 
                         replace_with_error_message(&mut failed_transaction, &reason);
 
@@ -54,7 +55,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                             error_code.as_u64()
                         );
 
-                        return (failed_transaction, error_code);
+                        return Ok((failed_transaction, error_code));
                     }
                     _ => {
                         continue;
@@ -65,7 +66,6 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
                 retries += 1;
                 if retries >= MAX_RETRIES {
                     info!("Transaction failed, max retries exceeded: {}", err);
-                    println!("Transaction failed, max retries exceeded: {}", err);
                     break;
                 }
 
@@ -85,7 +85,7 @@ pub async fn retrieve_tx_on_network<GatewayProxy: GatewayAsyncService>(
     let error_message = ReturnCode::message(ReturnCode::NetworkTimeout);
     let failed_transaction: ApiTransactionResult = create_tx_failed(error_message);
 
-    (failed_transaction, ReturnCode::NetworkTimeout)
+    Ok((failed_transaction, ReturnCode::NetworkTimeout))
 }
 
 pub fn parse_reason(reason: &str) -> (ReturnCode, String) {

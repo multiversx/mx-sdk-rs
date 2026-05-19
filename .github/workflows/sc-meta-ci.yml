@@ -1,0 +1,67 @@
+name: sc-meta CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  template_test_current:
+    name: Template tool test - current (unreleased) templates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+          target: wasm32v1-none
+
+      - name: Install prerequisites
+        run: |
+          cargo install wasm-opt
+          cargo install --path framework/meta
+          sc-meta install mx-scenario-go --tag v5.1.0
+
+          which wasm-opt
+          which mx-scenario-go
+          mx-scenario-go --version
+
+      - name: Run template tool test
+        run: cargo test -p multiversx-sc-meta --features template-test-current --test template_test
+
+  template_test_released:
+    name: Template tool test - released templates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+          target: wasm32-unknown-unknown
+
+      - name: Install prerequisites
+        run: |
+          cargo install wasm-opt
+          cargo install --path framework/meta
+          sc-meta install mx-scenario-go --tag v5.1.0
+          sc-meta install wasm32
+
+          which wasm-opt
+          which mx-scenario-go
+          mx-scenario-go --version
+
+      - name: Run template tool test
+        run: cargo test -p multiversx-sc-meta --features template-test-released --test template_test

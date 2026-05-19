@@ -2,6 +2,7 @@ use core::str;
 use std::{
     fs::{self},
     io::{self, Read},
+    path::Path,
 };
 
 use aes::{Aes128, cipher::KeyIvInit};
@@ -71,7 +72,6 @@ impl Wallet {
 
         let mut digest =
             HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
-        HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
         digest.update(&seed);
         let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
@@ -92,7 +92,6 @@ impl Wallet {
 
             digest =
                 HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
-            HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
             digest.update(&buff);
             let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();
@@ -118,7 +117,10 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn from_pem_file(file_path: &str) -> Result<Self> {
+    pub fn from_pem_file<P>(file_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
         let contents = std::fs::read_to_string(file_path)?;
         Self::from_pem_file_contents(contents)
     }
@@ -137,14 +139,14 @@ impl Wallet {
         address_bytes[address_bytes.len() - 1] % 3
     }
 
-    pub fn get_pem_decoded_content(file: &str) -> Vec<u8> {
+    pub fn get_pem_decoded_content<P: AsRef<Path>>(file: P) -> Vec<u8> {
         let pem_content = fs::read_to_string(file).unwrap();
         let lines: Vec<&str> = pem_content.split('\n').collect();
         let pem_encoded_keys = format!("{}{}{}", lines[1], lines[2], lines[3]);
         base64_decode(pem_encoded_keys)
     }
 
-    pub fn get_wallet_keys_pem(file: &str) -> (String, String) {
+    pub fn get_wallet_keys_pem<P: AsRef<Path>>(file: P) -> (String, String) {
         let pem_decoded_keys = Self::get_pem_decoded_content(file);
         let (private_key, public_key) = pem_decoded_keys.split_at(pem_decoded_keys.len() / 2);
         let private_key_str = String::from_utf8(private_key.to_vec()).unwrap();
@@ -153,17 +155,20 @@ impl Wallet {
         (private_key_str, public_key_str)
     }
 
-    pub fn from_keystore_secret(file_path: &str, insert_password: InsertPassword) -> Result<Self> {
+    pub fn from_keystore_secret<P: AsRef<Path>>(
+        file_path: P,
+        insert_password: InsertPassword,
+    ) -> Result<Self> {
         let decryption_params = match insert_password {
             InsertPassword::Plaintext(password) => {
-                Self::validate_keystore_password(file_path, password.to_string()).unwrap_or_else(
+                Self::validate_keystore_password(&file_path, password.to_string()).unwrap_or_else(
                     |e| {
                         panic!("Error: {:?}", e);
                     },
                 )
             }
             InsertPassword::StandardInput => {
-                Self::validate_keystore_password(file_path, Self::get_keystore_password())
+                Self::validate_keystore_password(&file_path, Self::get_keystore_password())
                     .unwrap_or_else(|e| {
                         panic!("Error: {:?}", e);
                     })
@@ -175,8 +180,8 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn get_private_key_from_keystore_secret(
-        file_path: &str,
+    pub fn get_private_key_from_keystore_secret<P: AsRef<Path>>(
+        file_path: P,
         password: &str,
     ) -> Result<PrivateKey> {
         let decyption_params = Self::validate_keystore_password(file_path, password.to_string())
@@ -227,8 +232,8 @@ impl Wallet {
         password
     }
 
-    pub fn validate_keystore_password(
-        path: &str,
+    pub fn validate_keystore_password<P: AsRef<Path>>(
+        path: P,
         password: String,
     ) -> Result<DecryptionParams, WalletError> {
         let json_body = fs::read_to_string(path).unwrap();
