@@ -5,7 +5,8 @@ use multiversx_sc_snippets::imports::Bech32Address;
 
 use crate::cli::ReproducibleBuildUnpublishArgs;
 
-use super::publish::{compute_bytes_for_signing, load_private_key};
+use super::publish::compute_bytes_for_signing;
+use crate::cli::cli_args_sender::load_wallet;
 
 /// CLI entry point for `sc-meta reproducible-build unpublish`.
 pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
@@ -25,11 +26,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
         }
     }
 
-    let priv_key = load_private_key(
-        args.pem.as_deref(),
-        args.keystore.as_deref(),
-        args.keystore_password.as_deref(),
-    );
+    let wallet = load_wallet(&args.sender).unwrap_or_else(|e| panic!("Failed to load wallet: {e}"));
 
     // Build compact payload JSON matching the Python implementation.
     let payload_obj = serde_json::json!({
@@ -40,7 +37,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
 
     // Sign using the same MultiversX message signing protocol as verify.
     let bytes_to_sign = compute_bytes_for_signing(&contract, &payload);
-    let signature: [u8; 64] = priv_key.sign(bytes_to_sign);
+    let signature: [u8; 64] = wallet.sign_bytes(bytes_to_sign);
     let signature_hex: String = signature.encode_hex();
 
     let request_body = serde_json::json!({

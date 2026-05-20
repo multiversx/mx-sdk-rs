@@ -2,13 +2,14 @@ use std::io::{self, Write};
 use std::time::Duration;
 
 use hex::ToHex;
-use multiversx_sc_snippets::sdk::{crypto::private_key::PrivateKey, wallet::Wallet};
+use multiversx_sc_snippets::sdk::wallet::Wallet;
 use sha2::{Digest, Sha256};
 use sha3::Keccak256;
 
 use multiversx_sc_snippets::imports::Bech32Address;
 
 use crate::cli::ReproducibleBuildPublishArgs;
+use crate::cli::cli_args_sender::load_wallet;
 
 const ELROND_SIGNED_MESSAGE_PREFIX: &[u8] = b"\x17Elrond Signed Message:\n";
 const HTTP_STATUS_OK: u16 = 200;
@@ -34,11 +35,7 @@ pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
         }
     }
 
-    let priv_key = load_private_key(
-        args.pem.as_deref(),
-        args.keystore.as_deref(),
-        args.keystore_password.as_deref(),
-    );
+    let wallet = load_wallet(&args.sender).unwrap_or_else(|e| panic!("Failed to load wallet: {e}"));
 
     // Read source.json as a raw JSON value (to re-serialize compact with no extra whitespace).
     let source_json_text = std::fs::read_to_string(&args.packaged_src)
@@ -55,7 +52,7 @@ pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
     );
 
     // Sign the payload.
-    let signature_hex = sign_payload(&priv_key, &contract, &payload);
+    let signature_hex = sign_payload(&wallet, &contract, &payload);
 
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
     let (status, body) = post_verification_request(
@@ -71,31 +68,6 @@ pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
-
-/// Loads the private key from a PEM file or keystore, depending on CLI args.
-pub(super) fn load_private_key(
-    pem: Option<&str>,
-    keystore: Option<&str>,
-    keystore_password: Option<&str>,
-) -> PrivateKey {
-    match (pem, keystore) {
-        (Some(pem_path), None) => {
-            let (priv_key_hex, _) = Wallet::get_wallet_keys_pem(pem_path);
-            PrivateKey::from_hex_str(&priv_key_hex)
-                .unwrap_or_else(|e| panic!("Failed to parse PEM private key: {e}"))
-        }
-        (None, Some(keystore_path)) => {
-            let password = match keystore_password {
-                Some(pw) => pw.to_string(),
-                None => Wallet::get_keystore_password(),
-            };
-            Wallet::get_private_key_from_keystore_secret(keystore_path, &password)
-                .unwrap_or_else(|e| panic!("Failed to load keystore: {e}"))
-        }
-        (None, None) => panic!("Either --pem or --keystore must be provided"),
-        (Some(_), Some(_)) => panic!("--pem and --keystore are mutually exclusive"),
-    }
-}
 
 /// Builds a compact JSON payload string (no whitespace) matching the Python implementation.
 fn build_payload(
@@ -135,13 +107,9 @@ pub(super) fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str)
 }
 
 /// Signs the payload using the MultiversX message signing protocol and returns the hex signature.
-pub(super) fn sign_payload(
-    priv_key: &PrivateKey,
-    contract: &Bech32Address,
-    payload: &str,
-) -> String {
+pub(super) fn sign_payload(wallet: &Wallet, contract: &Bech32Address, payload: &str) -> String {
     let bytes_to_sign = compute_bytes_for_signing(contract, payload);
-    let signature: [u8; 64] = priv_key.sign(bytes_to_sign);
+    let signature: [u8; 64] = wallet.sign_bytes(bytes_to_sign);
     signature.encode_hex()
 }
 

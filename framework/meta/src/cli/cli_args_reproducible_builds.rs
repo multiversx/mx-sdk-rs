@@ -1,5 +1,6 @@
 use clap::{Args, Subcommand};
 
+use super::cli_args_sender::SenderArgs;
 use super::cli_args_standalone::LocalDepsArgs;
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -199,19 +200,8 @@ pub struct ReproducibleBuildPublishArgs {
     #[arg(long = "contract-variant", verbatim_doc_comment)]
     pub contract_variant: Option<String>,
 
-    /// Path to a PEM wallet file used to sign the verification request.
-    /// Mutually exclusive with --keystore.
-    #[arg(long, verbatim_doc_comment)]
-    pub pem: Option<String>,
-
-    /// Path to a keystore JSON wallet file used to sign the verification request.
-    /// Mutually exclusive with --pem.
-    #[arg(long, verbatim_doc_comment)]
-    pub keystore: Option<String>,
-
-    /// Keystore password (plain text). If omitted, will prompt interactively.
-    #[arg(long = "keystore-password", verbatim_doc_comment)]
-    pub keystore_password: Option<String>,
+    #[command(flatten)]
+    pub sender: SenderArgs,
 
     /// Skip the confirmation prompt before submitting.
     #[arg(
@@ -237,19 +227,8 @@ pub struct ReproducibleBuildUnpublishArgs {
     #[arg(long = "verifier-url", verbatim_doc_comment)]
     pub verifier_url: String,
 
-    /// Path to a PEM wallet file used to sign the request.
-    /// Mutually exclusive with --keystore.
-    #[arg(long, verbatim_doc_comment)]
-    pub pem: Option<String>,
-
-    /// Path to a keystore JSON wallet file used to sign the request.
-    /// Mutually exclusive with --pem.
-    #[arg(long, verbatim_doc_comment)]
-    pub keystore: Option<String>,
-
-    /// Keystore password (plain text). If omitted, will prompt interactively.
-    #[arg(long = "keystore-password", verbatim_doc_comment)]
-    pub keystore_password: Option<String>,
+    #[command(flatten)]
+    pub sender: SenderArgs,
 
     /// Skip the confirmation prompt before submitting.
     #[arg(
