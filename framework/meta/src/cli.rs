@@ -1,4 +1,5 @@
 mod cli_args_standalone;
+pub mod cli_args_sender;
 pub mod cli_args_tx;
 mod cli_args_validate;
 mod cli_standalone_main;
