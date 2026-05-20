@@ -54,7 +54,11 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     let tx = tx_builder.into_sdk_transaction();
 
     let contract_address = compute_new_address_bech32(&tx.sender, nonce);
-    if let Some(ex) = ExplorerUrl::from_chain_id(&tx.chain_id) {
+
+    // TODO: refactor, by working with an interactor object in the future,
+    // who keeps the effective network config/chain ID
+    let effective_chain_id = args.gateway.chain.as_deref().unwrap_or(&tx.chain_id);
+    if let Some(ex) = ExplorerUrl::from_chain_id(effective_chain_id) {
         println!("new contract: {}", ex.address_url(&contract_address));
     } else {
         println!("new contract address: {contract_address}");
