@@ -74,8 +74,8 @@ impl<'a> ContractCreator<'a> {
     }
 
     pub fn create_contract(&self, args_tag: FrameworkVersion) {
-        self.copy_template(args_tag.clone());
-        self.update_dependencies(args_tag);
+        self.copy_template(args_tag);
+        self.update_dependencies();
         self.rename_template();
     }
 
@@ -84,8 +84,8 @@ impl<'a> ContractCreator<'a> {
             .copy_template(self.target.contract_dir(), args_tag);
     }
 
-    pub fn update_dependencies(&self, args_tag: FrameworkVersion) {
-        self.adjuster.update_cargo_toml_files(args_tag);
+    pub fn update_dependencies(&self) {
+        self.adjuster.update_cargo_toml_files();
     }
 
     pub fn rename_template(&self) {
