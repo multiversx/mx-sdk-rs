@@ -380,7 +380,18 @@ fn check_cargo_locks_unchanged(
             _ => {}
         }
     }
+    for path in after.keys() {
+        if !before.contains_key(path) {
+            eprintln!(
+                "Error: new Cargo.lock created during build: {}",
+                path.display()
+            );
+            any_changed = true;
+        }
+    }
     if any_changed {
-        panic!("One or more Cargo.lock files changed during build. Use --locked to prevent this.");
+        panic!(
+            "One or more Cargo.lock files were created or modified during the build; the build is not reproducible."
+        );
     }
 }
