@@ -6,6 +6,8 @@ use multiversx_sc_scenario::{
     multiversx_sc::types::Address,
 };
 use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount};
+
+use super::ExplorerUrl;
 use std::{
     collections::HashMap,
     fs::File,
@@ -34,6 +36,7 @@ where
     pub post_runners: ScenarioRunnerList,
 
     pub current_dir: PathBuf,
+    pub explorer_url: Option<ExplorerUrl>,
 }
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
@@ -48,6 +51,7 @@ where
             .await
             .expect("could not get network config");
         let gas_price = network_config.min_gas_price;
+        let explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
         Self {
             proxy,
             use_chain_simulator: false,
@@ -58,6 +62,7 @@ where
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
             gas_price,
+            explorer_url,
         }
     }
 

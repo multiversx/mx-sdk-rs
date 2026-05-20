@@ -2,6 +2,7 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
+use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
 use super::parse_code_metadata::parse_code_metadata;
@@ -53,7 +54,15 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     let tx = tx_builder.into_sdk_transaction();
 
     let contract_address = compute_new_address_bech32(&tx.sender, nonce);
-    println!("Contract address: {contract_address}");
+
+    // TODO: refactor, by working with an interactor object in the future,
+    // who keeps the effective network config/chain ID
+    let effective_chain_id = args.gateway.chain.as_deref().unwrap_or(&tx.chain_id);
+    if let Some(ex) = ExplorerUrl::from_chain_id(effective_chain_id) {
+        println!("new contract: {}", ex.address_url(&contract_address));
+    } else {
+        println!("new contract address: {contract_address}");
+    }
 
     sign_and_dispatch(
         wallet,
