@@ -476,6 +476,10 @@ pub struct TemplateArgs {
     /// If missing, the default author will be considered.
     #[arg(long, verbatim_doc_comment)]
     pub author: Option<String>,
+
+    /// Overwrite the destination directory if it already exists.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
 }
 
 impl CliArgsToRaw for TemplateArgs {
