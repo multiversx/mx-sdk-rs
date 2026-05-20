@@ -18,6 +18,19 @@ pub fn source_unpack(args: &SourceUnpackArgs) {
         .as_deref()
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(HARDCODED_UNWRAP_FOLDER));
+
+    let is_non_empty = output_folder
+        .read_dir()
+        .map(|mut rd| rd.next().is_some())
+        .unwrap_or(false);
+    if is_non_empty && !args.overwrite {
+        eprintln!(
+            "Error: output folder is not empty: {}\nUse --overwrite to wipe it before unpacking.",
+            output_folder.display()
+        );
+        std::process::exit(1);
+    }
+
     let (folder, build_root) = unpack_packaged_src(Path::new(&args.packaged_src), &output_folder)
         .unwrap_or_else(|e| panic!("{e:#}"));
     println!("Unwrapped to:     {}", folder.display());

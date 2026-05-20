@@ -175,6 +175,10 @@ pub struct SourceUnpackArgs {
     /// Defaults to /tmp/unwrapped if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub output: Option<String>,
+
+    /// Overwrite the output folder if it already exists and is non-empty.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub overwrite: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
