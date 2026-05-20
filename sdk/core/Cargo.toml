@@ -37,6 +37,7 @@ log = "0.4"
 scrypt = { version = "0.11", default-features = false }
 aes = "0.8"
 ctr = "0.9"
+rpassword = "7.3"
 
 # Optional dependencies, for wallet-full
 rand = { version = "0.10", optional = true, default-features = false }
