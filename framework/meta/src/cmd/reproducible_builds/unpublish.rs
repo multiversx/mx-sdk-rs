@@ -46,7 +46,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
     });
 
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
-    println!("Submitting unverify request to {url} ...");
+    println!("Submitting unpublish request to {url} ...");
 
     let client = reqwest::Client::new();
     let response = client
@@ -63,7 +63,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
         .unwrap_or_else(|e| panic!("Failed to read response body: {e}"));
 
     if raw.is_empty() {
-        println!("Unverify request completed (status {status}).");
+        println!("Unpublish request completed (status {status}).");
         return;
     }
 
