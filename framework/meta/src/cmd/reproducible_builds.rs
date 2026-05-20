@@ -1,4 +1,4 @@
-mod build;
+mod build_cmd;
 mod build_outcome;
 mod check;
 mod download;
@@ -20,7 +20,7 @@ pub use project_config::{
 pub use build_outcome::{BuildOutcome, ContractOutcomeEntry};
 pub use source_json_model::{PackedSource, SCHEMA_VERSION};
 
-pub use build::docker_build;
+pub use build_cmd::docker_build;
 pub use check::check_contract_verification;
 pub use download::download_contract_verification;
 pub use init_config::init_config;
