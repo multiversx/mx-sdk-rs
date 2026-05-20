@@ -18,7 +18,7 @@ pub use project_config::{
 };
 
 pub use build_outcome::{BuildOutcome, ContractOutcomeEntry};
-pub use source_json_model::{PackedSource, SCHEMA_VERSION};
+pub use source_json_model::{PackedSource, SCHEMA_VERSION, SourceFileEntry, SourceMetadata};
 
 pub use build_cmd::docker_build;
 pub use check::check_contract_verification;
@@ -29,5 +29,5 @@ pub use local_deps::local_deps;
 pub use publish::publish_contract;
 pub use release_notes::release_notes;
 pub use source_pack::source_pack;
-pub use source_unpack::source_unpack;
+pub use source_unpack::{source_unpack, unpack_packaged_src, unpack_packed_source};
 pub use unpublish::unpublish_contract;

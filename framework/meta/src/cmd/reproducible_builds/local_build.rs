@@ -124,7 +124,8 @@ fn run_local_build(cfg: LocalBuildConfig) {
     // If --packaged-src is set, unpack to /tmp/unwrapped/ and derive project/build-root from it.
     let (project_folder, build_root) = if let Some(src) = cfg.packaged_src.as_deref() {
         let unwrap_folder = PathBuf::from(super::source_unpack::HARDCODED_UNWRAP_FOLDER);
-        let (folder, build_root_from_json) = unpack_packaged_src(Path::new(src), &unwrap_folder);
+        let (folder, build_root_from_json) =
+            unpack_packaged_src(Path::new(src), &unwrap_folder).unwrap_or_else(|e| panic!("{e:#}"));
         (folder, PathBuf::from(build_root_from_json))
     } else {
         (cfg.project.clone(), cfg.build_root.clone())

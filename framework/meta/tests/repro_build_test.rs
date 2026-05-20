@@ -1,15 +1,20 @@
-use std::{fs, path::Path};
+use std::{
+    collections::HashSet,
+    fs,
+    path::{Path, PathBuf},
+};
 
 use multiversx_sc_meta::{
     cli::{
         AllArgs, InitConfigArgs, MetaLibArgs, ReleaseNotesArgs, ReproducibleBuildBuildArgs,
-        ReproducibleBuildLocalBuildArgs,
+        ReproducibleBuildLocalBuildArgs, SourcePackArgs,
     },
     cmd::{
         all::call_all_meta,
         reproducible_builds::{
-            BuildOutcome, PackedSource, SCHEMA_VERSION, docker_build, init_config, local_build,
-            release_notes,
+            BuildOutcome, PackedSource, SCHEMA_VERSION, SourceFileEntry, SourceMetadata,
+            docker_build, init_config, local_build, release_notes, source_pack,
+            unpack_packaged_src, unpack_packed_source,
         },
     },
     folder_structure::{setup_workspace, strip_path},
@@ -21,6 +26,10 @@ use multiversx_sc_meta_lib::{
 
 const TEST_DIR_PATH_LOCAL: &str = "contracts/test-reproducible-build/local";
 const TEST_DIR_PATH_DOCKER: &str = "contracts/test-reproducible-build/full";
+const TEST_DIR_PATH_SOURCE_PACK: &str = "contracts/test-reproducible-build/source-pack";
+const TEST_DIR_PATH_SOURCE_ROUNDTRIP: &str = "contracts/test-reproducible-build/source-roundtrip";
+const TEST_DIR_PATH_SOURCE_ROUNDTRIP_OUT: &str =
+    "contracts/test-reproducible-build/source-roundtrip-out";
 const CONTRACTS: [&str; 2] = ["adder", "crypto-kitties"];
 
 /// Local-build half of the reproducible build test.
@@ -36,7 +45,7 @@ fn repro_build_local() {
     let workspace = find_current_workspace().unwrap();
     let test_dir = workspace.join(TEST_DIR_PATH_LOCAL);
 
-    setup_build_dir(&workspace, &test_dir);
+    setup_build_dir(&workspace, &test_dir, &CONTRACTS);
 
     for contract in CONTRACTS {
         let contract_dir = test_dir.join(contract);
@@ -103,7 +112,7 @@ fn repro_build_docker() {
     let workspace = find_current_workspace().unwrap();
     let test_dir = workspace.join(TEST_DIR_PATH_DOCKER);
 
-    setup_build_dir(&workspace, &test_dir);
+    setup_build_dir(&workspace, &test_dir, &CONTRACTS);
 
     for contract in CONTRACTS {
         let contract_dir = test_dir.join(contract);
@@ -240,14 +249,14 @@ fn check_artifacts(output_dir: &Path, expected_contracts: &[&str]) {
     }
 }
 
-fn setup_build_dir(workspace: &Path, build_dir: &Path) {
+fn setup_build_dir(workspace: &Path, build_dir: &Path, contracts: &[&str]) {
     if build_dir.exists() {
         fs::remove_dir_all(build_dir).unwrap();
     }
     fs::create_dir_all(build_dir).unwrap();
 
     let examples = workspace.join("contracts").join("examples");
-    for contract in CONTRACTS {
+    for contract in contracts {
         copy_dir::copy_dir(examples.join(contract), build_dir.join(contract))
             .unwrap_or_else(|e| panic!("failed to copy {contract}: {e}"));
     }
@@ -260,7 +269,7 @@ fn setup_build_dir(workspace: &Path, build_dir: &Path) {
 
     strip_path(build_dir, &["target".to_string()]);
 
-    for contract in CONTRACTS {
+    for contract in contracts {
         setup_workspace(
             &build_dir.join(contract),
             &["wasm".to_string(), "target".to_string()],
@@ -269,5 +278,139 @@ fn setup_build_dir(workspace: &Path, build_dir: &Path) {
             path: Some(build_dir.join(contract).to_str().unwrap().to_string()),
             overwrite: true,
         });
+    }
+}
+
+/// Packs the adder contract and verifies the resulting `.source.json` is
+/// well-formed: correct schema version, correct contract name, non-empty
+/// entries, `Cargo.toml` and at least one `src/*.rs` file included.
+#[test]
+fn source_pack_entries() {
+    let workspace = find_current_workspace().unwrap();
+    let test_dir = workspace.join(TEST_DIR_PATH_SOURCE_PACK);
+
+    setup_build_dir(&workspace, &test_dir, &["adder"]);
+
+    let adder_dir = test_dir.join("adder");
+    source_pack(&SourcePackArgs {
+        path: Some(adder_dir.to_str().unwrap().to_string()),
+        contract: None,
+    });
+
+    let source_json = find_source_json(&adder_dir.join("output"));
+    let text = fs::read_to_string(&source_json).unwrap();
+    let packed: PackedSource =
+        serde_json::from_str(&text).unwrap_or_else(|e| panic!("failed to parse source.json: {e}"));
+
+    assert_eq!(packed.schema_version, SCHEMA_VERSION);
+    assert_eq!(packed.metadata.contract_name, "adder");
+    assert!(!packed.entries.is_empty(), "entries must not be empty");
+
+    let paths: HashSet<&str> = packed.entries.iter().map(|e| e.path.as_str()).collect();
+    assert!(paths.contains("Cargo.toml"), "Cargo.toml must be present");
+    assert!(
+        paths
+            .iter()
+            .any(|p| p.starts_with("src/") && p.ends_with(".rs")),
+        "at least one src/*.rs file must be present; got: {paths:?}"
+    );
+}
+
+/// Packs adder, then unpacks the `.source.json` and verifies every entry's
+/// file is present in the output directory with identical content.
+#[test]
+fn source_pack_roundtrip() {
+    let workspace = find_current_workspace().unwrap();
+    let test_dir = workspace.join(TEST_DIR_PATH_SOURCE_ROUNDTRIP);
+    let unpack_dir = workspace.join(TEST_DIR_PATH_SOURCE_ROUNDTRIP_OUT);
+
+    setup_build_dir(&workspace, &test_dir, &["adder"]);
+    if unpack_dir.exists() {
+        fs::remove_dir_all(&unpack_dir).unwrap();
+    }
+
+    let adder_dir = test_dir.join("adder");
+    source_pack(&SourcePackArgs {
+        path: Some(adder_dir.to_str().unwrap().to_string()),
+        contract: None,
+    });
+
+    let source_json = find_source_json(&adder_dir.join("output"));
+    let text = fs::read_to_string(&source_json).unwrap();
+    let packed: PackedSource = serde_json::from_str(&text).unwrap();
+
+    let (unpacked_folder, _build_root) = unpack_packaged_src(&source_json, &unpack_dir).unwrap();
+
+    for entry in &packed.entries {
+        let original = adder_dir.join(&entry.path);
+        let restored = unpacked_folder.join(&entry.path);
+
+        assert!(restored.exists(), "unpacked file missing: {}", entry.path);
+
+        if original.exists() {
+            assert_eq!(
+                fs::read(&original).unwrap(),
+                fs::read(&restored).unwrap(),
+                "content mismatch for {}",
+                entry.path
+            );
+        }
+    }
+}
+
+/// Unpacking a `.source.json` that contains `../` must return an error.
+#[test]
+fn source_unpack_rejects_parent_dir_path() {
+    let packed = make_packed_source_with_entry("../escape.txt");
+    let err = unpack_packed_source(&packed, &std::env::temp_dir().join("sc-meta-test-traverse"))
+        .unwrap_err();
+    assert!(
+        err.to_string().contains("path traversal"),
+        "expected path traversal error, got: {err:#}"
+    );
+}
+
+/// Unpacking a `.source.json` that contains an absolute path must return an error.
+#[test]
+fn source_unpack_rejects_absolute_path() {
+    let packed = make_packed_source_with_entry("/etc/passwd");
+    let err = unpack_packed_source(&packed, &std::env::temp_dir().join("sc-meta-test-traverse"))
+        .unwrap_err();
+    assert!(
+        err.to_string().contains("absolute path"),
+        "expected absolute path error, got: {err:#}"
+    );
+}
+
+fn find_source_json(output_dir: &Path) -> PathBuf {
+    fs::read_dir(output_dir)
+        .unwrap_or_else(|e| panic!("cannot read {}: {e}", output_dir.display()))
+        .flatten()
+        .map(|e| e.path())
+        .find(|p| {
+            p.file_name()
+                .and_then(|n| n.to_str())
+                .map(|n| n.ends_with(".source.json"))
+                .unwrap_or(false)
+        })
+        .unwrap_or_else(|| panic!("no .source.json found in {}", output_dir.display()))
+}
+
+fn make_packed_source_with_entry(path: &str) -> PackedSource {
+    PackedSource {
+        schema_version: SCHEMA_VERSION.to_string(),
+        metadata: SourceMetadata {
+            contract_name: "test".to_string(),
+            contract_version: "0.0.0".to_string(),
+            build_metadata: None,
+            build_options: None,
+        },
+        entries: vec![SourceFileEntry {
+            path: path.to_string(),
+            content: "aGVsbG8=".to_string(),
+            module: ".".to_string(),
+            dependency_depth: 0,
+            is_test_file: false,
+        }],
     }
 }
