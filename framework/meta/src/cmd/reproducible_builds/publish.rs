@@ -13,6 +13,7 @@ use crate::cli::ReproducibleBuildPublishArgs;
 const ELROND_SIGNED_MESSAGE_PREFIX: &[u8] = b"\x17Elrond Signed Message:\n";
 const HTTP_STATUS_OK: u16 = 200;
 const HTTP_STATUS_TIMEOUT: u16 = 408;
+const MAX_POLL_ATTEMPTS: u32 = 30;
 
 /// CLI entry point for `sc-meta reproducible-build publish`.
 pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
@@ -248,6 +249,10 @@ async fn poll_task(verifier_url: &str, task_id: &str) {
             println!("Task status: {status}");
             println!("{}", serde_json::to_string_pretty(&body).unwrap());
             last_status = status;
+        }
+
+        if attempt >= MAX_POLL_ATTEMPTS {
+            panic!("Verification task did not finish after {MAX_POLL_ATTEMPTS} polling attempts.");
         }
     }
 }
