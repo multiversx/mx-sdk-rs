@@ -2,11 +2,9 @@ use std::io::{self, Write};
 use std::time::Duration;
 
 use hex::ToHex;
-use multiversx_sc_snippets::sdk::wallet::Wallet;
-use sha2::{Digest, Sha256};
-use sha3::Keccak256;
-
+use multiversx_chain_core::std::crypto;
 use multiversx_sc_snippets::imports::Bech32Address;
+use multiversx_sc_snippets::sdk::wallet::Wallet;
 
 use crate::cli::ReproducibleBuildPublishArgs;
 use crate::cli::cli_args_sender::load_wallet;
@@ -95,7 +93,7 @@ fn build_payload(
 /// 3. content = PREFIX + len(raw_data) + raw_data  (PREFIX = `\x17Elrond Signed Message:\n`)
 /// 4. return keccak256(content)
 pub(super) fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str) -> Vec<u8> {
-    let hashed_payload: String = Sha256::digest(payload.as_bytes()).encode_hex();
+    let hashed_payload: String = crypto::sha256(payload.as_bytes()).encode_hex();
     let raw_data = format!("{}{hashed_payload}", contract.to_bech32_str());
     let raw_data_bytes = raw_data.as_bytes();
     let len_str = raw_data_bytes.len().to_string();
@@ -105,7 +103,7 @@ pub(super) fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str)
     content.extend_from_slice(ELROND_SIGNED_MESSAGE_PREFIX);
     content.extend_from_slice(len_str.as_bytes());
     content.extend_from_slice(raw_data_bytes);
-    Keccak256::digest(&content).to_vec()
+    crypto::keccak256(&content).to_vec()
 }
 
 /// Signs the payload using the MultiversX message signing protocol and returns the hex signature.
@@ -231,8 +229,7 @@ async fn poll_task(verifier_url: &str, task_id: &str) {
 mod tests {
     use super::*;
     use hex::ToHex;
-    use sha2::{Digest, Sha256};
-    use sha3::Keccak256;
+    use multiversx_chain_core::std::crypto::{keccak256, sha256};
 
     /// Independently re-implements the signing bytes computation and checks it matches.
     #[test]
@@ -248,13 +245,13 @@ mod tests {
         assert_eq!(result.len(), 32);
 
         // Independently compute the expected value step by step.
-        let hashed_payload: String = Sha256::digest(payload.as_bytes()).encode_hex();
+        let hashed_payload: String = sha256(payload.as_bytes()).encode_hex();
         let raw_data = format!("{}{hashed_payload}", contract.to_bech32_str());
         let mut content = Vec::new();
         content.extend_from_slice(ELROND_SIGNED_MESSAGE_PREFIX);
         content.extend_from_slice(raw_data.len().to_string().as_bytes());
         content.extend_from_slice(raw_data.as_bytes());
-        let expected = Keccak256::digest(&content).to_vec();
+        let expected = keccak256(&content).to_vec();
 
         assert_eq!(result, expected);
     }
