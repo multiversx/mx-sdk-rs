@@ -15,6 +15,7 @@ const ELROND_SIGNED_MESSAGE_PREFIX: &[u8] = b"\x17Elrond Signed Message:\n";
 const HTTP_STATUS_OK: u16 = 200;
 const HTTP_STATUS_TIMEOUT: u16 = 408;
 const MAX_POLL_ATTEMPTS: u32 = 30;
+const POLL_INTERVAL: Duration = Duration::from_secs(20);
 
 /// CLI entry point for `sc-meta reproducible-build publish`.
 pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
@@ -196,7 +197,7 @@ async fn poll_task(verifier_url: &str, task_id: &str) {
     let mut attempt: u32 = 0;
 
     loop {
-        tokio::time::sleep(Duration::from_secs(10)).await;
+        tokio::time::sleep(POLL_INTERVAL).await;
         attempt += 1;
         println!("Polling attempt {attempt} ...");
 
