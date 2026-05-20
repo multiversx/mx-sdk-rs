@@ -9,7 +9,7 @@ use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
 use bip39::Mnemonic;
 use ctr::{Ctr128BE, cipher::StreamCipher};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
 use scrypt::{Params, scrypt};
@@ -256,9 +256,9 @@ impl Wallet {
         let n = keystore.crypto.kdfparams.n as f64;
         let r = keystore.crypto.kdfparams.r as u64;
         let p = keystore.crypto.kdfparams.p as u64;
-        let dklen = keystore.crypto.kdfparams.dklen as usize;
+        let _dklen = keystore.crypto.kdfparams.dklen as usize;
 
-        let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).unwrap();
+        let params = Params::new(n.log2() as u8, r as u32, p as u32).unwrap();
 
         let mut derived_key = vec![0u8; 32];
         scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
@@ -284,10 +284,9 @@ impl Wallet {
     }
 
     pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> Vec<u8> {
-        let mut cipher = Ctr128BE::<Aes128>::new(
-            decryption_params.derived_key_first_half.as_slice().into(),
-            decryption_params.iv.as_slice().into(),
-        );
+        let key: &[u8; 16] = decryption_params.derived_key_first_half.as_slice().try_into().unwrap();
+        let iv: &[u8; 16] = decryption_params.iv.as_slice().try_into().unwrap();
+        let mut cipher = Ctr128BE::<Aes128>::new(key.into(), iv.into());
         let mut decrypted = decryption_params.data.to_vec();
         cipher.apply_keystream(&mut decrypted);
 
@@ -307,7 +306,7 @@ impl Wallet {
     ) -> String {
         use rand::Rng;
 
-        let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
+        let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];
         rand::rng().fill_bytes(&mut rand_salt);
         let salt_hex = hex::encode(rand_salt);
