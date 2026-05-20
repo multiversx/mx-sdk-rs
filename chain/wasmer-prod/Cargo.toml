@@ -10,7 +10,7 @@ description = "MultiversX VM adapter for the Wasmer Production executor"
 path = "src/wasmer_prod.rs"
 
 [dependencies]
-home = "=0.5.1" # downgrading, >= 0.5.2 requires rustc 1.88, which is causing linker problems on Linux
+home = "=0.5.1" # downgrading, >= 0.5.2 requires rustc 1.88
 
 [dependencies.multiversx-chain-core]
 version = "=0.22.1"
