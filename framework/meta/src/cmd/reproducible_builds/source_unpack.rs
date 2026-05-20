@@ -9,6 +9,7 @@ use crate::cli::SourceUnpackArgs;
 
 use super::source_json_model::PackedSource;
 
+/// TODO: eliminate the hardcoded path, make it fully configurable, test
 pub const HARDCODED_UNWRAP_FOLDER: &str = "/tmp/unwrapped";
 
 /// CLI entry point for `sc-meta reproducible-build source-unpack`.
