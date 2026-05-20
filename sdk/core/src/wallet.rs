@@ -284,7 +284,11 @@ impl Wallet {
     }
 
     pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> Vec<u8> {
-        let key: &[u8; 16] = decryption_params.derived_key_first_half.as_slice().try_into().unwrap();
+        let key: &[u8; 16] = decryption_params
+            .derived_key_first_half
+            .as_slice()
+            .try_into()
+            .unwrap();
         let iv: &[u8; 16] = decryption_params.iv.as_slice().try_into().unwrap();
         let mut cipher = Ctr128BE::<Aes128>::new(key.into(), iv.into());
         let mut decrypted = decryption_params.data.to_vec();
