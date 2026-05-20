@@ -61,6 +61,7 @@ deployPayableFeatures() {
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_DEPLOY}" \
+        --wait-result \
         || return
 
     ADDRESS_PAYABLE_FEATURES=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['contractAddress']" 2>/dev/null)
@@ -79,6 +80,7 @@ upgrade() {
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_UPGRADE}" \
+        --wait-result \
         || return
 }
 
@@ -93,6 +95,7 @@ add() {
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_CALL}" \
+        --wait-result \
         || return
 }
 

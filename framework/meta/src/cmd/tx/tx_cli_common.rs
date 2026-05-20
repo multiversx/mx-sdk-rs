@@ -1,6 +1,7 @@
 use std::fs;
 
 use anyhow::{Context, Result, anyhow};
+use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::{
     hex,
     imports::{
@@ -85,7 +86,11 @@ pub(super) async fn broadcast_and_save(
         .send_transaction(&output.emitted_transaction)
         .await
         .context("failed to broadcast transaction")?;
-    println!("Transaction hash: {tx_hash}");
+    if let Some(ex) = ExplorerUrl::from_chain_id(&output.emitted_transaction.chain_id) {
+        println!("transaction: {}", ex.tx_url(&tx_hash));
+    } else {
+        println!("transaction hash: {tx_hash}");
+    }
 
     let mut output_with_hash = TxOutputFile {
         emitted_transaction_hash: tx_hash.clone(),

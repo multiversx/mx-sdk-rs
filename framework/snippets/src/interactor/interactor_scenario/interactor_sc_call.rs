@@ -78,8 +78,12 @@ where
 
         match tx_hash {
             Ok(tx_hash) => {
-                println!("sc call tx hash: {tx_hash}");
                 log::info!("sc call tx hash: {tx_hash}");
+                if let Some(ex) = &self.explorer_url {
+                    println!("sc call: {}", ex.tx_url(&tx_hash));
+                } else {
+                    println!("sc call tx hash: {tx_hash}");
+                }
                 tx_hash
             }
             Err(err) => {
