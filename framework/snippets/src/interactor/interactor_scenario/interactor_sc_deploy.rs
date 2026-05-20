@@ -55,8 +55,12 @@ where
 
         match tx_hash_result {
             Ok(tx_hash) => {
-                println!("sc deploy tx hash: {tx_hash}");
                 log::info!("sc deploy tx hash: {tx_hash}");
+                if let Some(ex) = &self.explorer_url {
+                    println!("sc deploy: {}", ex.tx_url(&tx_hash));
+                } else {
+                    println!("sc deploy tx hash: {tx_hash}");
+                }
                 tx_hash
             }
             Err(err) => {
@@ -97,16 +101,20 @@ where
         let nonce = tx.nonce;
         sc_deploy_step.save_response(network_response::parse_tx_response(tx, return_code));
 
-        let deploy_address = sc_deploy_step
+        let new_address = sc_deploy_step
             .response()
             .new_deployed_address
             .clone()
             .unwrap();
-        let deploy_address_bech32 = Bech32Address::encode_address(self.get_hrp(), deploy_address);
+        let new_address_bech32 = Bech32Address::encode_address(self.get_hrp(), new_address);
 
-        let set_state_step = SetStateStep::new().new_address(addr, nonce, &deploy_address_bech32);
+        let set_state_step = SetStateStep::new().new_address(addr, nonce, &new_address_bech32);
 
-        println!("deploy address: {deploy_address_bech32}");
+        if let Some(ex) = &self.explorer_url {
+            println!("new contract: {}", ex.address_url(&new_address_bech32));
+        } else {
+            println!("new contract address: {new_address_bech32}");
+        }
         self.pre_runners.run_set_state_step(&set_state_step);
         self.post_runners.run_set_state_step(&set_state_step);
 
