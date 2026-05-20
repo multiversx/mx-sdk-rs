@@ -17,6 +17,9 @@ pub use project_config::{
     BuildConfig, GeneralConfig, PublishConfig, ReproducibleBuildProjectConfig,
 };
 
+pub use build_outcome::{BuildOutcome, ContractOutcomeEntry};
+pub use source_json_model::{PackedSource, SCHEMA_VERSION};
+
 pub use build::docker_build;
 pub use check::check_contract_verification;
 pub use download::download_contract_verification;

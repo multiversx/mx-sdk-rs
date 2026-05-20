@@ -7,7 +7,10 @@ use multiversx_sc_meta::{
     },
     cmd::{
         all::call_all_meta,
-        reproducible_builds::{docker_build, init_config, local_build, release_notes},
+        reproducible_builds::{
+            BuildOutcome, PackedSource, SCHEMA_VERSION, docker_build, init_config, local_build,
+            release_notes,
+        },
     },
     folder_structure::{setup_workspace, strip_path},
 };
@@ -77,6 +80,11 @@ fn repro_build_local() {
             docker_image: None,
             output: None,
         });
+
+        check_artifacts(
+            &contract_dir.join("output-local"),
+            expected_contracts(contract),
+        );
     }
 }
 
@@ -144,12 +152,94 @@ fn repro_build_docker() {
             docker_image: None,
             output: None,
         });
+
+        check_artifacts(
+            &contract_dir.join("output-rb"),
+            expected_contracts(contract),
+        );
     }
 }
 
 /// Clears `build_dir`, copies each contract into it, strips framework
 /// `path = "..."` deps across the whole tree, then writes a default
 /// `sc-reproducible-build.toml` inside each contract subdirectory.
+fn expected_contracts(contract: &str) -> &'static [&'static str] {
+    match contract {
+        "adder" => &["adder"],
+        "crypto-kitties" => &["kitty-auction", "kitty-genetic-alg", "kitty-ownership"],
+        other => panic!("unknown contract: {other}"),
+    }
+}
+
+/// Verifies the artifacts produced by a reproducible build:
+/// - `artifacts.json` exists, parses correctly, and lists exactly the expected contracts
+/// - every contract has a non-empty codehash
+/// - every contract's output folder contains `.wasm`, `.codehash.txt`, and `.source.json`
+/// - every `.source.json` parses correctly, matches schema version, and has source entries
+fn check_artifacts(output_dir: &Path, expected_contracts: &[&str]) {
+    let artifacts_path = output_dir.join("artifacts.json");
+    assert!(
+        artifacts_path.exists(),
+        "artifacts.json not found: {}",
+        artifacts_path.display()
+    );
+
+    let outcome: BuildOutcome = serde_json::from_str(&fs::read_to_string(&artifacts_path).unwrap())
+        .unwrap_or_else(|e| panic!("failed to parse artifacts.json: {e}"));
+
+    let mut actual: Vec<&str> = outcome.contracts.keys().map(String::as_str).collect();
+    actual.sort_unstable();
+    assert_eq!(
+        actual, expected_contracts,
+        "contracts in artifacts.json do not match expected"
+    );
+
+    for (contract_stem, entry) in &outcome.contracts {
+        assert!(
+            !entry.codehash.is_empty(),
+            "empty codehash for {contract_stem}"
+        );
+
+        let contract_dir = output_dir.join(contract_stem);
+        assert!(
+            contract_dir.is_dir(),
+            "output folder missing for {contract_stem}: {}",
+            contract_dir.display()
+        );
+
+        let wasm = contract_dir.join(&entry.artifacts.bytecode);
+        assert!(wasm.exists(), ".wasm missing: {}", wasm.display());
+
+        let codehash_txt = contract_dir.join(format!("{contract_stem}.codehash.txt"));
+        assert!(
+            codehash_txt.exists(),
+            ".codehash.txt missing: {}",
+            codehash_txt.display()
+        );
+
+        let source_json_path = contract_dir.join(&entry.artifacts.src_package);
+        assert!(
+            source_json_path.exists(),
+            ".source.json missing: {}",
+            source_json_path.display()
+        );
+
+        let packed: PackedSource =
+            serde_json::from_str(&fs::read_to_string(&source_json_path).unwrap())
+                .unwrap_or_else(|e| panic!("failed to parse {}: {e}", source_json_path.display()));
+
+        assert_eq!(
+            packed.schema_version, SCHEMA_VERSION,
+            "schema version mismatch for {contract_stem}"
+        );
+        assert!(
+            !packed.entries.is_empty(),
+            "no source entries in {}",
+            source_json_path.display()
+        );
+    }
+}
+
 fn setup_build_dir(workspace: &Path, build_dir: &Path) {
     if build_dir.exists() {
         fs::remove_dir_all(build_dir).unwrap();
