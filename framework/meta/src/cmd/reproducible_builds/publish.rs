@@ -19,7 +19,8 @@ const POLL_INTERVAL: Duration = Duration::from_secs(20);
 
 /// CLI entry point for `sc-meta reproducible-build publish`.
 pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
-    let contract = Bech32Address::from_bech32_str(&args.contract);
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())
+        .unwrap_or_else(|e| panic!("Invalid contract address {:?}: {e}", args.contract));
 
     if !args.skip_confirmation {
         print!(

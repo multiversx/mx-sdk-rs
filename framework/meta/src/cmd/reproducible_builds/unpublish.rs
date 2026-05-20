@@ -10,7 +10,8 @@ use crate::cli::cli_args_sender::load_wallet;
 
 /// CLI entry point for `sc-meta reproducible-build unpublish`.
 pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
-    let contract = Bech32Address::from_bech32_str(&args.contract);
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())
+        .unwrap_or_else(|e| panic!("Invalid contract address {:?}: {e}", args.contract));
 
     if !args.skip_confirmation {
         print!(
