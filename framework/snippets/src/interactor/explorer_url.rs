@@ -36,3 +36,54 @@ fn explorer_base_url_from_chain_id(chain_id: &str) -> Option<&'static str> {
         _ => None,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_from_chain_id_known() {
+        assert!(ExplorerUrl::from_chain_id("1").is_some());
+        assert!(ExplorerUrl::from_chain_id("T").is_some());
+        assert!(ExplorerUrl::from_chain_id("D").is_some());
+    }
+
+    #[test]
+    fn test_from_chain_id_unknown() {
+        assert!(ExplorerUrl::from_chain_id("").is_none());
+        assert!(ExplorerUrl::from_chain_id("X").is_none());
+    }
+
+    #[test]
+    fn test_tx_url() {
+        let ex = ExplorerUrl::from_chain_id("1").unwrap();
+        assert_eq!(
+            ex.tx_url("abc123"),
+            "https://explorer.multiversx.com/transactions/abc123"
+        );
+
+        let ex = ExplorerUrl::from_chain_id("T").unwrap();
+        assert_eq!(
+            ex.tx_url("abc123"),
+            "https://testnet-explorer.multiversx.com/transactions/abc123"
+        );
+
+        let ex = ExplorerUrl::from_chain_id("D").unwrap();
+        assert_eq!(
+            ex.tx_url("abc123"),
+            "https://devnet-explorer.multiversx.com/transactions/abc123"
+        );
+    }
+
+    #[test]
+    fn test_address_url() {
+        let ex = ExplorerUrl::from_chain_id("1").unwrap();
+        let addr = Bech32Address::from_bech32_string(
+            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th".to_string(),
+        );
+        assert_eq!(
+            ex.address_url(&addr),
+            "https://explorer.multiversx.com/accounts/erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
+        );
+    }
+}
