@@ -1,7 +1,7 @@
 use core::str;
 use std::{
     fs::{self},
-    io::{self, Read},
+    io::{self, Write},
     path::Path,
 };
 
@@ -223,13 +223,9 @@ impl Wallet {
     }
 
     pub fn get_keystore_password() -> String {
-        println!(
-            "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
-        );
-        let mut password = String::new();
-        io::stdin().read_to_string(&mut password).unwrap();
-        password = password.trim().to_string();
-        password
+        print!("Insert password: ");
+        io::stdout().flush().unwrap();
+        rpassword::read_password().unwrap()
     }
 
     pub fn validate_keystore_password<P: AsRef<Path>>(

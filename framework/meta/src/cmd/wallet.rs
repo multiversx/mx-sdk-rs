@@ -221,6 +221,9 @@ fn new(new_args: &WalletNewArgs) {
                 private_key_str.as_str(),
                 outfile,
             );
+            if let Some(outfile) = outfile {
+                println!("Wallet saved to '{outfile}'");
+            }
         }
         Some("keystore-secret") => {
             let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
@@ -233,6 +236,9 @@ fn new(new_args: &WalletNewArgs) {
                 &Wallet::get_keystore_password(),
             );
             write_resulted_keystore(json_result, outfile);
+            if let Some(outfile) = outfile {
+                println!("Wallet saved to '{outfile}'");
+            }
         }
         Some(_) => {
             println!("Unsupported format");
