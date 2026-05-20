@@ -33,7 +33,8 @@ struct ContractVerifierSource {
 
 /// CLI entry point for `sc-meta reproducible-build download`.
 pub async fn download_contract_verification(args: &ReproducibleBuildDownloadArgs) {
-    let contract = Bech32Address::from_bech32_str(&args.contract);
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())
+        .unwrap_or_else(|e| panic!("Invalid contract address {:?}: {e}", args.contract));
     let bech32 = contract.to_bech32_str().to_string();
 
     let base_url = args.verifier_url.trim_end_matches('/');

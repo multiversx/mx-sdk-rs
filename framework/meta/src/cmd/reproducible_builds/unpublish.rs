@@ -10,7 +10,8 @@ use crate::cli::cli_args_sender::load_wallet;
 
 /// CLI entry point for `sc-meta reproducible-build unpublish`.
 pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
-    let contract = Bech32Address::from_bech32_str(&args.contract);
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())
+        .unwrap_or_else(|e| panic!("Invalid contract address {:?}: {e}", args.contract));
 
     if !args.skip_confirmation {
         print!(
@@ -46,7 +47,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
     });
 
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
-    println!("Submitting unverify request to {url} ...");
+    println!("Submitting unpublish request to {url} ...");
 
     let client = reqwest::Client::new();
     let response = client
@@ -63,7 +64,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
         .unwrap_or_else(|e| panic!("Failed to read response body: {e}"));
 
     if raw.is_empty() {
-        println!("Unverify request completed (status {status}).");
+        println!("Unpublish request completed (status {status}).");
         return;
     }
 

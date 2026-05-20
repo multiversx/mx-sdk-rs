@@ -7,7 +7,8 @@ use crate::cli::ReproducibleBuildCheckArgs;
 /// GETs the verified-contracts list from the verifier service and reports
 /// whether the given contract address is currently verified.
 pub async fn check_contract_verification(args: &ReproducibleBuildCheckArgs) {
-    let contract = Bech32Address::from_bech32_str(&args.contract);
+    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())
+        .unwrap_or_else(|e| panic!("Invalid contract address {:?}: {e}", args.contract));
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
 
     println!(
