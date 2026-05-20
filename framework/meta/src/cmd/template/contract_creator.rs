@@ -10,17 +10,12 @@ pub async fn create_contract(args: &TemplateArgs) {
     let target = target_from_args(args);
     let contract_dir = target.contract_dir();
 
-    if contract_dir.exists() {
-        if args.force {
-            std::fs::remove_dir_all(&contract_dir)
-                .unwrap_or_else(|e| panic!("failed to remove existing directory: {e}"));
-        } else {
-            eprintln!(
-                "error: destination `{}` already exists. Use --force to overwrite.",
-                contract_dir.display()
-            );
-            std::process::exit(1);
-        }
+    if contract_dir.exists() && !args.overwrite {
+        eprintln!(
+            "Error: destination `{}` already exists. Use --overwrite to overwrite.",
+            contract_dir.display()
+        );
+        std::process::exit(1);
     }
 
     let version = get_repo_version(&args.tag);
@@ -34,6 +29,13 @@ pub async fn create_contract(args: &TemplateArgs) {
         false,
         args.author.clone(),
     );
+
+    // Remove only after the download succeeded and the template name is validated,
+    // so a failure in those steps does not cause unnecessary data loss.
+    if args.overwrite && contract_dir.exists() {
+        std::fs::remove_dir_all(&contract_dir)
+            .unwrap_or_else(|e| panic!("failed to remove existing directory: {e}"));
+    }
 
     creator.create_contract(version_tag);
 }

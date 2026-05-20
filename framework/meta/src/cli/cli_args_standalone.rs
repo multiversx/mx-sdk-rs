@@ -479,7 +479,7 @@ pub struct TemplateArgs {
 
     /// Overwrite the destination directory if it already exists.
     #[arg(long, verbatim_doc_comment)]
-    pub force: bool,
+    pub overwrite: bool,
 }
 
 impl CliArgsToRaw for TemplateArgs {
