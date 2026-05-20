@@ -69,7 +69,7 @@ impl Default for ContractVariantSettings {
             profile: Default::default(),
             std: false,
             rustc_version: RustcVersion::current_version(),
-            rustc_target: tools::build_target::default_target().to_owned(),
+            rustc_target: tools::install_wasm_target::default_target().to_owned(),
             opcode_version: OpcodeVersion::default(),
             wasm_opt_version: None,
         }

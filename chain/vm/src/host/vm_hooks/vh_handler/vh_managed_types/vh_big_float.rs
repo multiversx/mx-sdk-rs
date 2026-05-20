@@ -285,4 +285,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
         Ok(())
     }
+
+    pub fn bf_drop(&self, map_handle: RawHandle) {
+        self.context.m_types_lock().bf_remove(map_handle);
+    }
 }

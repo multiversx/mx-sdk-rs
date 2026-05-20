@@ -27,13 +27,11 @@ contract-call-legacy = ["multiversx-sc/contract-call-legacy"]
 
 
 [dependencies]
-base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
 hex-literal = "1.0"
 log = { version = "0.4", features = ["std"] }
-sha2 = "0.10"
 serde = "1.0"
 serde_json = "1.0"
 pathdiff = "0.2"
@@ -61,3 +59,6 @@ version = "=0.5.1"
 [dependencies.multiversx-chain-vm]
 version = "=0.22.1"
 path = "../../chain/vm"
+
+[dev-dependencies]
+static_assertions = "1.1"

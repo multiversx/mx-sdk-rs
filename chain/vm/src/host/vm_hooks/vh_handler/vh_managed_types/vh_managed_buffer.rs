@@ -210,4 +210,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .mb_set(dest_handle, encoded.into_bytes());
         Ok(())
     }
+
+    pub fn mb_drop(&self, handle: RawHandle) {
+        self.context.m_types_lock().mb_remove(handle);
+    }
 }

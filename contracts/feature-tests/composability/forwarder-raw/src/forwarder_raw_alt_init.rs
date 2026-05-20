@@ -20,7 +20,7 @@ pub trait ForwarderRawAlternativeInit: super::forwarder_raw_common::ForwarderRaw
         self.tx()
             .to(&to)
             .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .arguments_raw(args.into_arg_buffer())
             .async_call_and_exit();
     }
 
@@ -61,7 +61,7 @@ pub trait ForwarderRawAlternativeInit: super::forwarder_raw_common::ForwarderRaw
             .gas(half_gas)
             .egld(payment)
             .raw_call(endpoint_name)
-            .arguments_raw(args.to_arg_buffer())
+            .arguments_raw(args.into_arg_buffer())
             .returns(ReturnsRawResult)
             .sync_call();
 

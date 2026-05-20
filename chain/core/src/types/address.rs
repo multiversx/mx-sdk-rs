@@ -5,8 +5,6 @@ use core::fmt::Debug;
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 const NUM_INIT_CHARS_FOR_SC: usize = 10;
 const NUM_INIT_CHARS_FOR_METACHAIN_SC: usize = 15;
-pub const VM_TYPE_LEN: usize = 2;
-pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 /// An Address is just a H256 with a different name.
 /// Has a different ABI name than H256.
@@ -41,26 +39,6 @@ impl Address {
     /// ```
     pub const fn from_hex(hex_str: &str) -> Self {
         Address(H256::from_hex(hex_str))
-    }
-
-    /// Generates a mock smart contract address deterministically from a creator address and nonce.
-    /// Used in testing environments to simulate address generation without a real VM.
-    pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
-        let mut result = [0x00; 32];
-
-        result[10] = 0x11;
-        result[11] = 0x11;
-        result[12] = 0x11;
-        result[13] = 0x11;
-
-        result[14..29].copy_from_slice(&creator_address[..15]);
-        result[29] = creator_nonce as u8;
-        result[30..].copy_from_slice(&creator_address[30..]);
-
-        let start_index = NUM_INIT_CHARS_FOR_SC - VM_TYPE_LEN;
-        result[start_index..(start_index + DEFAULT_VM_TYPE.len())].copy_from_slice(DEFAULT_VM_TYPE);
-
-        Address::from(result)
     }
 
     /// Returns the shard ID of this address in a 3-shard configuration.

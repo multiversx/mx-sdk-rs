@@ -69,6 +69,10 @@ pub struct BuildArgs {
     #[arg(long = "twiggy-dominators", verbatim_doc_comment)]
     pub twiggy_dominators: bool,
 
+    /// Generate a file with the blake2b hash of the compiled contract.
+    #[arg(long = "codehash", verbatim_doc_comment)]
+    pub codehash: bool,
+
     /// Backwards compatibility with mxpy, delete when github actions are fixed.
     #[deprecated]
     #[arg(long = "target", verbatim_doc_comment)]
@@ -103,6 +107,7 @@ impl Default for BuildArgs {
             twiggy_paths: false,
             twiggy_monos: false,
             twiggy_dominators: false,
+            codehash: false,
             target: None,
             release: false,
             out_dir: None,
@@ -164,6 +169,9 @@ impl CliArgsToRaw for BuildArgs {
         }
         if self.twiggy_dominators {
             raw.push("--twiggy-dominators".to_string());
+        }
+        if self.codehash {
+            raw.push("--codehash".to_string());
         }
         raw
     }

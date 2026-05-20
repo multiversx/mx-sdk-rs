@@ -1,9 +1,9 @@
 use core::fmt::Debug;
 use multiversx_sc::{
-    api::ManagedTypeApi,
+    api::{ManagedTypeApi, use_raw_handle},
     types::{
         BigInt, BigUint, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer, ManagedByteArray,
-        ManagedRef, ManagedType,
+        ManagedRef, ManagedRefMut, ManagedType,
     },
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -55,4 +55,26 @@ fn test_managed_ref_eq() {
         BigUint::<StaticApi>::from(1u32).as_ref(),
         BigUint::<StaticApi>::from(2u32).as_ref()
     );
+}
+
+#[test]
+fn test_managed_ref_no_drop() {
+    const INVALID_HANDLE: i32 = 1000;
+    unsafe {
+        let _r = ManagedRef::<'static, StaticApi, ManagedBuffer<StaticApi>>::wrap_handle(
+            use_raw_handle(INVALID_HANDLE),
+        );
+    }
+
+    unsafe {
+        let mut r = ManagedRefMut::<'static, StaticApi, ManagedBuffer<StaticApi>>::wrap_handle(
+            use_raw_handle(INVALID_HANDLE),
+        );
+        r.overwrite(b"abc");
+    }
+
+    unsafe {
+        let r = ManagedBuffer::<StaticApi>::from_handle(use_raw_handle(INVALID_HANDLE));
+        assert_eq!(r.to_vec(), b"abc");
+    }
 }
