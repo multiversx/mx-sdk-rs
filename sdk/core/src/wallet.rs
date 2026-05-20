@@ -222,6 +222,10 @@ impl Wallet {
         self.priv_key.sign(tx_bytes)
     }
 
+    pub fn sign_bytes(&self, data: Vec<u8>) -> [u8; 64] {
+        self.priv_key.sign(data)
+    }
+
     pub fn get_keystore_password() -> String {
         print!("Insert password: ");
         io::stdout().flush().unwrap();

@@ -27,7 +27,6 @@ contract-call-legacy = ["multiversx-sc/contract-call-legacy"]
 
 
 [dependencies]
-base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"

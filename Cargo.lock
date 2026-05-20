@@ -3277,6 +3277,7 @@ name = "multiversx-sc-meta"
 version = "0.65.1"
 dependencies = [
  "anyhow",
+ "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3284,6 +3285,7 @@ dependencies = [
  "convert_case 0.11.0",
  "copy_dir",
  "hex",
+ "indexmap",
  "multiversx-sc",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
@@ -3297,6 +3299,8 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
+ "sha2",
+ "sha3",
  "tokio",
  "toml",
  "zip",
@@ -3334,7 +3338,6 @@ dependencies = [
 name = "multiversx-sc-scenario"
 version = "0.65.1"
 dependencies = [
- "base64",
  "colored 3.1.1",
  "hex",
  "hex-literal",
@@ -3360,7 +3363,6 @@ name = "multiversx-sc-snippets"
 version = "0.65.1"
 dependencies = [
  "anyhow",
- "base64",
  "colored 3.1.1",
  "env_logger",
  "futures",
@@ -5207,6 +5209,13 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc-meta-lib",
  "str-repeat",
+]
+
+[[package]]
+name = "strip-path"
+version = "0.1.0"
+dependencies = [
+ "multiversx-sc-meta",
 ]
 
 [[package]]

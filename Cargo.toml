@@ -31,6 +31,7 @@ members = [
   "tools/managed-mem-bench",
   "tools/mxpy-snippet-generator",
   "tools/op-test-gen",
+  "tools/strip-path",
   "tools/wat-gen",
 
   "contracts/modules",

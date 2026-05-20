@@ -8,10 +8,7 @@ use multiversx_sc_snippets::{
         ManagedBuffer, StaticApi,
     },
     sdk::{
-        data::{
-            keystore::InsertPassword,
-            transaction::{ApiTransactionResult, Transaction},
-        },
+        data::transaction::{ApiTransactionResult, Transaction},
         utils::base64_decode,
         wallet::Wallet,
     },
@@ -23,7 +20,8 @@ use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
 use super::output::TxOutputFile;
-use crate::cli::cli_args_tx::{GatewayArgs, SenderArgs, TxArgs};
+pub use crate::cli::cli_args_sender::load_wallet;
+use crate::cli::cli_args_tx::{GatewayArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
@@ -120,18 +118,6 @@ pub(super) fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
         .serialize(&mut ser)
         .context("failed to serialize transaction")?;
     String::from_utf8(buf).context("non-UTF8 in serialized JSON")
-}
-
-/// Load a wallet from a PEM file or JSON keystore.
-pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
-    if let Some(pem) = &sender.pem {
-        Wallet::from_pem_file(pem).context("failed to load PEM wallet")
-    } else if let Some(keyfile) = &sender.keyfile {
-        Wallet::from_keystore_secret(keyfile, InsertPassword::StandardInput)
-            .context("failed to load keystore wallet")
-    } else {
-        Err(anyhow!("a wallet is required: use --pem or --keyfile"))
-    }
 }
 
 /// Interpret a list of mandos-format argument strings (e.g. `0x1a`, `str:hello`, `42`)

@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::FromStr;
 
 use crate::{codec::*, types::Address};
 use bech32::{Bech32, Hrp};
@@ -75,6 +76,14 @@ impl Bech32Address {
         })
     }
 
+    /// Decodes a bech32 string slice into a `Bech32Address`.
+    /// Convenience wrapper around [`Self::from_bech32_string`] that clones the input.
+    /// Panics if the string is not valid bech32 or does not decode to a 32-byte address.
+    pub fn from_bech32_str(bech32_str: &str) -> Self {
+        Self::from_bech32_string(bech32_str.to_string())
+    }
+
+    /// Encodes an address with an explicit HRP into a `Bech32Address`.
     /// Creates a [`Bech32Address`] by decoding the given bech32 string.
     ///
     /// # Panics
@@ -263,6 +272,59 @@ impl PartialEq<&str> for Bech32Address {
 impl PartialEq<Address> for Bech32Address {
     fn eq(&self, other: &Address) -> bool {
         &self.address == other
+    }
+}
+
+/// Error returned when parsing a [`Bech32Address`] from a string fails.
+#[derive(Debug)]
+pub enum Bech32AddressParseError {
+    /// The bech32 string could not be decoded.
+    DecodeError(bech32::DecodeError),
+    /// The decoded payload was not exactly 32 bytes.
+    InvalidLength(usize),
+}
+
+impl std::fmt::Display for Bech32AddressParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Bech32AddressParseError::DecodeError(e) => write!(f, "bech32 decode error: {e}"),
+            Bech32AddressParseError::InvalidLength(n) => {
+                write!(f, "invalid address length: expected 32 bytes, got {n}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for Bech32AddressParseError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Bech32AddressParseError::DecodeError(e) => Some(e),
+            Bech32AddressParseError::InvalidLength(_) => None,
+        }
+    }
+}
+
+impl From<bech32::DecodeError> for Bech32AddressParseError {
+    fn from(e: bech32::DecodeError) -> Self {
+        Bech32AddressParseError::DecodeError(e)
+    }
+}
+
+impl FromStr for Bech32Address {
+    type Err = Bech32AddressParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (hrp, dest_address_bytes) = bech32::decode(s)?;
+        if dest_address_bytes.len() != 32 {
+            return Err(Bech32AddressParseError::InvalidLength(
+                dest_address_bytes.len(),
+            ));
+        }
+        Ok(Bech32Address {
+            address: Address::from_slice(&dest_address_bytes),
+            hrp: hrp.to_string(),
+            bech32: s.to_string(),
+        })
     }
 }
 

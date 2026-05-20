@@ -1,6 +1,8 @@
 use clap::{Args, Subcommand};
 use std::path::PathBuf;
 
+pub use super::cli_args_sender::SenderArgs;
+
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct TxCliArgs {
     #[command(subcommand)]
@@ -42,18 +44,6 @@ pub struct GatewayArgs {
     /// If omitted, the chain ID is taken from the network config automatically.
     #[arg(long = "chain")]
     pub chain: Option<String>,
-}
-
-/// Wallet / sender arguments shared by commands that sign transactions.
-#[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct SenderArgs {
-    /// Path to a PEM wallet file.
-    #[arg(long, group = "wallet_source")]
-    pub pem: Option<PathBuf>,
-
-    /// Path to a JSON keystore wallet file.
-    #[arg(long, group = "wallet_source")]
-    pub keyfile: Option<PathBuf>,
 }
 
 /// Generic transaction arguments (gas, nonce, value, broadcast flags).
