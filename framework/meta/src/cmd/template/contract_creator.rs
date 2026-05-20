@@ -7,10 +7,25 @@ use super::{
 
 /// Creates a new contract on disk, from a template, given a name.
 pub async fn create_contract(args: &TemplateArgs) {
+    let target = target_from_args(args);
+    let contract_dir = target.contract_dir();
+
+    if contract_dir.exists() {
+        if args.force {
+            std::fs::remove_dir_all(&contract_dir)
+                .unwrap_or_else(|e| panic!("failed to remove existing directory: {e}"));
+        } else {
+            eprintln!(
+                "error: destination `{}` already exists. Use --force to overwrite.",
+                contract_dir.display()
+            );
+            std::process::exit(1);
+        }
+    }
+
     let version = get_repo_version(&args.tag);
     let version_tag: FrameworkVersion = version.get_tag();
     let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir()).await;
-    let target = target_from_args(args);
 
     let creator = ContractCreator::new(
         &repo_temp_download,
