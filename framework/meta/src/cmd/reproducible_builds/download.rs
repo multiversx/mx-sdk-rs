@@ -1,14 +1,11 @@
-use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
 use multiversx_sc_snippets::imports::Bech32Address;
 use serde::Deserialize;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{fs, path::PathBuf};
 
 use crate::cli::ReproducibleBuildDownloadArgs;
 
-use super::source_json_model::{PackedSource, SourceFileEntry};
+use super::source_json_model::PackedSource;
+use super::source_unpack::unpack_packed_source;
 
 // ---------------------------------------------------------------------------
 // Response wrapper — only new types needed; inner source reuses PackedSource.
@@ -86,6 +83,33 @@ pub async fn download_contract_verification(args: &ReproducibleBuildDownloadArgs
         )
     });
 
+    let is_non_empty = output_dir
+        .read_dir()
+        .map(|mut rd| rd.next().is_some())
+        .unwrap_or(false);
+    if is_non_empty {
+        if args.overwrite {
+            fs::remove_dir_all(&output_dir).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to clear output directory {}: {e}",
+                    output_dir.display()
+                )
+            });
+            fs::create_dir_all(&output_dir).unwrap_or_else(|e| {
+                panic!(
+                    "Failed to recreate output directory {}: {e}",
+                    output_dir.display()
+                )
+            });
+        } else {
+            eprintln!(
+                "Error: output directory is not empty: {}\nUse --overwrite to wipe it before downloading.",
+                output_dir.display()
+            );
+            std::process::exit(1);
+        }
+    }
+
     // --- Save ABI ---
     let contract_name = source
         .contract
@@ -103,12 +127,7 @@ pub async fn download_contract_verification(args: &ReproducibleBuildDownloadArgs
     // --- Unpack source entries ---
     if let Some(packed) = &source.contract {
         let sources_dir = output_dir.join("src");
-        unpack_entries(&packed.entries, &sources_dir);
-        println!(
-            "Unpacked {} source files to: {}",
-            packed.entries.len(),
-            sources_dir.display()
-        );
+        unpack_packed_source(packed, &sources_dir).unwrap_or_else(|e| panic!("{e:#}"));
     }
 
     // --- Print metadata ---
@@ -120,20 +139,5 @@ pub async fn download_contract_verification(args: &ReproducibleBuildDownloadArgs
     }
     if let Some(ipfs) = &response.ipfs_file_hash {
         println!("IPFS hash:    {ipfs}");
-    }
-}
-
-fn unpack_entries(entries: &[SourceFileEntry], dest: &Path) {
-    for entry in entries {
-        let file_path = dest.join(&entry.path);
-        if let Some(parent) = file_path.parent() {
-            fs::create_dir_all(parent)
-                .unwrap_or_else(|e| panic!("Failed to create dir {}: {e}", parent.display()));
-        }
-        let content = BASE64
-            .decode(&entry.content)
-            .unwrap_or_else(|e| panic!("Failed to base64-decode entry '{}': {e}", entry.path));
-        fs::write(&file_path, content)
-            .unwrap_or_else(|e| panic!("Failed to write '{}': {e}", file_path.display()));
     }
 }

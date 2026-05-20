@@ -277,6 +277,10 @@ pub struct ReproducibleBuildDownloadArgs {
         verbatim_doc_comment
     )]
     pub include_test_files: bool,
+
+    /// Overwrite the output directory if it already exists and is non-empty.
+    #[arg(long, default_value = "false", verbatim_doc_comment)]
+    pub overwrite: bool,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
