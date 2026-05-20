@@ -22,5 +22,6 @@ files_include = [
     "interactor/.gitignore",
     "interactor/src",
     "interactor/tests",
+    "snippets",
 ]
 has_interactor = true
