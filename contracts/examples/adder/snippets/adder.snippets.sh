@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NETWORK=devnet      # choose: devnet, testnet, mainnet, chain-simulator
-TOOL_VARIANT=source # choose: sc-meta, source, mxpy
+NETWORK=devnet       # choose: devnet, testnet, mainnet, chain-simulator
+TOOL_VARIANT=sc-meta # choose: sc-meta, mxpy
 
 # ── Tool selection ─────────────────────────────────────────────────────────────
 case "${TOOL_VARIANT}" in
@@ -13,10 +13,12 @@ TX_TOOL=("${BASE[@]}" "${TX_CMD}")
 DATA_TOOL=("${BASE[@]}" data)
 # ──────────────────────────────────────────────────────────────────────────────
 
-if [[ "${TOOL_VARIANT}" == "sc-meta" ]]; then
+PEM="alice.pem"
+
+# Creates a test wallet (alice.pem). Only works with sc-meta.
+setup() {
     sc-meta wallet test-wallet --name alice
-fi
-ALICE="alice.pem"
+}
 
 case "${NETWORK}" in
     devnet)           PROXY=https://devnet-gateway.multiversx.com;  CHAIN=D ;;
@@ -26,6 +28,7 @@ case "${NETWORK}" in
 esac
 
 ADDRESS=$("${DATA_TOOL[@]}" load --partition "${NETWORK}" --key="address-${NETWORK}")
+BYTECODE="../output/adder.wasm"
 OUTFILE_DEPLOY="deploy-${NETWORK}.interaction.json"
 OUTFILE_UPGRADE="upgrade-${NETWORK}.interaction.json"
 OUTFILE_CALL="call-${NETWORK}.interaction.json"
@@ -34,14 +37,15 @@ export RUST_BACKTRACE=1
 
 deploy() {
     "${TX_TOOL[@]}" deploy \
-        --bytecode "../output/adder.wasm" \
-        --pem="${ALICE}" \
+        --bytecode "${BYTECODE}" \
+        --pem="${PEM}" \
         --gas-limit=50000000 \
         --arguments 0 \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_DEPLOY}" \
+        --wait-result \
         || return
 
     ADDRESS=$("${DATA_TOOL[@]}" parse --file="${OUTFILE_DEPLOY}" --expression="data['contractAddress']" 2>/dev/null)
@@ -55,20 +59,21 @@ deploy() {
 
 upgrade() {
     "${TX_TOOL[@]}" upgrade "${ADDRESS}" \
-        --bytecode "../output/adder.wasm" \
-        --pem="${ALICE}" \
+        --bytecode "${BYTECODE}" \
+        --pem="${PEM}" \
         --gas-limit=50000000 \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_UPGRADE}" \
+        --wait-result \
         || return
 }
 
 add() {
     NUMBER=5
     "${TX_TOOL[@]}" call "${ADDRESS}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=5000000 \
         --function="add" \
         --arguments "${NUMBER}" \
@@ -76,10 +81,11 @@ add() {
         --chain="${CHAIN}" \
         --send \
         --outfile="${OUTFILE_CALL}" \
+        --wait-result \
         || return
 }
 
-getSum() {
+sum() {
     "${TX_TOOL[@]}" query "${ADDRESS}" \
         --function="getSum" \
         --proxy="${PROXY}" \
@@ -96,7 +102,7 @@ add_v2() {
     OUTFILE_CALL_SIGNED="call-signed-${NETWORK}.interaction.json"
 
     "${TX_TOOL[@]}" call "${ADDRESS}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=5000000 \
         --function="add" \
         --arguments "${NUMBER}" \
@@ -107,7 +113,7 @@ add_v2() {
 
     "${BASE[@]}" tx sign \
         --infile="${OUTFILE_CALL_PREPARED}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --proxy="${PROXY}" \
         --outfile="${OUTFILE_CALL_SIGNED}" \
         || return
