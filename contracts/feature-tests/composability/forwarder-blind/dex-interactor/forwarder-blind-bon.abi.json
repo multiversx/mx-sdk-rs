@@ -12,11 +12,11 @@
         "contractCrate": {
             "name": "forwarder-blind",
             "version": "0.0.0",
-            "gitVersion": "v0.65.1-1-gb94cabe23"
+            "gitVersion": "v0.66.0-1-gb94cabe23"
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.65.1"
+            "version": "0.66.0"
         }
     },
     "docs": [

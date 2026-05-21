@@ -2,7 +2,7 @@ pub mod install_debugger;
 mod install_scenario_go;
 mod system_info;
 
-use multiversx_sc_meta_lib::tools::{self, build_target::install_target};
+use multiversx_sc_meta_lib::tools::{self, RustcVersion};
 
 use crate::cli::{
     InstallArgs, InstallCommand, InstallDebuggerArgs, InstallMxScenarioGoArgs, InstallWasm32Args,
@@ -31,11 +31,9 @@ async fn install_scenario_go(sg_args: &InstallMxScenarioGoArgs) {
     install_scenario_go::install(sg_args.tag.clone()).await;
 }
 
-fn install_wasm32(_wasm32_args: &InstallWasm32Args) {
-    install_target(None, tools::build_target::WASM32_TARGET);
-    if tools::build_target::is_wasm32v1_available() {
-        install_target(None, tools::build_target::WASM32V1_TARGET);
-    }
+fn install_wasm32(wasm32_args: &InstallWasm32Args) {
+    let rustc_version = RustcVersion::from_opt_toolchain(wasm32_args.toolchain.as_deref());
+    tools::install_wasm_target::install_all_wasm32_targets(Some(&rustc_version));
 }
 
 fn install_wasm_opt(_wasm_opt_args: &InstallWasmOptArgs) {

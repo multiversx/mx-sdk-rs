@@ -11,7 +11,9 @@ use crate::{
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
         TryStaticCast,
     },
-    formatter::{FormatByteReceiver, SCLowerHex, hex_util::encode_bytes_as_hex},
+    formatter::{
+        FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex, hex_util::encode_bytes_as_hex,
+    },
     types::{ManagedBuffer, ManagedType},
 };
 
@@ -255,12 +257,30 @@ where
     }
 }
 
+impl<M, const N: usize> SCDisplay for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCDisplay::fmt(&self.buffer, f)
+    }
+}
+
 impl<M, const N: usize> SCLowerHex for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         SCLowerHex::fmt(&self.buffer, f)
+    }
+}
+
+impl<M, const N: usize> SCBinary for ManagedByteArray<M, N>
+where
+    M: ManagedTypeApi,
+{
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        SCBinary::fmt(&self.buffer, f)
     }
 }
 

@@ -33,6 +33,8 @@ jobs:
 
       - name: Run sc-meta commands
         run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
           cd contracts/feature-tests/basic-features
           sc-meta all build
           sc-meta all proxy

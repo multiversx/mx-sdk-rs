@@ -54,14 +54,6 @@ jobs:
       rust-toolchain: 1.87
       runs-on: ubuntu-latest
 
-  interactor-tests:
-    name: Interactor Tests
-    needs: build-contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/interactor-tests.yml@v6.0.1
-    with:
-      rust-toolchain: 1.87
-      runs-on: ubuntu-latest
-
   generate-report:
     name: Generate Report
     needs: build-contracts

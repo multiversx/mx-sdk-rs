@@ -27,7 +27,7 @@ where
             value: sc_deploy_step.tx.egld_value.value.to_string(),
             sender: sc_deploy_step.tx.from.to_address().to_bech32(&hrp),
             receiver: Bech32Address::zero(&hrp),
-            gas_price: self.network_config.min_gas_price,
+            gas_price: self.gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),
             signature: None,
@@ -55,8 +55,12 @@ where
 
         match tx_hash_result {
             Ok(tx_hash) => {
-                println!("sc deploy tx hash: {tx_hash}");
                 log::info!("sc deploy tx hash: {tx_hash}");
+                if let Some(ex) = &self.explorer_url {
+                    println!("sc deploy: {}", ex.tx_url(&tx_hash));
+                } else {
+                    println!("sc deploy tx hash: {tx_hash}");
+                }
                 tx_hash
             }
             Err(err) => {
@@ -89,22 +93,28 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone())
+            .await
+            .expect("failed to fetch transaction result");
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
         sc_deploy_step.save_response(network_response::parse_tx_response(tx, return_code));
 
-        let deploy_address = sc_deploy_step
+        let new_address = sc_deploy_step
             .response()
             .new_deployed_address
             .clone()
             .unwrap();
-        let deploy_address_bech32 = Bech32Address::encode_address(self.get_hrp(), deploy_address);
+        let new_address_bech32 = Bech32Address::encode_address(self.get_hrp(), new_address);
 
-        let set_state_step = SetStateStep::new().new_address(addr, nonce, &deploy_address_bech32);
+        let set_state_step = SetStateStep::new().new_address(addr, nonce, &new_address_bech32);
 
-        println!("deploy address: {deploy_address_bech32}");
+        if let Some(ex) = &self.explorer_url {
+            println!("new contract: {}", ex.address_url(&new_address_bech32));
+        } else {
+            println!("new contract address: {new_address_bech32}");
+        }
         self.pre_runners.run_set_state_step(&set_state_step);
         self.post_runners.run_set_state_step(&set_state_step);
 

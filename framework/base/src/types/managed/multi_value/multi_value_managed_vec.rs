@@ -99,7 +99,10 @@ where
     }
 
     #[allow(clippy::redundant_closure)]
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    where
+        T: Clone,
+    {
         self.0
             .slice(start_index, end_index)
             .map(|value| Self(value))

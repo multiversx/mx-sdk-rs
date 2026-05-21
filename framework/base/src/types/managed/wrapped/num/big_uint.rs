@@ -91,9 +91,37 @@ impl<M: ManagedTypeApi> BigUint<M> {
     ///
     /// ## Safety
     ///
-    /// The value needs to be initialized after creation, otherwise the VM will halt the first time the value is attempted to be read.
+    /// The value needs to be initialized after creation, otherwise the VM will halt the first time
+    /// the value is attempted to be read.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If the caller unwinds (panics) before the returned value is fully initialized, the
+    /// `BigUint` is dropped normally — which issues a `drop_big_int` call for an uninitialized
+    /// handle. This may corrupt the VM handle table. Callers must ensure initialization
+    /// completes before any panic can occur.
     pub unsafe fn new_uninit() -> Self {
         unsafe { Self::new_unchecked(BigInt::new_uninit()) }
+    }
+
+    /// Creates a new object and initializes it via a closure that receives the raw handle.
+    ///
+    /// ## Safety
+    ///
+    /// The closure `init_fn` must fully initialize the value behind the handle before returning.
+    /// The initialized value must also be non-negative, otherwise the `BigUint` invariant is broken.
+    ///
+    /// ## Panic / unwind safety
+    ///
+    /// If `init_fn` unwinds (panics), the partially-constructed `BigUint` is leaked — its
+    /// destructor is **not** called. This means no `drop_big_int` call will be issued for the
+    /// allocated handle, which may leave the VM handle table in an inconsistent state.
+    /// Callers must ensure that `init_fn` does not panic.
+    pub unsafe fn new_init_handle<F>(init_fn: F) -> Self
+    where
+        F: FnOnce(M::BigIntHandle),
+    {
+        unsafe { Self::new_unchecked(BigInt::new_init_handle(init_fn)) }
     }
 
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
@@ -108,9 +136,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
         T: TryInto<i64> + num_traits::Unsigned,
     {
         unsafe {
-            let result = Self::new_uninit();
-            Self::set_value(result.get_handle(), value);
-            result
+            Self::new_init_handle(|handle| {
+                Self::set_value(handle, value);
+            })
         }
     }
 
@@ -304,13 +332,94 @@ impl<M: ManagedTypeApi> BigUint<M> {
         }
     }
 
+    /// Assigns `self = base^exp`.
+    pub fn pow_assign(&mut self, base: &BigUint<M>, exp: u32) {
+        let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
+        M::managed_type_impl().bi_pow(self.get_handle(), base.get_handle(), exp_handle);
+    }
+
     pub fn pow(&self, exp: u32) -> Self {
-        let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         unsafe {
-            let result = BigUint::new_uninit();
-            M::managed_type_impl().bi_pow(result.get_handle(), self.get_handle(), big_int_temp_1);
+            let mut result = BigUint::new_uninit();
+            result.pow_assign(self, exp);
             result
         }
+    }
+
+    /// The integer part of the k-th root, computed via Newton's method.
+    ///
+    /// The initial guess is derived from the number of significant bits (`log2_floor`):
+    /// `x0 = 2^(floor(log2(self) / k) + 1)`, which is always an overestimate.
+    ///
+    /// Returns `0` when `self` is zero.
+    ///
+    /// # Panics
+    /// Panics if `k` is zero.
+    pub fn nth_root(&self, k: u32) -> Self {
+        if k == 0 {
+            quick_signal_error::<M>(err_msg::BIG_UINT_NTH_ROOT_ZERO);
+        }
+
+        if k == 1 {
+            return self.clone();
+        }
+
+        self.nth_root_unchecked(k)
+    }
+
+    // Expects k > 1. Does not check this precondition, so it is the caller's responsibility to ensure it.
+    pub(crate) fn nth_root_unchecked(&self, k: u32) -> Self {
+        // log2 is None for the number zero,
+        // but in this case we can return early with the correct result of zero without doing any computation
+        let Some(log2) = self.log2_floor() else {
+            return BigUint::zero();
+        };
+
+        // Initial overestimate: 2^(floor(log2 / k) + 1)
+        let mut x = BigUint::from(1u64) << ((log2 / k + 1) as usize);
+
+        // Newton's iteration: x = ((k-1)*x + self / x^(k-1)) / k
+        // Converges from above; stop when the estimate stops decreasing.
+        let k_big = BigUint::<M>::from(k as u64);
+        let k_minus_1_big = BigUint::<M>::from((k - 1) as u64);
+
+        // Pre-allocate buffers reused across iterations to avoid per-iteration allocations.
+        // SAFETY: both are fully written before being read in every iteration.
+        let mut x_pow_k_minus_1 = unsafe { BigUint::new_uninit() };
+        let mut new_x = unsafe { BigUint::new_uninit() };
+        let api = M::managed_type_impl();
+        loop {
+            // x_pow_k_minus_1 = x^(k-1)
+            x_pow_k_minus_1.pow_assign(&x, k - 1);
+
+            // Reuse x_pow_k_minus_1's handle for self / x^(k-1).
+            // The VM reads both operands before writing, so dest == divisor is safe.
+            api.bi_t_div(
+                x_pow_k_minus_1.get_handle(),
+                self.get_handle(),
+                x_pow_k_minus_1.get_handle(),
+            );
+
+            // new_x = (k-1)*x + self/x^(k-1)
+            api.bi_mul(
+                new_x.get_handle(),
+                k_minus_1_big.get_handle(),
+                x.get_handle(),
+            );
+            new_x += &x_pow_k_minus_1;
+
+            // new_x /= k
+            new_x /= &k_big;
+
+            if new_x >= x {
+                break;
+            }
+
+            // Swap handles instead of cloning: zero API calls, no allocation.
+            core::mem::swap(&mut x, &mut new_x);
+        }
+
+        x
     }
 
     /// The whole part of the base-2 logarithm.
@@ -403,8 +512,8 @@ impl<M: ManagedTypeApi> BigUint<M> {
             .unwrap_or_else(|| ErrorHelper::<M>::signal_error_with_message("ln internal error"))
             as i64;
 
-        let mut result = crate::types::math_util::logarithm_i64::ln_polynomial(x);
-        crate::types::math_util::logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
+        let mut result = crate::math::internal_logarithm_i64::ln_polynomial(x);
+        crate::math::internal_logarithm_i64::ln_add_bit_log2(&mut result, log2_floor);
 
         debug_assert!(result > 0);
 
@@ -415,9 +524,45 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 }
 
+/// Error returned when parsing a `BigUint` from a decimal string fails.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseBigUintError;
+
+impl core::fmt::Display for ParseBigUintError {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_str(err_msg::BIG_UINT_PARSE_ERROR)
+    }
+}
+
+impl<M: ManagedTypeApi> core::str::FromStr for BigUint<M> {
+    type Err = ParseBigUintError;
+
+    /// Parses a decimal string into a `BigUint`.
+    ///
+    /// Returns `Err(ParseBigUintError)` if the string is empty or contains non-digit characters.
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.is_empty() {
+            return Err(ParseBigUintError);
+        }
+        let mut result = BigUint::zero();
+        for byte in s.bytes() {
+            if !byte.is_ascii_digit() {
+                return Err(ParseBigUintError);
+            }
+            result *= 10u64;
+            result += (byte - b'0') as u64;
+        }
+        Ok(result)
+    }
+}
+
 impl<M: ManagedTypeApi> Clone for BigUint<M> {
     fn clone(&self) -> Self {
         unsafe { self.as_big_int().clone().into_big_uint_unchecked() }
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        self.value.clone_from(&source.value);
     }
 }
 

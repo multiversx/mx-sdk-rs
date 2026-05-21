@@ -40,7 +40,9 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash).await;
+        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash)
+            .await
+            .expect("failed to fetch transaction result");
 
         sc_call_step.save_response(network_response::parse_tx_response(tx, return_code));
 
@@ -76,8 +78,12 @@ where
 
         match tx_hash {
             Ok(tx_hash) => {
-                println!("sc call tx hash: {tx_hash}");
                 log::info!("sc call tx hash: {tx_hash}");
+                if let Some(ex) = &self.explorer_url {
+                    println!("sc call: {}", ex.tx_url(&tx_hash));
+                } else {
+                    println!("sc call tx hash: {tx_hash}");
+                }
                 tx_hash
             }
             Err(err) => {
@@ -122,7 +128,7 @@ where
             value: normalized.egld_value.value.to_string(),
             sender: Bech32Address::encode_address(hrp, normalized.from.to_address()),
             receiver: Bech32Address::encode_address(hrp, normalized.to.to_address()),
-            gas_price: self.network_config.min_gas_price,
+            gas_price: self.gas_price,
             gas_limit: normalized.gas_limit.value,
             data,
             signature: None,

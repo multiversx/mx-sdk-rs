@@ -1,6 +1,9 @@
 use core::str;
 
-use crate::cli::{WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs};
+use crate::cli::{
+    WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
+    WalletTestWalletArgs,
+};
 use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
@@ -16,6 +19,7 @@ pub fn wallet(args: &WalletArgs) {
         WalletAction::New(new_args) => new(new_args),
         WalletAction::Bech32(bech32_args) => bech32_conversion(bech32_args),
         WalletAction::Convert(convert_args) => convert(convert_args),
+        WalletAction::TestWallet(test_wallet_args) => test_wallet_cmd(test_wallet_args),
     }
 }
 
@@ -217,6 +221,9 @@ fn new(new_args: &WalletNewArgs) {
                 private_key_str.as_str(),
                 outfile,
             );
+            if let Some(outfile) = outfile {
+                println!("Wallet saved to '{outfile}'");
+            }
         }
         Some("keystore-secret") => {
             let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
@@ -229,10 +236,29 @@ fn new(new_args: &WalletNewArgs) {
                 &Wallet::get_keystore_password(),
             );
             write_resulted_keystore(json_result, outfile);
+            if let Some(outfile) = outfile {
+                println!("Wallet saved to '{outfile}'");
+            }
         }
         Some(_) => {
             println!("Unsupported format");
         }
         None => {}
     }
+}
+
+fn test_wallet_cmd(args: &WalletTestWalletArgs) {
+    let name = &args.name;
+    let pem = match multiversx_sc_snippets::test_wallets::pem_contents(name) {
+        Some(pem) => pem,
+        None => {
+            let valid = multiversx_sc_snippets::test_wallets::valid_names().join(", ");
+            eprintln!("Unknown test wallet name: '{name}'. Valid names: {valid}");
+            std::process::exit(1);
+        }
+    };
+    let path = args.path.clone().unwrap_or_else(|| format!("{name}.pem"));
+    let mut file = File::create(&path).unwrap();
+    file.write_all(pem.as_bytes()).unwrap();
+    println!("Saved test wallet '{name}' to '{path}'");
 }

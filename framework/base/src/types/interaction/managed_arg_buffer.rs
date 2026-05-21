@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApi, ManagedTypeApi, use_raw_handle},
+    api::{ErrorApi, ManagedTypeApi, ManagedTypeApiImpl, use_raw_handle},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -322,10 +322,12 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        Self::from(ManagedVec::<M, ManagedBuffer<M>>::read_from_payload(
-            payload,
-        ))
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe {
+            Self::from(ManagedVec::<M, ManagedBuffer<M>>::read_from_payload(
+                payload,
+            ))
+        }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
@@ -337,6 +339,10 @@ where
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.data.save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }
 

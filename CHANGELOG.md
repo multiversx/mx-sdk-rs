@@ -57,6 +57,87 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+### [sc 0.66.0, chain 0.23.0, sdk 0.16.0, scenario-format 0.26.1] - 2026-05-21
+- Memory and thread safety:
+	- Managed type memory management: proper `Drop` implementations for managed types:
+		- `ManagedBuffer`, `BigInt`, `BigFloat`, `ManagedVec`, and `ManagedMap` now call their VM-side destructor when dropped;
+		- Fixed memory leaks and double-drop issues previously present in `ManagedVec` and `ManagedBuffer`;
+		- `ManagedVecItem` derive macro now generates `requires_drop` correctly;
+		- `ManagedVec` slice out-of-bounds fix;
+		- `MultiValueEncoded::to_arg_buffer` fix;
+		- Memory benchmarks added for managed types.
+	- Thread safety:
+		- `DebugHandle` and `StaticApiHandle` are now explicitly `!Send`;
+		- All managed types implement `!Send + !Sync`, with tests.
+- Mathematical library additions:
+	- `nth_root` for `BigUint`;
+	- `linear_interpolation` and `weighted_average` functions;
+	- `ManagedDecimal` improvements:
+		- `exp_approx`: exponential approximation function;
+		- `compounded_interest` and `compounded_interest_factor` methods;
+		- `mul` / `div` with half-up rounding mode;
+		- Fixed `into_raw_units` / `as_raw_units` conversion;
+		- `nth_root` support;
+		- Backwards-compatibility fixes.
+	- `SaturatingSub` / `SaturatingSubAssign` for `BigUint`.
+	- `BigUint::from_str` (implements `FromStr` / `parse()`);
+- `sc-meta` new features, updates and fixes:
+	- `sc-meta` transaction CLI (`sc-meta tx`): a new command-line tool for composing and broadcasting transactions directly from the terminal:
+		- `sc-meta tx deploy` - deploy a contract;
+		- `sc-meta tx call` - call a contract endpoint;
+		- `sc-meta tx query` - query a contract (no gas);
+		- `sc-meta tx sign` - sign a transaction offline;
+		- `sc-meta tx upgrade` - upgrade a deployed contract;
+		- `--payments` / `--token-transfers` flags for specifying ESDT payments;
+		- `--wait-result` flag (requires `--send`);
+		- `--code-metadata` args refactor.
+	- `sc-meta reproducible-build` - new tooling for building and verifying contracts reproducibly:
+		- Docker-based local build;
+		- `sc-meta all download` with `--overwrite` flag;
+		- `sc-meta all publish` / `unpublish` with polling and max-attempt logic;
+		- Source pack/unpack (zip) with test & refactor;
+		- `artifacts.json` generation and code hash verification;
+		- `repro-build init-config` for project configuration toml;
+		- `repro-build release-notes` CLI;
+		- Integration test and CI support.
+	- `sc-meta data` CLI: new subcommand for managing contract data/storage, for scripts.
+	- Wallet improvements:
+		- `sc-meta wallet new` hides password from console (uses `rpassword`);
+		- `sc-meta wallet test-wallet` CLI command.
+	- Other improvements:
+		- `sc-meta new --force` flag: overwrite an existing template directory;
+		- `sc-meta new --overwrite` bugfix;
+		- `sc-meta install wasm32 --toolchain <toolchain>` CLI flag;
+		- `sc-meta install debugger` on Windows, duplicate-protection, configures `rust-analyzer.debug.engine`;
+		- `sc-meta install all` Windows fix;
+		- `sc-meta all codehash` with fallback;
+		- Detect duplicate contract names;
+		- `sc-meta rust version` displayed in full;
+		- `CARGO_NET_GIT_FETCH_WITH_CLI` env flag propagated through contract builds.
+- Explorer URLs are displayed after transactions and for new contracts in interactor and `sc-meta tx` CLI.
+- Rust VM gas schedule updates:
+	- Gas schedule v9+ updates;
+	- Fixed gas accounting for conversions, more hooks, and `ManagedMap` operations;
+	- Overflow check added in multiply-gas helper;
+	- `wasmer-prod`: fix for missing breakpoint after early exit / out-of-gas.
+- Chain core additions:
+	- Standard code hash function added to `multiversx-chain-core`;
+	- VM code hash hook;
+	- Basic crypto functions consolidated in chain core;
+	- Deploy address computation impls centralized.
+	- `Bech32Address` improvements:
+		- `try_from_bech32_string` constructor with explicit error;
+		- `FromStr` implementation;
+		- Better error on empty string input.
+- SDK improvements:
+	- Interactor gas price support;
+	- Refactoring: REST API types and naming updated to match the Go SDK implementation;
+	- `Wallet::from_pem_file` accepts any `AsRef<Path>`;
+	- `Wallet` methods now take `AsRef<Path>` generically.
+- `ManagedByteArray` now implements `SCDisplay` and `SCBinary`.
+- Dependency upgrades.
+
+
 ### [sc 0.65.1, chain 0.22.1, sdk 0.15.1] - 2026-03-25
 - `sc-meta` improvements:
 	- `sc-meta wallet new --shard <id>` flag: generates a new wallet whose address belongs to the given shard;

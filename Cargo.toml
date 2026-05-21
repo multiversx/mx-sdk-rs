@@ -22,13 +22,16 @@ members = [
   "sdk/http",
   "sdk/scenario-format",
 
-  "tools/mxpy-snippet-generator",
+  "tools/cs-test-runner",
   # "tools/plotter",
   "tools/interactor-system-func-calls/",
   "tools/interactor-delegation-func-calls/",
   "tools/interactor-governance-func-calls/",
   "tools/gas-schedule-generator",
+  "tools/managed-mem-bench",
+  "tools/mxpy-snippet-generator",
   "tools/op-test-gen",
+  "tools/strip-path",
   "tools/wat-gen",
 
   "contracts/modules",

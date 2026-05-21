@@ -32,7 +32,7 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     }
 
     fn get_raw_handle(&self) -> RawHandle {
-        self.get_handle().cast_or_signal_error::<M, _>()
+        self.get_handle().get_raw_handle()
     }
 
     fn get_raw_handle_unchecked(&self) -> RawHandle {

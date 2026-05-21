@@ -3,11 +3,14 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::TransferStep,
 };
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
 
 use crate::InteractorSimulateGasAsync;
 
-use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync, InteractorRunAsync};
+use super::{
+    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
+    InteractorRunAsync,
+};
 
 async fn simulate_gas_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
@@ -53,6 +56,24 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_transfer(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorIntoSdkTransaction
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+{
+    fn into_sdk_transaction(self) -> Transaction {
+        let step_wrapper = self.tx_to_step();
+        step_wrapper
+            .env
+            .world
+            .tx_call_to_blockchain_tx(&step_wrapper.step.tx.to_tx_call())
     }
 }
 
