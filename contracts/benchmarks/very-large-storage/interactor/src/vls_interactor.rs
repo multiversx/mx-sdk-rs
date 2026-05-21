@@ -16,7 +16,7 @@ pub async fn very_large_storage_cli() {
 
     let config = Config::load_config();
 
-    let mut basic_interact = BasicInteract::new(config).await;
+    let mut basic_interact = VeryLargeStorageInteractor::new(config).await;
 
     let cli = vls_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -30,13 +30,13 @@ pub async fn very_large_storage_cli() {
     }
 }
 
-pub struct BasicInteract {
+pub struct VeryLargeStorageInteractor {
     pub interactor: Interactor,
     pub owner_address: Bech32Address,
     pub state: State,
 }
 
-impl BasicInteract {
+impl VeryLargeStorageInteractor {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
@@ -48,7 +48,7 @@ impl BasicInteract {
 
         interactor.generate_blocks(30u64).await.unwrap();
 
-        BasicInteract {
+        VeryLargeStorageInteractor {
             interactor,
             owner_address: owner_address.into(),
             state: State::load_state(),
