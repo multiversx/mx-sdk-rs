@@ -13,10 +13,12 @@ TX_TOOL=("${BASE[@]}" "${TX_CMD}")
 DATA_TOOL=("${BASE[@]}" data)
 # ──────────────────────────────────────────────────────────────────────────────
 
-if [[ "${TOOL_VARIANT}" == "sc-meta" ]]; then
+PEM="alice.pem"
+
+# Creates a test wallet (alice.pem). Only works with sc-meta.
+setup() {
     sc-meta wallet test-wallet --name alice
-fi
-ALICE="alice.pem"
+}
 
 case "${NETWORK}" in
     devnet)           PROXY=https://devnet-gateway.multiversx.com;  CHAIN=D ;;
@@ -36,7 +38,7 @@ export RUST_BACKTRACE=1
 deploy() {
     "${TX_TOOL[@]}" deploy \
         --bytecode "${BYTECODE}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=50000000 \
         --arguments 0 \
         --proxy="${PROXY}" \
@@ -58,7 +60,7 @@ deploy() {
 upgrade() {
     "${TX_TOOL[@]}" upgrade "${ADDRESS}" \
         --bytecode "${BYTECODE}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=50000000 \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
@@ -71,7 +73,7 @@ upgrade() {
 add() {
     NUMBER=5
     "${TX_TOOL[@]}" call "${ADDRESS}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=5000000 \
         --function="add" \
         --arguments "${NUMBER}" \
@@ -100,7 +102,7 @@ add_v2() {
     OUTFILE_CALL_SIGNED="call-signed-${NETWORK}.interaction.json"
 
     "${TX_TOOL[@]}" call "${ADDRESS}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --gas-limit=5000000 \
         --function="add" \
         --arguments "${NUMBER}" \
@@ -111,7 +113,7 @@ add_v2() {
 
     "${BASE[@]}" tx sign \
         --infile="${OUTFILE_CALL_PREPARED}" \
-        --pem="${ALICE}" \
+        --pem="${PEM}" \
         --proxy="${PROXY}" \
         --outfile="${OUTFILE_CALL_SIGNED}" \
         || return
