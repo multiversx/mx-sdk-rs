@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NETWORK=devnet      # choose: devnet, testnet, mainnet, chain-simulator
-TOOL_VARIANT=source # choose: sc-meta, source, mxpy
+NETWORK=devnet       # choose: devnet, testnet, mainnet, chain-simulator
+TOOL_VARIANT=sc-meta # choose: sc-meta, mxpy
 
 # ── Tool selection ─────────────────────────────────────────────────────────────
 case "${TOOL_VARIANT}" in
@@ -26,6 +26,7 @@ case "${NETWORK}" in
 esac
 
 ADDRESS=$("${DATA_TOOL[@]}" load --partition "${NETWORK}" --key="address-${NETWORK}")
+BYTECODE="../output/adder.wasm"
 OUTFILE_DEPLOY="deploy-${NETWORK}.interaction.json"
 OUTFILE_UPGRADE="upgrade-${NETWORK}.interaction.json"
 OUTFILE_CALL="call-${NETWORK}.interaction.json"
@@ -34,7 +35,7 @@ export RUST_BACKTRACE=1
 
 deploy() {
     "${TX_TOOL[@]}" deploy \
-        --bytecode "../output/adder.wasm" \
+        --bytecode "${BYTECODE}" \
         --pem="${ALICE}" \
         --gas-limit=50000000 \
         --arguments 0 \
@@ -55,7 +56,7 @@ deploy() {
 
 upgrade() {
     "${TX_TOOL[@]}" upgrade "${ADDRESS}" \
-        --bytecode "../output/adder.wasm" \
+        --bytecode "${BYTECODE}" \
         --pem="${ALICE}" \
         --gas-limit=50000000 \
         --proxy="${PROXY}" \
@@ -79,7 +80,7 @@ add() {
         || return
 }
 
-getSum() {
+sum() {
     "${TX_TOOL[@]}" query "${ADDRESS}" \
         --function="getSum" \
         --proxy="${PROXY}" \
