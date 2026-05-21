@@ -18,8 +18,8 @@ The interactor deploys the contract and calls `append`, reporting gas used and t
 
 ```bash
 # Deploy
-cargo run deploy
+cargo run -- deploy
 
 # Append bytes and print gas used + total storage size
-cargo run append -n 10000
+cargo run -- append -n 10000
 ```

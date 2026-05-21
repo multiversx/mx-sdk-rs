@@ -5955,7 +5955,6 @@ dependencies = [
  "clap",
  "multiversx-sc-snippets",
  "serde",
- "serial_test",
  "tokio",
  "toml",
  "very-large-storage",
