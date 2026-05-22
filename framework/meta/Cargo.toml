@@ -25,6 +25,7 @@ template-test-current = []
 template-test-released = []
 chain-simulator-tests = []
 repro-build-test = []
+install-debugger-test = []
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
