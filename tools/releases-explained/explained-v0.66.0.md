@@ -78,11 +78,11 @@ Key capabilities:
 
 - **Docker-based local build**: contracts are compiled inside a Docker container with a fixed toolchain, ensuring the output Wasm is identical regardless of the host machine.
 - sc-meta reproducible-build download with an --overwrite flag for refreshing previously downloaded artifacts.
-- sc-meta reproducible-build publish and sc-meta reproducible-build publish with polling and a configurable maximum-attempt limit, for interacting with a contract registry.
+- sc-meta reproducible-build publish and sc-meta reproducible-build unpublish with polling and a configurable maximum-attempt limit, for interacting with a contract registry.
 - Source pack/unpack (zip): the source tree can be packed into a zip for distribution and unpacked for verification, with full test coverage.
 - artifacts.json generation and code-hash verification: after a build, a manifest of output files and their hashes is produced. A subsequent verification step compares the deployed code hash against this manifest.
-- sc-meta reproducible-build publish init-config: generates a project-level configuration TOML that records the Docker image and other settings used for the reproducible build.
-- sc-meta reproducible-build publish release-notes CLI: generates release notes from the build artifacts.
+- sc-meta reproducible-build init-config: generates a project-level configuration TOML that records the Docker image and other settings used for the reproducible build.
+- sc-meta reproducible-build release-notes CLI: generates release notes from the build artifacts.
 - Integration test and CI support: the tooling includes integration tests and hooks for running reproducible-build verification in CI pipelines.
 
 
