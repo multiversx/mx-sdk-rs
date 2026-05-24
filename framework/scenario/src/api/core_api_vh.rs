@@ -7,3 +7,4 @@ mod error_api_vh;
 mod log_api_vh;
 mod send_api_vh;
 mod storage_api_vh;
+mod test_api_vh;

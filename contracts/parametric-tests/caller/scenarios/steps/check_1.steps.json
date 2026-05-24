@@ -1,0 +1,29 @@
+{
+    "name": "check after 1st call",
+    "steps": [
+        {       
+            "step": "checkState",
+            "comment": "caller should keep half of the EGLD",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "99000",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:caller": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {},
+                    "code": "file:../../output/caller.wasm"
+                },
+                "sc:callee": {
+                    "nonce": "0",
+                    "balance": "500",
+                    "storage": {},
+                    "code": "file:../../../callee/output/callee.wasm"
+                }
+            }
+        }
+    ]
+}

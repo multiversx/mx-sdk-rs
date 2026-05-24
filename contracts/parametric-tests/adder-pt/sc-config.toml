@@ -1,0 +1,2 @@
+[contracts.adder-pt]
+ei = "ignore" # TODO: parametric test EI option
