@@ -108,3 +108,19 @@ jobs:
 
       - name: Run repro build docker test
         run: cargo test -p multiversx-sc-meta --features repro-build-test --test repro_build_test -- repro_build_docker --exact --nocapture
+
+  install_debugger_test:
+    name: Install debugger test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.87
+
+      - name: Run install debugger test
+        run: cargo test -p multiversx-sc-meta --features install-debugger-test --test install_debugger_test -- test_install_debugger --exact --nocapture
