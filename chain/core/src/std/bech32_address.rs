@@ -5,38 +5,17 @@ use crate::{codec::*, types::Address};
 use bech32::{Bech32, Hrp};
 use serde::{Deserialize, Serialize};
 
+mod bech32_address_error;
+pub use bech32_address_error::Bech32AddressError;
+
+mod bech32_hrp;
+pub use bech32_hrp::Bech32Hrp;
+
 const BECH32_PREFIX: &str = "bech32:";
 
 const ERR_ADDRESS_EMPTY: &str = "address string is empty";
 
 const DEFAULT_HRP: &str = "erd";
-
-/// Error type returned by [`Bech32Address::try_from_bech32_string`].
-#[derive(Debug)]
-pub enum Bech32AddressError {
-    /// The string could not be decoded as a valid bech32 value.
-    /// Contains a message with the offending input and the underlying error.
-    DecodeError(String),
-    /// The decoded payload is not exactly 32 bytes.
-    /// Contains the actual decoded length.
-    InvalidLength(usize),
-}
-
-impl core::fmt::Display for Bech32AddressError {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Bech32AddressError::DecodeError(msg) => write!(f, "bech32 decode error: {msg}"),
-            Bech32AddressError::InvalidLength(len) => {
-                write!(
-                    f,
-                    "invalid address length after decoding: expected 32, got {len}"
-                )
-            }
-        }
-    }
-}
-
-impl std::error::Error for Bech32AddressError {}
 
 /// Wraps and address, and presents it as a bech32 expression wherever possible.
 ///
@@ -48,7 +27,7 @@ impl std::error::Error for Bech32AddressError {}
 #[derive(Clone, PartialEq, Eq)]
 pub struct Bech32Address {
     pub address: Address,
-    pub hrp: String,
+    pub hrp: Bech32Hrp,
     pub bech32: String,
 }
 
@@ -71,7 +50,7 @@ impl Bech32Address {
 
         Ok(Bech32Address {
             address: Address::from_slice(&dest_address_bytes),
-            hrp: hrp.to_string(),
+            hrp: Bech32Hrp::from_string(hrp.to_string()),
             bech32: bech32_string,
         })
     }
@@ -102,7 +81,7 @@ impl Bech32Address {
 
         Bech32Address {
             address,
-            hrp: hrp.to_owned(),
+            hrp: Bech32Hrp::from_string(hrp.to_owned()),
             bech32: bech32_string,
         }
     }
@@ -164,12 +143,12 @@ impl Bech32Address {
 
     /// Returns the human-readable part (HRP) as a borrowed `&str`.
     pub fn as_hrp(&self) -> &str {
-        &self.hrp
+        self.hrp.as_str()
     }
 
     /// Clones and returns the human-readable part (HRP) as an owned [`String`].
     pub fn to_hrp(&self) -> String {
-        self.hrp.clone()
+        self.hrp.as_str().to_string()
     }
 
     /// Consumes `self` and returns the underlying [`Address`].
@@ -322,7 +301,7 @@ impl FromStr for Bech32Address {
         }
         Ok(Bech32Address {
             address: Address::from_slice(&dest_address_bytes),
-            hrp: hrp.to_string(),
+            hrp: Bech32Hrp::from_string(hrp.to_string()),
             bech32: s.to_string(),
         })
     }
@@ -348,7 +327,8 @@ mod tests {
     #[test]
     fn test_try_from_bech32_string_roundtrip() {
         let original = Bech32Address::try_from_bech32_string(VALID_BECH32.to_string()).unwrap();
-        let re_encoded = Bech32Address::encode_address(&original.hrp, original.address.clone());
+        let re_encoded =
+            Bech32Address::encode_address(original.hrp.as_str(), original.address.clone());
         assert_eq!(re_encoded.bech32, VALID_BECH32);
     }
 
