@@ -355,7 +355,7 @@ impl Wallet {
             version: KEYSTORE_VERSION,
             kind: "secretKey".to_string(),
             address: public_key.to_string(),
-            bech32: address.to_bech32(hrp).bech32,
+            bech32: address.to_bech32(hrp.into()).bech32,
         };
 
         let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
@@ -380,7 +380,7 @@ impl Wallet {
             .collect::<Vec<&str>>()
             .join("\n");
 
-        let address_bech32 = Bech32Address::encode_address(hrp, address.clone());
+        let address_bech32 = Bech32Address::encode_address(hrp.into(), address.clone());
         let pem_content = format!(
             "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
         );

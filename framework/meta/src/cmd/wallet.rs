@@ -6,6 +6,7 @@ use crate::cli::{
 };
 use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
+use multiversx_sc_snippets::sdk::chain_core::std::Bech32Hrp;
 use multiversx_sc_snippets::sdk::{crypto::public_key::PublicKey, wallet::Wallet};
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -192,7 +193,11 @@ impl WalletInfo {
 fn new(new_args: &WalletNewArgs) {
     let format = new_args.wallet_format.as_deref();
     let outfile = new_args.outfile.as_ref();
-    let hrp = new_args.hrp.clone().unwrap_or_else(|| "erd".to_string());
+    let hrp = new_args
+        .hrp
+        .as_deref()
+        .map(Bech32Hrp::from)
+        .unwrap_or_default();
 
     let wallet = if let Some(shard) = new_args.shard {
         WalletInfo::generate_for_shard(shard)
@@ -210,13 +215,13 @@ fn new(new_args: &WalletNewArgs) {
     println!("Mnemonic: {}", mnemonic);
 
     println!("Wallet address:");
-    println!("  - bech32: {}", address.to_bech32(&hrp));
+    println!("  - bech32: {}", address.to_bech32(hrp));
     println!("  - hex:    0x{}", address.to_hex());
 
     match format {
         Some("pem") => {
             write_resulted_pem(
-                &hrp,
+                hrp.as_str(),
                 public_key_str.as_str(),
                 private_key_str.as_str(),
                 outfile,
@@ -230,7 +235,7 @@ fn new(new_args: &WalletNewArgs) {
             let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
             let json_result = Wallet::encrypt_keystore(
                 hex_decoded_keys.as_slice(),
-                &hrp,
+                hrp.as_str(),
                 &address,
                 &public_key_str,
                 &Wallet::get_keystore_password(),
