@@ -66,15 +66,19 @@ impl From<Hrp> for Bech32Hrp {
     }
 }
 
-impl From<String> for Bech32Hrp {
-    fn from(s: String) -> Self {
-        Bech32Hrp::from_string(s)
+impl TryFrom<String> for Bech32Hrp {
+    type Error = bech32::primitives::hrp::Error;
+
+    fn try_from(s: String) -> Result<Self, Self::Error> {
+        Hrp::parse(&s).map(Bech32Hrp)
     }
 }
 
-impl From<&str> for Bech32Hrp {
-    fn from(s: &str) -> Self {
-        Bech32Hrp::parse_unchecked(s)
+impl TryFrom<&str> for Bech32Hrp {
+    type Error = bech32::primitives::hrp::Error;
+
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        Hrp::parse(s).map(Bech32Hrp)
     }
 }
 
@@ -114,5 +118,80 @@ impl<'de> Deserialize<'de> for Bech32Hrp {
         Hrp::parse(&s)
             .map(Bech32Hrp)
             .map_err(|e| serde::de::Error::custom(format!("invalid HRP: {e}")))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_try_from_str_valid() {
+        let hrp = Bech32Hrp::try_from("erd").unwrap();
+        assert_eq!(hrp.as_str(), "erd");
+
+        let hrp = Bech32Hrp::try_from("test").unwrap();
+        assert_eq!(hrp.as_str(), "test");
+    }
+
+    #[test]
+    fn test_try_from_string_valid() {
+        let hrp = Bech32Hrp::try_from(String::from("erd")).unwrap();
+        assert_eq!(hrp.as_str(), "erd");
+    }
+
+    #[test]
+    fn test_try_from_str_invalid() {
+        // HRP cannot be empty
+        assert!(Bech32Hrp::try_from("").is_err());
+        // HRP cannot contain non-ASCII characters
+        assert!(Bech32Hrp::try_from("\u{e9}rd").is_err());
+    }
+
+    #[test]
+    fn test_try_from_string_invalid() {
+        assert!(Bech32Hrp::try_from(String::from("")).is_err());
+        assert!(Bech32Hrp::try_from(String::from("\u{e9}rd")).is_err());
+    }
+
+    #[test]
+    fn test_parse_unchecked() {
+        let hrp = Bech32Hrp::parse_unchecked("erd");
+        assert_eq!(hrp.as_str(), "erd");
+    }
+
+    #[test]
+    fn test_default_is_erd() {
+        assert_eq!(Bech32Hrp::default().as_str(), "erd");
+    }
+
+    #[test]
+    fn test_partial_eq_str() {
+        let hrp = Bech32Hrp::try_from("erd").unwrap();
+        assert!(hrp == *"erd");
+        assert!(hrp == "erd");
+        assert!(hrp != *"test");
+        assert!(hrp != "test");
+    }
+
+    #[test]
+    fn test_display() {
+        let hrp = Bech32Hrp::try_from("erd").unwrap();
+        assert_eq!(hrp.to_string(), "erd");
+    }
+
+    #[test]
+    fn test_serde_roundtrip() {
+        let hrp = Bech32Hrp::try_from("erd").unwrap();
+        let json = serde_json::to_string(&hrp).unwrap();
+        assert_eq!(json, "\"erd\"");
+        let decoded: Bech32Hrp = serde_json::from_str(&json).unwrap();
+        assert_eq!(decoded, hrp);
+    }
+
+    #[test]
+    fn test_serde_deserialize_invalid() {
+        // Non-ASCII characters are not valid in an HRP
+        assert!(serde_json::from_str::<Bech32Hrp>("\"\u{e9}rd\"").is_err());
     }
 }
