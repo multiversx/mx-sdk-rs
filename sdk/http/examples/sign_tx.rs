@@ -19,8 +19,8 @@ async fn main() {
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
         value: "0".to_string(),
-        receiver: addr.to_bech32(&network_config.address_hrp),
-        sender: addr.to_bech32(&network_config.address_hrp),
+        receiver: addr.to_bech32(network_config.address_hrp),
+        sender: addr.to_bech32(network_config.address_hrp),
         gas_price: arg.gas_price,
         gas_limit: arg.gas_limit,
         data: arg.data,

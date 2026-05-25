@@ -15,4 +15,4 @@ pub mod test;
 pub mod test_coverage;
 pub mod tx;
 pub mod upgrade;
-pub mod wallet;
+pub mod wallet_cmd;

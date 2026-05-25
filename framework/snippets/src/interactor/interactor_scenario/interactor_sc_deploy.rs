@@ -20,13 +20,13 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
-        let hrp = self.network_config.address_hrp.clone();
+        let hrp = self.network_config.address_hrp;
 
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
-            sender: sc_deploy_step.tx.from.to_address().to_bech32(&hrp),
-            receiver: Bech32Address::zero(&hrp),
+            sender: sc_deploy_step.tx.from.to_address().to_bech32(hrp),
+            receiver: Bech32Address::zero(hrp),
             gas_price: self.gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),

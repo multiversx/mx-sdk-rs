@@ -5,7 +5,10 @@ use multiversx_sc_scenario::{
     meta::tools::find_current_workspace,
     multiversx_sc::types::Address,
 };
-use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount};
+use multiversx_sdk::{
+    chain_core::std::Bech32Hrp,
+    gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount},
+};
 
 use super::ExplorerUrl;
 use std::{
@@ -82,7 +85,7 @@ where
             address.clone(),
             Sender {
                 address: address.clone(),
-                hrp: self.network_config.address_hrp.clone(),
+                hrp: self.network_config.address_hrp,
                 wallet,
                 current_nonce: None,
             },
@@ -115,8 +118,8 @@ where
         self.current_dir.join(INTERACTOR_SET_STATE_PATH)
     }
 
-    pub fn get_hrp(&self) -> &str {
-        &self.network_config.address_hrp
+    pub fn get_hrp(&self) -> Bech32Hrp {
+        self.network_config.address_hrp
     }
 
     pub fn is_registered_wallet(&self, address: &Address) -> bool {
