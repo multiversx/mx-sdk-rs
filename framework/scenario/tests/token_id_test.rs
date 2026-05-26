@@ -11,6 +11,10 @@ use multiversx_sc_scenario::{
     multiversx_sc, token_id,
 };
 
+// TokenId intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(TokenId::<StaticApi>: Send, Sync);
+
 #[test]
 fn test_egld() {
     assert!(EgldOrEsdtTokenIdentifier::<StaticApi>::egld().is_egld());
@@ -293,6 +297,33 @@ fn test_managed_token_id_macro() {
         token_id!(b"ALC-6258d2"),
         TokenId::<StaticApi>::from("ALC-6258d2")
     );
+}
+
+#[test]
+fn test_token_id_as_esdt() {
+    // ESDT token produces Some
+    let esdt = TokenId::<StaticApi>::from("ALC-6258d2");
+    assert!(esdt.as_esdt().is_some());
+    assert_eq!(
+        *esdt.as_esdt().unwrap(),
+        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2"),
+    );
+
+    // native token produces None
+    assert!(TokenId::<StaticApi>::native().as_esdt().is_none());
+}
+
+#[test]
+fn test_token_id_into_esdt() {
+    // ESDT token produces Some
+    let esdt = TokenId::<StaticApi>::from("ALC-6258d2");
+    assert_eq!(
+        esdt.into_esdt().unwrap(),
+        EsdtTokenIdentifier::<StaticApi>::from("ALC-6258d2"),
+    );
+
+    // native token produces None
+    assert!(TokenId::<StaticApi>::native().into_esdt().is_none());
 }
 
 #[test]

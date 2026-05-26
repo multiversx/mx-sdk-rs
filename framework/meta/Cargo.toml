@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.65.0"
+version = "0.66.0"
 edition = "2024"
 
 authors = [
@@ -23,6 +23,9 @@ path = "src/main.rs"
 [features]
 template-test-current = []
 template-test-released = []
+chain-simulator-tests = []
+repro-build-test = []
+install-debugger-test = []
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -42,27 +45,37 @@ common-path = "1.0"
 bip39 = { version = "2.0", features = ["rand"] }
 anyhow = "1.0"
 hex = "0.4.3"
+base64 = "0.22"
+indexmap = { version = "2", features = ["serde"] }
 # warning: newer versions require Rust 1.88, hence we are not upgrading yet
 zip = { version = "7.2", features = ["deflate"], default-features = false }
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.65.0"
+version = "=0.66.0"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.65.0"
+version = "=0.66.0"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.65.0"
+version = "=0.66.0"
 path = "../snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.65.0"
+version = "=0.66.0"
 path = "../scenario"
 
+[dependencies.multiversx-chain-core]
+version = "=0.23.0"
+path = "../../chain/core"
+features = ["std"]
+
 [dependencies.multiversx-sdk]
-version = "=0.15.0"
+version = "=0.16.0"
 path = "../../sdk/core"
 features = ["wallet-full"]
+
+[dev-dependencies]
+serial_test = "3.2"

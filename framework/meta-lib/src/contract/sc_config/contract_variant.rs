@@ -145,6 +145,10 @@ impl ContractVariant {
         format!("{}.imports.json", self.output_name_base(build_args))
     }
 
+    pub fn codehash_output_name(&self, build_args: &BuildArgs) -> String {
+        format!("{}.codehash.txt", self.output_name_base(build_args))
+    }
+
     pub fn twiggy_top_name(&self, build_args: &BuildArgs) -> String {
         format!("twiggy-top-{}.txt", self.output_name_base(build_args))
     }

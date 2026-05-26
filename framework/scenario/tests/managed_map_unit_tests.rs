@@ -1,6 +1,10 @@
 use multiversx_sc::types::{ManagedBuffer, ManagedMap};
 use multiversx_sc_scenario::api::StaticApi;
 
+// ManagedMap intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(ManagedMap::<StaticApi>: Send, Sync);
+
 #[test]
 fn key_mutability_test() {
     let mut map = ManagedMap::<StaticApi>::new();

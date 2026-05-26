@@ -27,6 +27,18 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[ignore]
+fn alloc_mem_fail_rs() {
+    world().run("scenarios/alloc_mem_fail.scen.json");
+}
+
+#[test]
+#[ignore]
+fn alloc_mem_leaking_rs() {
+    world().run("scenarios/alloc_mem_leaking.scen.json");
+}
+
+#[test]
 fn boxed_bytes_zeros_rs() {
     world().run("scenarios/boxed_bytes_zeros.scen.json");
 }
@@ -84,18 +96,6 @@ fn echo_varargs_u_32_alloc_rs() {
 #[test]
 fn echo_vec_u_8_rs() {
     world().run("scenarios/echo_vec_u8.scen.json");
-}
-
-#[test]
-#[ignore]
-fn fail_memory_rs() {
-    world().run("scenarios/alloc_mem_fail.scen.json");
-}
-
-#[test]
-#[ignore]
-fn leaking_memory_rs() {
-    world().run("scenarios/alloc_mem_leaking.scen.json");
 }
 
 #[test]

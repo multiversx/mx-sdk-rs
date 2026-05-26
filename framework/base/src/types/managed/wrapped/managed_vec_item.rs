@@ -8,7 +8,7 @@ use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
-    api::{HandleConstraints, ManagedTypeApi, use_raw_handle},
+    api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl, use_raw_handle},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
         ManagedByteArray, ManagedRef, ManagedType, ManagedVec, NonZeroBigUint, TokenId,
@@ -25,7 +25,7 @@ use super::{
 /// in the underlying managed buffer.
 /// Not all data needs to be stored as payload, for instance for most managed types
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
-pub trait ManagedVecItem: 'static {
+pub trait ManagedVecItem: Sized + 'static {
     /// Type managing the underlying binary representation in a ManagedVec..
     type PAYLOAD: ManagedVecItemPayload;
 
@@ -50,7 +50,12 @@ pub trait ManagedVecItem: 'static {
     }
 
     /// Parses given bytes as a an owned object.
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
+    ///
+    /// # Safety
+    ///
+    /// It creates a new object from a payload, which will drop.
+    /// This can lead to a double drop, in case the payload is also handled by another object.
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self;
 
     /// Parses given bytes as a representation of the object, either owned, or a reference.
     ///
@@ -65,6 +70,23 @@ pub trait ManagedVecItem: 'static {
     ///
     /// Note that a destructor should not be called at this moment, since the ManagedVec will take ownership of the item.
     fn save_to_payload(self, payload: &mut Self::PAYLOAD);
+
+    /// Signals that vec should drop all items one by one when being itself dropped.
+    ///
+    /// If false, iterating over all items on drop makes no sense.
+    fn requires_drop() -> bool;
+
+    fn temp_decode<F, R>(payload: &Self::PAYLOAD, f: F) -> R
+    where
+        F: FnOnce(&Self) -> R,
+    {
+        unsafe {
+            let item = Self::read_from_payload(payload);
+            let result = f(&item);
+            core::mem::forget(item);
+            result
+        }
+    }
 }
 
 /// Used by the ManagedVecItem derive.
@@ -110,7 +132,7 @@ macro_rules! impl_int {
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 $ty::from_be_bytes(payload.buffer.into_array())
             }
 
@@ -120,6 +142,10 @@ macro_rules! impl_int {
 
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 payload.buffer = GenericArray::from_array(self.to_be_bytes());
+            }
+
+            fn requires_drop() -> bool {
+                false
             }
         }
     };
@@ -136,16 +162,20 @@ impl ManagedVecItem for usize {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u32::read_from_payload(payload) as usize
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { u32::read_from_payload(payload) as usize }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         (self as u32).save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -154,18 +184,22 @@ impl ManagedVecItem for bool {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u8::read_from_payload(payload) > 0
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { u8::read_from_payload(payload) > 0 }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         // true -> 1u8
         // false -> 0u8
         u8::from(self).save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -179,16 +213,16 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let (p1, p2) = <ManagedVecItemPayloadBuffer<U1> as ManagedVecItemPayloadAdd<
             T::PAYLOAD,
         >>::split_from_add(payload);
 
-        let disc = u8::read_from_payload(p1);
+        let disc = unsafe { u8::read_from_payload(p1) };
         if disc == 0 {
             None
         } else {
-            Some(T::read_from_payload(p2))
+            Some(unsafe { T::read_from_payload(p2) })
         }
     }
 
@@ -206,6 +240,10 @@ where
             t.save_to_payload(p2);
         }
     }
+
+    fn requires_drop() -> bool {
+        T::requires_drop()
+    }
 }
 
 macro_rules! impl_managed_type {
@@ -215,8 +253,8 @@ macro_rules! impl_managed_type {
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-                let handle = use_raw_handle(i32::read_from_payload(payload));
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
                 unsafe { Self::from_handle(handle) }
             }
 
@@ -230,6 +268,10 @@ macro_rules! impl_managed_type {
             fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
                 let handle = unsafe { self.forget_into_handle() };
                 handle.get_raw_handle().save_to_payload(payload);
+            }
+
+            fn requires_drop() -> bool {
+                M::managed_type_impl().requires_managed_type_drop()
             }
         }
     };
@@ -253,8 +295,8 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
         unsafe { Self::from_handle(handle) }
     }
 
@@ -268,6 +310,10 @@ where
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }
 
@@ -280,8 +326,8 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        let handle = use_raw_handle(i32::read_from_payload(payload));
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        let handle = use_raw_handle(unsafe { i32::read_from_payload(payload) });
         unsafe { Self::from_handle(handle) }
     }
 
@@ -296,6 +342,10 @@ where
         let handle = unsafe { self.forget_into_handle() };
         handle.get_raw_handle().save_to_payload(payload);
     }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
+    }
 }
 
 impl ManagedVecItem for EsdtTokenType {
@@ -303,16 +353,20 @@ impl ManagedVecItem for EsdtTokenType {
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u8::read_from_payload(payload).into()
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { u8::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.as_u8().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -321,16 +375,20 @@ impl ManagedVecItem for EsdtLocalRole {
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
     type Ref<'a> = Self;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        u16::read_from_payload(payload).into()
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { u16::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
-        Self::read_from_payload(payload)
+        unsafe { Self::read_from_payload(payload) }
     }
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.as_u16().save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        false
     }
 }
 
@@ -344,7 +402,7 @@ where
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             (
@@ -368,6 +426,10 @@ where
             managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
         }
     }
+
+    fn requires_drop() -> bool {
+        T1::requires_drop() || T2::requires_drop()
+    }
 }
 
 impl<T1, T2, T3> ManagedVecItem for MultiValue3<T1, T2, T3>
@@ -381,7 +443,7 @@ where
     const SKIPS_RESERIALIZATION: bool = T1::SKIPS_RESERIALIZATION && T2::SKIPS_RESERIALIZATION;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             (
@@ -406,5 +468,9 @@ where
             managed_vec_item_save_to_payload_index(tuple.1, payload, &mut index);
             managed_vec_item_save_to_payload_index(tuple.2, payload, &mut index);
         }
+    }
+
+    fn requires_drop() -> bool {
+        T1::requires_drop() || T2::requires_drop() || T3::requires_drop()
     }
 }

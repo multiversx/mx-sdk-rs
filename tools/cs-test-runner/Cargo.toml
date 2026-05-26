@@ -1,0 +1,14 @@
+[package]
+name = "cs-test-runner"
+version = "0.0.0"
+edition = "2024"
+publish = false
+authors = ["MultiversX <contact@multiversx.com>"]
+
+[[bin]]
+name = "cs-test-runner"
+path = "src/main.rs"
+
+[dependencies.multiversx-sc-meta-lib]
+version = "0.66.0"
+path = "../../framework/meta-lib"

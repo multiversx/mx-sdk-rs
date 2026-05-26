@@ -7,10 +7,20 @@ use super::{
 
 /// Creates a new contract on disk, from a template, given a name.
 pub async fn create_contract(args: &TemplateArgs) {
+    let target = target_from_args(args);
+    let contract_dir = target.contract_dir();
+
+    if contract_dir.exists() && !args.overwrite {
+        eprintln!(
+            "Error: destination `{}` already exists. Use --overwrite to overwrite.",
+            contract_dir.display()
+        );
+        std::process::exit(1);
+    }
+
     let version = get_repo_version(&args.tag);
     let version_tag: FrameworkVersion = version.get_tag();
     let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir()).await;
-    let target = target_from_args(args);
 
     let creator = ContractCreator::new(
         &repo_temp_download,
@@ -19,6 +29,13 @@ pub async fn create_contract(args: &TemplateArgs) {
         false,
         args.author.clone(),
     );
+
+    // Remove only after the download succeeded and the template name is validated,
+    // so a failure in those steps does not cause unnecessary data loss.
+    if args.overwrite && contract_dir.exists() {
+        std::fs::remove_dir_all(&contract_dir)
+            .unwrap_or_else(|e| panic!("failed to remove existing directory: {e}"));
+    }
 
     creator.create_contract(version_tag);
 }
@@ -74,8 +91,8 @@ impl<'a> ContractCreator<'a> {
     }
 
     pub fn create_contract(&self, args_tag: FrameworkVersion) {
-        self.copy_template(args_tag.clone());
-        self.update_dependencies(args_tag);
+        self.copy_template(args_tag);
+        self.update_dependencies();
         self.rename_template();
     }
 
@@ -84,8 +101,8 @@ impl<'a> ContractCreator<'a> {
             .copy_template(self.target.contract_dir(), args_tag);
     }
 
-    pub fn update_dependencies(&self, args_tag: FrameworkVersion) {
-        self.adjuster.update_cargo_toml_files(args_tag);
+    pub fn update_dependencies(&self) {
+        self.adjuster.update_cargo_toml_files();
     }
 
     pub fn rename_template(&self) {

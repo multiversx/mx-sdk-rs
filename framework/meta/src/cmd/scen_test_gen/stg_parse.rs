@@ -6,6 +6,7 @@ pub const IGNORE_ANNOTATION_PREFIX: &str = "#[ignore";
 pub const SHOULD_PANIC_ANNOTATION_PREFIX: &str = "#[should_panic";
 pub const SCEN_PATTERN_PREFIX: &str = "\"scenarios/";
 pub const SCEN_PATTERN_SUFFIX: &str = ".scen.json\"";
+pub const INSERT_GHOST_ACCOUNTS: &str = ".insert_ghost_accounts()";
 
 pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
     let mut docs = String::new();
@@ -59,6 +60,7 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
             ignore_line,
             should_panic_line,
             scenario_file_name,
+            insert_ghost_accounts: section_str.contains(INSERT_GHOST_ACCOUNTS),
         })
     } else {
         None

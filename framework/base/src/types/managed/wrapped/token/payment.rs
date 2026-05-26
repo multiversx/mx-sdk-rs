@@ -3,7 +3,7 @@ use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApiImpl, ManagedTypeApi},
+    api::{ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl},
     codec::{
         self, NestedDecode, TopDecode,
         derive::{NestedEncode, TopEncode},
@@ -233,6 +233,21 @@ impl<M: ManagedTypeApi> Payment<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for Payment<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if self.token_nonce == 0 {
+            write!(f, "{}: {}", self.token_identifier, self.amount)
+        } else {
+            write!(
+                f,
+                "{} (nonce {}): {}",
+                self.token_identifier, self.token_nonce, self.amount
+            )
+        }
+    }
+}
+
 impl<M> AsRef<Payment<M>> for &Payment<M>
 where
     M: ManagedTypeApi,
@@ -313,7 +328,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             Payment {
@@ -336,5 +351,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
             managed_vec_item_save_to_payload_index(self.token_nonce, payload, &mut index);
             managed_vec_item_save_to_payload_index(self.amount, payload, &mut index);
         }
+    }
+
+    fn requires_drop() -> bool {
+        M::managed_type_impl().requires_managed_type_drop()
     }
 }

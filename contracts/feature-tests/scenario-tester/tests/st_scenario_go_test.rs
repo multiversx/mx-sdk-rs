@@ -5,6 +5,11 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+fn forbidden_opcodes_go() {
+    world().run("scenarios/forbidden-opcodes.scen.json");
+}
+
+#[test]
 fn interactor_trace_go() {
     world().run("scenarios/interactor_trace.scen.json");
 }
@@ -17,9 +22,4 @@ fn st_adder_go() {
 #[test]
 fn st_partial_key_check_go() {
     world().run("scenarios/st-partial-key-check.scen.json");
-}
-
-#[test]
-fn st_forbidden_opcodes_go() {
-    world().run("scenarios/forbidden-opcodes.scen.json");
 }

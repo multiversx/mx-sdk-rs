@@ -1,6 +1,9 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+pub use super::cli_args_reproducible_builds::*;
+
+use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
 /// Parsed arguments of the meta crate CLI.
@@ -86,6 +89,13 @@ pub enum StandaloneCliAction {
     LocalDeps(LocalDepsArgs),
 
     #[command(
+        name = "reproducible-build",
+        alias = "rb",
+        about = "Reproducible build operations."
+    )]
+    ReproducibleBuild(ReproducibleBuildArgs),
+
+    #[command(
         name = "wallet",
         about = "Generates a new wallet or performs actions on an existing wallet."
     )]
@@ -96,6 +106,84 @@ pub enum StandaloneCliAction {
         about = "Can install, start and stop a chain simulator configuration."
     )]
     ChainSimulator(ChainSimulatorArgs),
+
+    #[command(
+        name = "tx",
+        about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
+    )]
+    Tx(TxCliArgs),
+
+    #[command(
+        name = "data",
+        about = "Manages local key-value data storage (store / load / parse)."
+    )]
+    Data(DataArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataArgs {
+    #[command(subcommand)]
+    pub command: DataAction,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum DataAction {
+    #[command(about = "Persist a key-value pair to the local data storage file.")]
+    Store(DataStoreArgs),
+
+    #[command(about = "Print a value from the local data storage file.")]
+    Load(DataLoadArgs),
+
+    #[command(
+        about = "Extract a value from a JSON file using a Python-style expression.",
+        long_about = "Supports expressions of the form: data['key'] or data['key']['subkey']."
+    )]
+    Parse(DataParseArgs),
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataStoreArgs {
+    /// The key to store.
+    #[arg(long)]
+    pub key: String,
+
+    /// The value to store.
+    #[arg(long)]
+    pub value: String,
+
+    /// The storage partition (default: *).
+    #[arg(long, default_value = "*")]
+    pub partition: String,
+
+    /// Use the global storage instead of the current directory.
+    #[arg(long, default_value_t = false)]
+    pub use_global: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataLoadArgs {
+    /// The key to load.
+    #[arg(long)]
+    pub key: String,
+
+    /// The storage partition (default: *).
+    #[arg(long, default_value = "*")]
+    pub partition: String,
+
+    /// Use the global storage instead of the current directory.
+    #[arg(long, default_value_t = false)]
+    pub use_global: bool,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct DataParseArgs {
+    /// Path to the JSON file to parse.
+    #[arg(long)]
+    pub file: PathBuf,
+
+    /// Expression to evaluate, e.g. `data['contractAddress']`.
+    #[arg(long)]
+    pub expression: String,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -250,21 +338,7 @@ pub struct ConvertArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct AllArgs {
-    #[command(subcommand)]
-    pub command: ContractCliAction,
-
-    /// Target directory where to call all contract meta crates.
-    /// Will be current directory if not specified.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true)]
-    pub path: Option<String>,
-
-    /// Ignore all directories with these names.
-    #[arg(long, verbatim_doc_comment)]
-    #[clap(global = true, default_value = "target")]
-    pub ignore: Vec<String>,
-
+pub struct MetaLibArgs {
     #[arg(
         long = "no-abi-git-version",
         help = "Skips loading the Git version into the ABI",
@@ -285,11 +359,31 @@ pub struct AllArgs {
     pub target_dir_all: Option<String>,
 }
 
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AllArgs {
+    #[command(subcommand)]
+    pub command: ContractCliAction,
+
+    /// Target directory where to call all contract meta crates.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    #[command(flatten)]
+    pub meta_lib_args: MetaLibArgs,
+}
+
 impl AllArgs {
     pub fn target_dir_all_override(&self) -> Self {
         let mut result = self.clone();
-        if let Some(target_dir_all) = &self.target_dir_all {
-            result.target_dir_meta = Some(target_dir_all.clone());
+        if let Some(target_dir_all) = &self.meta_lib_args.target_dir_all {
+            result.meta_lib_args.target_dir_meta = Some(target_dir_all.clone());
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
@@ -304,37 +398,6 @@ impl AllArgs {
             }
         }
         result
-    }
-
-    pub fn to_cargo_run_args(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.append(&mut processed.command.to_raw());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
-    }
-
-    /// Produces the arguments for an abi call corresponding to a build.
-    ///
-    /// Used to get the rustc and framework versions configured for a build.
-    pub fn to_cargo_abi_for_build(&self) -> Vec<String> {
-        let processed = self.target_dir_all_override();
-        let mut raw = vec!["run".to_string()];
-        if let Some(target_dir_meta) = &processed.target_dir_meta {
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_meta.clone());
-        }
-        raw.push("abi".to_string());
-        if !processed.load_abi_git_version {
-            raw.push("--no-abi-git-version".to_string());
-        }
-        raw
     }
 }
 
@@ -397,6 +460,10 @@ pub struct TemplateArgs {
     /// If missing, the default author will be considered.
     #[arg(long, verbatim_doc_comment)]
     pub author: Option<String>,
+
+    /// Overwrite the destination directory if it already exists.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
 }
 
 impl CliArgsToRaw for TemplateArgs {
@@ -484,7 +551,12 @@ pub struct InstallMxScenarioGoArgs {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct InstallWasm32Args {}
+pub struct InstallWasm32Args {
+    /// The Rust toolchain to install the wasm32 target for (e.g. `nightly-2024-01-01`, `stable`).
+    /// If not specified, the current toolchain is used.
+    #[arg(long, verbatim_doc_comment)]
+    pub toolchain: Option<String>,
+}
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasmOptArgs {}
@@ -514,8 +586,15 @@ pub enum WalletAction {
         about = "Encodes/decodes a bech32 address to/from hex"
     )]
     Bech32(WalletBech32Args),
+
     #[command(name = "convert", about = "Converts a wallet")]
     Convert(WalletConvertArgs),
+
+    #[command(
+        name = "test-wallet",
+        about = "Saves a test wallet PEM file to disk. Do not use on mainnet."
+    )]
+    TestWallet(WalletTestWalletArgs),
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Parser)]
@@ -537,13 +616,21 @@ pub struct WalletNewArgs {
 
     #[arg(long = "hrp", verbatim_doc_comment)]
     pub hrp: Option<String>,
+
+    /// If set, mines a wallet assigned to the given shard ID.
+    /// For the standard 3-shard mainnet configuration, valid shard IDs are 0, 1, or 2.
+    #[arg(long = "shard", verbatim_doc_comment)]
+    pub shard: Option<u8>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct WalletConvertArgs {
+    /// The format of the input wallet. Allowed values: mnemonic, pem, keystore-secret.
     #[arg(long = "in-format", verbatim_doc_comment)]
     pub from: String,
 
+    /// The format of the output wallet. Allowed values: pem, keystore-secret.
+    /// Supported conversions: mnemonic -> pem, keystore-secret -> pem, pem -> keystore-secret.
     #[arg(long = "out-format", verbatim_doc_comment)]
     pub to: String,
 
@@ -563,4 +650,16 @@ pub struct WalletBech32Args {
     pub hex_address: Option<String>,
     #[arg(long = "decode", verbatim_doc_comment)]
     pub bech32_address: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WalletTestWalletArgs {
+    /// The name of the test wallet.
+    /// Providing an invalid name will print the full list of valid names.
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: String,
+
+    /// Output path for the PEM file. Defaults to ./<name>.pem in the current directory.
+    #[arg(long = "path", verbatim_doc_comment)]
+    pub path: Option<String>,
 }

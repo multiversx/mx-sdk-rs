@@ -9,7 +9,9 @@ pub struct GatewayDappProxy {
 
 impl GatewayDappProxy {
     pub fn new(proxy_url: String) -> Self {
-        Self { proxy_url }
+        Self {
+            proxy_url: proxy_url.trim_end_matches('/').to_owned(),
+        }
     }
 
     /// Performs a request to the gateway.

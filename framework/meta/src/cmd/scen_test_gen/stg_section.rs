@@ -16,6 +16,7 @@ pub struct ScenarioTestFn {
     pub ignore_line: Option<String>,
     pub should_panic_line: Option<String>,
     pub scenario_file_name: String,
+    pub insert_ghost_accounts: bool,
 }
 
 impl Section {
@@ -29,6 +30,7 @@ impl Section {
                 should_panic_line: None,
                 test_line: TEST_ANNOTATION.to_string(),
                 scenario_file_name: scenario_name.to_string(),
+                insert_ghost_accounts: false,
             }),
         }
     }
