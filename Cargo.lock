@@ -3316,7 +3316,7 @@ dependencies = [
 name = "multiversx-sc-abi"
 version = "0.25.0"
 dependencies = [
- "bitflags 2.11.0",
+ "bitflags 2.11.1",
  "multiversx-chain-core",
  "multiversx-sc-codec",
  "num-bigint",

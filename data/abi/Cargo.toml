@@ -23,7 +23,7 @@ categories = [
 ]
 
 [dependencies.multiversx-chain-core]
-version = "=0.22.0"
+version = "=0.23.0"
 path = "../../chain/core"
 
 [dependencies.multiversx-sc-codec]
