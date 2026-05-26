@@ -4,7 +4,7 @@ use multiversx_sdk::wallet::Wallet;
 use std::{
     fs,
     io::Write,
-    path::PathBuf,
+    path::{Path, PathBuf},
     process::{Command, Stdio},
 };
 
@@ -29,7 +29,7 @@ fn temp_path(filename: &str) -> PathBuf {
 }
 
 /// Silently removes a file if it exists, ignoring errors.
-fn remove_if_exists(path: &PathBuf) {
+fn remove_if_exists(path: &Path) {
     let _ = fs::remove_file(path);
 }
 
@@ -129,7 +129,6 @@ fn test_convert_mnemonic_to_pem_custom_hrp() {
             infile: Some(mnemonic_file.to_str().unwrap().to_string()),
             outfile: Some(output_pem.to_str().unwrap().to_string()),
             hrp: Some(custom_hrp.to_string()),
-            ..Default::default()
         }),
     });
 
