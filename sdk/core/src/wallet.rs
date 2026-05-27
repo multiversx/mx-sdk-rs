@@ -80,7 +80,7 @@ impl Wallet {
 
     #[deprecated(
         since = "0.67.0",
-        note = "Use `Wallet::from(PrivateKey::from_hex_str(hex).unwrap())` instead"
+        note = "Use `PrivateKey::from_hex_str(hex).map(Wallet::from)` instead"
     )]
     pub fn from_private_key_hex(priv_key: &str) -> Result<Self> {
         let private_key = PrivateKey::from_hex_str(priv_key)?;
