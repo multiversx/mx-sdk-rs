@@ -1,16 +1,20 @@
-use bip39::{Language, Mnemonic};
-use rand::Rng;
 use std::{
     fs::{self, File},
     io::{self, Read, Write},
 };
 
+use bip39::{Language, Mnemonic};
+use rand::Rng;
+
 use multiversx_sc::types::Address;
-use multiversx_sc_snippets::sdk::chain_core::std::Bech32Hrp;
-use multiversx_sc_snippets::sdk::wallet::Keystore;
-use multiversx_sc_snippets::sdk::wallet::KeystoreRandomness;
-use multiversx_sc_snippets::sdk::wallet::Wallet;
-use multiversx_sc_snippets::{hex, imports::Bech32Address};
+use multiversx_sc_snippets::{
+    hex,
+    imports::Bech32Address,
+    sdk::{
+        chain_core::std::Bech32Hrp,
+        wallet::{Keystore, KeystoreRandomness, Wallet},
+    },
+};
 use multiversx_sdk::{
     crypto::private_key::PrivateKey,
     wallet::{KeystoreError, WalletPem},
@@ -50,7 +54,7 @@ fn convert(convert_args: &WalletConvertArgs) {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
                 let wallet = Wallet::from_mnemonic_string(mnemonic_str);
-                write_resulted_pem(hrp, &wallet, outfile);
+                write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
             None => {
                 println!(
@@ -58,7 +62,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 let wallet = Wallet::from_mnemonic_string(mnemonic_str);
-                write_resulted_pem(hrp, &wallet, outfile);
+                write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
         },
         ("keystore-secret", "pem") => match infile {
@@ -67,7 +71,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 match keystore.decrypt_wallet(&get_keystore_password()) {
                     Ok(wallet) => {
                         println!("Password is correct");
-                        write_resulted_pem(hrp, &wallet, outfile);
+                        write_resulted_pem(wallet.to_pem(hrp), outfile);
                     }
                     Err(KeystoreError::InvalidPassword) => {
                         panic!("Password is incorrect");
@@ -104,8 +108,8 @@ fn convert(convert_args: &WalletConvertArgs) {
     }
 }
 
-fn write_resulted_pem(hrp: Bech32Hrp, wallet: &Wallet, outfile: Option<&String>) {
-    let pem_content = wallet.to_pem(hrp).to_pem_str();
+fn write_resulted_pem(wallet_pem: WalletPem, outfile: Option<&String>) {
+    let pem_content = wallet_pem.to_pem_str();
     match outfile {
         Some(outfile) => {
             let mut file = File::create(outfile).unwrap();
@@ -219,7 +223,7 @@ fn new(new_args: &WalletNewArgs) {
 
     match format {
         Some("pem") => {
-            write_resulted_pem(hrp, &new_wallet_info.wallet, outfile);
+            write_resulted_pem(new_wallet_info.wallet.to_pem(hrp), outfile);
             if let Some(outfile) = outfile {
                 println!("Wallet saved to '{outfile}'");
             }
@@ -238,8 +242,10 @@ fn new(new_args: &WalletNewArgs) {
                 println!("Wallet saved to '{outfile}'");
             }
         }
-        Some(_) => {
-            println!("Unsupported format");
+        Some(format) => {
+            println!(
+                "Unsupported format: '{format}'. Supported formats are 'pem' and 'keystore-secret'."
+            );
         }
         None => {}
     }
