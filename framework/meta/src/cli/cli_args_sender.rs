@@ -28,7 +28,8 @@ pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
             Some(pw) => pw.clone(),
             None => get_keystore_password(),
         };
-        let priv_key = Keystore::get_private_key_from_file(keyfile, &password)
+        let priv_key = Keystore::from_file(keyfile)
+            .extract_private_key(&password)
             .context("failed to load keystore wallet")?;
         Wallet::from_private_key_hex(&priv_key.to_string())
             .context("failed to load keystore wallet")

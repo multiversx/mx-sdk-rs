@@ -61,8 +61,9 @@ fn convert(convert_args: &WalletConvertArgs) {
         },
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
-                let private_key =
-                    Keystore::get_private_key_from_file(file, &get_keystore_password()).unwrap();
+                let private_key = Keystore::from_file(file)
+                    .extract_private_key(&get_keystore_password())
+                    .unwrap();
                 write_resulted_pem(hrp, &private_key.to_string(), outfile);
             }
             None => {

@@ -1,18 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-pub const KDF_N: u32 = 4096;
-pub const KDF_R: u32 = 8;
-pub const KDF_P: u32 = 1;
-pub const KDF_DKLEN: usize = 32;
-pub const KEYSTORE_VERSION: u32 = 4;
-
-#[derive(Debug)]
-pub enum KeystoreError {
-    InvalidPassword,
-    InvalidKdf,
-    InvalidCipher,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CryptoParams {
     pub iv: String,
@@ -45,11 +32,4 @@ pub struct KeystoreJson {
     pub address: String,
     pub bech32: String,
     pub crypto: Crypto,
-}
-
-#[derive(Clone, Debug)]
-pub struct DecryptionParams {
-    pub derived_key_first_half: Vec<u8>,
-    pub iv: Vec<u8>,
-    pub data: Vec<u8>,
 }

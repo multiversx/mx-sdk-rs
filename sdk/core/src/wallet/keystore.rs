@@ -2,7 +2,6 @@ use std::fs;
 use std::path::Path;
 
 use aes::{Aes128, cipher::KeyIvInit};
-use anyhow::Result;
 use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, KeyInit, Mac};
 use multiversx_chain_core::std::Bech32Address;
@@ -11,13 +10,16 @@ use sha2::Sha256;
 
 use crate::crypto::private_key::PrivateKey;
 
-use super::{
-    Crypto, CryptoParams, DecryptionParams, KDF_DKLEN, KDF_N, KDF_P, KDF_R, KEYSTORE_VERSION,
-    KdfParams, KeystoreError, KeystoreJson,
-};
+use super::{Crypto, CryptoParams, KdfParams, KeystoreError, KeystoreJson};
 
+const KDF_N: u32 = 4096;
+const KDF_R: u32 = 8;
+const KDF_P: u32 = 1;
+const KDF_DKLEN: usize = 32;
+const KEYSTORE_VERSION: u32 = 4;
 const CIPHER_ALGORITHM_AES_128_CTR: &str = "aes-128-ctr";
 const KDF_SCRYPT: &str = "scrypt";
+const KIND_SECRET_KEY: &str = "secretKey";
 
 type HmacSha256 = Hmac<Sha256>;
 
@@ -52,79 +54,53 @@ impl Keystore {
         s
     }
 
-    pub fn validate_password(&self, password: &str) -> Result<DecryptionParams, KeystoreError> {
-        let ciphertext = hex::decode(&self.json.crypto.ciphertext).unwrap();
+    pub fn extract_private_key(&self, password: &str) -> Result<PrivateKey, KeystoreError> {
+        let ciphertext = hex::decode(&self.json.crypto.ciphertext)?;
 
         let cipher = &self.json.crypto.cipher;
         if cipher != CIPHER_ALGORITHM_AES_128_CTR {
             return Err(KeystoreError::InvalidCipher);
         }
 
-        let iv = hex::decode(&self.json.crypto.cipherparams.iv).unwrap();
-        let salt = hex::decode(&self.json.crypto.kdfparams.salt).unwrap();
-        let json_mac = hex::decode(&self.json.crypto.mac).unwrap();
-
         let kdf = &self.json.crypto.kdf;
         if kdf != KDF_SCRYPT {
             return Err(KeystoreError::InvalidKdf);
         }
+
+        let iv_bytes = hex::decode(&self.json.crypto.cipherparams.iv)?;
+        let iv: [u8; 16] = iv_bytes
+            .as_slice()
+            .try_into()
+            .map_err(|e: std::array::TryFromSliceError| KeystoreError::Other(e.into()))?;
+        let salt = hex::decode(&self.json.crypto.kdfparams.salt)?;
+        let json_mac = hex::decode(&self.json.crypto.mac)?;
+
         let n = self.json.crypto.kdfparams.n as f64;
         let r = self.json.crypto.kdfparams.r as u64;
         let p = self.json.crypto.kdfparams.p as u64;
         let _dklen = self.json.crypto.kdfparams.dklen as usize;
 
-        let params = Params::new(n.log2() as u8, r as u32, p as u32).unwrap();
+        let params = Params::new(n.log2() as u8, r as u32, p as u32)
+            .map_err(|e| KeystoreError::Other(e.into()))?;
 
         let mut derived_key = vec![0u8; 32];
         scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
 
-        let derived_key_first_half = derived_key[0..16].to_vec();
-        let derived_key_second_half = derived_key[16..32].to_vec();
+        let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
+        let derived_key_second_half = &derived_key[16..32];
 
-        let mut input_mac = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
+        let mut input_mac = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
         input_mac.update(&ciphertext);
         let computed_mac = input_mac.finalize().into_bytes();
 
-        if computed_mac.to_vec() == json_mac {
-            println!("Password is correct");
-            Ok(DecryptionParams {
-                derived_key_first_half,
-                iv,
-                data: ciphertext,
-            })
-        } else {
+        if computed_mac.to_vec() != json_mac {
             println!("Password is incorrect");
-            Err(KeystoreError::InvalidPassword)
+            return Err(KeystoreError::InvalidPassword);
         }
-    }
 
-    pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> Vec<u8> {
-        let key: &[u8; 16] = decryption_params
-            .derived_key_first_half
-            .as_slice()
-            .try_into()
-            .unwrap();
-        let iv: &[u8; 16] = decryption_params.iv.as_slice().try_into().unwrap();
-        let mut cipher = Ctr128BE::<Aes128>::new(key.into(), iv.into());
-        let mut decrypted = decryption_params.data.to_vec();
-        cipher.apply_keystream(&mut decrypted);
-
-        decrypted
-    }
-
-    pub fn get_private_key_from_file<P: AsRef<Path>>(
-        file_path: P,
-        password: &str,
-    ) -> Result<PrivateKey> {
-        let decryption_params = Self::from_file(file_path)
-            .validate_password(password)
-            .unwrap_or_else(|e| {
-                panic!("Error: {:?}", e);
-            });
-        let priv_key = PrivateKey::from_hex_str(
-            hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),
-        )?;
-        Ok(priv_key)
+        println!("Password is correct");
+        let private_key_bytes = run_cipher(derived_key_first_half, iv, ciphertext);
+        PrivateKey::from_bytes(&private_key_bytes).map_err(Into::into)
     }
 
     /// Not available in dapps, since it uses randomness to generate the keystore.
@@ -150,16 +126,10 @@ impl Keystore {
         )
         .unwrap();
 
-        let derived_key_first_half = derived_key[0..16].to_vec();
+        let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
         let derived_key_second_half = derived_key[16..32].to_vec();
 
-        let decryption_params = DecryptionParams {
-            derived_key_first_half,
-            iv: randomness.iv.to_vec(),
-            data: data.to_vec(),
-        };
-
-        let ciphertext = Self::decrypt_secret_key(decryption_params);
+        let ciphertext = run_cipher(derived_key_first_half, randomness.iv, data.to_vec());
 
         let mut h = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
         h.update(&ciphertext);
@@ -182,10 +152,20 @@ impl Keystore {
                 },
                 id: randomness.id,
                 version: KEYSTORE_VERSION,
-                kind: "secretKey".to_string(),
+                kind: KIND_SECRET_KEY.to_string(),
                 address: public_key.to_string(),
                 bech32: bech32_address.bech32,
             },
         }
     }
+}
+
+/// Applies AES-128-CTR to `data` in place and returns the result.
+///
+/// AES-128-CTR is a symmetric stream cipher, so the same operation both
+/// encrypts plaintext and decrypts ciphertext.
+fn run_cipher(key: [u8; 16], iv: [u8; 16], mut data: Vec<u8>) -> Vec<u8> {
+    let mut cipher = Ctr128BE::<Aes128>::new((&key).into(), (&iv).into());
+    cipher.apply_keystream(&mut data);
+    data
 }
