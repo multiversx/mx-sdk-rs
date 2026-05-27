@@ -1,5 +1,6 @@
 use multiversx_chain_core::std::Bech32Hrp;
 use multiversx_sc::types::Address;
+use multiversx_sc_meta::cmd::wallet_cmd::new_keystore_randomness;
 use multiversx_sdk::wallet::Keystore;
 use multiversx_sdk::wallet::Wallet;
 use std::fs::{self, File};
@@ -21,10 +22,10 @@ fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
     let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
     let json_result = Keystore::encrypt(
         hex_decoded_keys.as_slice(),
-        hrp.try_into().expect("invalid HRP"),
-        &address,
+        address.to_bech32(hrp.try_into().expect("invalid HRP")),
         ALICE_PUBLIC_KEY,
         KEYSTORE_PASSWORD,
+        new_keystore_randomness(),
     )
     .to_json_string();
     write_to_file(&json_result, file);

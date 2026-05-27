@@ -5,7 +5,7 @@ use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
 use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, KeyInit, Mac};
-use multiversx_chain_core::{std::Bech32Hrp, types::Address};
+use multiversx_chain_core::std::Bech32Address;
 use scrypt::{Params, scrypt};
 use sha2::Sha256;
 
@@ -21,6 +21,19 @@ const KDF_SCRYPT: &str = "scrypt";
 
 type HmacSha256 = Hmac<Sha256>;
 
+/// Groups all randomness inputs required to encrypt a keystore.
+///
+/// Keeping these separate from [`Keystore::encrypt`] makes the function
+/// deterministic and easy to test with fixed values.
+pub struct KeystoreRandomness {
+    pub salt: [u8; 32],
+    pub iv: [u8; 16],
+    pub id: String,
+}
+
+/// Wraps a keystore JSON payload and provides encryption/decryption helpers.
+///
+/// The `json` field holds the raw [`KeystoreJson`] that is serialised to disk.
 pub struct Keystore {
     pub json: KeystoreJson,
 }
@@ -117,34 +130,32 @@ impl Keystore {
     /// Not available in dapps, since it uses randomness to generate the keystore.
     ///
     /// Only available in the sc-meta standalone CLI.
-    #[cfg(feature = "wallet-full")]
     pub fn encrypt(
         data: &[u8],
-        hrp: Bech32Hrp,
-        address: &Address,
+        bech32_address: Bech32Address,
         public_key: &str,
         password: &str,
+        randomness: KeystoreRandomness,
     ) -> Self {
-        use rand::Rng;
-
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
-        let mut rand_salt: [u8; 32] = [0u8; 32];
-        rand::rng().fill_bytes(&mut rand_salt);
-        let salt_hex = hex::encode(rand_salt);
-
-        let mut rand_iv: [u8; 16] = [0u8; 16];
-        rand::rng().fill_bytes(&mut rand_iv);
-        let iv_hex = hex::encode(rand_iv);
+        let salt_hex = hex::encode(randomness.salt);
+        let iv_hex = hex::encode(randomness.iv);
 
         let mut derived_key = vec![0u8; 32];
-        scrypt(password.as_bytes(), &rand_salt, &params, &mut derived_key).unwrap();
+        scrypt(
+            password.as_bytes(),
+            &randomness.salt,
+            &params,
+            &mut derived_key,
+        )
+        .unwrap();
 
         let derived_key_first_half = derived_key[0..16].to_vec();
         let derived_key_second_half = derived_key[16..32].to_vec();
 
         let decryption_params = DecryptionParams {
             derived_key_first_half,
-            iv: rand_iv.to_vec(),
+            iv: randomness.iv.to_vec(),
             data: data.to_vec(),
         };
 
@@ -169,11 +180,11 @@ impl Keystore {
                     },
                     mac: hex::encode(mac),
                 },
-                id: uuid::Uuid::new_v4().to_string(),
+                id: randomness.id,
                 version: KEYSTORE_VERSION,
                 kind: "secretKey".to_string(),
                 address: public_key.to_string(),
-                bech32: address.to_bech32(hrp).bech32,
+                bech32: bech32_address.bech32,
             },
         }
     }

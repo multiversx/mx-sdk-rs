@@ -3374,6 +3374,7 @@ dependencies = [
  "multiversx-sc-snippets",
  "multiversx-sdk",
  "pathdiff",
+ "rand 0.10.1",
  "regex",
  "reqwest",
  "ruplacer",
@@ -3383,6 +3384,7 @@ dependencies = [
  "serial_test",
  "tokio",
  "toml",
+ "uuid",
  "zip",
 ]
 
@@ -3480,7 +3482,6 @@ dependencies = [
  "multiversx-chain-core",
  "pbkdf2",
  "pem",
- "rand 0.10.1",
  "rpassword",
  "scrypt",
  "serde",
@@ -3488,7 +3489,6 @@ dependencies = [
  "serde_repr",
  "sha2 0.11.0",
  "sha3",
- "uuid",
  "zeroize",
 ]
 

@@ -1,5 +1,8 @@
 use core::str;
 
+use multiversx_sdk::crypto::private_key::PrivateKey;
+use rand::Rng;
+
 use crate::cli::{
     WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
     WalletTestWalletArgs,
@@ -8,6 +11,7 @@ use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
 use multiversx_sc_snippets::sdk::chain_core::std::Bech32Hrp;
 use multiversx_sc_snippets::sdk::wallet::Keystore;
+use multiversx_sc_snippets::sdk::wallet::KeystoreRandomness;
 use multiversx_sc_snippets::sdk::wallet::Wallet;
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -74,12 +78,13 @@ fn convert(convert_args: &WalletConvertArgs) {
                 let hex_decoded_keys =
                     hex::decode(format!("{}{}", private_key_str, public_key_str)).unwrap();
 
+                let randomness = new_keystore_randomness();
                 let json_result = Keystore::encrypt(
                     hex_decoded_keys.as_slice(),
-                    hrp,
-                    &address,
+                    address.to_bech32(hrp),
                     &public_key_str,
                     &Wallet::get_keystore_password(),
+                    randomness,
                 )
                 .to_json_string();
                 write_resulted_keystore(json_result, outfile);
@@ -117,6 +122,18 @@ fn write_resulted_keystore(json_result: String, outfile: Option<&String>) {
         None => {
             println!("{}", json_result);
         }
+    }
+}
+
+pub fn new_keystore_randomness() -> KeystoreRandomness {
+    let mut salt = [0u8; 32];
+    let mut iv = [0u8; 16];
+    rand::rng().fill_bytes(&mut salt);
+    rand::rng().fill_bytes(&mut iv);
+    KeystoreRandomness {
+        salt,
+        iv,
+        id: uuid::Uuid::new_v4().to_string(),
     }
 }
 
@@ -220,12 +237,13 @@ fn new(new_args: &WalletNewArgs) {
         Some("keystore-secret") => {
             let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
             let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
+            let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
                 hex_decoded_keys.as_slice(),
-                hrp,
-                &address,
+                address.to_bech32(hrp),
                 &public_key_str,
                 &Wallet::get_keystore_password(),
+                randomness,
             )
             .to_json_string();
             write_resulted_keystore(json_result, outfile);
@@ -254,4 +272,17 @@ fn test_wallet_cmd(args: &WalletTestWalletArgs) {
     let mut file = File::create(&path).unwrap();
     file.write_all(pem.as_bytes()).unwrap();
     println!("Saved test wallet '{name}' to '{path}'");
+}
+
+/// Currently not in use.
+#[allow(unused)]
+pub fn generate_random_private_key<T>(r: &mut T) -> PrivateKey
+where
+    T: rand::CryptoRng + rand::Rng,
+{
+    let mut secret_key = PrivateKey([0u8; 64]);
+
+    r.fill_bytes(&mut secret_key.0);
+
+    secret_key
 }

@@ -3,6 +3,7 @@ mod keystore_json;
 mod wallet_pem;
 
 pub use keystore::Keystore;
+pub use keystore::KeystoreRandomness;
 pub use keystore_json::*;
 pub use wallet_pem::WalletPem;
 

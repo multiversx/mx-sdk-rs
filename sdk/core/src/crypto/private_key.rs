@@ -124,21 +124,6 @@ impl PrivateKey {
         PrivateKey::from_bytes(key.as_slice()).unwrap()
     }
 
-    /// Currently not in use.
-    ///
-    /// Guarded by feature "wallet-full", to avoid unnecessarily importing `rand`.
-    #[cfg(feature = "wallet-full")]
-    pub fn generate<T>(r: &mut T) -> PrivateKey
-    where
-        T: rand::CryptoRng + rand::Rng,
-    {
-        let mut secret_key = PrivateKey([0u8; 64]);
-
-        r.fill_bytes(&mut secret_key.0);
-
-        secret_key
-    }
-
     pub fn to_bytes(&self) -> [u8; PRIVATE_KEY_LENGTH] {
         self.0
     }
