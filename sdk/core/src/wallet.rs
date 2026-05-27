@@ -1,37 +1,31 @@
+mod keystore;
+mod keystore_json;
 mod wallet_pem;
 
+pub use keystore::Keystore;
+pub use keystore_json::*;
 pub use wallet_pem::WalletPem;
 
 use core::str;
 use std::{
-    fs::{self},
     io::{self, Write},
     path::Path,
 };
 
-use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
 use bip39::Mnemonic;
-use ctr::{Ctr128BE, cipher::StreamCipher};
-use hmac::{Hmac, KeyInit, Mac};
 use multiversx_chain_core::{
     std::{Bech32Address, Bech32Hrp},
     types::Address,
 };
-use scrypt::{Params, scrypt};
 use serde_json::json;
-use sha2::{Digest, Sha256};
+use sha2::Digest;
 use sha3::Keccak256;
 
 use crate::{
     crypto::{private_key::PrivateKey, public_key::PublicKey},
-    data::{keystore::*, transaction::Transaction},
+    data::transaction::Transaction,
 };
-
-const CIPHER_ALGORITHM_AES_128_CTR: &str = "aes-128-ctr";
-const KDF_SCRYPT: &str = "scrypt";
-
-type HmacSha256 = Hmac<Sha256>;
 
 #[derive(Clone, Debug)]
 pub struct Wallet {
@@ -89,39 +83,23 @@ impl Wallet {
         file_path: P,
         insert_password: InsertPassword,
     ) -> Result<Self> {
+        let keystore = Keystore::from_file(&file_path);
         let decryption_params = match insert_password {
             InsertPassword::Plaintext(password) => {
-                Self::validate_keystore_password(&file_path, password.to_string()).unwrap_or_else(
-                    |e| {
-                        panic!("Error: {:?}", e);
-                    },
-                )
+                keystore.validate_password(&password).unwrap_or_else(|e| {
+                    panic!("Error: {:?}", e);
+                })
             }
-            InsertPassword::StandardInput => {
-                Self::validate_keystore_password(&file_path, Self::get_keystore_password())
-                    .unwrap_or_else(|e| {
-                        panic!("Error: {:?}", e);
-                    })
-            }
+            InsertPassword::StandardInput => keystore
+                .validate_password(&Self::get_keystore_password())
+                .unwrap_or_else(|e| {
+                    panic!("Error: {:?}", e);
+                }),
         };
         let priv_key = PrivateKey::from_hex_str(
-            hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),
+            hex::encode(Keystore::decrypt_secret_key(decryption_params)).as_str(),
         )?;
         Ok(Self::from_private_key(priv_key, None))
-    }
-
-    pub fn get_private_key_from_keystore_secret<P: AsRef<Path>>(
-        file_path: P,
-        password: &str,
-    ) -> Result<PrivateKey> {
-        let decyption_params = Self::validate_keystore_password(file_path, password.to_string())
-            .unwrap_or_else(|e| {
-                panic!("Error: {:?}", e);
-            });
-        let priv_key = PrivateKey::from_hex_str(
-            hex::encode(Self::decrypt_secret_key(decyption_params)).as_str(),
-        )?;
-        Ok(priv_key)
     }
 
     #[deprecated(
@@ -168,139 +146,6 @@ impl Wallet {
         print!("Insert password: ");
         io::stdout().flush().unwrap();
         rpassword::read_password().unwrap()
-    }
-
-    pub fn validate_keystore_password<P: AsRef<Path>>(
-        path: P,
-        password: String,
-    ) -> Result<DecryptionParams, WalletError> {
-        let json_body = fs::read_to_string(path).unwrap();
-        let keystore: Keystore = serde_json::from_str(&json_body).unwrap();
-        let ciphertext = hex::decode(&keystore.crypto.ciphertext).unwrap();
-
-        let cipher = &keystore.crypto.cipher;
-        if cipher != CIPHER_ALGORITHM_AES_128_CTR {
-            return Err(WalletError::InvalidCipher);
-        }
-
-        let iv = hex::decode(&keystore.crypto.cipherparams.iv).unwrap();
-        let salt = hex::decode(&keystore.crypto.kdfparams.salt).unwrap();
-        let json_mac = hex::decode(&keystore.crypto.mac).unwrap();
-
-        let kdf = &keystore.crypto.kdf;
-        if kdf != KDF_SCRYPT {
-            return Err(WalletError::InvalidKdf);
-        }
-        let n = keystore.crypto.kdfparams.n as f64;
-        let r = keystore.crypto.kdfparams.r as u64;
-        let p = keystore.crypto.kdfparams.p as u64;
-        let _dklen = keystore.crypto.kdfparams.dklen as usize;
-
-        let params = Params::new(n.log2() as u8, r as u32, p as u32).unwrap();
-
-        let mut derived_key = vec![0u8; 32];
-        scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
-
-        let derived_key_first_half = derived_key[0..16].to_vec();
-        let derived_key_second_half = derived_key[16..32].to_vec();
-
-        let mut input_mac = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
-        input_mac.update(&ciphertext);
-        let computed_mac = input_mac.finalize().into_bytes();
-
-        if computed_mac.to_vec() == json_mac {
-            println!("Password is correct");
-            Ok(DecryptionParams {
-                derived_key_first_half,
-                iv,
-                data: ciphertext,
-            })
-        } else {
-            println!("Password is incorrect");
-            Err(WalletError::InvalidPassword)
-        }
-    }
-
-    pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> Vec<u8> {
-        let key: &[u8; 16] = decryption_params
-            .derived_key_first_half
-            .as_slice()
-            .try_into()
-            .unwrap();
-        let iv: &[u8; 16] = decryption_params.iv.as_slice().try_into().unwrap();
-        let mut cipher = Ctr128BE::<Aes128>::new(key.into(), iv.into());
-        let mut decrypted = decryption_params.data.to_vec();
-        cipher.apply_keystream(&mut decrypted);
-
-        decrypted
-    }
-
-    /// Not available in dapps, since it uses randomness to generate the keystore.
-    ///
-    /// Only available in the sc-meta standalone CLI.
-    #[cfg(feature = "wallet-full")]
-    pub fn encrypt_keystore(
-        data: &[u8],
-        hrp: &str,
-        address: &Address,
-        public_key: &str,
-        password: &str,
-    ) -> String {
-        use rand::Rng;
-
-        let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
-        let mut rand_salt: [u8; 32] = [0u8; 32];
-        rand::rng().fill_bytes(&mut rand_salt);
-        let salt_hex = hex::encode(rand_salt);
-
-        let mut rand_iv: [u8; 16] = [0u8; 16];
-        rand::rng().fill_bytes(&mut rand_iv);
-        let iv_hex = hex::encode(rand_iv);
-
-        let mut derived_key = vec![0u8; 32];
-        scrypt(password.as_bytes(), &rand_salt, &params, &mut derived_key).unwrap();
-
-        let derived_key_first_half = derived_key[0..16].to_vec();
-        let derived_key_second_half = derived_key[16..32].to_vec();
-
-        let decryption_params = DecryptionParams {
-            derived_key_first_half,
-            iv: rand_iv.to_vec(),
-            data: data.to_vec(),
-        };
-
-        let ciphertext = Self::decrypt_secret_key(decryption_params);
-
-        let mut h = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
-        h.update(&ciphertext);
-        let mac = h.finalize().into_bytes();
-        let keystore = Keystore {
-            crypto: Crypto {
-                cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
-                cipherparams: CryptoParams { iv: iv_hex },
-                ciphertext: hex::encode(&ciphertext),
-                kdf: KDF_SCRYPT.to_string(),
-                kdfparams: KdfParams {
-                    salt: salt_hex,
-                    n: KDF_N,
-                    r: KDF_R,
-                    p: KDF_P,
-                    dklen: KDF_DKLEN as u32,
-                },
-                mac: hex::encode(mac),
-            },
-            id: uuid::Uuid::new_v4().to_string(),
-            version: KEYSTORE_VERSION,
-            kind: "secretKey".to_string(),
-            address: public_key.to_string(),
-            bech32: address
-                .to_bech32(hrp.try_into().expect("invalid HRP"))
-                .bech32,
-        };
-
-        let mut keystore_json: String = serde_json::to_string_pretty(&keystore).unwrap();
-        keystore_json.push('\n');
-        keystore_json
     }
 
     pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {

@@ -7,7 +7,7 @@ pub const KDF_DKLEN: usize = 32;
 pub const KEYSTORE_VERSION: u32 = 4;
 
 #[derive(Debug)]
-pub enum WalletError {
+pub enum KeystoreError {
     InvalidPassword,
     InvalidKdf,
     InvalidCipher,
@@ -44,7 +44,7 @@ pub struct Crypto {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Keystore {
+pub struct KeystoreJson {
     pub version: u32,
     pub kind: String,
     pub id: String,

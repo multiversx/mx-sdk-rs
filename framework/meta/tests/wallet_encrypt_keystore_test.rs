@@ -1,5 +1,6 @@
 use multiversx_chain_core::std::Bech32Hrp;
 use multiversx_sc::types::Address;
+use multiversx_sdk::wallet::Keystore;
 use multiversx_sdk::wallet::Wallet;
 use std::fs::{self, File};
 use std::io::Write;
@@ -18,13 +19,14 @@ fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
 
     let concatenated_keys = format!("{}{}", ALICE_PRIVATE_KEY, ALICE_PUBLIC_KEY);
     let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
-    let json_result = Wallet::encrypt_keystore(
+    let json_result = Keystore::encrypt(
         hex_decoded_keys.as_slice(),
-        hrp,
+        hrp.try_into().expect("invalid HRP"),
         &address,
         ALICE_PUBLIC_KEY,
         KEYSTORE_PASSWORD,
-    );
+    )
+    .to_json_string();
     write_to_file(&json_result, file);
     address
 }
@@ -34,7 +36,7 @@ fn test_wallet_convert_pem_to_keystore() {
     let _ = create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_1);
     let wallet_pem = Wallet::from_pem_file(ALICE_PEM_PATH).unwrap();
     assert_eq!(
-        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_1, KEYSTORE_PASSWORD)
+        Keystore::get_private_key_from_file(ALICE_KEYSTORE_PATH_TEST_1, KEYSTORE_PASSWORD)
             .unwrap()
             .to_string(),
         wallet_pem.private_key_hex()
@@ -47,8 +49,7 @@ fn test_wallet_convert_keystore_to_pem() {
     create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_2);
 
     let private_key =
-        Wallet::get_private_key_from_keystore_secret(ALICE_KEYSTORE_PATH_TEST_2, KEYSTORE_PASSWORD)
-            .unwrap();
+        Keystore::get_private_key_from_file(ALICE_KEYSTORE_PATH_TEST_2, KEYSTORE_PASSWORD).unwrap();
     let pem_content = Wallet::from_private_key_hex(&private_key.to_string())
         .unwrap()
         .to_pem(Bech32Hrp::default())

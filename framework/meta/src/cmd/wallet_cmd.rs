@@ -7,6 +7,7 @@ use crate::cli::{
 use bip39::{Language, Mnemonic};
 use multiversx_sc::types::{self, Address};
 use multiversx_sc_snippets::sdk::chain_core::std::Bech32Hrp;
+use multiversx_sc_snippets::sdk::wallet::Keystore;
 use multiversx_sc_snippets::sdk::wallet::Wallet;
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
 use std::{
@@ -55,11 +56,9 @@ fn convert(convert_args: &WalletConvertArgs) {
         },
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
-                let private_key = Wallet::get_private_key_from_keystore_secret(
-                    file,
-                    &Wallet::get_keystore_password(),
-                )
-                .unwrap();
+                let private_key =
+                    Keystore::get_private_key_from_file(file, &Wallet::get_keystore_password())
+                        .unwrap();
                 write_resulted_pem(hrp, &private_key.to_string(), outfile);
             }
             None => {
@@ -75,13 +74,14 @@ fn convert(convert_args: &WalletConvertArgs) {
                 let hex_decoded_keys =
                     hex::decode(format!("{}{}", private_key_str, public_key_str)).unwrap();
 
-                let json_result = Wallet::encrypt_keystore(
+                let json_result = Keystore::encrypt(
                     hex_decoded_keys.as_slice(),
-                    hrp.as_str(),
+                    hrp,
                     &address,
                     &public_key_str,
                     &Wallet::get_keystore_password(),
-                );
+                )
+                .to_json_string();
                 write_resulted_keystore(json_result, outfile);
             }
             None => {
@@ -220,13 +220,14 @@ fn new(new_args: &WalletNewArgs) {
         Some("keystore-secret") => {
             let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
             let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
-            let json_result = Wallet::encrypt_keystore(
+            let json_result = Keystore::encrypt(
                 hex_decoded_keys.as_slice(),
-                hrp.as_str(),
+                hrp,
                 &address,
                 &public_key_str,
                 &Wallet::get_keystore_password(),
-            );
+            )
+            .to_json_string();
             write_resulted_keystore(json_result, outfile);
             if let Some(outfile) = outfile {
                 println!("Wallet saved to '{outfile}'");

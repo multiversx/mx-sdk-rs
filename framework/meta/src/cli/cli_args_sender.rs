@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::Args;
-use multiversx_sc_snippets::sdk::{data::keystore::InsertPassword, wallet::Wallet};
+use multiversx_sc_snippets::sdk::{wallet::InsertPassword, wallet::Wallet};
 use std::path::PathBuf;
 
 /// Wallet / sender arguments shared by commands that sign transactions.
