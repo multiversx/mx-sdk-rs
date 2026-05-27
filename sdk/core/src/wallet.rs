@@ -29,7 +29,7 @@ use crate::{
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Wallet {
-    pub priv_key: PrivateKey,
+    pub private_key: PrivateKey,
     pub address: Address,
     pub source: WalletSource,
 }
@@ -48,7 +48,7 @@ impl Wallet {
     pub fn new(private_key: PrivateKey, source: WalletSource) -> Self {
         let address = PublicKey::from(&private_key).to_address();
         Wallet {
-            priv_key: private_key,
+            private_key,
             address,
             source,
         }
@@ -58,7 +58,7 @@ impl Wallet {
 impl From<WalletPem> for Wallet {
     fn from(wallet_pem: WalletPem) -> Self {
         Self::new(
-            wallet_pem.priv_key,
+            wallet_pem.private_key,
             WalletSource::PemFile(wallet_pem.address.hrp),
         )
     }
@@ -78,8 +78,8 @@ impl Wallet {
     }
 
     pub fn from_private_key_hex(priv_key: &str) -> Result<Self> {
-        let priv_key = PrivateKey::from_hex_str(priv_key)?;
-        Ok(Self::new(priv_key, WalletSource::PrivateKey))
+        let private_key = PrivateKey::from_hex_str(priv_key)?;
+        Ok(Self::new(private_key, WalletSource::PrivateKey))
     }
 
     pub fn from_pem_file<P>(file_path: P) -> Result<Self>
@@ -95,7 +95,7 @@ impl Wallet {
 
     pub fn new_test_wallet(name: &'static str, pem: &str) -> Self {
         let wallet_pem = WalletPem::from_pem_str(pem).unwrap();
-        Self::new(wallet_pem.priv_key, WalletSource::TestWallet(name))
+        Self::new(wallet_pem.private_key, WalletSource::TestWallet(name))
     }
 
     #[deprecated(
@@ -111,11 +111,11 @@ impl Wallet {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.priv_key.to_string()
+        self.private_key.to_string()
     }
 
     pub fn public_key_hex(&self) -> String {
-        PublicKey::from(&self.priv_key).to_string()
+        PublicKey::from(&self.private_key).to_string()
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
@@ -131,16 +131,16 @@ impl Wallet {
             tx_bytes = h.finalize().to_vec();
         }
 
-        self.priv_key.sign(tx_bytes)
+        self.private_key.sign(tx_bytes)
     }
 
     pub fn sign_bytes(&self, data: Vec<u8>) -> [u8; 64] {
-        self.priv_key.sign(data)
+        self.private_key.sign(data)
     }
 
     pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {
         WalletPem {
-            priv_key: self.priv_key,
+            private_key: self.private_key,
             address: Bech32Address::encode_address(hrp, self.address.clone()),
         }
     }

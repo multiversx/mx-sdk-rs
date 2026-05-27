@@ -16,7 +16,7 @@ const ALICE_PRIVATE_KEY: &str = "413f42575f7f26fad3317a778771212fdb80245850981e4
 fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
     let wallet = Wallet::from_private_key_hex(ALICE_PRIVATE_KEY).unwrap();
     let json_result = Keystore::encrypt(
-        wallet.priv_key,
+        wallet.private_key,
         hrp.try_into().expect("invalid HRP"),
         KEYSTORE_PASSWORD,
         new_keystore_randomness(),
@@ -35,8 +35,8 @@ fn test_wallet_convert_pem_to_keystore() {
             .unwrap()
             .decrypt_wallet(KEYSTORE_PASSWORD)
             .unwrap()
-            .priv_key,
-        wallet_pem.priv_key
+            .private_key,
+        wallet_pem.private_key
     );
     fs::remove_file(ALICE_KEYSTORE_PATH_TEST_1).unwrap();
 }
@@ -52,8 +52,10 @@ fn test_wallet_convert_keystore_to_pem() {
     let pem_content = wallet.to_pem(Bech32Hrp::default()).to_pem_str();
     write_to_file(&pem_content, ALICE_PEM_PATH_TEST);
     assert_eq!(
-        wallet.priv_key,
-        Wallet::from_pem_file(ALICE_PEM_PATH_TEST).unwrap().priv_key
+        wallet.private_key,
+        Wallet::from_pem_file(ALICE_PEM_PATH_TEST)
+            .unwrap()
+            .private_key
     );
 
     fs::remove_file(ALICE_PEM_PATH_TEST).unwrap();

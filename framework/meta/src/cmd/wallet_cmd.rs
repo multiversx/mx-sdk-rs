@@ -86,7 +86,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 let wallet_pem = WalletPem::from_pem_file(file).expect("error reading PEM file");
                 let randomness = new_keystore_randomness();
                 let json_result = Keystore::encrypt(
-                    wallet_pem.priv_key,
+                    wallet_pem.private_key,
                     hrp,
                     &get_keystore_password(),
                     randomness,
@@ -227,7 +227,7 @@ fn new(new_args: &WalletNewArgs) {
         Some("keystore-secret") => {
             let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
-                new_wallet_info.wallet.priv_key,
+                new_wallet_info.wallet.private_key,
                 hrp,
                 &get_keystore_password(),
                 randomness,
