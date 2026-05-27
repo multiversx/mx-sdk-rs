@@ -84,10 +84,9 @@ impl Keystore {
         )
         .unwrap();
 
-        let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
-        let derived_key_second_half = &derived_key[16..32];
+        let (derived_key_first_half, derived_key_second_half) = split_derived_key(&derived_key);
 
-        let mut input_mac = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
+        let mut input_mac = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
         input_mac.update(&self.ciphertext);
         let computed_mac = input_mac.finalize().into_bytes();
 
@@ -128,8 +127,7 @@ impl Keystore {
         )
         .unwrap();
 
-        let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
-        let derived_key_second_half = &derived_key[16..32];
+        let (derived_key_first_half, derived_key_second_half) = split_derived_key(&derived_key);
 
         let ciphertext = run_cipher(
             derived_key_first_half,
@@ -137,7 +135,7 @@ impl Keystore {
             private_key_bytes.to_vec(),
         );
 
-        let mut h = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
+        let mut h = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
         h.update(&ciphertext);
         let mac = h.finalize().into_bytes().to_vec();
 
@@ -167,4 +165,16 @@ fn run_cipher(key: [u8; 16], iv: [u8; 16], mut data: Vec<u8>) -> Vec<u8> {
     let mut cipher = Ctr128BE::<Aes128>::new((&key).into(), (&iv).into());
     cipher.apply_keystream(&mut data);
     data
+}
+
+/// Splits a 32-byte scrypt derived key into two 16-byte halves.
+///
+/// The first half is used as the AES-128 cipher key; the second half is
+/// used as the HMAC-SHA256 key for MAC verification.
+fn split_derived_key(derived_key: &[u8; 32]) -> ([u8; 16], [u8; 16]) {
+    let mut first_half = [0u8; 16];
+    let mut second_half = [0u8; 16];
+    first_half.copy_from_slice(&derived_key[..16]);
+    second_half.copy_from_slice(&derived_key[16..]);
+    (first_half, second_half)
 }
