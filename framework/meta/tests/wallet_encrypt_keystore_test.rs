@@ -38,6 +38,7 @@ fn test_wallet_convert_pem_to_keystore() {
     let wallet_pem = Wallet::from_pem_file(ALICE_PEM_PATH).unwrap();
     assert_eq!(
         Keystore::from_file(ALICE_KEYSTORE_PATH_TEST_1)
+            .unwrap()
             .extract_private_key(KEYSTORE_PASSWORD)
             .unwrap()
             .to_string(),
@@ -51,6 +52,7 @@ fn test_wallet_convert_keystore_to_pem() {
     create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_2);
 
     let private_key = Keystore::from_file(ALICE_KEYSTORE_PATH_TEST_2)
+        .unwrap()
         .extract_private_key(KEYSTORE_PASSWORD)
         .unwrap();
     let pem_content = Wallet::from_private_key_hex(&private_key.to_string())
