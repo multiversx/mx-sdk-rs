@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use multiversx_chain_core::std::Bech32Address;
+
 use super::{Keystore, KeystoreRandomness};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,8 +55,7 @@ impl Keystore {
         Ok(Keystore {
             version: json.version,
             kind: json.kind,
-            address: json.address,
-            bech32: json.bech32,
+            bech32_address: Bech32Address::from_bech32_str(&json.bech32),
             cipher: json.crypto.cipher,
             ciphertext,
             kdf: json.crypto.kdf,
@@ -76,8 +77,8 @@ impl Keystore {
             version: self.version,
             kind: self.kind.clone(),
             id: self.randomness.id.clone(),
-            address: self.address.clone(),
-            bech32: self.bech32.clone(),
+            address: self.bech32_address.address.to_hex(),
+            bech32: self.bech32_address.bech32.clone(),
             crypto: Crypto {
                 cipher: self.cipher.clone(),
                 cipherparams: CryptoParams {

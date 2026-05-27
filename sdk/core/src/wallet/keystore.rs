@@ -4,7 +4,7 @@ use std::path::Path;
 use aes::{Aes128, cipher::KeyIvInit};
 use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, KeyInit, Mac};
-use multiversx_chain_core::std::Bech32Address;
+use multiversx_chain_core::std::{Bech32Address, Bech32Hrp};
 use scrypt::{Params, scrypt};
 use sha2::Sha256;
 
@@ -37,8 +37,7 @@ pub struct KeystoreRandomness {
 pub struct Keystore {
     pub version: u32,
     pub kind: String,
-    pub address: String,
-    pub bech32: String,
+    pub bech32_address: Bech32Address,
     pub cipher: String,
     pub ciphertext: Vec<u8>,
     pub kdf: String,
@@ -107,12 +106,13 @@ impl Keystore {
     /// Only available in the sc-meta standalone CLI.
     pub fn encrypt(
         private_key: PrivateKey,
-        bech32_address: Bech32Address,
+        hrp: Bech32Hrp,
         password: &str,
         randomness: KeystoreRandomness,
     ) -> Self {
+        let public_key = PublicKey::from(&private_key);
+        let bech32_address = public_key.to_address().to_bech32(hrp);
         let private_key_bytes = private_key.to_bytes();
-        let public_key_hex = PublicKey::from(&private_key).to_string();
 
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
 
@@ -140,8 +140,7 @@ impl Keystore {
         Keystore {
             version: KEYSTORE_VERSION,
             kind: KIND_SECRET_KEY.to_string(),
-            address: public_key_hex,
-            bech32: bech32_address.bech32,
+            bech32_address,
             cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
             ciphertext,
             kdf: KDF_SCRYPT.to_string(),

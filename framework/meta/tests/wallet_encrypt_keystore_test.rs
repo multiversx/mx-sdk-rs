@@ -17,9 +17,7 @@ fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
     let wallet = Wallet::from_private_key_hex(ALICE_PRIVATE_KEY).unwrap();
     let json_result = Keystore::encrypt(
         wallet.priv_key,
-        wallet
-            .address
-            .to_bech32(hrp.try_into().expect("invalid HRP")),
+        hrp.try_into().expect("invalid HRP"),
         KEYSTORE_PASSWORD,
         new_keystore_randomness(),
     )

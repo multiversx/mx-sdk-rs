@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::{Result, anyhow};
 use multiversx_chain_core::std::Bech32Address;
 
@@ -47,6 +49,15 @@ impl WalletPem {
         let priv_key = PrivateKey::from_hex_str(private_key_str)?;
 
         Ok(WalletPem { priv_key, address })
+    }
+
+    /// Reads a PEM file from disk and parses it with [`WalletPem::from_pem_str`].
+    pub fn from_pem_file<P>(file_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let contents = std::fs::read_to_string(file_path)?;
+        Self::from_pem_str(&contents)
     }
 
     /// Produces a PEM string from this `WalletPem`.

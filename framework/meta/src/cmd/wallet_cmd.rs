@@ -13,7 +13,10 @@ use multiversx_sc_snippets::sdk::wallet::Keystore;
 use multiversx_sc_snippets::sdk::wallet::KeystoreRandomness;
 use multiversx_sc_snippets::sdk::wallet::Wallet;
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
-use multiversx_sdk::{crypto::private_key::PrivateKey, wallet::KeystoreError};
+use multiversx_sdk::{
+    crypto::private_key::PrivateKey,
+    wallet::{KeystoreError, WalletPem},
+};
 
 use crate::cli::cli_args_sender::get_keystore_password;
 use crate::cli::{
@@ -82,11 +85,11 @@ fn convert(convert_args: &WalletConvertArgs) {
         },
         ("pem", "keystore-secret") => match infile {
             Some(file) => {
-                let wallet = Wallet::from_pem_file(file).expect("error reading PEM file");
+                let wallet_pem = WalletPem::from_pem_file(file).expect("error reading PEM file");
                 let randomness = new_keystore_randomness();
                 let json_result = Keystore::encrypt(
-                    wallet.priv_key,
-                    wallet.address.to_bech32(hrp),
+                    wallet_pem.priv_key,
+                    hrp,
                     &get_keystore_password(),
                     randomness,
                 )
@@ -228,7 +231,7 @@ fn new(new_args: &WalletNewArgs) {
             let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
                 new_wallet_info.wallet.priv_key,
-                new_wallet_info.wallet.address.to_bech32(hrp),
+                hrp,
                 &get_keystore_password(),
                 randomness,
             )
