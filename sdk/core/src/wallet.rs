@@ -31,46 +31,71 @@ use crate::{
 pub struct Wallet {
     pub priv_key: PrivateKey,
     pub address: Address,
-    pub hrp: Option<Bech32Hrp>,
+    pub source: WalletSource,
+}
+
+/// Optional structure that indicates how thew [`Wallet`] was created, with additional metadata.
+#[derive(Clone, Debug)]
+pub enum WalletSource {
+    Mnemonic,
+    PrivateKey,
+    PemFile(Bech32Hrp),
+    TestWallet(&'static str),
+    Keystore(Bech32Hrp),
+}
+
+impl Wallet {
+    pub fn new(private_key: PrivateKey, source: WalletSource) -> Self {
+        let address = PublicKey::from(&private_key).to_address();
+        Wallet {
+            priv_key: private_key,
+            address,
+            source,
+        }
+    }
 }
 
 impl From<WalletPem> for Wallet {
     fn from(wallet_pem: WalletPem) -> Self {
-        Self::from_private_key(wallet_pem.priv_key, Some(wallet_pem.address.hrp))
+        Self::new(
+            wallet_pem.priv_key,
+            WalletSource::PemFile(wallet_pem.address.hrp),
+        )
+    }
+}
+
+impl From<PrivateKey> for Wallet {
+    fn from(private_key: PrivateKey) -> Self {
+        Self::new(private_key, WalletSource::PrivateKey)
     }
 }
 
 impl Wallet {
-    fn from_private_key(priv_key: PrivateKey, hrp: Option<Bech32Hrp>) -> Self {
-        let address = PublicKey::from(&priv_key).to_address();
-        Wallet {
-            priv_key,
-            address,
-            hrp,
-        }
-    }
-
     pub fn from_mnemonic_string(mnemonic_str: String) -> Wallet {
         let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
         let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32);
-        Self::from_private_key(private_key, None)
+        Self::new(private_key, WalletSource::Mnemonic)
     }
 
     pub fn from_private_key_hex(priv_key: &str) -> Result<Self> {
         let priv_key = PrivateKey::from_hex_str(priv_key)?;
-        Ok(Self::from_private_key(priv_key, None))
+        Ok(Self::new(priv_key, WalletSource::PrivateKey))
     }
 
     pub fn from_pem_file<P>(file_path: P) -> Result<Self>
     where
         P: AsRef<Path>,
     {
-        let contents = std::fs::read_to_string(file_path)?;
-        Self::from_pem_file_contents(contents)
+        Ok(WalletPem::from_pem_file(file_path)?.into())
     }
 
     pub fn from_pem_file_contents(contents: String) -> Result<Self> {
         Ok(WalletPem::from_pem_str(&contents)?.into())
+    }
+
+    pub fn new_test_wallet(name: &'static str, pem: &str) -> Self {
+        let wallet_pem = WalletPem::from_pem_str(pem).unwrap();
+        Self::new(wallet_pem.priv_key, WalletSource::TestWallet(name))
     }
 
     #[deprecated(

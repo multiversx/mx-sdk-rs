@@ -39,68 +39,64 @@ const WALLETS: &[(&str, &str)] = &[
     ("s2onja", SZONJA_PEM),
 ];
 
-fn test_wallet(pem_file_contents: &str) -> Wallet {
-    Wallet::from_pem_file_contents(pem_file_contents.to_string()).unwrap()
-}
-
 /// Test wallet. Do not use on mainnet.
 pub fn alice() -> Wallet {
-    test_wallet(ALICE_PEM)
+    Wallet::new_test_wallet("alice", ALICE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn bob() -> Wallet {
-    test_wallet(BOB_PEM)
+    Wallet::new_test_wallet("bob", BOB_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn carol() -> Wallet {
-    test_wallet(CAROL_PEM)
+    Wallet::new_test_wallet("carol", CAROL_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn dan() -> Wallet {
-    test_wallet(DAN_PEM)
+    Wallet::new_test_wallet("dan", DAN_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn eve() -> Wallet {
-    test_wallet(EVE_PEM)
+    Wallet::new_test_wallet("eve", EVE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn frank() -> Wallet {
-    test_wallet(FRANK_PEM)
+    Wallet::new_test_wallet("frank", FRANK_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn grace() -> Wallet {
-    test_wallet(GRACE_PEM)
+    Wallet::new_test_wallet("grace", GRACE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn heidi() -> Wallet {
-    test_wallet(HEIDI_PEM)
+    Wallet::new_test_wallet("heidi", HEIDI_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn ivan() -> Wallet {
-    test_wallet(IVAN_PEM)
+    Wallet::new_test_wallet("ivan", IVAN_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn judy() -> Wallet {
-    test_wallet(JUDY_PEM)
+    Wallet::new_test_wallet("judy", JUDY_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn mallory() -> Wallet {
-    test_wallet(MALLORY_PEM)
+    Wallet::new_test_wallet("mallory", MALLORY_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn mike() -> Wallet {
-    test_wallet(MIKE_PEM)
+    Wallet::new_test_wallet("mike", MIKE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -109,7 +105,7 @@ pub fn mike() -> Wallet {
 ///
 /// Address: 0x14af28ce7d79117f689228b1af89d16e8b0c16a3d36062a2b6eeb8fbab6c0000
 pub fn sophie() -> Wallet {
-    test_wallet(SOPHIE_PEM)
+    Wallet::new_test_wallet("sophie", SOPHIE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -118,7 +114,7 @@ pub fn sophie() -> Wallet {
 ///
 /// Address: 0x4b9ab2524a7d15416fb78d4d88249dc30272bd6ee1b8a07d4342c33a40a00001
 pub fn simon() -> Wallet {
-    test_wallet(SIMON_PEM)
+    Wallet::new_test_wallet("simon", SIMON_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -127,7 +123,7 @@ pub fn simon() -> Wallet {
 ///
 /// Address: 0x5ea3f378aaaa9f51cef76093b62e1041c90b415016dfa49760d7a846a8d90002
 pub fn szonja() -> Wallet {
-    test_wallet(SZONJA_PEM)
+    Wallet::new_test_wallet("szonja", SZONJA_PEM)
 }
 
 /// Test wallets. Do not use on mainnet.
