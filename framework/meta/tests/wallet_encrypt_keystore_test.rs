@@ -33,10 +33,10 @@ fn test_wallet_convert_pem_to_keystore() {
     assert_eq!(
         Keystore::from_file(ALICE_KEYSTORE_PATH_TEST_1)
             .unwrap()
-            .extract_private_key(KEYSTORE_PASSWORD)
+            .decrypt_wallet(KEYSTORE_PASSWORD)
             .unwrap()
-            .to_string(),
-        wallet_pem.private_key_hex()
+            .priv_key,
+        wallet_pem.priv_key
     );
     fs::remove_file(ALICE_KEYSTORE_PATH_TEST_1).unwrap();
 }
@@ -45,20 +45,15 @@ fn test_wallet_convert_pem_to_keystore() {
 fn test_wallet_convert_keystore_to_pem() {
     create_keystore_file_from_scratch("erd", ALICE_KEYSTORE_PATH_TEST_2);
 
-    let private_key = Keystore::from_file(ALICE_KEYSTORE_PATH_TEST_2)
+    let wallet = Keystore::from_file(ALICE_KEYSTORE_PATH_TEST_2)
         .unwrap()
-        .extract_private_key(KEYSTORE_PASSWORD)
+        .decrypt_wallet(KEYSTORE_PASSWORD)
         .unwrap();
-    let pem_content = Wallet::from_private_key_hex(&private_key.to_string())
-        .unwrap()
-        .to_pem(Bech32Hrp::default())
-        .to_pem_str();
+    let pem_content = wallet.to_pem(Bech32Hrp::default()).to_pem_str();
     write_to_file(&pem_content, ALICE_PEM_PATH_TEST);
     assert_eq!(
-        private_key.to_string(),
-        Wallet::from_pem_file(ALICE_PEM_PATH_TEST)
-            .unwrap()
-            .private_key_hex()
+        wallet.priv_key,
+        Wallet::from_pem_file(ALICE_PEM_PATH_TEST).unwrap().priv_key
     );
 
     fs::remove_file(ALICE_PEM_PATH_TEST).unwrap();

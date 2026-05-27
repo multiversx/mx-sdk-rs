@@ -55,7 +55,7 @@ impl Keystore {
         Ok(Keystore {
             version: json.version,
             kind: json.kind,
-            bech32_address: Bech32Address::from_bech32_str(&json.bech32),
+            address: Bech32Address::from_bech32_str(&json.bech32),
             cipher: json.crypto.cipher,
             ciphertext,
             kdf: json.crypto.kdf,
@@ -77,8 +77,8 @@ impl Keystore {
             version: self.version,
             kind: self.kind.clone(),
             id: self.randomness.id.clone(),
-            address: self.bech32_address.address.to_hex(),
-            bech32: self.bech32_address.bech32.clone(),
+            address: self.address.address.to_hex(),
+            bech32: self.address.bech32.clone(),
             crypto: Crypto {
                 cipher: self.cipher.clone(),
                 cipherparams: CryptoParams {

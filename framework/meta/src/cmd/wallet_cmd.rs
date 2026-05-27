@@ -1,5 +1,3 @@
-use core::str;
-
 use bip39::{Language, Mnemonic};
 use rand::Rng;
 use std::{
@@ -52,7 +50,7 @@ fn convert(convert_args: &WalletConvertArgs) {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
                 let wallet = Wallet::from_mnemonic_string(mnemonic_str);
-                write_resulted_pem(hrp, &wallet.private_key_hex(), outfile);
+                write_resulted_pem(hrp, &wallet, outfile);
             }
             None => {
                 println!(
@@ -60,16 +58,16 @@ fn convert(convert_args: &WalletConvertArgs) {
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 let wallet = Wallet::from_mnemonic_string(mnemonic_str);
-                write_resulted_pem(hrp, &wallet.private_key_hex(), outfile);
+                write_resulted_pem(hrp, &wallet, outfile);
             }
         },
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
                 let keystore = Keystore::from_file(file).expect("keystore parsing error");
-                match keystore.extract_private_key(&get_keystore_password()) {
-                    Ok(priv_key) => {
+                match keystore.decrypt_wallet(&get_keystore_password()) {
+                    Ok(wallet) => {
                         println!("Password is correct");
-                        write_resulted_pem(hrp, &priv_key.to_string(), outfile);
+                        write_resulted_pem(hrp, &wallet, outfile);
                     }
                     Err(KeystoreError::InvalidPassword) => {
                         panic!("Password is incorrect");
@@ -106,8 +104,7 @@ fn convert(convert_args: &WalletConvertArgs) {
     }
 }
 
-fn write_resulted_pem(hrp: Bech32Hrp, private_key: &str, outfile: Option<&String>) {
-    let wallet = Wallet::from_private_key_hex(private_key).unwrap();
+fn write_resulted_pem(hrp: Bech32Hrp, wallet: &Wallet, outfile: Option<&String>) {
     let pem_content = wallet.to_pem(hrp).to_pem_str();
     match outfile {
         Some(outfile) => {
@@ -222,7 +219,7 @@ fn new(new_args: &WalletNewArgs) {
 
     match format {
         Some("pem") => {
-            write_resulted_pem(hrp, &new_wallet_info.wallet.private_key_hex(), outfile);
+            write_resulted_pem(hrp, &new_wallet_info.wallet, outfile);
             if let Some(outfile) = outfile {
                 println!("Wallet saved to '{outfile}'");
             }

@@ -29,10 +29,8 @@ pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
             None => get_keystore_password(),
         };
         let keystore = Keystore::from_file(keyfile)?;
-        let priv_key = keystore
-            .extract_private_key(&password)
-            .context("failed to load keystore wallet")?;
-        Wallet::from_private_key_hex(&priv_key.to_string())
+        keystore
+            .decrypt_wallet(&password)
             .context("failed to load keystore wallet")
     } else {
         Err(anyhow!("a wallet is required: use --pem or --keyfile"))

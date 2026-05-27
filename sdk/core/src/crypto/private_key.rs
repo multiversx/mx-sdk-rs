@@ -20,7 +20,7 @@ pub const SEED_LENGTH: usize = 32;
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct PrivateKey(pub [u8; PRIVATE_KEY_LENGTH]);
 
 impl PrivateKey {
@@ -182,6 +182,12 @@ impl PrivateKey {
 impl Display for PrivateKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         hex::encode(&self.0[..32]).fmt(f)
+    }
+}
+
+impl std::fmt::Debug for PrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PrivateKey({})", self)
     }
 }
 

@@ -27,7 +27,7 @@ use crate::{
     data::transaction::Transaction,
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Wallet {
     pub priv_key: PrivateKey,
     pub address: Address,
@@ -35,7 +35,7 @@ pub struct Wallet {
 }
 
 /// Optional structure that indicates how thew [`Wallet`] was created, with additional metadata.
-#[derive(Clone, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub enum WalletSource {
     Mnemonic,
     PrivateKey,

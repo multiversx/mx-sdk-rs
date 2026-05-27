@@ -8,7 +8,10 @@ use multiversx_chain_core::std::{Bech32Address, Bech32Hrp};
 use scrypt::{Params, scrypt};
 use sha2::Sha256;
 
-use crate::crypto::{private_key::PrivateKey, public_key::PublicKey};
+use crate::{
+    crypto::{private_key::PrivateKey, public_key::PublicKey},
+    wallet::Wallet,
+};
 
 use super::{KeystoreError, KeystoreJson};
 
@@ -37,7 +40,7 @@ pub struct KeystoreRandomness {
 pub struct Keystore {
     pub version: u32,
     pub kind: String,
-    pub bech32_address: Bech32Address,
+    pub address: Bech32Address,
     pub cipher: String,
     pub ciphertext: Vec<u8>,
     pub kdf: String,
@@ -62,7 +65,11 @@ impl Keystore {
         s
     }
 
-    pub fn extract_private_key(&self, password: &str) -> Result<PrivateKey, KeystoreError> {
+    /// Decrypts the keystore with the given password and returns a [`Wallet`].
+    ///
+    /// Returns [`KeystoreError::InvalidPassword`] if the MAC check fails, or
+    /// other variants for unsupported cipher / KDF parameters.
+    pub fn decrypt_wallet(&self, password: &str) -> Result<Wallet, KeystoreError> {
         if self.cipher != CIPHER_ALGORITHM_AES_128_CTR {
             return Err(KeystoreError::InvalidCipher);
         }
@@ -98,12 +105,18 @@ impl Keystore {
             self.randomness.iv,
             self.ciphertext.clone(),
         );
-        PrivateKey::from_bytes(&private_key_bytes).map_err(Into::into)
+
+        let private_key = PrivateKey::from_bytes(&private_key_bytes)?;
+        Ok(Wallet::new(
+            private_key,
+            super::WalletSource::Keystore(self.address.hrp),
+        ))
     }
 
-    /// Not available in dapps, since it uses randomness to generate the keystore.
+    /// Encrypts a private key into a keystore using scrypt + AES-128-CTR + HMAC-SHA256.
     ///
-    /// Only available in the sc-meta standalone CLI.
+    /// The wallet address stored in the keystore is derived from `private_key`
+    /// and encoded with the given `hrp`.
     pub fn encrypt(
         private_key: PrivateKey,
         hrp: Bech32Hrp,
@@ -111,7 +124,7 @@ impl Keystore {
         randomness: KeystoreRandomness,
     ) -> Self {
         let public_key = PublicKey::from(&private_key);
-        let bech32_address = public_key.to_address().to_bech32(hrp);
+        let address = public_key.to_address().to_bech32(hrp);
         let private_key_bytes = private_key.to_bytes();
 
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
@@ -140,7 +153,7 @@ impl Keystore {
         Keystore {
             version: KEYSTORE_VERSION,
             kind: KIND_SECRET_KEY.to_string(),
-            bech32_address,
+            address,
             cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
             ciphertext,
             kdf: KDF_SCRYPT.to_string(),
