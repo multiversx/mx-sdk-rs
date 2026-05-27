@@ -136,7 +136,7 @@ impl PrivateKey {
         hex::encode(&self.0[..32])
     }
 
-    pub fn sign(&self, message: Vec<u8>) -> [u8; 64] {
+    pub fn sign(&self, message: impl AsRef<[u8]>) -> [u8; 64] {
         let mut h: Sha512 = Sha512::new();
         h.update(&self.0[..32]);
 
@@ -152,7 +152,7 @@ impl PrivateKey {
         expanded_secret_key[31] |= 64;
 
         h.update(&digest1[32..]);
-        h.update(&message);
+        h.update(message.as_ref());
         message_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let message_digest_reduced = sc_reduce(message_digest);
@@ -163,7 +163,7 @@ impl PrivateKey {
 
         h.update(encoded_r);
         h.update(&self.0[32..]);
-        h.update(&message);
+        h.update(message.as_ref());
         hram_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let hram_digest_reduced = sc_reduce(hram_digest);

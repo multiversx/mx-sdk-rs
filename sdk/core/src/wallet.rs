@@ -94,10 +94,6 @@ impl Wallet {
         Ok(WalletPem::from_pem_file(file_path)?.into())
     }
 
-    pub fn from_pem_file_contents(contents: String) -> Result<Self> {
-        Ok(WalletPem::from_pem_str(&contents)?.into())
-    }
-
     pub(crate) fn new_test_wallet(name: &'static str, pem: &str) -> Self {
         let wallet_pem = WalletPem::from_pem_str(pem).unwrap();
         Self::new(wallet_pem.private_key, WalletSource::TestWallet(name))
@@ -143,7 +139,7 @@ impl Wallet {
         self.private_key.sign(tx_bytes)
     }
 
-    pub fn sign_bytes(&self, data: Vec<u8>) -> [u8; 64] {
+    pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> [u8; 64] {
         self.private_key.sign(data)
     }
 
