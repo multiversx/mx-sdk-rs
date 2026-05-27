@@ -57,9 +57,9 @@ fn test_convert_mnemonic_to_pem_file_in_file_out() {
         }),
     });
 
-    let (private_key, public_key) = Wallet::get_wallet_keys_pem(&output_pem);
-    assert_eq!(private_key, KNOWN_PRIVATE_KEY);
-    assert_eq!(public_key, KNOWN_PUBLIC_KEY);
+    let wallet = Wallet::from_pem_file(&output_pem).unwrap();
+    assert_eq!(wallet.private_key_hex(), KNOWN_PRIVATE_KEY);
+    assert_eq!(wallet.public_key_hex(), KNOWN_PUBLIC_KEY);
 
     let pem_content = fs::read_to_string(&output_pem).unwrap();
     assert!(
@@ -140,9 +140,9 @@ fn test_convert_mnemonic_to_pem_custom_hrp() {
     );
 
     // Key material must be the same regardless of the HRP
-    let (private_key, public_key) = Wallet::get_wallet_keys_pem(&output_pem);
-    assert_eq!(private_key, KNOWN_PRIVATE_KEY);
-    assert_eq!(public_key, KNOWN_PUBLIC_KEY);
+    let wallet = Wallet::from_pem_file(&output_pem).unwrap();
+    assert_eq!(wallet.private_key_hex(), KNOWN_PRIVATE_KEY);
+    assert_eq!(wallet.public_key_hex(), KNOWN_PUBLIC_KEY);
 
     remove_if_exists(&mnemonic_file);
     remove_if_exists(&output_pem);

@@ -22,7 +22,7 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
 
     // Create the interactor – this fetches the network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet).await;
+    let sender_address = interactor.register_wallet(wallet.clone()).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
 
     // Determine nonce.

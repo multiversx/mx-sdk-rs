@@ -1,3 +1,7 @@
+mod wallet_pem;
+
+pub use wallet_pem::WalletPem;
+
 use core::str;
 use std::{
     fs::{self},
@@ -10,111 +14,57 @@ use anyhow::Result;
 use bip39::Mnemonic;
 use ctr::{Ctr128BE, cipher::StreamCipher};
 use hmac::{Hmac, KeyInit, Mac};
-use multiversx_chain_core::{std::Bech32Address, types::Address};
-use pbkdf2::pbkdf2;
+use multiversx_chain_core::{
+    std::{Bech32Address, Bech32Hrp},
+    types::Address,
+};
 use scrypt::{Params, scrypt};
 use serde_json::json;
-use sha2::{Digest, Sha256, Sha512};
+use sha2::{Digest, Sha256};
 use sha3::Keccak256;
-use zeroize::Zeroize;
 
 use crate::{
-    crypto::{
-        private_key::{PRIVATE_KEY_LENGTH, PrivateKey},
-        public_key::PublicKey,
-    },
+    crypto::{private_key::PrivateKey, public_key::PublicKey},
     data::{keystore::*, transaction::Transaction},
-    utils::*,
 };
 
-const EGLD_COIN_TYPE: u32 = 508;
-const HARDENED: u32 = 0x80000000;
 const CIPHER_ALGORITHM_AES_128_CTR: &str = "aes-128-ctr";
 const KDF_SCRYPT: &str = "scrypt";
 
-type HmacSha512 = Hmac<Sha512>;
 type HmacSha256 = Hmac<Sha256>;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Wallet {
     priv_key: PrivateKey,
+    pub address: Address,
+    pub hrp: Option<Bech32Hrp>,
+}
+
+impl From<WalletPem> for Wallet {
+    fn from(wallet_pem: WalletPem) -> Self {
+        Self::from_private_key(wallet_pem.priv_key, Some(wallet_pem.address.hrp))
+    }
 }
 
 impl Wallet {
-    fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {
-        let mut salt = String::with_capacity(8 + password.len());
-        salt.push_str("mnemonic");
-        salt.push_str(password);
-
-        let mut seed = [0u8; 64];
-
-        let _ = pbkdf2::<Hmac<Sha512>>(
-            mnemonic.to_string().as_bytes(),
-            salt.as_bytes(),
-            2048,
-            &mut seed,
-        );
-
-        salt.zeroize();
-
-        seed
-    }
-
-    pub fn get_private_key_from_mnemonic(
-        mnemonic: Mnemonic,
-        account: u32,
-        address_index: u32,
-    ) -> PrivateKey {
-        let seed = Self::seed_from_mnemonic(mnemonic, "");
-
-        let serialized_key_len = 32;
-        let hardened_child_padding: u8 = 0;
-
-        let mut digest =
-            HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
-        digest.update(&seed);
-        let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
-        let mut key = intermediary[..serialized_key_len].to_vec();
-        let mut chain_code = intermediary[serialized_key_len..].to_vec();
-
-        for child_idx in [
-            44 | HARDENED,
-            EGLD_COIN_TYPE | HARDENED,
-            account | HARDENED, // account
-            HARDENED,
-            address_index | HARDENED, // addressIndex
-        ] {
-            let mut buff = [vec![hardened_child_padding], key.clone()].concat();
-            buff.push((child_idx >> 24) as u8);
-            buff.push((child_idx >> 16) as u8);
-            buff.push((child_idx >> 8) as u8);
-            buff.push(child_idx as u8);
-
-            digest =
-                HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
-            digest.update(&buff);
-            let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
-            key = intermediary[..serialized_key_len].to_vec();
-            chain_code = intermediary[serialized_key_len..].to_vec();
+    fn from_private_key(priv_key: PrivateKey, hrp: Option<Bech32Hrp>) -> Self {
+        let address = PublicKey::from(&priv_key).to_address();
+        Wallet {
+            priv_key,
+            address,
+            hrp,
         }
-
-        PrivateKey::from_bytes(key.as_slice()).unwrap()
     }
 
-    pub fn get_wallet_keys_mnemonic(mnemonic_str: String) -> (String, String) {
+    pub fn from_mnemonic_string(mnemonic_str: String) -> Wallet {
         let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
-        let private_key = Self::get_private_key_from_mnemonic(mnemonic, 0u32, 0u32);
-        let public_key = PublicKey::from(&private_key);
-
-        let public_key_str: &str = &public_key.to_string();
-        let private_key_str: &str = &private_key.to_string();
-
-        (private_key_str.to_string(), public_key_str.to_string())
+        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32);
+        Self::from_private_key(private_key, None)
     }
 
-    pub fn from_private_key(priv_key: &str) -> Result<Self> {
+    pub fn from_private_key_hex(priv_key: &str) -> Result<Self> {
         let priv_key = PrivateKey::from_hex_str(priv_key)?;
-        Ok(Self { priv_key })
+        Ok(Self::from_private_key(priv_key, None))
     }
 
     pub fn from_pem_file<P>(file_path: P) -> Result<Self>
@@ -126,33 +76,13 @@ impl Wallet {
     }
 
     pub fn from_pem_file_contents(contents: String) -> Result<Self> {
-        let x = pem::parse(contents)?;
-        let x = x.contents()[..PRIVATE_KEY_LENGTH].to_vec();
-        let priv_key_str = std::str::from_utf8(x.as_slice())?;
-        let pri_key = PrivateKey::from_hex_str(priv_key_str)?;
-        Ok(Self { priv_key: pri_key })
+        Ok(WalletPem::from_pem_str(&contents)?.into())
     }
 
     pub fn get_shard(&self) -> u8 {
         let address = self.to_address();
         let address_bytes = address.as_bytes();
         address_bytes[address_bytes.len() - 1] % 3
-    }
-
-    pub fn get_pem_decoded_content<P: AsRef<Path>>(file: P) -> Vec<u8> {
-        let pem_content = fs::read_to_string(file).unwrap();
-        let lines: Vec<&str> = pem_content.split('\n').collect();
-        let pem_encoded_keys = format!("{}{}{}", lines[1], lines[2], lines[3]);
-        base64_decode(pem_encoded_keys)
-    }
-
-    pub fn get_wallet_keys_pem<P: AsRef<Path>>(file: P) -> (String, String) {
-        let pem_decoded_keys = Self::get_pem_decoded_content(file);
-        let (private_key, public_key) = pem_decoded_keys.split_at(pem_decoded_keys.len() / 2);
-        let private_key_str = String::from_utf8(private_key.to_vec()).unwrap();
-        let public_key_str = String::from_utf8(public_key.to_vec()).unwrap();
-
-        (private_key_str, public_key_str)
     }
 
     pub fn from_keystore_secret<P: AsRef<Path>>(
@@ -177,7 +107,7 @@ impl Wallet {
         let priv_key = PrivateKey::from_hex_str(
             hex::encode(Self::decrypt_secret_key(decryption_params)).as_str(),
         )?;
-        Ok(Self { priv_key })
+        Ok(Self::from_private_key(priv_key, None))
     }
 
     pub fn get_private_key_from_keystore_secret<P: AsRef<Path>>(
@@ -203,7 +133,15 @@ impl Wallet {
     }
 
     pub fn to_address(&self) -> Address {
-        PublicKey::from(&self.priv_key).to_address()
+        self.address.clone()
+    }
+
+    pub fn private_key_hex(&self) -> String {
+        self.priv_key.to_string()
+    }
+
+    pub fn public_key_hex(&self) -> String {
+        PublicKey::from(&self.priv_key).to_string()
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
@@ -365,29 +303,10 @@ impl Wallet {
         keystore_json
     }
 
-    pub fn generate_pem_content(
-        hrp: &str,
-        address: &Address,
-        private_key: &str,
-        public_key: &str,
-    ) -> String {
-        let concat_keys = format!("{}{}", private_key, public_key);
-        let concat_keys_b64 = base64_encode(concat_keys);
-
-        // Split the base64 string into 64-character lines
-        let formatted_key = concat_keys_b64
-            .as_bytes()
-            .chunks(64)
-            .map(|chunk| std::str::from_utf8(chunk).unwrap())
-            .collect::<Vec<&str>>()
-            .join("\n");
-
-        let address_bech32 =
-            Bech32Address::encode_address(hrp.try_into().expect("invalid HRP"), address.clone());
-        let pem_content = format!(
-            "-----BEGIN PRIVATE KEY for {address_bech32}-----\n{formatted_key}\n-----END PRIVATE KEY for {address_bech32}-----\n"
-        );
-
-        pem_content
+    pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {
+        WalletPem {
+            priv_key: self.priv_key,
+            address: Bech32Address::encode_address(hrp, self.address.clone()),
+        }
     }
 }

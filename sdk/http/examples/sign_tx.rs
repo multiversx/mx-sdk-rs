@@ -3,7 +3,7 @@ use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
 async fn main() {
-    let wl = Wallet::from_private_key(
+    let wl = Wallet::from_private_key_hex(
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
     )
     .unwrap();
