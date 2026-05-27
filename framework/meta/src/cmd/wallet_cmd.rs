@@ -266,16 +266,3 @@ fn test_wallet_cmd(args: &WalletTestWalletArgs) {
     file.write_all(pem.as_bytes()).unwrap();
     println!("Saved test wallet '{name}' to '{path}'");
 }
-
-/// Currently not in use.
-#[allow(unused)]
-pub fn generate_random_private_key<T>(r: &mut T) -> PrivateKey
-where
-    T: rand::CryptoRng + rand::Rng,
-{
-    let mut secret_key = PrivateKey([0u8; 64]);
-
-    r.fill_bytes(&mut secret_key.0);
-
-    secret_key
-}
