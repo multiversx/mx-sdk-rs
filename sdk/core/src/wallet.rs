@@ -35,7 +35,7 @@ pub struct Wallet {
     pub source: WalletSource,
 }
 
-/// Optional structure that indicates how thew [`Wallet`] was created, with additional metadata.
+/// Optional structure that indicates how the [`Wallet`] was created, with additional metadata.
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum WalletSource {
     Mnemonic,
