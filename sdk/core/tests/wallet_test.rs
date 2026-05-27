@@ -15,11 +15,11 @@ fn test_private_key_from_mnemonic() {
     let address = public_key.to_address();
     assert_eq!(
         "0b7966138e80b8f3bb64046f56aea4250fd7bacad6ed214165cea6767fd0bc2c",
-        private_key.to_string()
+        private_key.to_hex()
     );
     assert_eq!(
         "dfefe0453840e5903f2bd519de9b0ed6e9621e57e28ba0b4c1b15115091dd72f",
-        public_key.to_string()
+        public_key.to_hex()
     );
     assert_eq!(
         "erd1mlh7q3fcgrjeq0et65vaaxcw6m5ky8jhu296pdxpk9g32zga6uhsemxx2a",
@@ -31,11 +31,11 @@ fn test_private_key_from_mnemonic() {
     let address = public_key.to_address();
     assert_eq!(
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
-        private_key.to_string()
+        private_key.to_hex()
     );
     assert_eq!(
         "af8fef070a581873912ccbafb6a78bb9eb4e003085ac43dbbdfa3e20eb93cede",
-        public_key.to_string()
+        public_key.to_hex()
     );
     assert_eq!(
         "erd147877pc2tqv88yfvewhmdfuth845uqpsskky8kaalglzp6unem0qpwh982",

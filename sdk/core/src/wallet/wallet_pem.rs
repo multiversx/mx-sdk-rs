@@ -90,10 +90,10 @@ impl WalletPem {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.private_key.to_string()
+        self.private_key.to_hex()
     }
 
     pub fn public_key_hex(&self) -> String {
-        PublicKey::from(&self.private_key).to_string()
+        PublicKey::from(&self.private_key).to_hex()
     }
 }

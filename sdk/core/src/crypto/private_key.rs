@@ -132,6 +132,10 @@ impl PrivateKey {
         &self.0
     }
 
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0[..32])
+    }
+
     pub fn sign(&self, message: Vec<u8>) -> [u8; 64] {
         let mut h: Sha512 = Sha512::new();
         h.update(&self.0[..32]);
@@ -181,7 +185,7 @@ impl PrivateKey {
 
 impl Display for PrivateKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        hex::encode(&self.0[..32]).fmt(f)
+        self.to_hex().fmt(f)
     }
 }
 
@@ -196,7 +200,7 @@ impl Serialize for PrivateKey {
     where
         S: Serializer,
     {
-        serializer.serialize_str(self.to_string().as_str())
+        serializer.serialize_str(self.to_hex().as_str())
     }
 }
 

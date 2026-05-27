@@ -9,6 +9,10 @@ pub use keystore_error::KeystoreError;
 pub use keystore_json::*;
 pub use wallet_pem::WalletPem;
 
+// TODO: move under wallet
+pub use crate::crypto::private_key::PrivateKey;
+pub use crate::crypto::public_key::PublicKey;
+
 use core::str;
 use std::path::Path;
 
@@ -22,10 +26,7 @@ use serde_json::json;
 use sha2::Digest;
 use sha3::Keccak256;
 
-use crate::{
-    crypto::{private_key::PrivateKey, public_key::PublicKey},
-    data::transaction::Transaction,
-};
+use crate::data::transaction::Transaction;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Wallet {
@@ -77,6 +78,10 @@ impl Wallet {
         Self::new(private_key, WalletSource::Mnemonic)
     }
 
+    #[deprecated(
+        since = "0.67.0",
+        note = "Use `Wallet::from(PrivateKey::from_hex_str(hex).unwrap())` instead"
+    )]
     pub fn from_private_key_hex(priv_key: &str) -> Result<Self> {
         let private_key = PrivateKey::from_hex_str(priv_key)?;
         Ok(Self::new(private_key, WalletSource::PrivateKey))
@@ -93,7 +98,7 @@ impl Wallet {
         Ok(WalletPem::from_pem_str(&contents)?.into())
     }
 
-    pub fn new_test_wallet(name: &'static str, pem: &str) -> Self {
+    pub(crate) fn new_test_wallet(name: &'static str, pem: &str) -> Self {
         let wallet_pem = WalletPem::from_pem_str(pem).unwrap();
         Self::new(wallet_pem.private_key, WalletSource::TestWallet(name))
     }
@@ -111,11 +116,15 @@ impl Wallet {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.private_key.to_string()
+        self.private_key.to_hex()
+    }
+
+    pub fn public_key(&self) -> PublicKey {
+        PublicKey::from(&self.private_key)
     }
 
     pub fn public_key_hex(&self) -> String {
-        PublicKey::from(&self.private_key).to_string()
+        PublicKey::from(&self.private_key).to_hex()
     }
 
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {

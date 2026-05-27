@@ -58,8 +58,8 @@ fn test_convert_mnemonic_to_pem_file_in_file_out() {
     });
 
     let wallet = Wallet::from_pem_file(&output_pem).unwrap();
-    assert_eq!(wallet.private_key_hex(), KNOWN_PRIVATE_KEY);
-    assert_eq!(wallet.public_key_hex(), KNOWN_PUBLIC_KEY);
+    assert_eq!(wallet.private_key.to_hex(), KNOWN_PRIVATE_KEY);
+    assert_eq!(wallet.public_key().to_hex(), KNOWN_PUBLIC_KEY);
 
     let pem_content = fs::read_to_string(&output_pem).unwrap();
     assert!(
