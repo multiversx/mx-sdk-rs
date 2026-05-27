@@ -37,19 +37,17 @@ pub struct KeystoreRandomness {
 pub struct Keystore {
     pub version: u32,
     pub kind: String,
-    pub id: String,
     pub address: String,
     pub bech32: String,
     pub cipher: String,
-    pub iv: [u8; 16],
     pub ciphertext: Vec<u8>,
     pub kdf: String,
-    pub salt: Vec<u8>,
     pub n: u32,
     pub r: u32,
     pub p: u32,
     pub dklen: u32,
     pub mac: Vec<u8>,
+    pub randomness: KeystoreRandomness,
 }
 
 impl Keystore {
@@ -77,8 +75,14 @@ impl Keystore {
         let params = Params::new(n.log2() as u8, self.r, self.p)
             .map_err(|e| KeystoreError::Other(e.into()))?;
 
-        let mut derived_key = vec![0u8; 32];
-        scrypt(password.as_bytes(), &self.salt, &params, &mut derived_key).unwrap();
+        let mut derived_key = [0u8; 32];
+        scrypt(
+            password.as_bytes(),
+            &self.randomness.salt,
+            &params,
+            &mut derived_key,
+        )
+        .unwrap();
 
         let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
         let derived_key_second_half = &derived_key[16..32];
@@ -93,8 +97,11 @@ impl Keystore {
         }
 
         println!("Password is correct");
-        let private_key_bytes =
-            run_cipher(derived_key_first_half, self.iv, self.ciphertext.clone());
+        let private_key_bytes = run_cipher(
+            derived_key_first_half,
+            self.randomness.iv,
+            self.ciphertext.clone(),
+        );
         PrivateKey::from_bytes(&private_key_bytes).map_err(Into::into)
     }
 
@@ -110,7 +117,7 @@ impl Keystore {
     ) -> Self {
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
 
-        let mut derived_key = vec![0u8; 32];
+        let mut derived_key = [0u8; 32];
         scrypt(
             password.as_bytes(),
             &randomness.salt,
@@ -120,7 +127,7 @@ impl Keystore {
         .unwrap();
 
         let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
-        let derived_key_second_half = derived_key[16..32].to_vec();
+        let derived_key_second_half = &derived_key[16..32];
 
         let ciphertext = run_cipher(derived_key_first_half, randomness.iv, data.to_vec());
 
@@ -131,19 +138,17 @@ impl Keystore {
         Keystore {
             version: KEYSTORE_VERSION,
             kind: KIND_SECRET_KEY.to_string(),
-            id: randomness.id,
             address: public_key.to_string(),
             bech32: bech32_address.bech32,
             cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
-            iv: randomness.iv,
             ciphertext,
             kdf: KDF_SCRYPT.to_string(),
-            salt: randomness.salt.to_vec(),
             n: KDF_N,
             r: KDF_R,
             p: KDF_P,
             dklen: KDF_DKLEN as u32,
             mac,
+            randomness,
         }
     }
 }

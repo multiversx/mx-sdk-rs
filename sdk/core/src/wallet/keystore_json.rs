@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use super::Keystore;
+use super::{Keystore, KeystoreRandomness};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CryptoParams {
@@ -44,24 +44,30 @@ impl Keystore {
             .as_slice()
             .try_into()
             .map_err(|_: std::array::TryFromSliceError| anyhow::anyhow!("iv must be 16 bytes"))?;
-        let salt = hex::decode(&json.crypto.kdfparams.salt)?;
+        let salt_bytes = hex::decode(&json.crypto.kdfparams.salt)?;
+        let salt: [u8; 32] = salt_bytes
+            .as_slice()
+            .try_into()
+            .map_err(|_: std::array::TryFromSliceError| anyhow::anyhow!("salt must be 32 bytes"))?;
         let mac = hex::decode(&json.crypto.mac)?;
         Ok(Keystore {
             version: json.version,
             kind: json.kind,
-            id: json.id,
             address: json.address,
             bech32: json.bech32,
             cipher: json.crypto.cipher,
-            iv,
             ciphertext,
             kdf: json.crypto.kdf,
-            salt,
             n: json.crypto.kdfparams.n,
             r: json.crypto.kdfparams.r,
             p: json.crypto.kdfparams.p,
             dklen: json.crypto.kdfparams.dklen,
             mac,
+            randomness: KeystoreRandomness {
+                salt,
+                iv,
+                id: json.id,
+            },
         })
     }
 
@@ -69,18 +75,18 @@ impl Keystore {
         KeystoreJson {
             version: self.version,
             kind: self.kind.clone(),
-            id: self.id.clone(),
+            id: self.randomness.id.clone(),
             address: self.address.clone(),
             bech32: self.bech32.clone(),
             crypto: Crypto {
                 cipher: self.cipher.clone(),
                 cipherparams: CryptoParams {
-                    iv: hex::encode(self.iv),
+                    iv: hex::encode(self.randomness.iv),
                 },
                 ciphertext: hex::encode(&self.ciphertext),
                 kdf: self.kdf.clone(),
                 kdfparams: KdfParams {
-                    salt: hex::encode(&self.salt),
+                    salt: hex::encode(self.randomness.salt),
                     n: self.n,
                     r: self.r,
                     p: self.p,
