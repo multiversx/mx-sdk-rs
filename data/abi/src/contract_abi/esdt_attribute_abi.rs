@@ -1,6 +1,6 @@
 use alloc::string::{String, ToString};
 
-use super::{TypeAbi, TypeDescriptionContainerImpl, TypeName};
+use crate::{TypeAbi, TypeDescriptionContainerImpl, TypeName};
 
 #[derive(Clone, Debug)]
 pub struct EsdtAttributeAbi {

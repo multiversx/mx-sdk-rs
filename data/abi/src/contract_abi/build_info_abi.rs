@@ -7,7 +7,23 @@ use alloc::{borrow::ToOwned, string::String};
 pub struct BuildInfoAbi {
     pub rustc: Option<RustcAbi>,
     pub contract_crate: ContractCrateBuildAbi,
+    pub abi: Option<FrameworkBuildAbi>,
     pub framework: FrameworkBuildAbi,
+}
+
+impl BuildInfoAbi {
+    pub fn dummy() -> Self {
+        BuildInfoAbi {
+            rustc: None,
+            contract_crate: ContractCrateBuildAbi {
+                name: "contract-crate".to_owned(),
+                version: "0.0.0".to_owned(),
+                git_version: "0.0.0".to_owned(),
+            },
+            abi: Some(FrameworkBuildAbi::new("abi-crate", "0.0.0")),
+            framework: FrameworkBuildAbi::new("framework-crate", "0.0.0"),
+        }
+    }
 }
 
 #[derive(Clone, Default, Debug)]
@@ -51,13 +67,21 @@ pub struct FrameworkBuildAbi {
 }
 
 impl FrameworkBuildAbi {
+    pub fn new(name: &str, version: &str) -> Self {
+        FrameworkBuildAbi {
+            name: name.to_owned(),
+            version: version.to_owned(),
+        }
+    }
+
     /// Called from the ABI generator in every contract.
     ///
-    /// Note: the values are extracted here, this makes them capture the framework crate info.
-    pub fn create() -> Self {
-        FrameworkBuildAbi {
-            name: env!("CARGO_PKG_NAME").to_owned(),
-            version: env!("CARGO_PKG_VERSION").to_owned(),
-        }
+    /// Contains the ABI crate name and current version.
+    pub fn abi_crate() -> Self {
+        FrameworkBuildAbi::new(env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"))
+    }
+
+    pub fn dummy() -> Self {
+        FrameworkBuildAbi::new("", "")
     }
 }
