@@ -73,12 +73,6 @@ impl Wallet {
         Ok(WalletPem::from_pem_str(&contents)?.into())
     }
 
-    pub fn get_shard(&self) -> u8 {
-        let address = self.to_address();
-        let address_bytes = address.as_bytes();
-        address_bytes[address_bytes.len() - 1] % 3
-    }
-
     #[deprecated(
         since = "0.54.0",
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
