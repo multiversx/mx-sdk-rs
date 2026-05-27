@@ -11,25 +11,21 @@ const ALICE_KEYSTORE_PATH_TEST_1: &str = "tests/alice1.json";
 const ALICE_KEYSTORE_PATH_TEST_2: &str = "tests/alice2.json";
 const ALICE_PEM_PATH_TEST: &str = "tests/alice_test.pem";
 const KEYSTORE_PASSWORD: &str = "abcd";
-const ALICE_PUBLIC_KEY: &str = "0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1";
 const ALICE_PRIVATE_KEY: &str = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
 
 fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
     let wallet = Wallet::from_private_key_hex(ALICE_PRIVATE_KEY).unwrap();
-    let address = wallet.to_address();
-
-    let concatenated_keys = format!("{}{}", ALICE_PRIVATE_KEY, ALICE_PUBLIC_KEY);
-    let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
     let json_result = Keystore::encrypt(
-        hex_decoded_keys.as_slice(),
-        address.to_bech32(hrp.try_into().expect("invalid HRP")),
-        ALICE_PUBLIC_KEY,
+        wallet.priv_key,
+        wallet
+            .address
+            .to_bech32(hrp.try_into().expect("invalid HRP")),
         KEYSTORE_PASSWORD,
         new_keystore_randomness(),
     )
     .to_json_string();
     write_to_file(&json_result, file);
-    address
+    wallet.address
 }
 
 #[test]

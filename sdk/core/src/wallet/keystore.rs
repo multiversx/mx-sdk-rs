@@ -8,7 +8,7 @@ use multiversx_chain_core::std::Bech32Address;
 use scrypt::{Params, scrypt};
 use sha2::Sha256;
 
-use crate::crypto::private_key::PrivateKey;
+use crate::crypto::{private_key::PrivateKey, public_key::PublicKey};
 
 use super::{KeystoreError, KeystoreJson};
 
@@ -109,12 +109,14 @@ impl Keystore {
     ///
     /// Only available in the sc-meta standalone CLI.
     pub fn encrypt(
-        data: &[u8],
+        private_key: PrivateKey,
         bech32_address: Bech32Address,
-        public_key: &str,
         password: &str,
         randomness: KeystoreRandomness,
     ) -> Self {
+        let private_key_bytes = private_key.to_bytes();
+        let public_key_hex = PublicKey::from(&private_key).to_string();
+
         let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
 
         let mut derived_key = [0u8; 32];
@@ -129,16 +131,20 @@ impl Keystore {
         let derived_key_first_half: [u8; 16] = derived_key[0..16].try_into().unwrap();
         let derived_key_second_half = &derived_key[16..32];
 
-        let ciphertext = run_cipher(derived_key_first_half, randomness.iv, data.to_vec());
+        let ciphertext = run_cipher(
+            derived_key_first_half,
+            randomness.iv,
+            private_key_bytes.to_vec(),
+        );
 
-        let mut h = HmacSha256::new_from_slice(&derived_key_second_half).unwrap();
+        let mut h = HmacSha256::new_from_slice(derived_key_second_half).unwrap();
         h.update(&ciphertext);
         let mac = h.finalize().into_bytes().to_vec();
 
         Keystore {
             version: KEYSTORE_VERSION,
             kind: KIND_SECRET_KEY.to_string(),
-            address: public_key.to_string(),
+            address: public_key_hex,
             bech32: bech32_address.bech32,
             cipher: CIPHER_ALGORITHM_AES_128_CTR.to_string(),
             ciphertext,

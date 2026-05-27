@@ -1,23 +1,24 @@
 use core::str;
 
-use multiversx_sdk::crypto::private_key::PrivateKey;
-use rand::Rng;
-
-use crate::cli::cli_args_sender::get_keystore_password;
-use crate::cli::{
-    WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
-    WalletTestWalletArgs,
-};
 use bip39::{Language, Mnemonic};
-use multiversx_sc::types::{self, Address};
+use rand::Rng;
+use std::{
+    fs::{self, File},
+    io::{self, Read, Write},
+};
+
+use multiversx_sc::types::Address;
 use multiversx_sc_snippets::sdk::chain_core::std::Bech32Hrp;
 use multiversx_sc_snippets::sdk::wallet::Keystore;
 use multiversx_sc_snippets::sdk::wallet::KeystoreRandomness;
 use multiversx_sc_snippets::sdk::wallet::Wallet;
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
-use std::{
-    fs::{self, File},
-    io::{self, Read, Write},
+use multiversx_sdk::crypto::private_key::PrivateKey;
+
+use crate::cli::cli_args_sender::get_keystore_password;
+use crate::cli::{
+    WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
+    WalletTestWalletArgs,
 };
 
 pub fn wallet(args: &WalletArgs) {
@@ -74,17 +75,10 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("pem", "keystore-secret") => match infile {
             Some(file) => {
                 let wallet = Wallet::from_pem_file(file).expect("error reading PEM file");
-                let private_key_str = wallet.private_key_hex();
-                let public_key_str = wallet.public_key_hex();
-                let address = wallet.address;
-                let hex_decoded_keys =
-                    hex::decode(format!("{}{}", private_key_str, public_key_str)).unwrap();
-
                 let randomness = new_keystore_randomness();
                 let json_result = Keystore::encrypt(
-                    hex_decoded_keys.as_slice(),
-                    address.to_bech32(hrp),
-                    &public_key_str,
+                    wallet.priv_key,
+                    wallet.address.to_bech32(hrp),
                     &get_keystore_password(),
                     randomness,
                 )
@@ -148,7 +142,7 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
             let bytes_from_hex = hex::decode(hex).unwrap();
             let bytes_arr: [u8; 32] = bytes_from_hex.try_into().unwrap();
 
-            let addr = types::Address::from(&bytes_arr);
+            let addr = Address::from(&bytes_arr);
             let bech32_addr = Bech32Address::from(addr).to_bech32_str().to_string();
             println!("{}", bech32_addr);
         }
@@ -168,34 +162,24 @@ pub fn generate_mnemonic() -> Mnemonic {
     Mnemonic::generate_in(Language::English, 24).unwrap()
 }
 
-struct WalletInfo {
+struct NewWalletInfo {
     mnemonic: Mnemonic,
-    private_key_str: String,
-    public_key_str: String,
-    address: Address,
+    wallet: Wallet,
 }
 
-impl WalletInfo {
+impl NewWalletInfo {
     fn generate() -> Self {
         let mnemonic = generate_mnemonic();
         let wallet = Wallet::from_mnemonic_string(mnemonic.to_string());
-        let private_key_str = wallet.private_key_hex();
-        let public_key_str = wallet.public_key_hex();
-        let address = wallet.address;
-        WalletInfo {
-            mnemonic,
-            private_key_str,
-            public_key_str,
-            address,
-        }
+        NewWalletInfo { mnemonic, wallet }
     }
 
     fn generate_for_shard(shard: u8) -> Self {
         assert!(shard < 3, "Shard must be between 0 and 2");
         loop {
-            let wallet = Self::generate();
-            if wallet.address.shard_of_3().as_u32() == shard as u32 {
-                return wallet;
+            let wallet_info = Self::generate();
+            if wallet_info.wallet.address.shard_of_3().as_u32() == shard as u32 {
+                return wallet_info;
             }
         }
     }
@@ -210,40 +194,33 @@ fn new(new_args: &WalletNewArgs) {
         .map(|hrp| Bech32Hrp::try_from(hrp).expect("invalid HRP"))
         .unwrap_or_default();
 
-    let wallet = if let Some(shard) = new_args.shard {
-        WalletInfo::generate_for_shard(shard)
+    let new_wallet_info = if let Some(shard) = new_args.shard {
+        NewWalletInfo::generate_for_shard(shard)
     } else {
-        WalletInfo::generate()
+        NewWalletInfo::generate()
     };
 
-    let WalletInfo {
-        mnemonic,
-        private_key_str,
-        public_key_str,
-        address,
-    } = wallet;
-
-    println!("Mnemonic: {}", mnemonic);
+    println!("Mnemonic: {}", new_wallet_info.mnemonic);
 
     println!("Wallet address:");
-    println!("  - bech32: {}", address.to_bech32(hrp));
-    println!("  - hex:    0x{}", address.to_hex());
+    println!(
+        "  - bech32: {}",
+        new_wallet_info.wallet.address.to_bech32(hrp)
+    );
+    println!("  - hex:    0x{}", new_wallet_info.wallet.address.to_hex());
 
     match format {
         Some("pem") => {
-            write_resulted_pem(hrp, private_key_str.as_str(), outfile);
+            write_resulted_pem(hrp, &new_wallet_info.wallet.private_key_hex(), outfile);
             if let Some(outfile) = outfile {
                 println!("Wallet saved to '{outfile}'");
             }
         }
         Some("keystore-secret") => {
-            let concatenated_keys = format!("{}{}", private_key_str, public_key_str);
-            let hex_decoded_keys = hex::decode(concatenated_keys).unwrap();
             let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
-                hex_decoded_keys.as_slice(),
-                address.to_bech32(hrp),
-                &public_key_str,
+                new_wallet_info.wallet.priv_key,
+                new_wallet_info.wallet.address.to_bech32(hrp),
                 &get_keystore_password(),
                 randomness,
             )

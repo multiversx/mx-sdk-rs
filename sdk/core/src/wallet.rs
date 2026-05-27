@@ -29,7 +29,7 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct Wallet {
-    priv_key: PrivateKey,
+    pub priv_key: PrivateKey,
     pub address: Address,
     pub hrp: Option<Bech32Hrp>,
 }
