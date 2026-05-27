@@ -13,7 +13,7 @@ use multiversx_sc_snippets::sdk::wallet::Keystore;
 use multiversx_sc_snippets::sdk::wallet::KeystoreRandomness;
 use multiversx_sc_snippets::sdk::wallet::Wallet;
 use multiversx_sc_snippets::{hex, imports::Bech32Address};
-use multiversx_sdk::crypto::private_key::PrivateKey;
+use multiversx_sdk::{crypto::private_key::PrivateKey, wallet::KeystoreError};
 
 use crate::cli::cli_args_sender::get_keystore_password;
 use crate::cli::{
@@ -62,11 +62,19 @@ fn convert(convert_args: &WalletConvertArgs) {
         },
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
-                let private_key = Keystore::from_file(file)
-                    .unwrap()
-                    .extract_private_key(&get_keystore_password())
-                    .unwrap();
-                write_resulted_pem(hrp, &private_key.to_string(), outfile);
+                let keystore = Keystore::from_file(file).expect("keystore parsing error");
+                match keystore.extract_private_key(&get_keystore_password()) {
+                    Ok(priv_key) => {
+                        println!("Password is correct");
+                        write_resulted_pem(hrp, &priv_key.to_string(), outfile);
+                    }
+                    Err(KeystoreError::InvalidPassword) => {
+                        panic!("Password is incorrect");
+                    }
+                    Err(e) => {
+                        panic!("Failed to extract private key from keystore: {e}");
+                    }
+                }
             }
             None => {
                 panic!("Input file is required for keystore-secret format");

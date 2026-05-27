@@ -91,11 +91,9 @@ impl Keystore {
         let computed_mac = input_mac.finalize().into_bytes();
 
         if computed_mac.to_vec() != self.mac {
-            println!("Password is incorrect");
             return Err(KeystoreError::InvalidPassword);
         }
 
-        println!("Password is correct");
         let private_key_bytes = run_cipher(
             derived_key_first_half,
             self.randomness.iv,
