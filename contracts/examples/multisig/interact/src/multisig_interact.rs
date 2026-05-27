@@ -113,8 +113,8 @@ impl MultisigInteract {
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
-        for wallet in &[carol, dan, eve] {
-            self.interactor.register_wallet(*wallet).await;
+        for wallet in [carol, dan, eve] {
+            self.interactor.register_wallet(wallet).await;
         }
     }
 

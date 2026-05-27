@@ -10,7 +10,7 @@ use serde::{
 
 pub const PUBLIC_KEY_LENGTH: usize = 32;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct PublicKey([u8; PUBLIC_KEY_LENGTH]);
 
 impl PublicKey {
@@ -24,6 +24,10 @@ impl PublicKey {
 
     pub fn to_address(&self) -> Address {
         self.0.into()
+    }
+
+    pub fn to_hex(&self) -> String {
+        hex::encode(self.0)
     }
 
     pub fn from_hex_str(pk: &str) -> Result<Self> {
@@ -47,7 +51,13 @@ impl From<&PrivateKey> for PublicKey {
 
 impl Display for PublicKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        hex::encode(self.0).fmt(f)
+        self.to_hex().fmt(f)
+    }
+}
+
+impl std::fmt::Debug for PublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PublicKey({})", self)
     }
 }
 
@@ -56,7 +66,7 @@ impl Serialize for PublicKey {
     where
         S: Serializer,
     {
-        serializer.serialize_str(self.to_string().as_str())
+        serializer.serialize_str(self.to_hex().as_str())
     }
 }
 

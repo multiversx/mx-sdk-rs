@@ -3,17 +3,24 @@ use std::fmt::Display;
 use super::edwards25519::{sc_mul_add, sc_reduce};
 use crate::crypto::edwards25519::extended_group_element::ExtendedGroupElement;
 use anyhow::{Result, anyhow};
+use bip39::Mnemonic;
+use hmac::{Hmac, KeyInit, Mac};
+use pbkdf2::pbkdf2;
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
 use sha2::{Digest, Sha512};
+use zeroize::Zeroize;
 
 pub const PRIVATE_KEY_LENGTH: usize = 64;
 pub const SIGNATURE_LENGTH: usize = 64;
 pub const SEED_LENGTH: usize = 32;
 
-#[derive(Copy, Clone, Debug)]
+const EGLD_COIN_TYPE: u32 = 508;
+const HARDENED: u32 = 0x80000000;
+
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct PrivateKey(pub [u8; PRIVATE_KEY_LENGTH]);
 
 impl PrivateKey {
@@ -61,19 +68,60 @@ impl PrivateKey {
         PrivateKey::from_bytes(bytes.as_slice())
     }
 
-    /// Currently not in use.
-    ///
-    /// Guarded by feature "wallet-full", to avoid unnecessarily importing `rand`.
-    #[cfg(feature = "wallet-full")]
-    pub fn generate<T>(r: &mut T) -> PrivateKey
-    where
-        T: rand::CryptoRng + rand::Rng,
-    {
-        let mut secret_key = PrivateKey([0u8; 64]);
+    fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {
+        let mut salt = String::with_capacity(8 + password.len());
+        salt.push_str("mnemonic");
+        salt.push_str(password);
 
-        r.fill_bytes(&mut secret_key.0);
+        let mut seed = [0u8; 64];
 
-        secret_key
+        let _ = pbkdf2::<Hmac<Sha512>>(
+            mnemonic.to_string().as_bytes(),
+            salt.as_bytes(),
+            2048,
+            &mut seed,
+        );
+
+        salt.zeroize();
+
+        seed
+    }
+
+    pub fn from_mnemonic(mnemonic: Mnemonic, account: u32, address_index: u32) -> PrivateKey {
+        let seed = Self::seed_from_mnemonic(mnemonic, "");
+
+        let serialized_key_len = 32;
+        let hardened_child_padding: u8 = 0;
+
+        let mut digest =
+            Hmac::<Sha512>::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
+        digest.update(&seed);
+        let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
+        let mut key = intermediary[..serialized_key_len].to_vec();
+        let mut chain_code = intermediary[serialized_key_len..].to_vec();
+
+        for child_idx in [
+            44 | HARDENED,
+            EGLD_COIN_TYPE | HARDENED,
+            account | HARDENED,
+            HARDENED,
+            address_index | HARDENED,
+        ] {
+            let mut buff = [vec![hardened_child_padding], key.clone()].concat();
+            buff.push((child_idx >> 24) as u8);
+            buff.push((child_idx >> 16) as u8);
+            buff.push((child_idx >> 8) as u8);
+            buff.push(child_idx as u8);
+
+            digest =
+                Hmac::<Sha512>::new_from_slice(&chain_code).expect("HMAC can take key of any size");
+            digest.update(&buff);
+            let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
+            key = intermediary[..serialized_key_len].to_vec();
+            chain_code = intermediary[serialized_key_len..].to_vec();
+        }
+
+        PrivateKey::from_bytes(key.as_slice()).unwrap()
     }
 
     pub fn to_bytes(&self) -> [u8; PRIVATE_KEY_LENGTH] {
@@ -84,7 +132,11 @@ impl PrivateKey {
         &self.0
     }
 
-    pub fn sign(&self, message: Vec<u8>) -> [u8; 64] {
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.0[..32])
+    }
+
+    pub fn sign(&self, message: impl AsRef<[u8]>) -> [u8; 64] {
         let mut h: Sha512 = Sha512::new();
         h.update(&self.0[..32]);
 
@@ -100,7 +152,7 @@ impl PrivateKey {
         expanded_secret_key[31] |= 64;
 
         h.update(&digest1[32..]);
-        h.update(&message);
+        h.update(message.as_ref());
         message_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let message_digest_reduced = sc_reduce(message_digest);
@@ -111,7 +163,7 @@ impl PrivateKey {
 
         h.update(encoded_r);
         h.update(&self.0[32..]);
-        h.update(&message);
+        h.update(message.as_ref());
         hram_digest.copy_from_slice(h.finalize_reset().as_ref());
 
         let hram_digest_reduced = sc_reduce(hram_digest);
@@ -133,7 +185,13 @@ impl PrivateKey {
 
 impl Display for PrivateKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        hex::encode(&self.0[..32]).fmt(f)
+        self.to_hex().fmt(f)
+    }
+}
+
+impl std::fmt::Debug for PrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PrivateKey({})", self)
     }
 }
 
@@ -142,7 +200,7 @@ impl Serialize for PrivateKey {
     where
         S: Serializer,
     {
-        serializer.serialize_str(self.to_string().as_str())
+        serializer.serialize_str(self.to_hex().as_str())
     }
 }
 
