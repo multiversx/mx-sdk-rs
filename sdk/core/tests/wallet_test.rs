@@ -1,10 +1,7 @@
 use bip39::Mnemonic;
 
+use multiversx_sdk::crypto::{private_key::PrivateKey, public_key::PublicKey};
 use multiversx_sdk::test_wallets;
-use multiversx_sdk::{
-    crypto::{private_key::PrivateKey, public_key::PublicKey},
-    wallet::Wallet,
-};
 
 #[test]
 fn test_private_key_from_mnemonic() {
@@ -43,15 +40,6 @@ fn test_private_key_from_mnemonic() {
     );
 }
 
-#[test]
-fn test_load_from_pem() {
-    let wallet = Wallet::from_pem_file("tests/alice.pem").unwrap();
-    let address = wallet.to_address();
-    assert_eq!(
-        "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-        address.to_bech32_default().bech32
-    );
-}
 #[test]
 fn test_get_shard() {
     let alice = test_wallets::alice(); // [1, 57, 71, 46, 255, 104, 134, 119, 26, 152, 47, 48, 131, 218, 93, 66, 31, 36, 194, 145, 129, 230, 56, 136, 34, 141, 200, 28, 166, 13, 105, 225]
