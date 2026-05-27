@@ -4,9 +4,10 @@
 mod forwarder_raw_alt_init;
 mod forwarder_raw_async;
 mod forwarder_raw_common;
-mod forwarder_raw_deploy_upgrade;
+mod forwarder_raw_deploy;
 mod forwarder_raw_sync;
 mod forwarder_raw_transf_exec;
+mod forwarder_raw_upgrade;
 
 multiversx_sc::imports!();
 
@@ -18,7 +19,8 @@ pub trait ForwarderRaw:
     + forwarder_raw_common::ForwarderRawCommon
     + forwarder_raw_async::ForwarderRawAsync
     + forwarder_raw_sync::ForwarderRawSync
-    + forwarder_raw_deploy_upgrade::ForwarderRawDeployUpgrade
+    + forwarder_raw_deploy::ForwarderRawDeploy
+    + forwarder_raw_upgrade::ForwarderRawUpgrade
     + forwarder_raw_transf_exec::ForwarderRawTransferExecute
 {
     #[init]

@@ -41,7 +41,7 @@
         },
         {
             "step": "scQuery",
-            "id": "2",
+            "id": "code-hash-sc",
             "tx": {
                 "to": "sc:basic-features",
                 "function": "code_hash",
@@ -52,6 +52,40 @@
             "expect": {
                 "out": [
                     "0x3b29df9a92eba48fb1335b7300c055e812f30a263fe7e300525012fb657617a6"
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "code-hash-user",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "code_hash",
+                "arguments": [
+                    "address:owner"
+                ]
+            },
+            "expect": {
+                "out": [
+                    ""
+                ],
+                "status": ""
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "code-hash-missing-account",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "code_hash",
+                "arguments": [
+                    "address:missing-account"
+                ]
+            },
+            "expect": {
+                "out": [
+                    ""
                 ],
                 "status": ""
             }

@@ -1,6 +1,6 @@
 use core::borrow::Borrow;
 
-use multiversx_sc_codec::multi_types::MultiValueVec;
+use multiversx_sc_codec::multi_types::{IgnoreValue, MultiValueVec};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
@@ -99,7 +99,10 @@ where
     }
 
     #[allow(clippy::redundant_closure)]
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self> {
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    where
+        T: Clone,
+    {
         self.0
             .slice(start_index, end_index)
             .map(|value| Self(value))
@@ -129,6 +132,10 @@ where
 
     pub fn into_vec(self) -> ManagedVec<M, T> {
         self.0
+    }
+
+    pub fn as_vec(&self) -> &ManagedVec<M, T> {
+        &self.0
     }
 
     #[cfg(feature = "alloc")]
@@ -244,11 +251,26 @@ where
 {
 }
 
+impl<M, T, U> TypeAbiFrom<&MultiValueManagedVec<M, U>> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: ManagedVecItem + TypeAbi,
+{
+}
+
 impl<M, T, U> TypeAbiFrom<MultiValueVec<U>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
     U: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<IgnoreValue> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi,
 {
 }
 

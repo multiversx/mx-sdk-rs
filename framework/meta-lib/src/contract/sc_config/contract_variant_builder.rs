@@ -86,11 +86,11 @@ impl ContractVariantBuilder {
                     kill_legacy_callback: cms.kill_legacy_callback,
                     profile: ContractVariantProfile::from_serde(&cms.profile),
                     std: cms.std.unwrap_or(default.settings.std),
-                    rustc_version: RustcVersion::from_opt_sc_config_serde(&cms.rustc_version),
+                    rustc_version: RustcVersion::from_opt_toolchain(cms.rustc_version.as_deref()),
                     rustc_target: cms
                         .rustc_target
                         .clone()
-                        .unwrap_or_else(|| tools::build_target::default_target().to_owned()),
+                        .unwrap_or_else(|| tools::install_wasm_target::default_target().to_owned()),
                     opcode_version: cms.opcode_version.as_ref().map_or(
                         default.settings.opcode_version,
                         |v| OpcodeVersion::from_settings_str(v).expect("Invalid opcode version in contract variant settings; allowed values are '1' and '2'")

@@ -1,4 +1,4 @@
-use crate::sdk::data::transaction::{Transaction, TransactionOnNetwork};
+use crate::sdk::data::transaction::{ApiTransactionResult, Transaction};
 use crate::{InteractorBase, Sender, multiversx_sc::types::Address};
 use futures::future::join_all;
 use multiversx_sc_scenario::imports::ReturnCode;
@@ -29,7 +29,7 @@ where
     pub(crate) async fn process_txs(
         &mut self,
         txs: Vec<Transaction>,
-    ) -> Vec<(TransactionOnNetwork, ReturnCode)> {
+    ) -> Vec<(ApiTransactionResult, ReturnCode)> {
         let mut futures = Vec::new();
 
         for tx in &txs {
@@ -44,7 +44,11 @@ where
         }
 
         self.generate_blocks(4).await.unwrap();
-        join_all(futures).await
+        join_all(futures)
+            .await
+            .into_iter()
+            .map(|r| r.expect("failed to fetch transaction result"))
+            .collect()
     }
 }
 

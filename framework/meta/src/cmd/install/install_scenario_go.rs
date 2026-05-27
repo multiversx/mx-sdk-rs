@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use colored::Colorize;
 use core::time;
 use serde_json::Value;
 use std::{
@@ -21,14 +22,14 @@ const SCENARIO_CLI_RELEASES_BASE_URL: &str =
 const CARGO_HOME: &str = env!("CARGO_HOME");
 
 #[derive(Clone, Debug)]
-pub struct ScenarioGoRelease {
+struct ScenarioGoRelease {
     #[allow(dead_code)]
-    pub tag_name: String,
-    pub download_url: String,
+    tag_name: String,
+    download_url: String,
 }
 
 #[derive(Clone, Debug)]
-pub struct ScenarioGoInstaller {
+struct ScenarioGoInstaller {
     tag: Option<String>,
     zip_name: String,
     user_agent: String,
@@ -36,27 +37,39 @@ pub struct ScenarioGoInstaller {
     cargo_bin_folder: PathBuf,
 }
 
-fn select_zip_name() -> String {
-    match get_system_info() {
+fn select_zip_name(system_info: SystemInfo) -> String {
+    match system_info {
         SystemInfo::Linux => "mx_scenario_go_linux_amd64.zip".to_string(),
         SystemInfo::MacOs => "mx_scenario_go_darwin_amd64.zip".to_string(),
+        SystemInfo::Windows => unreachable!("mx-scenario-go is not supported on Windows"),
     }
 }
 
-impl ScenarioGoInstaller {
-    pub fn new(tag: Option<String>) -> Self {
-        let cargo_home = PathBuf::from(CARGO_HOME);
-        let cargo_bin_folder = cargo_home.join("bin");
-        ScenarioGoInstaller {
-            tag,
-            zip_name: select_zip_name(),
-            user_agent: USER_AGENT.to_string(),
-            temp_dir_path: std::env::temp_dir(),
-            cargo_bin_folder,
-        }
+pub async fn install(tag: Option<String>) {
+    let system_info = get_system_info();
+    if system_info == SystemInfo::Windows {
+        println!(
+            "{}",
+            "mx-scenario-go is not supported on Windows, skipping.".yellow()
+        );
+        return;
     }
 
-    pub async fn install(&self) {
+    let cargo_home = PathBuf::from(CARGO_HOME);
+    let cargo_bin_folder = cargo_home.join("bin");
+    let installer = ScenarioGoInstaller {
+        tag,
+        zip_name: select_zip_name(system_info),
+        user_agent: USER_AGENT.to_string(),
+        temp_dir_path: std::env::temp_dir(),
+        cargo_bin_folder,
+    };
+
+    installer.install().await;
+}
+
+impl ScenarioGoInstaller {
+    async fn install(&self) {
         let release_raw = self
             .get_scenario_go_release_json()
             .await

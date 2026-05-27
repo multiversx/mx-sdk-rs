@@ -18,6 +18,3 @@ add-labels = ["upgrade"]
 
 [[proxy]]
 path = "../recursive-caller/src/vault_proxy.rs"
-
-[[proxy]]
-path = "../interact/src/vault_proxy.rs"

@@ -1,0 +1,66 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_neg+",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_neg",
+                "arguments": [
+                    "1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "-1234"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_neg0",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_neg",
+                "arguments": [
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ]
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "big_int_neg-",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "big_int_neg",
+                "arguments": [
+                    "-1234"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "1234"
+                ]
+            }
+        }
+    ]
+}

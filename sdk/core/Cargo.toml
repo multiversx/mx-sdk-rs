@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2024"
 
 authors = [
@@ -24,25 +24,26 @@ serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_repr = "0.1"
 anyhow = "1.0"
 bip39 = "2.0"
-sha2 = "0.10"
-sha3 = "0.10"
-hmac = { version = "0.12", features = ["std"] }
+sha2 = "0.11"
+sha3 = "0.12"
+hmac = "0.13"
 hex = "0.4"
 base64 = "0.22"
-pbkdf2 = { version = "0.12", default-features = false }
+pbkdf2 = { version = "0.13", default-features = false }
 zeroize = "1.4"
 itertools = "0.14"
 pem = "3.0"
 log = "0.4"
-scrypt = { version = "0.11", default-features = false }
-aes = "0.8"
-ctr = "0.9"
+scrypt = { version = "0.12", default-features = false }
+aes = "0.9"
+ctr = "0.10"
+rpassword = "~7.3" # rpassword >=7.4 requires Rust 1.88 (let_chains), pin to 7.3.x for Rust 1.85 compat
 
 # Optional dependencies, for wallet-full
 rand = { version = "0.10", optional = true, default-features = false }
 uuid = { version = "1.10", features = ["v4"], optional = true }
 
 [dependencies.multiversx-chain-core]
-version = "=0.22.0"
+version = "=0.23.0"
 features = ["std"]
 path = "../../chain/core"

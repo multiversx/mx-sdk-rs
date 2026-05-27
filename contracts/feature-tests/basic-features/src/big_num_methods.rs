@@ -124,6 +124,11 @@ pub trait BigIntMethods {
         BigInt::from_biguint(sign, unsigned)
     }
 
+    #[endpoint]
+    fn big_int_neg(&self, a: BigInt) -> BigInt {
+        -a
+    }
+
     // mixed operations (explicit conversions)
 
     #[endpoint]

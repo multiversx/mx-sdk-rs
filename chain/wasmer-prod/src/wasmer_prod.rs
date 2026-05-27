@@ -1,7 +1,9 @@
 use std::sync::{Arc, Mutex};
 
+use multiversx_chain_core::types::ReturnCode;
 use multiversx_chain_vm_executor::{
-    Executor, InstanceState, OpcodeCost, VMHooksEarlyExit, VMHooksLegacy, VMHooksLegacyAdapter,
+    BreakpointValueLegacy, Executor, InstanceState, OpcodeCost, VMHooksEarlyExit, VMHooksLegacy,
+    VMHooksLegacyAdapter,
 };
 use multiversx_chain_vm_executor_wasmer::new_traits::{
     WasmerProdExecutor, WasmerProdInstanceState, WasmerProdRuntimeRef,
@@ -85,6 +87,19 @@ impl InstanceState for WasmerProdInstanceStateAdapter {
 
 impl InstanceStateSetEarlyExit for WasmerProdInstanceStateAdapter {
     fn set_early_exit(&self, early_exit: VMHooksEarlyExit) {
+        // This ensures that the execution will halt after the current instruction.
+        self.0
+            .set_breakpoint_value_legacy(early_exit_to_breakpoint_value(&early_exit));
+
+        // This is passed to the error handler at the end of the executor execution.
         self.0.set_early_exit(early_exit);
+    }
+}
+
+fn early_exit_to_breakpoint_value(early_exit: &VMHooksEarlyExit) -> BreakpointValueLegacy {
+    match ReturnCode::from_u64(early_exit.code) {
+        Some(ReturnCode::OutOfGas) => BreakpointValueLegacy::OutOfGas,
+        Some(ReturnCode::UserError) => BreakpointValueLegacy::SignalError,
+        _ => BreakpointValueLegacy::ExecutionFailed,
     }
 }

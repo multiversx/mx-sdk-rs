@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
-use multiversx_sc_scenario::multiversx_sc::types::Address;
+use multiversx_sc_scenario::{imports::Bech32Address, multiversx_sc::types::Address};
 use multiversx_sdk::data::account::Account;
 use multiversx_sdk::data::esdt::EsdtBalance;
 use multiversx_sdk::gateway::{
@@ -46,6 +46,19 @@ where
             ))
             .await
             .expect("failed to retrieve account")
+    }
+
+    /// Fetches the on-chain owner of `contract` and returns it as a [`Bech32Address`]
+    /// if that owner is a registered wallet, or `None` otherwise.
+    pub async fn get_registered_owner(&self, contract: &Address) -> Option<Bech32Address> {
+        let account = self.get_account(contract).await;
+        let owner_str = account.owner_address.filter(|s| !s.is_empty())?;
+        let owner = Bech32Address::from_bech32_string(owner_str);
+        if self.is_registered_wallet(owner.as_address()) {
+            Some(owner)
+        } else {
+            None
+        }
     }
 
     pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {

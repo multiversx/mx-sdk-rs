@@ -84,17 +84,17 @@ impl BigNumOperatorTestEndpoint {
         let body = if op_info.assign {
             format!(
                 "
-        a {op} b;
+        {};
         a
     ",
-                op = op_info.symbol()
+                op_info.format_op("a", "b")
             )
         } else {
             format!(
                 "
-        a {op} b
+        {}
     ",
-                op = op_info.symbol()
+                op_info.format_op("a", "b")
             )
         };
 
@@ -401,6 +401,38 @@ pub fn create_endpoints_for_op(op: &OperatorInfo) -> Vec<BigNumOperatorTestEndpo
                 ValueType::Bool,
             ));
             add_cmp_small_int_endpoints(op, ValueType::NonZeroBigUint, &mut endpoints);
+        }
+        OperatorGroup::SaturatingSubMethods => {
+            // SaturatingSub is only defined for BigUint
+            if op.assign {
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                    ValueType::BigUint,
+                ));
+                endpoints.push(BigNumOperatorTestEndpoint::new(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                ));
+                add_u32_u64_endpoints(op, ValueType::BigUint, None, &mut endpoints);
+            } else {
+                append_all_combinations(
+                    op,
+                    ValueType::BigUint,
+                    ValueType::BigUintRef,
+                    ValueType::BigUint,
+                    &mut endpoints,
+                );
+                add_u32_u64_endpoints(
+                    op,
+                    ValueType::BigUint,
+                    Some(ValueType::BigUintRef),
+                    &mut endpoints,
+                );
+            }
         }
     }
 

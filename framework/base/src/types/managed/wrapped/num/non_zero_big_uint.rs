@@ -295,6 +295,13 @@ impl<M: ManagedTypeApi> SCDisplay for NonZeroBigUint<M> {
     }
 }
 
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for NonZeroBigUint<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        core::fmt::Display::fmt(self.as_big_uint(), f)
+    }
+}
+
 impl<M: ManagedTypeApi> core::fmt::Debug for NonZeroBigUint<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("NonZeroBigUint")

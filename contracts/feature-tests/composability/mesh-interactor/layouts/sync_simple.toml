@@ -1,0 +1,15 @@
+[[start]]
+to = "sync_root"
+shard = 1
+gas_limit = 20000000
+
+[contracts.sync_root]
+shard = 1
+
+[[contracts.sync_root.calls]]
+to = "sync_target"
+call_type = "sync"
+gas_limit = 5000000
+
+[contracts.sync_target]
+shard = 1

@@ -1,0 +1,8 @@
+[contracts.main]
+name = "mesh-node"
+
+[[proxy]]
+path = "src/mesh_node_proxy.rs"
+[[proxy.path-rename]]
+from = "mesh_node"
+to = "crate"

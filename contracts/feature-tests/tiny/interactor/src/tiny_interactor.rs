@@ -15,7 +15,7 @@ pub async fn tiny_interactor_cli() {
 
     let config = Config::load_config();
 
-    let mut basic_interact = BasicInteractor::new(config).await;
+    let mut basic_interact = TinyInteractor::new(config).await;
 
     let cli = tiny_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -29,14 +29,14 @@ pub async fn tiny_interactor_cli() {
     }
 }
 
-pub struct BasicInteractor {
+pub struct TinyInteractor {
     pub interactor: Interactor,
     pub owner_address: Bech32Address,
     pub wallet_address: Bech32Address,
     pub state: State,
 }
 
-impl BasicInteractor {
+impl TinyInteractor {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
@@ -47,7 +47,7 @@ impl BasicInteractor {
 
         interactor.generate_blocks(30u64).await.unwrap();
 
-        BasicInteractor {
+        TinyInteractor {
             interactor,
             owner_address: owner_address.into(),
             wallet_address: wallet_address.into(),

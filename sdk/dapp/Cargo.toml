@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk-dapp"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2024"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -19,12 +19,12 @@ web-sys = { version = "0.3" }
 js-sys = { version = "0.3" }
 wasm-bindgen = { version = "0.2" }
 wasm-bindgen-futures = { version = "0.4" }
-gloo-net = { version = "0.6" }
+gloo-net = { version = "0.7" }
 anyhow = "1.0"
 hex = "0.4"
 itertools = "0.14"
 log = "0.4"
 
 [dependencies.multiversx-sdk]
-version = "=0.15.0"
+version = "=0.16.0"
 path = "../core"

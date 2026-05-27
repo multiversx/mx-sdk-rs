@@ -1234,4 +1234,62 @@ pub trait BigIntOperators {
     fn le_non_zero_big_uint_u64(&self, a: NonZeroBigUint, b: u64) -> bool {
         a <= b
     }
+
+    // Saturating sub methods
+
+    #[endpoint]
+    fn saturating_sub_big_uint_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_big_uint_ref(&self, a: BigUint, b: &BigUint) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_ref_big_uint(&self, a: &BigUint, b: BigUint) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_ref_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_u32(&self, a: BigUint, b: u32) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_ref_u32(&self, a: &BigUint, b: u32) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_u64(&self, a: BigUint, b: u64) -> BigUint {
+        a.saturating_sub(b)
+    }
+    #[endpoint]
+    fn saturating_sub_big_uint_ref_u64(&self, a: &BigUint, b: u64) -> BigUint {
+        a.saturating_sub(b)
+    }
+
+    // Saturating sub assign methods
+
+    #[endpoint]
+    fn saturating_sub_assign_big_uint_big_uint(&self, mut a: BigUint, b: BigUint) -> BigUint {
+        a.saturating_sub_assign(b);
+        a
+    }
+    #[endpoint]
+    fn saturating_sub_assign_big_uint_big_uint_ref(&self, mut a: BigUint, b: &BigUint) -> BigUint {
+        a.saturating_sub_assign(b);
+        a
+    }
+    #[endpoint]
+    fn saturating_sub_assign_big_uint_u32(&self, mut a: BigUint, b: u32) -> BigUint {
+        a.saturating_sub_assign(b);
+        a
+    }
+    #[endpoint]
+    fn saturating_sub_assign_big_uint_u64(&self, mut a: BigUint, b: u64) -> BigUint {
+        a.saturating_sub_assign(b);
+        a
+    }
 }

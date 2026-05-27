@@ -5,7 +5,7 @@ mod non_zero_big_uint;
 mod non_zero_big_uint_cmp;
 mod non_zero_big_uint_operators;
 
-pub use big_uint::BigUint;
+pub use big_uint::{BigUint, ParseBigUintError};
 pub use non_zero_big_uint::NonZeroBigUint;
 
 /// Error returned when attempting to convert zero to a non-zero number type.

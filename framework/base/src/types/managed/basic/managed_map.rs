@@ -1,5 +1,5 @@
 use crate::{
-    api::{ManagedMapApiImpl, ManagedTypeApi},
+    api::{ManagedMapApiImpl, ManagedTypeApi, ManagedTypeApiImpl},
     types::ManagedType,
 };
 
@@ -89,5 +89,11 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
 
     pub fn contains(&self, key: &ManagedBuffer<M>) -> bool {
         M::managed_type_impl().mm_contains(self.handle.clone(), key.handle.clone())
+    }
+}
+
+impl<M: ManagedTypeApi> Drop for ManagedMap<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_managed_map(self.handle.clone());
     }
 }

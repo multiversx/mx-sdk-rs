@@ -1,14 +1,15 @@
 use core::str;
 use std::{
     fs::{self},
-    io::{self, Read},
+    io::{self, Write},
+    path::Path,
 };
 
 use aes::{Aes128, cipher::KeyIvInit};
 use anyhow::Result;
 use bip39::Mnemonic;
 use ctr::{Ctr128BE, cipher::StreamCipher};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use multiversx_chain_core::{std::Bech32Address, types::Address};
 use pbkdf2::pbkdf2;
 use scrypt::{Params, scrypt};
@@ -71,7 +72,6 @@ impl Wallet {
 
         let mut digest =
             HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
-        HmacSha512::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
         digest.update(&seed);
         let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
@@ -92,7 +92,6 @@ impl Wallet {
 
             digest =
                 HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
-            HmacSha512::new_from_slice(&chain_code).expect("HMAC can take key of any size");
             digest.update(&buff);
             let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();
@@ -118,8 +117,11 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn from_pem_file(file_path: &str) -> Result<Self> {
-        let contents = std::fs::read_to_string(file_path).unwrap();
+    pub fn from_pem_file<P>(file_path: P) -> Result<Self>
+    where
+        P: AsRef<Path>,
+    {
+        let contents = std::fs::read_to_string(file_path)?;
         Self::from_pem_file_contents(contents)
     }
 
@@ -137,14 +139,14 @@ impl Wallet {
         address_bytes[address_bytes.len() - 1] % 3
     }
 
-    pub fn get_pem_decoded_content(file: &str) -> Vec<u8> {
+    pub fn get_pem_decoded_content<P: AsRef<Path>>(file: P) -> Vec<u8> {
         let pem_content = fs::read_to_string(file).unwrap();
         let lines: Vec<&str> = pem_content.split('\n').collect();
         let pem_encoded_keys = format!("{}{}{}", lines[1], lines[2], lines[3]);
         base64_decode(pem_encoded_keys)
     }
 
-    pub fn get_wallet_keys_pem(file: &str) -> (String, String) {
+    pub fn get_wallet_keys_pem<P: AsRef<Path>>(file: P) -> (String, String) {
         let pem_decoded_keys = Self::get_pem_decoded_content(file);
         let (private_key, public_key) = pem_decoded_keys.split_at(pem_decoded_keys.len() / 2);
         let private_key_str = String::from_utf8(private_key.to_vec()).unwrap();
@@ -153,17 +155,20 @@ impl Wallet {
         (private_key_str, public_key_str)
     }
 
-    pub fn from_keystore_secret(file_path: &str, insert_password: InsertPassword) -> Result<Self> {
+    pub fn from_keystore_secret<P: AsRef<Path>>(
+        file_path: P,
+        insert_password: InsertPassword,
+    ) -> Result<Self> {
         let decryption_params = match insert_password {
             InsertPassword::Plaintext(password) => {
-                Self::validate_keystore_password(file_path, password.to_string()).unwrap_or_else(
+                Self::validate_keystore_password(&file_path, password.to_string()).unwrap_or_else(
                     |e| {
                         panic!("Error: {:?}", e);
                     },
                 )
             }
             InsertPassword::StandardInput => {
-                Self::validate_keystore_password(file_path, Self::get_keystore_password())
+                Self::validate_keystore_password(&file_path, Self::get_keystore_password())
                     .unwrap_or_else(|e| {
                         panic!("Error: {:?}", e);
                     })
@@ -175,8 +180,8 @@ impl Wallet {
         Ok(Self { priv_key })
     }
 
-    pub fn get_private_key_from_keystore_secret(
-        file_path: &str,
+    pub fn get_private_key_from_keystore_secret<P: AsRef<Path>>(
+        file_path: P,
         password: &str,
     ) -> Result<PrivateKey> {
         let decyption_params = Self::validate_keystore_password(file_path, password.to_string())
@@ -217,18 +222,18 @@ impl Wallet {
         self.priv_key.sign(tx_bytes)
     }
 
-    pub fn get_keystore_password() -> String {
-        println!(
-            "Insert password. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
-        );
-        let mut password = String::new();
-        io::stdin().read_to_string(&mut password).unwrap();
-        password = password.trim().to_string();
-        password
+    pub fn sign_bytes(&self, data: Vec<u8>) -> [u8; 64] {
+        self.priv_key.sign(data)
     }
 
-    pub fn validate_keystore_password(
-        path: &str,
+    pub fn get_keystore_password() -> String {
+        print!("Insert password: ");
+        io::stdout().flush().unwrap();
+        rpassword::read_password().unwrap()
+    }
+
+    pub fn validate_keystore_password<P: AsRef<Path>>(
+        path: P,
         password: String,
     ) -> Result<DecryptionParams, WalletError> {
         let json_body = fs::read_to_string(path).unwrap();
@@ -251,9 +256,9 @@ impl Wallet {
         let n = keystore.crypto.kdfparams.n as f64;
         let r = keystore.crypto.kdfparams.r as u64;
         let p = keystore.crypto.kdfparams.p as u64;
-        let dklen = keystore.crypto.kdfparams.dklen as usize;
+        let _dklen = keystore.crypto.kdfparams.dklen as usize;
 
-        let params = Params::new(n.log2() as u8, r as u32, p as u32, dklen).unwrap();
+        let params = Params::new(n.log2() as u8, r as u32, p as u32).unwrap();
 
         let mut derived_key = vec![0u8; 32];
         scrypt(password.as_bytes(), &salt, &params, &mut derived_key).unwrap();
@@ -279,10 +284,13 @@ impl Wallet {
     }
 
     pub fn decrypt_secret_key(decryption_params: DecryptionParams) -> Vec<u8> {
-        let mut cipher = Ctr128BE::<Aes128>::new(
-            decryption_params.derived_key_first_half.as_slice().into(),
-            decryption_params.iv.as_slice().into(),
-        );
+        let key: &[u8; 16] = decryption_params
+            .derived_key_first_half
+            .as_slice()
+            .try_into()
+            .unwrap();
+        let iv: &[u8; 16] = decryption_params.iv.as_slice().try_into().unwrap();
+        let mut cipher = Ctr128BE::<Aes128>::new(key.into(), iv.into());
         let mut decrypted = decryption_params.data.to_vec();
         cipher.apply_keystream(&mut decrypted);
 
@@ -302,7 +310,7 @@ impl Wallet {
     ) -> String {
         use rand::Rng;
 
-        let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P, KDF_DKLEN).unwrap();
+        let params = Params::new((KDF_N as f64).log2() as u8, KDF_R, KDF_P).unwrap();
         let mut rand_salt: [u8; 32] = [0u8; 32];
         rand::rng().fill_bytes(&mut rand_salt);
         let salt_hex = hex::encode(rand_salt);

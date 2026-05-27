@@ -1,0 +1,7 @@
+[[start]]
+to = "direct"
+shard = 1
+gas_limit = 5000000
+
+[contracts.direct]
+shard = 1

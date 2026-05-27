@@ -48,6 +48,10 @@ where
         BackTransfers { payments }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.payments.is_empty()
+    }
+
     /// The sum of all EGLD-000000 back-transfers.
     pub fn egld_sum(&self) -> BigUint<A> {
         self.payments.egld_sum()

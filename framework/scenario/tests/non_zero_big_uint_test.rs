@@ -113,6 +113,30 @@ fn test_non_zero_big_uint_creation_and_conversion() {
 }
 
 #[test]
+fn test_non_zero_big_uint_display() {
+    type NZ = NonZeroBigUint<StaticApi>;
+    type BU = BigUint<StaticApi>;
+
+    assert_eq!(NZ::new_or_panic(BU::from(1u32)).to_string(), "1");
+    assert_eq!(NZ::new_or_panic(BU::from(42u32)).to_string(), "42");
+    assert_eq!(
+        NZ::new_or_panic(BU::from(1000000u32)).to_string(),
+        "1000000"
+    );
+    assert_eq!(
+        NZ::new_or_panic(BU::from(i64::MAX as u64)).to_string(),
+        (i64::MAX as u64).to_string()
+    );
+    // Display delegates to the inner BigUint
+    assert_eq!(
+        NZ::new_or_panic(BU::from(99u32)).to_string(),
+        BU::from(99u32).to_string()
+    );
+    // format! also uses Display
+    assert_eq!(format!("{}", NZ::new_or_panic(BU::from(7u32))), "7");
+}
+
+#[test]
 #[should_panic]
 fn test_non_zero_big_uint_new_or_panic_panics_on_zero() {
     let _ = NonZeroBigUint::<StaticApi>::new_or_panic(BigUint::<StaticApi>::from(0u32));

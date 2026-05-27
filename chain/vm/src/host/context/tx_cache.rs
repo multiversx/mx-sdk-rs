@@ -5,6 +5,7 @@ use std::{
 };
 
 use colored::Colorize;
+use multiversx_chain_core::std::new_address;
 
 use crate::{
     blockchain::state::{AccountData, BlockchainState},
@@ -104,8 +105,10 @@ impl TxCache {
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
             .unwrap_or_else(|| {
-                let new_mock_address =
-                    Address::generate_mock_address(&creator_address.to_vec(), current_nonce - 1);
+                let new_mock_address = new_address::generate_mock_address(
+                    &creator_address.to_vec(),
+                    current_nonce - 1,
+                );
                 println!(
                     "{}",
                     format!(

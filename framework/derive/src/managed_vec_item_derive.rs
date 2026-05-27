@@ -38,6 +38,39 @@ fn generate_enum_payload_nested_tuple(data_enum: &syn::DataEnum) -> proc_macro2:
     result
 }
 
+fn generate_requires_drop_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+    match fields {
+        syn::Fields::Named(fields_named) => fields_named
+            .named
+            .iter()
+            .map(|field| {
+                let type_name = &field.ty;
+                quote! {
+                    <#type_name as multiversx_sc::types::ManagedVecItem>::requires_drop()
+                }
+            })
+            .collect(),
+        _ => {
+            panic!("ManagedVecItem only supports named fields")
+        }
+    }
+}
+
+fn generate_enum_requires_drop_snippets(
+    data_enum: &syn::DataEnum,
+) -> Vec<proc_macro2::TokenStream> {
+    data_enum
+        .variants
+        .iter()
+        .filter_map(|variant| single_fields_type(&variant.fields))
+        .map(|ty| {
+            quote! {
+                <#ty as multiversx_sc::types::ManagedVecItem>::requires_drop()
+            }
+        })
+        .collect()
+}
+
 fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
@@ -104,6 +137,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let payload_nested_tuple = generate_enum_payload_nested_tuple(data_enum);
     let skips_reserialization = !variants_have_fields(data_enum);
+    let requires_drop_snippets = generate_enum_requires_drop_snippets(data_enum);
 
     let mut reader_match_arms = Vec::<proc_macro2::TokenStream>::new();
     let mut writer_match_arms = Vec::<proc_macro2::TokenStream>::new();
@@ -158,7 +192,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
             const SKIPS_RESERIALIZATION: bool = #skips_reserialization;
             type Ref<'a> = multiversx_sc::types::Ref<'a, Self>;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
 
                 unsafe {
@@ -185,6 +219,10 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                         #(#writer_match_arms)*
                     };
                 }
+            }
+
+            fn requires_drop() -> bool {
+                false #(|| #requires_drop_snippets)*
             }
         }
     };
@@ -216,6 +254,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
     let payload_nested_tuple = generate_struct_payload_nested_tuple(&data_struct.fields);
     let skips_reserialization_snippets =
         generate_skips_reserialization_snippets(&data_struct.fields);
+    let requires_drop_snippets = generate_requires_drop_snippets(&data_struct.fields);
     let read_from_payload_snippets = generate_read_from_payload_snippets(&data_struct.fields);
     let save_to_payload_snippets = generate_save_to_payload_snippets(&data_struct.fields);
 
@@ -225,7 +264,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = multiversx_sc::types::Ref<'a, Self>;
 
-            fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
                 let mut index = 0;
 
                 unsafe {
@@ -244,6 +283,10 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 unsafe {
                     #(#save_to_payload_snippets)*
                 }
+            }
+
+            fn requires_drop() -> bool {
+                false #(|| #requires_drop_snippets)*
             }
         }
     };

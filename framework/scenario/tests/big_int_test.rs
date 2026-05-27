@@ -1,6 +1,10 @@
 use multiversx_sc::types::BigInt;
 use multiversx_sc_scenario::api::StaticApi;
 
+// BigInt intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(BigInt::<StaticApi>: Send, Sync);
+
 #[test]
 fn test_big_int_add() {
     let x = BigInt::<StaticApi>::from(2);
@@ -13,6 +17,28 @@ fn assert_big_int_proportion(total: i64, part: i64, denom: i64, expected: i64) {
     let expected = BigInt::<StaticApi>::from(expected);
     assert_eq!(total.proportion(part, denom), expected);
     assert_eq!(total.clone().into_proportion(part, denom), expected);
+}
+
+#[test]
+fn test_big_int_display() {
+    assert_eq!(BigInt::<StaticApi>::from(0).to_string(), "0");
+    assert_eq!(BigInt::<StaticApi>::from(1).to_string(), "1");
+    assert_eq!(BigInt::<StaticApi>::from(-1).to_string(), "-1");
+    assert_eq!(BigInt::<StaticApi>::from(42).to_string(), "42");
+    assert_eq!(BigInt::<StaticApi>::from(-42).to_string(), "-42");
+    assert_eq!(BigInt::<StaticApi>::from(1000000).to_string(), "1000000");
+    assert_eq!(BigInt::<StaticApi>::from(-1000000).to_string(), "-1000000");
+    assert_eq!(
+        BigInt::<StaticApi>::from(i64::MAX).to_string(),
+        i64::MAX.to_string()
+    );
+    assert_eq!(
+        BigInt::<StaticApi>::from(i64::MIN).to_string(),
+        i64::MIN.to_string()
+    );
+    // format! also uses Display
+    assert_eq!(format!("{}", BigInt::<StaticApi>::from(123)), "123");
+    assert_eq!(format!("{}", BigInt::<StaticApi>::from(-123)), "-123");
 }
 
 #[test]
