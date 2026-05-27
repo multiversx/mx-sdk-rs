@@ -34,7 +34,6 @@ log = "0.4"
 scrypt = { version = "0.12", default-features = false }
 aes = "0.9"
 ctr = "0.10"
-rpassword = "~7.3" # rpassword >=7.4 requires Rust 1.88 (let_chains), pin to 7.3.x for Rust 1.85 compat
 
 [dependencies.multiversx-chain-core]
 version = "=0.23.0"

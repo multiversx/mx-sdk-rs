@@ -8,10 +8,7 @@ pub use keystore_json::*;
 pub use wallet_pem::WalletPem;
 
 use core::str;
-use std::{
-    io::{self, Write},
-    path::Path,
-};
+use std::path::Path;
 
 use anyhow::Result;
 use bip39::Mnemonic;
@@ -80,29 +77,6 @@ impl Wallet {
         address_bytes[address_bytes.len() - 1] % 3
     }
 
-    pub fn from_keystore_secret<P: AsRef<Path>>(
-        file_path: P,
-        insert_password: InsertPassword,
-    ) -> Result<Self> {
-        let keystore = Keystore::from_file(&file_path);
-        let decryption_params = match insert_password {
-            InsertPassword::Plaintext(password) => {
-                keystore.validate_password(&password).unwrap_or_else(|e| {
-                    panic!("Error: {:?}", e);
-                })
-            }
-            InsertPassword::StandardInput => keystore
-                .validate_password(&Self::get_keystore_password())
-                .unwrap_or_else(|e| {
-                    panic!("Error: {:?}", e);
-                }),
-        };
-        let priv_key = PrivateKey::from_hex_str(
-            hex::encode(Keystore::decrypt_secret_key(decryption_params)).as_str(),
-        )?;
-        Ok(Self::from_private_key(priv_key, None))
-    }
-
     #[deprecated(
         since = "0.54.0",
         note = "Renamed to `to_address`, type changed to multiversx_chain_core::types::Address"
@@ -141,12 +115,6 @@ impl Wallet {
 
     pub fn sign_bytes(&self, data: Vec<u8>) -> [u8; 64] {
         self.priv_key.sign(data)
-    }
-
-    pub fn get_keystore_password() -> String {
-        print!("Insert password: ");
-        io::stdout().flush().unwrap();
-        rpassword::read_password().unwrap()
     }
 
     pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {

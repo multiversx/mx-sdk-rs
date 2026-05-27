@@ -51,6 +51,8 @@ base64 = "0.22"
 indexmap = { version = "2", features = ["serde"] }
 # warning: newer versions require Rust 1.88, hence we are not upgrading yet
 zip = { version = "7.2", features = ["deflate"], default-features = false }
+# rpassword >=7.4 requires Rust 1.88 (let_chains), pin to 7.3.x for Rust 1.85 compat
+rpassword = "~7.3"
 
 [dependencies.multiversx-sc-meta-lib]
 version = "=0.66.0"

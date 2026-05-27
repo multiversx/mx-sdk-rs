@@ -3,6 +3,7 @@ use core::str;
 use multiversx_sdk::crypto::private_key::PrivateKey;
 use rand::Rng;
 
+use crate::cli::cli_args_sender::get_keystore_password;
 use crate::cli::{
     WalletAction, WalletArgs, WalletBech32Args, WalletConvertArgs, WalletNewArgs,
     WalletTestWalletArgs,
@@ -61,8 +62,7 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("keystore-secret", "pem") => match infile {
             Some(file) => {
                 let private_key =
-                    Keystore::get_private_key_from_file(file, &Wallet::get_keystore_password())
-                        .unwrap();
+                    Keystore::get_private_key_from_file(file, &get_keystore_password()).unwrap();
                 write_resulted_pem(hrp, &private_key.to_string(), outfile);
             }
             None => {
@@ -83,7 +83,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                     hex_decoded_keys.as_slice(),
                     address.to_bech32(hrp),
                     &public_key_str,
-                    &Wallet::get_keystore_password(),
+                    &get_keystore_password(),
                     randomness,
                 )
                 .to_json_string();
@@ -242,7 +242,7 @@ fn new(new_args: &WalletNewArgs) {
                 hex_decoded_keys.as_slice(),
                 address.to_bech32(hrp),
                 &public_key_str,
-                &Wallet::get_keystore_password(),
+                &get_keystore_password(),
                 randomness,
             )
             .to_json_string();
