@@ -15,10 +15,7 @@ use multiversx_sc_snippets::{
         wallet::{Keystore, KeystoreRandomness, Wallet},
     },
 };
-use multiversx_sdk::{
-    crypto::private_key::PrivateKey,
-    wallet::{KeystoreError, WalletPem},
-};
+use multiversx_sdk::wallet::{KeystoreError, WalletPem};
 
 use crate::cli::cli_args_sender::get_keystore_password;
 use crate::cli::{
