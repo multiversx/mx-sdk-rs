@@ -3476,6 +3476,7 @@ dependencies = [
  "base64",
  "bip39",
  "ctr",
+ "ed25519-dalek",
  "hex",
  "hmac",
  "itertools 0.14.0",

@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use super::private_key::PrivateKey;
 use anyhow::Result;
+use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use multiversx_chain_core::types::Address;
 use serde::{
     de::{Deserialize, Deserializer},
@@ -32,9 +33,18 @@ impl PublicKey {
 
     pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
-        let mut bits: [u8; 32] = [0u8; 32];
-        bits.copy_from_slice(&bytes[32..]);
+        let bits: [u8; PUBLIC_KEY_LENGTH] = bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("invalid public key length, expected 32 bytes"))?;
         Ok(Self(bits))
+    }
+
+    pub fn verify(&self, message: &[u8], signature: &[u8; 64]) -> bool {
+        let Ok(verifying_key) = VerifyingKey::from_bytes(&self.0) else {
+            return false;
+        };
+        let signature = Signature::from_bytes(signature);
+        verifying_key.verify(message, &signature).is_ok()
     }
 }
 
