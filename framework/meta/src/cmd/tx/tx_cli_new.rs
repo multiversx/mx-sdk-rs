@@ -2,7 +2,6 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc_snippets::{
-    hex,
     imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction},
     sdk::utils::{base64_decode, base64_encode},
 };
@@ -29,7 +28,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet).await;
+    let sender_address = interactor.register_wallet(wallet.clone()).await;
     let sender = sender_address.to_bech32(interactor.get_hrp());
 
     // Determine nonce (explicit override or recalled from network).
@@ -70,7 +69,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
 
     let sig = wallet.sign_tx(&tx);
-    tx.signature = Some(hex::encode(sig));
+    tx.signature = Some(sig);
 
     let output = TxOutputFile {
         emitted_transaction: tx,

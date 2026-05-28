@@ -3214,6 +3214,7 @@ dependencies = [
  "hex",
  "multiversx-sc-codec",
  "serde",
+ "serde_json",
  "sha2 0.11.0",
  "sha3",
 ]
@@ -3373,8 +3374,10 @@ dependencies = [
  "multiversx-sc-snippets",
  "multiversx-sdk",
  "pathdiff",
+ "rand 0.10.1",
  "regex",
  "reqwest",
+ "rpassword",
  "ruplacer",
  "semver",
  "serde",
@@ -3382,6 +3385,7 @@ dependencies = [
  "serial_test",
  "tokio",
  "toml",
+ "uuid",
  "zip",
 ]
 
@@ -3472,6 +3476,7 @@ dependencies = [
  "base64",
  "bip39",
  "ctr",
+ "ed25519-dalek",
  "hex",
  "hmac",
  "itertools 0.14.0",
@@ -3479,15 +3484,12 @@ dependencies = [
  "multiversx-chain-core",
  "pbkdf2",
  "pem",
- "rand 0.10.1",
- "rpassword",
  "scrypt",
  "serde",
  "serde_json",
  "serde_repr",
  "sha2 0.11.0",
  "sha3",
- "uuid",
  "zeroize",
 ]
 

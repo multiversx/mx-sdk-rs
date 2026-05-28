@@ -1,13 +1,15 @@
-use multiversx_sdk::{data::transaction::Transaction, wallet::Wallet};
+use multiversx_sdk::{data::transaction::Transaction, wallet::PrivateKey, wallet::Wallet};
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
 async fn main() {
-    let wl = Wallet::from_private_key(
-        "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
-    )
-    .unwrap();
-    let addr = wl.to_address();
+    let wallet = Wallet::from(
+        PrivateKey::from_hex_str(
+            "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
+        )
+        .unwrap(),
+    );
+    let addr = wallet.to_address();
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
     let network_config = blockchain.get_network_config().await.unwrap();
 
@@ -19,8 +21,8 @@ async fn main() {
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
         value: "0".to_string(),
-        receiver: addr.to_bech32(&network_config.address_hrp),
-        sender: addr.to_bech32(&network_config.address_hrp),
+        receiver: addr.to_bech32(network_config.address_hrp),
+        sender: addr.to_bech32(network_config.address_hrp),
         gas_price: arg.gas_price,
         gas_limit: arg.gas_limit,
         data: arg.data,
@@ -30,8 +32,8 @@ async fn main() {
         options: arg.options,
     };
 
-    let signature = wl.sign_tx(&unsign_tx);
-    unsign_tx.signature = Some(hex::encode(signature));
+    let signature = wallet.sign_tx(&unsign_tx);
+    unsign_tx.signature = Some(signature);
     let tx_hash = blockchain.send_transaction(&unsign_tx).await.unwrap();
 
     assert!(!tx_hash.is_empty());
