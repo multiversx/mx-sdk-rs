@@ -118,12 +118,12 @@ impl Keystore {
     /// The wallet address stored in the keystore is derived from `private_key`
     /// and encoded with the given `hrp`.
     pub fn encrypt(
-        private_key: PrivateKey,
+        private_key: &PrivateKey,
         hrp: Bech32Hrp,
         password: &str,
         randomness: KeystoreRandomness,
     ) -> Self {
-        let public_key = PublicKey::from(&private_key);
+        let public_key = PublicKey::from(private_key);
         let address = public_key.to_address().to_bech32(hrp);
         let private_key_bytes = private_key.to_bytes();
 

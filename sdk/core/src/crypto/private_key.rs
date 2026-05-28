@@ -2,8 +2,8 @@ use std::fmt::Display;
 
 use anyhow::{Result, anyhow};
 use bip39::Mnemonic;
-use ed25519_dalek::{Signer, SigningKey};
 use hmac::{Hmac, KeyInit, Mac};
+use multiversx_chain_core::std::crypto::ed25519;
 use pbkdf2::pbkdf2;
 use serde::{
     de::{Deserialize, Deserializer},
@@ -21,25 +21,21 @@ pub const SEED_LENGTH: usize = 32;
 const EGLD_COIN_TYPE: u32 = 508;
 const HARDENED: u32 = 0x80000000;
 
-#[derive(Copy, Clone, PartialEq, Eq)]
-pub struct PrivateKey(pub [u8; PRIVATE_KEY_LENGTH]);
+#[derive(Clone, PartialEq, Eq)]
+pub struct PrivateKey(pub ed25519::Ed25519SigningKey);
 
 impl PrivateKey {
     pub fn from_bytes(bytes: &[u8]) -> Result<PrivateKey> {
         match bytes.len() {
             SEED_LENGTH => {
                 let seed: [u8; 32] = bytes.try_into().unwrap();
-                let signing_key = SigningKey::from_bytes(&seed);
-                let mut bits: [u8; 64] = [0u8; 64];
-                bits[..32].copy_from_slice(bytes);
-                bits[32..].copy_from_slice(signing_key.verifying_key().as_bytes());
-                Ok(PrivateKey(bits))
+                Ok(PrivateKey(ed25519::Ed25519SigningKey::from_seed(&seed)))
             }
             PRIVATE_KEY_LENGTH => {
-                let mut bits: [u8; 64] = [0u8; 64];
-                bits.copy_from_slice(&bytes[..64]);
-
-                Ok(PrivateKey(bits))
+                let keypair: &[u8; 64] = bytes.try_into().unwrap();
+                ed25519::Ed25519SigningKey::from_keypair_bytes(keypair)
+                    .map(PrivateKey)
+                    .map_err(|e| anyhow!("Invalid keypair bytes: {e}"))
             }
             _ => Err(anyhow!("Invalid secret key length")),
         }
@@ -107,21 +103,15 @@ impl PrivateKey {
     }
 
     pub fn to_bytes(&self) -> [u8; PRIVATE_KEY_LENGTH] {
-        self.0
-    }
-
-    pub fn as_bytes(&self) -> &[u8; PRIVATE_KEY_LENGTH] {
-        &self.0
+        self.0.to_keypair_bytes()
     }
 
     pub fn to_hex(&self) -> String {
-        hex::encode(&self.0[..32])
+        hex::encode(self.0.to_seed_bytes())
     }
 
     pub fn sign(&self, message: impl AsRef<[u8]>) -> WalletSignature {
-        let seed: [u8; 32] = self.0[..32].try_into().unwrap();
-        let signing_key = SigningKey::from_bytes(&seed);
-        WalletSignature::from_bytes(signing_key.sign(message.as_ref()).to_bytes())
+        WalletSignature::from(self.0.sign(message.as_ref()))
     }
 }
 
