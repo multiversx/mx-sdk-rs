@@ -57,5 +57,5 @@ pub(crate) fn update_nonces_and_sign_tx(transaction: &mut Transaction, sender: &
     sender.current_nonce = Some(sender.current_nonce.unwrap() + 1);
 
     let signature = sender.wallet.sign_tx(&*transaction);
-    transaction.signature = Some(hex::encode(signature));
+    transaction.signature = Some(signature);
 }

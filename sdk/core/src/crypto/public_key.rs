@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use super::private_key::PrivateKey;
+use super::wallet_signature::WalletSignature;
 use anyhow::Result;
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use multiversx_chain_core::types::Address;
@@ -39,11 +40,11 @@ impl PublicKey {
         Ok(Self(bits))
     }
 
-    pub fn verify(&self, message: &[u8], signature: &[u8; 64]) -> bool {
+    pub fn verify(&self, message: &[u8], signature: &WalletSignature) -> bool {
         let Ok(verifying_key) = VerifyingKey::from_bytes(&self.0) else {
             return false;
         };
-        let signature = Signature::from_bytes(signature);
+        let signature = Signature::from_bytes(signature.as_bytes());
         verifying_key.verify(message, &signature).is_ok()
     }
 }

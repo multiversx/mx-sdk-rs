@@ -110,6 +110,6 @@ where
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);
-        transaction.signature = Some(hex::encode(signature));
+        transaction.signature = Some(signature);
     }
 }

@@ -38,7 +38,7 @@ async fn main() {
     let mut txs: Vec<Transaction> = vec![];
 
     let signature = wallet.sign_tx(&unsign_tx);
-    unsign_tx.signature = Some(hex::encode(signature));
+    unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 
     unsign_tx.version = 2;
@@ -46,7 +46,7 @@ async fn main() {
     unsign_tx.nonce += 1;
 
     let signature = wallet.sign_tx(&unsign_tx);
-    unsign_tx.signature = Some(hex::encode(signature));
+    unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 
     let tx_hash = blockchain.send_transactions(&txs).await.unwrap();
