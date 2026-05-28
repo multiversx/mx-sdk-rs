@@ -33,8 +33,9 @@ impl PublicKey {
 
     pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
-        let mut bits: [u8; 32] = [0u8; 32];
-        bits.copy_from_slice(&bytes[32..]);
+        let bits: [u8; PUBLIC_KEY_LENGTH] = bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("invalid public key length, expected 32 bytes"))?;
         Ok(Self(bits))
     }
 
