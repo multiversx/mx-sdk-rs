@@ -20,12 +20,10 @@ use std::path::Path;
 use anyhow::Result;
 use bip39::Mnemonic;
 use multiversx_chain_core::{
-    std::{Bech32Address, Bech32Hrp},
+    std::{Bech32Address, Bech32Hrp, crypto},
     types::Address,
 };
 use serde_json::json;
-use sha2::Digest;
-use sha3::Keccak256;
 
 use crate::data::transaction::Transaction;
 
@@ -132,9 +130,7 @@ impl Wallet {
 
         let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;
         if should_sign_on_tx_hash {
-            let mut h = Keccak256::new();
-            h.update(tx_bytes);
-            tx_bytes = h.finalize().to_vec();
+            tx_bytes = crypto::keccak256(&tx_bytes).to_vec();
         }
 
         self.private_key.sign(tx_bytes)
