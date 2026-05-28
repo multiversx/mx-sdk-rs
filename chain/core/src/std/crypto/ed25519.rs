@@ -1,44 +1,85 @@
 use ed25519_dalek::{Signer, Verifier};
 
-pub const SIGNATURE_LENGTH: usize = 64;
+/// An Ed25519 signing (private) key, wrapping a 32-byte seed.
+#[derive(Clone, PartialEq, Eq)]
+pub struct Ed25519SigningKey(ed25519_dalek::SigningKey);
 
-pub type Ed25519SigningKey = ed25519_dalek::SigningKey;
-pub type Ed25519VerifyingKey = ed25519_dalek::VerifyingKey;
-pub type Ed25519Signature = ed25519_dalek::Signature;
+/// An Ed25519 verifying (public) key.
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub struct Ed25519VerifyingKey(ed25519_dalek::VerifyingKey);
 
-/// Constructs a signing key from a 32-byte seed.
-pub fn signing_key_from_seed(seed: &[u8; 32]) -> Ed25519SigningKey {
-    Ed25519SigningKey::from_bytes(seed)
+/// An Ed25519 signature.
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub struct Ed25519Signature(ed25519_dalek::Signature);
+
+impl Ed25519SigningKey {
+    /// Constructs a signing key from a 32-byte seed.
+    pub fn from_seed(seed: &[u8; 32]) -> Self {
+        Self(ed25519_dalek::SigningKey::from_bytes(seed))
+    }
+
+    /// Constructs a signing key from a 64-byte keypair (seed || public key).
+    /// Returns an error if the public key half does not match the seed half.
+    pub fn from_keypair_bytes(bytes: &[u8; 64]) -> Result<Self, ed25519_dalek::SignatureError> {
+        ed25519_dalek::SigningKey::from_keypair_bytes(bytes).map(Self)
+    }
+
+    /// Returns the 32-byte seed (secret scalar).
+    pub fn to_seed_bytes(&self) -> &[u8; 32] {
+        self.0.as_bytes()
+    }
+
+    /// Returns the full 64-byte keypair encoding (seed || public key).
+    pub fn to_keypair_bytes(&self) -> [u8; 64] {
+        self.0.to_keypair_bytes()
+    }
+
+    /// Derives the corresponding verifying (public) key.
+    pub fn verifying_key(&self) -> Ed25519VerifyingKey {
+        Ed25519VerifyingKey(self.0.verifying_key())
+    }
+
+    /// Signs a message with this key.
+    pub fn sign(&self, message: &[u8]) -> Ed25519Signature {
+        Ed25519Signature(self.0.sign(message))
+    }
 }
 
-/// Derives the verifying (public) key from a 32-byte signing seed.
-pub fn verifying_key_from_seed(seed: &[u8; 32]) -> Ed25519VerifyingKey {
-    signing_key_from_seed(seed).verifying_key()
+impl Ed25519VerifyingKey {
+    /// Constructs a verifying key from its 32-byte compressed representation.
+    /// Returns `None` if the bytes do not represent a valid curve point.
+    pub fn from_bytes(bytes: &[u8; 32]) -> Option<Self> {
+        ed25519_dalek::VerifyingKey::from_bytes(bytes)
+            .ok()
+            .map(Self)
+    }
+
+    /// Returns the 32-byte compressed encoding of the public key.
+    pub fn to_bytes(&self) -> [u8; 32] {
+        self.0.to_bytes()
+    }
+
+    /// Returns a reference to the 32-byte compressed encoding of the public key.
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        self.0.as_bytes()
+    }
+
+    /// Verifies an Ed25519 signature. Returns `true` if the signature is valid.
+    pub fn verify(&self, message: &[u8], signature: &Ed25519Signature) -> bool {
+        self.0.verify(message, &signature.0).is_ok()
+    }
 }
 
-/// Constructs a verifying key from its 32-byte compressed representation.
-/// Returns `None` if the bytes do not represent a valid curve point.
-pub fn verifying_key_from_bytes(bytes: &[u8; 32]) -> Option<Ed25519VerifyingKey> {
-    Ed25519VerifyingKey::from_bytes(bytes).ok()
-}
+impl Ed25519Signature {
+    /// Constructs a signature from its 64-byte representation.
+    pub fn from_bytes(bytes: &[u8; 64]) -> Self {
+        Self(ed25519_dalek::Signature::from_bytes(bytes))
+    }
 
-/// Constructs an Ed25519 signature from its 64-byte representation.
-pub fn signature_from_bytes(bytes: &[u8; 64]) -> Ed25519Signature {
-    Ed25519Signature::from_bytes(bytes)
-}
-
-/// Signs a message with the given signing key.
-pub fn sign(signing_key: &Ed25519SigningKey, message: &[u8]) -> Ed25519Signature {
-    signing_key.sign(message)
-}
-
-/// Verifies an Ed25519 signature. Returns `true` if the signature is valid.
-pub fn verify(
-    verifying_key: &Ed25519VerifyingKey,
-    message: &[u8],
-    signature: &Ed25519Signature,
-) -> bool {
-    verifying_key.verify(message, signature).is_ok()
+    /// Returns the 64-byte encoding of this signature.
+    pub fn to_bytes(&self) -> [u8; 64] {
+        self.0.to_bytes()
+    }
 }
 
 #[cfg(test)]
@@ -59,65 +100,70 @@ mod tests {
 
     #[test]
     fn verifying_key_derived_from_seed() {
-        assert_eq!(verifying_key_from_seed(&SEED).to_bytes(), PK_BYTES);
+        assert_eq!(
+            Ed25519SigningKey::from_seed(&SEED)
+                .verifying_key()
+                .to_bytes(),
+            PK_BYTES
+        );
     }
 
     #[test]
     fn signing_key_from_seed_roundtrip() {
-        let sk = signing_key_from_seed(&SEED);
+        let sk = Ed25519SigningKey::from_seed(&SEED);
         assert_eq!(sk.verifying_key().to_bytes(), PK_BYTES);
     }
 
     #[test]
     fn sign_produces_known_signature() {
-        let sk = signing_key_from_seed(&SEED);
-        assert_eq!(sign(&sk, b"").to_bytes(), SIG_BYTES);
+        let sk = Ed25519SigningKey::from_seed(&SEED);
+        assert_eq!(sk.sign(b"").to_bytes(), SIG_BYTES);
     }
 
     #[test]
     fn verify_valid_signature() {
-        let vk = verifying_key_from_seed(&SEED);
-        let sig = signature_from_bytes(&SIG_BYTES);
-        assert!(verify(&vk, b"", &sig));
+        let vk = Ed25519SigningKey::from_seed(&SEED).verifying_key();
+        let sig = Ed25519Signature::from_bytes(&SIG_BYTES);
+        assert!(vk.verify(b"", &sig));
     }
 
     #[test]
     fn verify_rejects_wrong_message() {
-        let vk = verifying_key_from_seed(&SEED);
-        let sig = signature_from_bytes(&SIG_BYTES);
-        assert!(!verify(&vk, b"wrong", &sig));
+        let vk = Ed25519SigningKey::from_seed(&SEED).verifying_key();
+        let sig = Ed25519Signature::from_bytes(&SIG_BYTES);
+        assert!(!vk.verify(b"wrong", &sig));
     }
 
     #[test]
     fn verify_rejects_wrong_signature() {
-        let vk = verifying_key_from_seed(&SEED);
+        let vk = Ed25519SigningKey::from_seed(&SEED).verifying_key();
         let mut bad_bytes = SIG_BYTES;
         bad_bytes[0] ^= 0xff;
-        let bad_sig = signature_from_bytes(&bad_bytes);
-        assert!(!verify(&vk, b"", &bad_sig));
+        let bad_sig = Ed25519Signature::from_bytes(&bad_bytes);
+        assert!(!vk.verify(b"", &bad_sig));
     }
 
     #[test]
     fn verifying_key_from_bytes_roundtrip() {
-        let vk = verifying_key_from_bytes(&PK_BYTES).unwrap();
+        let vk = Ed25519VerifyingKey::from_bytes(&PK_BYTES).unwrap();
         assert_eq!(vk.to_bytes(), PK_BYTES);
     }
 
     #[test]
     fn verifying_key_from_bytes_different_seeds_differ() {
-        let vk1 = verifying_key_from_bytes(&PK_BYTES).unwrap();
-        let vk2 = verifying_key_from_seed(&[0x42u8; 32]);
+        let vk1 = Ed25519VerifyingKey::from_bytes(&PK_BYTES).unwrap();
+        let vk2 = Ed25519SigningKey::from_seed(&[0x42u8; 32]).verifying_key();
         assert_ne!(vk1.to_bytes(), vk2.to_bytes());
     }
 
     #[test]
     fn sign_then_verify_roundtrip() {
         let seed: [u8; 32] = [0x42u8; 32];
-        let sk = signing_key_from_seed(&seed);
+        let sk = Ed25519SigningKey::from_seed(&seed);
         let vk = sk.verifying_key();
         let msg = b"hello multiversx";
-        let sig = sign(&sk, msg);
-        assert!(verify(&vk, msg, &sig));
-        assert!(!verify(&vk, b"other message", &sig));
+        let sig = sk.sign(msg);
+        assert!(vk.verify(msg, &sig));
+        assert!(!vk.verify(b"other message", &sig));
     }
 }

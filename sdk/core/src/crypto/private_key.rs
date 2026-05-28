@@ -29,7 +29,7 @@ impl PrivateKey {
         match bytes.len() {
             SEED_LENGTH => {
                 let seed: [u8; 32] = bytes.try_into().unwrap();
-                Ok(PrivateKey(ed25519::signing_key_from_seed(&seed)))
+                Ok(PrivateKey(ed25519::Ed25519SigningKey::from_seed(&seed)))
             }
             PRIVATE_KEY_LENGTH => {
                 let keypair: &[u8; 64] = bytes.try_into().unwrap();
@@ -107,11 +107,11 @@ impl PrivateKey {
     }
 
     pub fn to_hex(&self) -> String {
-        hex::encode(self.0.as_bytes())
+        hex::encode(self.0.to_seed_bytes())
     }
 
     pub fn sign(&self, message: impl AsRef<[u8]>) -> WalletSignature {
-        WalletSignature::from(ed25519::sign(&self.0, message.as_ref()))
+        WalletSignature::from(self.0.sign(message.as_ref()))
     }
 }
 

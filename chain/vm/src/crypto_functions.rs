@@ -20,7 +20,7 @@ pub fn keccak256(data: &[u8]) -> [u8; crypto::KECCAK256_RESULT_LEN] {
 
 /// Verifies an Ed25519 signature.
 ///
-/// Wraps [`multiversx_chain_core::std::crypto::ed25519::verify`].
+/// Wraps [`multiversx_chain_core::std::crypto::ed25519::Ed25519VerifyingKey::verify`].
 ///
 /// Returns `true` if `signature` is a valid Ed25519 signature of `message`
 /// under the public key `key`.
@@ -37,9 +37,9 @@ pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     let Ok(sig_64) = signature.try_into() else {
         return false;
     };
-    let Some(verifying_key) = crypto::ed25519::verifying_key_from_bytes(key_32) else {
+    let Some(verifying_key) = crypto::ed25519::Ed25519VerifyingKey::from_bytes(key_32) else {
         return false;
     };
-    let sig = crypto::ed25519::signature_from_bytes(sig_64);
-    crypto::ed25519::verify(&verifying_key, message, &sig)
+    let sig = crypto::ed25519::Ed25519Signature::from_bytes(sig_64);
+    verifying_key.verify(message, &sig)
 }

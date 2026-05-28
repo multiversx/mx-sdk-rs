@@ -10,7 +10,7 @@ pub struct WalletSignature(ed25519::Ed25519Signature);
 
 impl WalletSignature {
     pub fn from_bytes(bytes: [u8; 64]) -> Self {
-        Self(ed25519::signature_from_bytes(&bytes))
+        Self(ed25519::Ed25519Signature::from_bytes(&bytes))
     }
 
     pub fn to_bytes(&self) -> [u8; 64] {

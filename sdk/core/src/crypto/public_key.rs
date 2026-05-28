@@ -37,13 +37,13 @@ impl PublicKey {
         let bits: [u8; PUBLIC_KEY_LENGTH] = bytes
             .try_into()
             .map_err(|_| anyhow::anyhow!("invalid public key length, expected 32 bytes"))?;
-        ed25519::verifying_key_from_bytes(&bits)
+        ed25519::Ed25519VerifyingKey::from_bytes(&bits)
             .map(PublicKey)
             .ok_or_else(|| anyhow::anyhow!("invalid ed25519 public key"))
     }
 
     pub fn verify(&self, message: &[u8], signature: &WalletSignature) -> bool {
-        ed25519::verify(&self.0, message, signature.inner())
+        self.0.verify(message, signature.inner())
     }
 }
 
