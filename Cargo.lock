@@ -3212,6 +3212,7 @@ dependencies = [
  "bitflags 2.11.1",
  "blake2",
  "hex",
+ "hex-literal",
  "multiversx-sc-codec",
  "serde",
  "serde_json",
