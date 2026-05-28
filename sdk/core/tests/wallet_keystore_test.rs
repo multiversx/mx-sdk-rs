@@ -34,7 +34,7 @@ fn erd_hrp() -> Bech32Hrp {
 fn test_keystore_encrypt_decrypt_roundtrip() {
     let private_key = alice_private_key();
     let keystore = Keystore::encrypt(
-        private_key,
+        private_key.clone(),
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),
@@ -73,7 +73,7 @@ fn test_keystore_wrong_password_rejected() {
 fn test_keystore_serialize_deserialize_roundtrip() {
     let private_key = alice_private_key();
     let keystore = Keystore::encrypt(
-        private_key,
+        private_key.clone(),
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),

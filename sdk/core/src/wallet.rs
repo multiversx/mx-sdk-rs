@@ -146,7 +146,7 @@ impl Wallet {
 
     pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {
         WalletPem {
-            private_key: self.private_key,
+            private_key: self.private_key.clone(),
             address: Bech32Address::encode_address(hrp, self.address.clone()),
         }
     }

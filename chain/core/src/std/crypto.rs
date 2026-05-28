@@ -1,7 +1,6 @@
 //! Standard crypto functions and constants used across many MultiversX crates.
-//!
-//! TODO: move here the rest of the functions and the Wallet, with signing.
 
+pub mod ed25519;
 mod keccak256;
 mod sha256;
 
