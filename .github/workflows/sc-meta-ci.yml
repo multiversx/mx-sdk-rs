@@ -22,7 +22,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.96
           target: wasm32v1-none
 
       - name: Install prerequisites
@@ -49,7 +49,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.96
           target: wasm32-unknown-unknown
 
       - name: Install prerequisites
@@ -77,7 +77,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.96
           target: wasm32v1-none
 
       - name: Install prerequisites
@@ -99,7 +99,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.96
           target: wasm32v1-none
 
       - name: Install prerequisites
@@ -120,7 +120,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.87
+          toolchain: 1.96
 
       - name: Run install debugger test
         run: cargo test -p multiversx-sc-meta --features install-debugger-test --test install_debugger_test -- test_install_debugger --exact --nocapture
