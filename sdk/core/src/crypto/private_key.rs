@@ -12,6 +12,8 @@ use serde::{
 use sha2::Sha512;
 use zeroize::Zeroize;
 
+use super::wallet_signature::WalletSignature;
+
 pub const PRIVATE_KEY_LENGTH: usize = 64;
 pub const SIGNATURE_LENGTH: usize = 64;
 pub const SEED_LENGTH: usize = 32;
@@ -116,10 +118,10 @@ impl PrivateKey {
         hex::encode(&self.0[..32])
     }
 
-    pub fn sign(&self, message: impl AsRef<[u8]>) -> [u8; 64] {
+    pub fn sign(&self, message: impl AsRef<[u8]>) -> WalletSignature {
         let seed: [u8; 32] = self.0[..32].try_into().unwrap();
         let signing_key = SigningKey::from_bytes(&seed);
-        signing_key.sign(message.as_ref()).to_bytes()
+        WalletSignature::from_bytes(signing_key.sign(message.as_ref()).to_bytes())
     }
 }
 

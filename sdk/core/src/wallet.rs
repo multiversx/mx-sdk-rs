@@ -12,6 +12,7 @@ pub use wallet_pem::WalletPem;
 // TODO: move under wallet
 pub use crate::crypto::private_key::PrivateKey;
 pub use crate::crypto::public_key::PublicKey;
+pub use crate::crypto::wallet_signature::WalletSignature;
 
 use core::str;
 use std::path::Path;
@@ -123,7 +124,7 @@ impl Wallet {
         PublicKey::from(&self.private_key).to_hex()
     }
 
-    pub fn sign_tx(&self, unsign_tx: &Transaction) -> [u8; 64] {
+    pub fn sign_tx(&self, unsign_tx: &Transaction) -> WalletSignature {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
 
@@ -139,7 +140,7 @@ impl Wallet {
         self.private_key.sign(tx_bytes)
     }
 
-    pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> [u8; 64] {
+    pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> WalletSignature {
         self.private_key.sign(data)
     }
 

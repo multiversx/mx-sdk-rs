@@ -164,7 +164,7 @@ pub async fn sign_and_dispatch(
         .unwrap_or_default();
 
     let sig = wallet.sign_tx(&tx);
-    tx.signature = Some(hex::encode(sig));
+    tx.signature = Some(sig);
 
     let output = TxOutputFile {
         emitted_transaction: tx,
