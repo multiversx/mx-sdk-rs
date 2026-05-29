@@ -49,7 +49,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.96
+          toolchain: 1.95
           target: wasm32-unknown-unknown
 
       - name: Install prerequisites
@@ -77,7 +77,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.96
+          toolchain: 1.95
           target: wasm32v1-none
 
       - name: Install prerequisites
@@ -99,7 +99,7 @@ jobs:
       - name: Install rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: 1.96
+          toolchain: 1.95
           target: wasm32v1-none
 
       - name: Install prerequisites
