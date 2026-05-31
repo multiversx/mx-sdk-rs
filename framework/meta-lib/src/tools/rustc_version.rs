@@ -8,7 +8,6 @@ use semver::Version;
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RustcVersion {
     pub version_meta: VersionMeta,
-    pub short_string: String,
 }
 
 impl RustcVersion {
@@ -28,16 +27,12 @@ impl RustcVersion {
     ///
     /// The name is passed verbatim as the `+<toolchain>` argument to `rustc -vV`
     /// (i.e. `rustc +nightly-2024-01-01 -vV`), which rustup intercepts to select the
-    /// appropriate installed toolchain. The same string is stored in `short_string` and
-    /// later used to build `+<toolchain>` arguments for `cargo` and `rustup` commands.
+    /// appropriate installed toolchain.
     ///
     /// Panics if the toolchain is not installed or if `rustc -vV` output cannot be parsed.
     pub fn from_toolchain(toolchain_name: &str) -> Self {
         let version_meta = get_version_meta_for_toolchain(toolchain_name);
-        RustcVersion {
-            version_meta,
-            short_string: toolchain_name.to_owned(),
-        }
+        RustcVersion { version_meta }
     }
 
     /// Retrieves the version of the currently active `rustc` by running `rustc -vV` at runtime.
@@ -46,24 +41,15 @@ impl RustcVersion {
     /// `$RUSTC` environment variable (falling back to `rustc` if unset), and additionally
     /// respects `$RUSTC_WRAPPER`. No toolchain override (`+<name>`) is applied, so the result
     /// reflects whichever toolchain is currently active in the shell environment.
-    ///
-    /// Unlike [`Self::from_toolchain`], which stores the caller-supplied name verbatim as
-    /// `short_string`, this method derives `short_string` from the parsed output and
-    /// includes the host triple (e.g. `"1.88-x86_64-unknown-linux-gnu"` for stable,
-    /// `"nightly-2024-01-01-x86_64-unknown-linux-gnu"` for nightly).
     pub fn current_version() -> RustcVersion {
         let version_meta =
             rustc_version::version_meta().expect("failed to get rustc version metadata");
-        let short_string = rustc_version_to_string(&version_meta);
-        RustcVersion {
-            version_meta,
-            short_string,
-        }
+        RustcVersion { version_meta }
     }
 
     /// Formats as a CLI for cargo or rustup, e.g. `cargo +1.88 build`.
     pub fn to_cli_arg(&self) -> String {
-        format!("+{}", self.short_string)
+        format!("+{}", self.short_string())
     }
 
     pub fn to_abi(&self) -> RustcAbi {
@@ -113,41 +99,67 @@ impl RustcVersion {
                         .expect("failed to parse LLVM version")
                 }),
             },
-            short_string: abi.short.clone(),
+        }
+    }
+
+    pub fn short_string(&self) -> String {
+        match self.version_meta.channel {
+            rustc_version::Channel::Stable => format!(
+                "{}-{}",
+                self.version_to_major_minor_string(),
+                self.version_meta.host
+            ),
+            rustc_version::Channel::Nightly => {
+                if let Some(build_date) = &self.version_meta.build_date {
+                    format!("nightly-{}-{}", build_date, self.version_meta.host)
+                } else {
+                    "nightly".to_owned()
+                }
+            }
+            _ => panic!("only stable and nightly supported"),
+        }
+    }
+
+    pub fn full_string(&self) -> String {
+        match self.version_meta.channel {
+            rustc_version::Channel::Stable => {
+                format!("{}-{}", self.version_to_string(), self.version_meta.host)
+            }
+            rustc_version::Channel::Nightly => {
+                if let Some(build_date) = &self.version_meta.build_date {
+                    format!("nightly-{}-{}", build_date, self.version_meta.host)
+                } else {
+                    "nightly".to_owned()
+                }
+            }
+            _ => panic!("only stable and nightly supported"),
+        }
+    }
+
+    /// Outputs `major.minor`, dropping the patch version.
+    ///
+    /// Rustup registers stable toolchains under their major.minor name (e.g. `1.85`), not the full
+    /// patch version (e.g. `1.85.1`). Using the full patch version as a `+<toolchain>` argument to
+    /// rustup would fail with "Missing manifest" for any toolchain installed via its major.minor name.
+    pub fn version_to_major_minor_string(&self) -> String {
+        let v = &self.version_meta.semver;
+        format!("{}.{}", v.major, v.minor)
+    }
+
+    /// Outputs `major.minor` if the patch and pre-release fields are absent, the full semver string otherwise.
+    pub fn version_to_string(&self) -> String {
+        let v = &self.version_meta.semver;
+        if v.patch == 0 && v.pre.is_empty() && v.build.is_empty() {
+            format!("{}.{}", v.major, v.minor)
+        } else {
+            v.to_string()
         }
     }
 }
 
 impl std::fmt::Display for RustcVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.short_string)
-    }
-}
-
-fn rustc_version_to_string(version_meta: &VersionMeta) -> String {
-    match version_meta.channel {
-        rustc_version::Channel::Stable => format!(
-            "{}-{}",
-            version_to_string(&version_meta.semver),
-            version_meta.host
-        ),
-        rustc_version::Channel::Nightly => {
-            if let Some(build_date) = &version_meta.build_date {
-                format!("nightly-{}-{}", build_date, version_meta.host)
-            } else {
-                "nightly".to_owned()
-            }
-        }
-        _ => panic!("only stable and nightly supported"),
-    }
-}
-
-/// Outputs major.minor if the other fields are zero or missing. Outputs the full string otherwise.
-fn version_to_string(version: &Version) -> String {
-    if version.patch == 0 && version.pre.is_empty() && version.build.is_empty() {
-        format!("{}.{}", version.major, version.minor)
-    } else {
-        version.to_string()
+        write!(f, "{}", self.full_string())
     }
 }
 
@@ -172,4 +184,140 @@ fn get_version_meta_for_toolchain(toolchain: &str) -> VersionMeta {
         String::from_utf8(output.stdout).expect("failed to parse rustc -vV output as UTF-8");
     rustc_version::version_meta_for(&version_string)
         .unwrap_or_else(|_| panic!("failed to parse rustc -vV output: {version_string}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use rustc_version::{Channel, VersionMeta};
+    use semver::Version;
+
+    use super::RustcVersion;
+
+    fn stable(version: &str, host: &str) -> RustcVersion {
+        RustcVersion {
+            version_meta: VersionMeta {
+                semver: Version::parse(version).unwrap(),
+                channel: Channel::Stable,
+                host: host.to_owned(),
+                commit_hash: None,
+                commit_date: None,
+                build_date: None,
+                short_version_string: String::new(),
+                llvm_version: None,
+            },
+        }
+    }
+
+    fn nightly(build_date: Option<&str>, host: &str) -> RustcVersion {
+        RustcVersion {
+            version_meta: VersionMeta {
+                semver: Version::new(0, 0, 0),
+                channel: Channel::Nightly,
+                host: host.to_owned(),
+                commit_hash: None,
+                commit_date: None,
+                build_date: build_date.map(|s| s.to_owned()),
+                short_version_string: String::new(),
+                llvm_version: None,
+            },
+        }
+    }
+
+    // version_to_major_minor_string tests
+
+    #[test]
+    fn major_minor_string_strips_patch() {
+        assert_eq!(
+            stable("1.85.1", "h").version_to_major_minor_string(),
+            "1.85"
+        );
+    }
+
+    #[test]
+    fn major_minor_string_zero_patch() {
+        assert_eq!(
+            stable("1.88.0", "h").version_to_major_minor_string(),
+            "1.88"
+        );
+    }
+
+    // version_to_string tests
+
+    #[test]
+    fn version_string_keeps_patch_when_nonzero() {
+        assert_eq!(stable("1.85.1", "h").version_to_string(), "1.85.1");
+    }
+
+    #[test]
+    fn version_string_drops_zero_patch() {
+        assert_eq!(stable("1.88.0", "h").version_to_string(), "1.88");
+    }
+
+    // short_string tests
+
+    #[test]
+    fn short_string_stable_strips_patch() {
+        assert_eq!(
+            stable("1.85.1", "aarch64-apple-darwin").short_string(),
+            "1.85-aarch64-apple-darwin"
+        );
+    }
+
+    #[test]
+    fn short_string_stable_zero_patch() {
+        assert_eq!(
+            stable("1.88.0", "x86_64-unknown-linux-gnu").short_string(),
+            "1.88-x86_64-unknown-linux-gnu"
+        );
+    }
+
+    #[test]
+    fn short_string_nightly_with_build_date() {
+        assert_eq!(
+            nightly(Some("2024-01-01"), "x86_64-unknown-linux-gnu").short_string(),
+            "nightly-2024-01-01-x86_64-unknown-linux-gnu"
+        );
+    }
+
+    #[test]
+    fn short_string_nightly_without_build_date() {
+        assert_eq!(
+            nightly(None, "x86_64-unknown-linux-gnu").short_string(),
+            "nightly"
+        );
+    }
+
+    // full_string tests
+
+    #[test]
+    fn full_string_stable_keeps_patch() {
+        assert_eq!(
+            stable("1.85.1", "aarch64-apple-darwin").full_string(),
+            "1.85.1-aarch64-apple-darwin"
+        );
+    }
+
+    #[test]
+    fn full_string_stable_zero_patch() {
+        assert_eq!(
+            stable("1.88.0", "x86_64-unknown-linux-gnu").full_string(),
+            "1.88-x86_64-unknown-linux-gnu"
+        );
+    }
+
+    #[test]
+    fn full_string_nightly_with_build_date() {
+        assert_eq!(
+            nightly(Some("2024-01-01"), "x86_64-unknown-linux-gnu").full_string(),
+            "nightly-2024-01-01-x86_64-unknown-linux-gnu"
+        );
+    }
+
+    #[test]
+    fn full_string_nightly_without_build_date() {
+        assert_eq!(
+            nightly(None, "x86_64-unknown-linux-gnu").full_string(),
+            "nightly"
+        );
+    }
 }
