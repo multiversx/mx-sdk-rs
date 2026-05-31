@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.66.0"
+version = "0.66.1"
 edition = "2024"
 
 authors = [
@@ -51,20 +51,20 @@ indexmap = { version = "2", features = ["serde"] }
 zip = { version = "7.2", features = ["deflate"], default-features = false }
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.66.0"
+version = "=0.66.1"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.66.0"
+version = "=0.66.1"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.66.0"
+version = "=0.66.1"
 path = "../snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.66.0"
+version = "=0.66.1"
 path = "../scenario"
 
 [dependencies.multiversx-chain-core]
