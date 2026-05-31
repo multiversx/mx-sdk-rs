@@ -4,6 +4,7 @@ use multiversx_sc::{
     types::MessageHashType,
 };
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn managedSha256(inputHandle: i32, outputHandle: i32) -> i32;
 
