@@ -1,6 +1,5 @@
-use multiversx_sc::types::{ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
-
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
+use multiversx_sc::imports::*;
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs
@@ -16,6 +15,10 @@ pub struct Struct2 {
     pub bool_field: bool,
     pub opt_field: Option<u8>,
     pub arr: u32,
+    pub duration_millis: DurationMillis,
+    pub duration_seconds: DurationSeconds,
+    pub timestamp_millis: TimestampMillis,
+    pub timestamp_seconds: TimestampSeconds,
 }
 
 #[test]
@@ -23,7 +26,7 @@ pub struct Struct2 {
 fn struct_2_static() {
     assert_eq!(
         <Struct2 as multiversx_sc::types::ManagedVecItem>::payload_size(),
-        22
+        54
     );
     assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
     assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::requires_drop());
@@ -39,17 +42,25 @@ fn struct_to_bytes_writer() {
         bool_field: true,
         opt_field: Some(5),
         arr: 0x61116222,
+        duration_millis: DurationMillis::new(10),
+        duration_seconds: DurationSeconds::new(20),
+        timestamp_millis: TimestampMillis::new(30),
+        timestamp_seconds: TimestampSeconds::new(40),
     };
 
     #[rustfmt::skip]
     let expected_payload = [
-        /* u_8  */ 0x01,
-        /* u_16 */ 0x00, 0x02,
-        /* u_32 */ 0x00, 0x00, 0x00, 0x03,
-        /* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
-        /* bool */ 0x01,
-        /* opt  */ 0x01, 0x05,
-        /* arr  */ 0x61, 0x11, 0x62, 0x22,
+        /* u_8              */ 0x01,
+        /* u_16             */ 0x00, 0x02,
+        /* u_32             */ 0x00, 0x00, 0x00, 0x03,
+        /* u_64             */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+        /* bool             */ 0x01,
+        /* opt              */ 0x01, 0x05,
+        /* arr              */ 0x61, 0x11, 0x62, 0x22,
+        /* duration_millis  */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
+        /* duration_seconds */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14,
+        /* timestamp_millis */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1e,
+        /* timestamp_secs   */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28,
     ];
 
     let mut payload = ManagedVecItemPayloadBuffer::new_buffer();
@@ -67,17 +78,25 @@ fn struct_2_from_bytes_reader() {
         bool_field: false,
         opt_field: Some(5),
         arr: 0x61116222,
+        duration_millis: DurationMillis::new(10),
+        duration_seconds: DurationSeconds::new(20),
+        timestamp_millis: TimestampMillis::new(30),
+        timestamp_seconds: TimestampSeconds::new(40),
     };
 
     #[rustfmt::skip]
     let payload = [
-        /* u_8  */ 0x01,
-        /* u_16 */ 0x00, 0x02,
-        /* u_32 */ 0x00, 0x00, 0x00, 0x03,
-        /* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
-        /* bool */ 0x00,
-        /* opt  */ 0x01, 0x05,
-        /* arr  */ 0x61, 0x11, 0x62, 0x22,
+        /* u_8              */ 0x01,
+        /* u_16             */ 0x00, 0x02,
+        /* u_32             */ 0x00, 0x00, 0x00, 0x03,
+        /* u_64             */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+        /* bool             */ 0x00,
+        /* opt              */ 0x01, 0x05,
+        /* arr              */ 0x61, 0x11, 0x62, 0x22,
+        /* duration_millis  */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
+        /* duration_seconds */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x14,
+        /* timestamp_millis */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1e,
+        /* timestamp_secs   */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28,
     ];
 
     <Struct2 as multiversx_sc::types::ManagedVecItem>::temp_decode(

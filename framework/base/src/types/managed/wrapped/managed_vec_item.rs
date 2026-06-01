@@ -4,7 +4,10 @@ use generic_array::{
     GenericArray,
     typenum::{U1, U2, U4, U8},
 };
-use multiversx_chain_core::types::{EsdtLocalRole, EsdtTokenType};
+use multiversx_chain_core::types::{
+    DurationMillis, DurationSeconds, EsdtLocalRole, EsdtTokenType, TimestampMillis,
+    TimestampSeconds,
+};
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
@@ -202,6 +205,36 @@ impl ManagedVecItem for bool {
         false
     }
 }
+
+macro_rules! impl_u64_newtype {
+    ($ty:ident, $as_u64:ident) => {
+        impl ManagedVecItem for $ty {
+            type PAYLOAD = ManagedVecItemPayloadBuffer<U8>;
+            const SKIPS_RESERIALIZATION: bool = true;
+            type Ref<'a> = Self;
+
+            unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+                $ty::new(u64::from_be_bytes(payload.buffer.into_array()))
+            }
+
+            unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
+                $ty::new(u64::from_be_bytes(payload.buffer.into_array()))
+            }
+
+            fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
+                payload.buffer = GenericArray::from_array(self.$as_u64().to_be_bytes());
+            }
+
+            fn requires_drop() -> bool {
+                false
+            }
+        }
+    };
+}
+impl_u64_newtype! {DurationMillis, as_u64_millis}
+impl_u64_newtype! {DurationSeconds, as_u64_seconds}
+impl_u64_newtype! {TimestampMillis, as_u64_millis}
+impl_u64_newtype! {TimestampSeconds, as_u64_seconds}
 
 impl<T> ManagedVecItem for Option<T>
 where
