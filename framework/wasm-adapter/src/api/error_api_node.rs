@@ -1,6 +1,7 @@
 use crate::{api::VmApiImpl, error_hook};
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn managedSignalError(messageHandle: i32) -> !;
 }
