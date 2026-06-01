@@ -1,6 +1,7 @@
 use crate::api::VmApiImpl;
 use multiversx_sc::api::{RawHandle, SendApi, SendApiImpl, const_handles};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn managedTransferValueExecute(
         dstHandle: i32,

@@ -5,7 +5,7 @@ ARG VERSION_RUST="1.95.0"
 # Set VERSION_SC_META=local to install sc-meta from the local source tree instead of
 # crates.io. When building locally, the build context must be the workspace root:
 #   docker build --build-arg VERSION_SC_META=local -f framework/meta/Dockerfile .
-ARG VERSION_SC_META="0.66.0"
+ARG VERSION_SC_META="0.66.1"
 ARG VERSION_WASM_OPT="0.116.1"
 ARG TARGETPLATFORM
 

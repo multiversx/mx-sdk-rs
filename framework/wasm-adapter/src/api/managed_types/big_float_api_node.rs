@@ -2,6 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{BigFloatApiImpl, Sign};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn bigFloatNewFromParts(integralPart: i32, fractionalPart: i32, exponent: i32) -> i32;
     fn bigFloatNewFromFrac(numerator: i64, denominator: i64) -> i32;
