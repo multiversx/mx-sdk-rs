@@ -6,7 +6,7 @@ use multiversx_sdk::wallet::PublicKey;
 fn test_private_key_from_mnemonic() {
     let mnemonic = Mnemonic::parse("acid twice post genre topic observe valid viable gesture fortune funny dawn around blood enemy page update reduce decline van bundle zebra rookie real").unwrap();
 
-    let private_key = mnemonic.to_private_key(0, 0);
+    let private_key = mnemonic.to_private_key(0, 0).unwrap();
     let public_key = PublicKey::from(&private_key);
     let address = public_key.to_address();
     assert_eq!(
@@ -22,7 +22,7 @@ fn test_private_key_from_mnemonic() {
         address.to_bech32_default().bech32
     );
 
-    let private_key = mnemonic.to_private_key(0, 1);
+    let private_key = mnemonic.to_private_key(0, 1).unwrap();
     let public_key = PublicKey::from(&private_key);
     let address = public_key.to_address();
     assert_eq!(

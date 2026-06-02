@@ -50,7 +50,7 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("mnemonic", "pem") => match infile {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
-                let wallet = Wallet::from(Mnemonic::parse(&mnemonic_str).unwrap());
+                let wallet = Wallet::try_from(Mnemonic::parse(&mnemonic_str).unwrap()).unwrap();
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
             None => {
@@ -58,7 +58,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                     "Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
-                let wallet = Wallet::from(Mnemonic::parse(&mnemonic_str).unwrap());
+                let wallet = Wallet::try_from(Mnemonic::parse(&mnemonic_str).unwrap()).unwrap();
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
         },
@@ -179,7 +179,7 @@ struct NewWalletInfo {
 impl NewWalletInfo {
     fn generate() -> Self {
         let mnemonic = generate_mnemonic();
-        let wallet = Wallet::from(mnemonic.clone());
+        let wallet = Wallet::try_from(mnemonic.clone()).unwrap();
         NewWalletInfo { mnemonic, wallet }
     }
 

@@ -46,11 +46,13 @@ impl From<PrivateKey> for Wallet {
     }
 }
 
-impl From<Mnemonic> for Wallet {
+impl TryFrom<Mnemonic> for Wallet {
+    type Error = anyhow::Error;
+
     /// Derives the wallet at account 0, address index 0 from the mnemonic.
-    fn from(mnemonic: Mnemonic) -> Self {
-        let private_key = mnemonic.to_private_key(0, 0);
-        Self::new(private_key, WalletSource::Mnemonic)
+    fn try_from(mnemonic: Mnemonic) -> Result<Self> {
+        let private_key = mnemonic.to_private_key(0, 0)?;
+        Ok(Self::new(private_key, WalletSource::Mnemonic))
     }
 }
 

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use hmac::{Hmac, KeyInit, Mac};
 use sha2::Sha512;
 
@@ -23,12 +23,14 @@ impl Mnemonic {
     /// passed directly without pre-processing.
     pub fn parse(s: &str) -> Result<Self> {
         let normalized = s.split_whitespace().collect::<Vec<_>>().join(" ");
-        Ok(Mnemonic(bip39::Mnemonic::parse(&normalized)?))
+        Ok(Mnemonic(
+            bip39::Mnemonic::parse(&normalized).context("invalid mnemonic phrase")?,
+        ))
     }
 
     /// Derives a [`PrivateKey`] using the MultiversX HD path
     /// `m/44'/508'/<account>'/0'/<address_index>'`.
-    pub fn to_private_key(&self, account: u32, address_index: u32) -> PrivateKey {
+    pub fn to_private_key(&self, account: u32, address_index: u32) -> Result<PrivateKey> {
         let seed = self.to_bip39_seed();
         self.bip32_derive(&seed, account, address_index)
     }
@@ -37,12 +39,17 @@ impl Mnemonic {
         self.0.to_seed_normalized("")
     }
 
-    fn bip32_derive(&self, seed: &[u8; 64], account: u32, address_index: u32) -> PrivateKey {
+    fn bip32_derive(
+        &self,
+        seed: &[u8; 64],
+        account: u32,
+        address_index: u32,
+    ) -> Result<PrivateKey> {
         let serialized_key_len = 32;
         let hardened_child_padding: u8 = 0;
 
-        let mut digest =
-            Hmac::<Sha512>::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
+        let mut digest = Hmac::<Sha512>::new_from_slice(b"ed25519 seed")
+            .context("failed to initialise root HMAC-SHA512 digest")?;
         digest.update(seed);
         let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
@@ -61,8 +68,8 @@ impl Mnemonic {
             buff.push((child_idx >> 8) as u8);
             buff.push(child_idx as u8);
 
-            digest =
-                Hmac::<Sha512>::new_from_slice(&chain_code).expect("HMAC can take key of any size");
+            digest = Hmac::<Sha512>::new_from_slice(&chain_code)
+                .context("failed to initialise child HMAC-SHA512 digest")?;
             digest.update(&buff);
             let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();
@@ -72,8 +79,8 @@ impl Mnemonic {
         let seed_bytes: &[u8; 32] = key
             .as_slice()
             .try_into()
-            .expect("BIP32 derived key has unexpected length");
-        PrivateKey::from_seed_bytes(seed_bytes)
+            .context("BIP32 derived key has unexpected length")?;
+        Ok(PrivateKey::from_seed_bytes(seed_bytes))
     }
 }
 
