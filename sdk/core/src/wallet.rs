@@ -1,6 +1,7 @@
 mod keystore;
 mod keystore_error;
 mod keystore_json;
+mod mnemonic;
 mod private_key;
 mod public_key;
 mod wallet_impl;
@@ -12,6 +13,7 @@ pub use keystore::Keystore;
 pub use keystore::KeystoreRandomness;
 pub use keystore_error::KeystoreError;
 pub use keystore_json::*;
+pub use mnemonic::Mnemonic;
 pub use private_key::{PRIVATE_KEY_LENGTH, PrivateKey, SEED_LENGTH};
 pub use public_key::{PUBLIC_KEY_LENGTH, PublicKey};
 pub use wallet_impl::Wallet;

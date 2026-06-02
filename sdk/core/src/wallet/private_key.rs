@@ -1,27 +1,19 @@
 use std::fmt::Display;
 
 use anyhow::{Result, anyhow};
-use bip39::Mnemonic;
-use hmac::{Hmac, KeyInit, Mac};
 use multiversx_chain_core::std::crypto::ed25519;
-use pbkdf2::pbkdf2;
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
-use sha2::Sha512;
-use zeroize::Zeroize;
 
 use super::wallet_signature::WalletSignature;
 
 pub const PRIVATE_KEY_LENGTH: usize = 64;
 pub const SEED_LENGTH: usize = 32;
 
-const EGLD_COIN_TYPE: u32 = 508;
-const HARDENED: u32 = 0x80000000;
-
 #[derive(Clone, PartialEq, Eq)]
-pub struct PrivateKey(pub ed25519::Ed25519SigningKey);
+pub struct PrivateKey(pub(crate) ed25519::Ed25519SigningKey);
 
 impl PrivateKey {
     /// Constructs a [`PrivateKey`] from a 32-byte ed25519 seed.
@@ -97,75 +89,6 @@ impl PrivateKey {
     pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
         PrivateKey::from_bytes(bytes.as_slice())
-    }
-
-    fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {
-        let mut salt = String::with_capacity(8 + password.len());
-        salt.push_str("mnemonic");
-        salt.push_str(password);
-
-        let mut seed = [0u8; 64];
-
-        let _ = pbkdf2::<Hmac<Sha512>>(
-            mnemonic.to_string().as_bytes(),
-            salt.as_bytes(),
-            2048,
-            &mut seed,
-        );
-
-        salt.zeroize();
-
-        seed
-    }
-
-    /// Derives a [`PrivateKey`] from a BIP-39 mnemonic using the MultiversX HD path
-    /// `m/44'/508'/<account>'/0'/<address_index>'`.
-    ///
-    /// Returns an error if the internal BIP-32 key derivation produces a key of
-    /// unexpected length (should not happen in practice).
-    pub fn from_mnemonic(
-        mnemonic: Mnemonic,
-        account: u32,
-        address_index: u32,
-    ) -> Result<PrivateKey> {
-        let seed = Self::seed_from_mnemonic(mnemonic, "");
-
-        let serialized_key_len = 32;
-        let hardened_child_padding: u8 = 0;
-
-        let mut digest =
-            Hmac::<Sha512>::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
-        digest.update(&seed);
-        let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
-        let mut key = intermediary[..serialized_key_len].to_vec();
-        let mut chain_code = intermediary[serialized_key_len..].to_vec();
-
-        for child_idx in [
-            44 | HARDENED,
-            EGLD_COIN_TYPE | HARDENED,
-            account | HARDENED,
-            HARDENED,
-            address_index | HARDENED,
-        ] {
-            let mut buff = [vec![hardened_child_padding], key.clone()].concat();
-            buff.push((child_idx >> 24) as u8);
-            buff.push((child_idx >> 16) as u8);
-            buff.push((child_idx >> 8) as u8);
-            buff.push(child_idx as u8);
-
-            digest =
-                Hmac::<Sha512>::new_from_slice(&chain_code).expect("HMAC can take key of any size");
-            digest.update(&buff);
-            let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
-            key = intermediary[..serialized_key_len].to_vec();
-            chain_code = intermediary[serialized_key_len..].to_vec();
-        }
-
-        let seed: &[u8; 32] = key
-            .as_slice()
-            .try_into()
-            .map_err(|_| anyhow!("BIP32 derived key has unexpected length"))?;
-        Ok(PrivateKey::from_seed_bytes(seed))
     }
 
     /// Returns the full 64-byte keypair as `[seed (32 bytes) || public_key (32 bytes)]`.
