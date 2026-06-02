@@ -24,7 +24,7 @@ pub async fn adder_cli() {
             basic_interact.deploy().await;
         }
         Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
-            let owner_address = basic_interact.adder_owner_address.clone();
+            let owner_address = basic_interact.config.owner.address();
             basic_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
@@ -42,27 +42,29 @@ pub async fn adder_cli() {
 
 pub struct BasicInteractor {
     pub interactor: Interactor,
-    pub adder_owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
+    pub config: Config,
     pub state: State,
 }
 
 impl BasicInteractor {
     pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
+        let mut interactor = Interactor::new(config.connection.gateway_uri())
             .await
-            .use_chain_simulator(config.use_chain_simulator());
+            .use_chain_simulator(config.connection.use_chain_simulator());
         interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
 
-        let adder_owner_address = interactor.register_wallet(test_wallets::mike()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
+        interactor
+            .register_wallet(config.owner.wallet().clone())
+            .await;
+        interactor
+            .register_wallet(config.wallet.wallet().clone())
+            .await;
 
         interactor.generate_blocks(30u64).await.unwrap();
 
         BasicInteractor {
             interactor,
-            adder_owner_address: adder_owner_address.into(),
-            wallet_address: wallet_address.into(),
+            config,
             state: State::load_state(),
         }
     }
@@ -75,11 +77,12 @@ impl BasicInteractor {
     }
 
     pub async fn deploy(&mut self) {
+        let owner_address = self.config.owner.address();
         let new_address = self
             .interactor
             .tx()
             .id("interactor deploy")
-            .from(&self.adder_owner_address.clone())
+            .from(&owner_address)
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
@@ -119,10 +122,11 @@ impl BasicInteractor {
     }
 
     pub async fn add(&mut self, value: u32) {
+        let wallet_address = self.config.wallet.address();
         self.interactor
             .tx()
             .id("interactor add")
-            .from(&self.wallet_address)
+            .from(&wallet_address)
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
             .typed(adder_proxy::AdderProxy)

@@ -23,7 +23,7 @@ async fn simulator_upgrade_test() {
     assert_eq!(sum, 1u32.into());
 
     basic_interact
-        .upgrade(7u32, &basic_interact.adder_owner_address.clone(), None)
+        .upgrade(7u32, &basic_interact.config.owner.address(), None)
         .await;
 
     basic_interact.generate_blocks(2).await;
@@ -36,7 +36,7 @@ async fn simulator_upgrade_test() {
     basic_interact
         .upgrade(
             10u32,
-            &basic_interact.wallet_address.clone(),
+            &basic_interact.config.wallet.address(),
             Some("upgrade is allowed only for owner"),
         )
         .await;
