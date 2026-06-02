@@ -18,12 +18,12 @@ pub struct Mnemonic(bip39::Mnemonic);
 impl Mnemonic {
     /// Parses a mnemonic phrase.
     ///
-    /// Embedded newlines are stripped before parsing, so file contents can be
+    /// All whitespace sequences (spaces, tabs, `\n`, `\r\n`, etc.) are
+    /// collapsed to single spaces before parsing, so file contents can be
     /// passed directly without pre-processing.
     pub fn parse(s: &str) -> Result<Self> {
-        Ok(Mnemonic(bip39::Mnemonic::parse(
-            s.replace('\n', "").trim(),
-        )?))
+        let normalized = s.split_whitespace().collect::<Vec<_>>().join(" ");
+        Ok(Mnemonic(bip39::Mnemonic::parse(&normalized)?))
     }
 
     /// Derives a [`PrivateKey`] using the MultiversX HD path
