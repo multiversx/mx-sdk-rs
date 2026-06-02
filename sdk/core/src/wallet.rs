@@ -71,10 +71,10 @@ impl From<PrivateKey> for Wallet {
 }
 
 impl Wallet {
-    pub fn from_mnemonic_string(mnemonic_str: String) -> Wallet {
-        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
-        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32);
-        Self::new(private_key, WalletSource::Mnemonic)
+    pub fn from_mnemonic_string(mnemonic_str: String) -> Result<Wallet> {
+        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', ""))?;
+        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32)?;
+        Ok(Self::new(private_key, WalletSource::Mnemonic))
     }
 
     #[deprecated(
@@ -111,7 +111,7 @@ impl Wallet {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.private_key.to_hex()
+        self.private_key.to_seed_hex()
     }
 
     pub fn public_key(&self) -> PublicKey {

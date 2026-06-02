@@ -46,7 +46,7 @@ impl WalletPem {
         let private_key_bytes = &decoded[..decoded.len() / 2];
         let private_key_str = std::str::from_utf8(private_key_bytes)
             .map_err(|e| anyhow!("invalid UTF-8 in private key: {e}"))?;
-        let private_key = PrivateKey::from_hex_str(private_key_str)?;
+        let private_key = PrivateKey::from_seed_hex_str(private_key_str)?;
 
         Ok(WalletPem {
             private_key,
@@ -90,7 +90,7 @@ impl WalletPem {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.private_key.to_hex()
+        self.private_key.to_seed_hex()
     }
 
     pub fn public_key_hex(&self) -> String {

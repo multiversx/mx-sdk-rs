@@ -60,7 +60,7 @@ fn test_pem_str_roundtrip() {
 fn test_wallet_from_pem_fields() {
     let pem = WalletPem::from_pem_file(ALICE_PEM_PATH).unwrap();
     let wallet = Wallet::from(pem);
-    assert_eq!(wallet.private_key.to_hex(), ALICE_PRIVATE_KEY_HEX);
+    assert_eq!(wallet.private_key.to_seed_hex(), ALICE_PRIVATE_KEY_HEX);
     assert_eq!(wallet.address.to_bech32_default().bech32, ALICE_BECH32);
 }
 
@@ -87,5 +87,5 @@ fn test_wallet_to_pem_str_roundtrip() {
     let hrp = Bech32Hrp::try_from("erd").unwrap();
     let pem_str = wallet.to_pem(hrp).to_pem_str();
     let reparsed = Wallet::from(WalletPem::from_pem_str(&pem_str).unwrap());
-    assert_eq!(reparsed.private_key.to_hex(), ALICE_PRIVATE_KEY_HEX);
+    assert_eq!(reparsed.private_key.to_seed_hex(), ALICE_PRIVATE_KEY_HEX);
 }

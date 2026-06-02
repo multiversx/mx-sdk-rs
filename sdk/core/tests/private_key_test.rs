@@ -22,16 +22,16 @@ fn test_from_bytes_seed_length_ok() {
     let seed = alice_seed_bytes();
     assert_eq!(seed.len(), SEED_LENGTH);
 
-    let pk = PrivateKey::from_bytes(&seed).unwrap();
+    let pk = PrivateKey::from_seed_bytes(seed.as_slice().try_into().unwrap());
 
     // to_hex() encodes only the first 32 bytes (the seed).
-    assert_eq!(pk.to_hex(), ALICE_SEED_HEX);
+    assert_eq!(pk.to_seed_hex(), ALICE_SEED_HEX);
 }
 
 #[test]
 fn test_from_bytes_seed_derives_correct_public_key() {
     let seed = alice_seed_bytes();
-    let pk = PrivateKey::from_bytes(&seed).unwrap();
+    let pk = PrivateKey::from_seed_bytes(seed.as_slice().try_into().unwrap());
 
     // The upper 32 bytes of the stored key must be the verifying key.
     let stored = pk.to_bytes();
@@ -42,10 +42,10 @@ fn test_from_bytes_seed_derives_correct_public_key() {
 #[test]
 fn test_from_bytes_seed_roundtrip() {
     let seed = alice_seed_bytes();
-    let pk = PrivateKey::from_bytes(&seed).unwrap();
+    let pk = PrivateKey::from_seed_bytes(seed.as_slice().try_into().unwrap());
 
     // Re-constructing from the returned 64-byte array must yield an equal key.
-    let pk2 = PrivateKey::from_bytes(&pk.to_bytes()).unwrap();
+    let pk2 = PrivateKey::from_keypair_bytes(&pk.to_bytes()).unwrap();
     assert_eq!(pk, pk2);
 }
 
@@ -58,16 +58,16 @@ fn test_from_bytes_full_length_ok() {
     let full = hex::decode(alice_64byte_hex()).unwrap();
     assert_eq!(full.len(), PRIVATE_KEY_LENGTH);
 
-    let pk = PrivateKey::from_bytes(&full).unwrap();
+    let pk = PrivateKey::from_keypair_bytes(full.as_slice().try_into().unwrap()).unwrap();
 
     // Seed portion must be preserved verbatim.
-    assert_eq!(pk.to_hex(), ALICE_SEED_HEX);
+    assert_eq!(pk.to_seed_hex(), ALICE_SEED_HEX);
 }
 
 #[test]
 fn test_from_bytes_full_preserves_all_64_bytes() {
     let full = hex::decode(alice_64byte_hex()).unwrap();
-    let pk = PrivateKey::from_bytes(&full).unwrap();
+    let pk = PrivateKey::from_keypair_bytes(full.as_slice().try_into().unwrap()).unwrap();
 
     assert_eq!(pk.to_bytes().as_slice(), full.as_slice());
 }
@@ -75,8 +75,8 @@ fn test_from_bytes_full_preserves_all_64_bytes() {
 #[test]
 fn test_from_bytes_full_roundtrip() {
     let full = hex::decode(alice_64byte_hex()).unwrap();
-    let pk = PrivateKey::from_bytes(&full).unwrap();
-    let pk2 = PrivateKey::from_bytes(&pk.to_bytes()).unwrap();
+    let pk = PrivateKey::from_keypair_bytes(full.as_slice().try_into().unwrap()).unwrap();
+    let pk2 = PrivateKey::from_keypair_bytes(&pk.to_bytes()).unwrap();
     assert_eq!(pk, pk2);
 }
 

@@ -106,7 +106,10 @@ impl Keystore {
             self.ciphertext.clone(),
         );
 
-        let private_key = PrivateKey::from_bytes(&private_key_bytes)?;
+        let private_key_arr: [u8; 64] = private_key_bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("decrypted keystore has wrong key length"))?;
+        let private_key = PrivateKey::from_keypair_bytes(&private_key_arr)?;
         Ok(Wallet::new(
             private_key,
             super::WalletSource::Keystore(self.address.hrp),

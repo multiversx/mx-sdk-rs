@@ -19,7 +19,7 @@ fn fixed_randomness() -> KeystoreRandomness {
 }
 
 fn alice_private_key() -> PrivateKey {
-    PrivateKey::from_hex_str(ALICE_PRIVATE_KEY_HEX).unwrap()
+    PrivateKey::from_seed_hex_str(ALICE_PRIVATE_KEY_HEX).unwrap()
 }
 
 fn erd_hrp() -> Bech32Hrp {
