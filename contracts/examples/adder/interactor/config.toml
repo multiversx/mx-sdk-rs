@@ -1,3 +1,4 @@
+contract_path = '../output/adder.mxsc.json'
 
 [connection]
 # chain_type = 'simulator'

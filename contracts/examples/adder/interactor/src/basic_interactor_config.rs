@@ -8,6 +8,7 @@ const CONFIG_FILE: &str = "config.toml";
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
+    pub contract_path: String,
     pub connection: ConnectionConfig,
     pub owner: WalletConfig,
     pub wallet: WalletConfig,
@@ -24,6 +25,7 @@ impl Config {
 
     pub fn chain_simulator_config() -> Self {
         Config {
+            contract_path: "../output/adder.mxsc.json".to_owned(),
             connection: ConnectionConfig::chain_simulator(),
             owner: WalletConfig::from_test_wallet("mike"),
             wallet: WalletConfig::from_test_wallet("ivan"),

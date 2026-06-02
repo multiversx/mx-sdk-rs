@@ -9,8 +9,6 @@ use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
 
-const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
-
 pub async fn adder_cli() {
     env_logger::init();
 
@@ -86,7 +84,7 @@ impl BasicInteractor {
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
-            .code(ADDER_CODE_PATH)
+            .code(MxscPath::new(&self.config.contract_path))
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
@@ -104,7 +102,7 @@ impl BasicInteractor {
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(new_value)
-            .code(ADDER_CODE_PATH)
+            .code(MxscPath::new(&self.config.contract_path))
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsHandledOrError::new())
             .run()
