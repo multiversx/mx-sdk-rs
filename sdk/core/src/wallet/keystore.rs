@@ -8,12 +8,7 @@ use multiversx_chain_core::std::{Bech32Address, Bech32Hrp};
 use scrypt::{Params, scrypt};
 use sha2::Sha256;
 
-use crate::{
-    crypto::{private_key::PrivateKey, public_key::PublicKey},
-    wallet::Wallet,
-};
-
-use super::{KeystoreError, KeystoreJson};
+use super::{KeystoreError, KeystoreJson, PrivateKey, PublicKey, Wallet};
 
 const KDF_N: u32 = 4096;
 const KDF_R: u32 = 8;

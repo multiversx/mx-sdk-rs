@@ -15,7 +15,6 @@ use zeroize::Zeroize;
 use super::wallet_signature::WalletSignature;
 
 pub const PRIVATE_KEY_LENGTH: usize = 64;
-pub const SIGNATURE_LENGTH: usize = 64;
 pub const SEED_LENGTH: usize = 32;
 
 const EGLD_COIN_TYPE: u32 = 508;

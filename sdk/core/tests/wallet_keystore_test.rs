@@ -1,7 +1,7 @@
 use multiversx_chain_core::std::Bech32Hrp;
 use multiversx_sdk::{
-    crypto::{private_key::PrivateKey, public_key::PublicKey},
     wallet::{Keystore, KeystoreError, KeystoreRandomness, WalletSource},
+    wallet::{PrivateKey, PublicKey},
 };
 
 // Well-known Alice private key used across the test suite.

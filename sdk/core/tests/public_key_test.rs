@@ -1,4 +1,4 @@
-use multiversx_sdk::crypto::public_key::PublicKey;
+use multiversx_sdk::wallet::PublicKey;
 
 // Alice's known values, consistent with wallet_pem_test.rs constants.
 const ALICE_PUBLIC_KEY_HEX: &str =

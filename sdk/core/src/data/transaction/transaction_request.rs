@@ -1,4 +1,4 @@
-use crate::crypto::wallet_signature::WalletSignature;
+use crate::wallet::WalletSignature;
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
