@@ -143,7 +143,8 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
         return None;
     };
     let original_tx_data =
-        String::from_utf8(base64_decode(data).unwrap_or_default()).unwrap_or_default();
+        String::from_utf8(base64_decode(data).expect("Failed to base64-decode tx.data"))
+            .unwrap_or_default();
 
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.address != ESDTSystemSCAddress.to_address() {
