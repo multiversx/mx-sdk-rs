@@ -20,12 +20,10 @@ use std::path::Path;
 use anyhow::Result;
 use bip39::Mnemonic;
 use multiversx_chain_core::{
-    std::{Bech32Address, Bech32Hrp},
+    std::{Bech32Address, Bech32Hrp, crypto},
     types::Address,
 };
 use serde_json::json;
-use sha2::Digest;
-use sha3::Keccak256;
 
 use crate::data::transaction::Transaction;
 
@@ -73,10 +71,10 @@ impl From<PrivateKey> for Wallet {
 }
 
 impl Wallet {
-    pub fn from_mnemonic_string(mnemonic_str: String) -> Wallet {
-        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', "")).unwrap();
-        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32);
-        Self::new(private_key, WalletSource::Mnemonic)
+    pub fn from_mnemonic_string(mnemonic_str: String) -> Result<Wallet> {
+        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', ""))?;
+        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32)?;
+        Ok(Self::new(private_key, WalletSource::Mnemonic))
     }
 
     #[deprecated(
@@ -113,7 +111,7 @@ impl Wallet {
     }
 
     pub fn private_key_hex(&self) -> String {
-        self.private_key.to_hex()
+        self.private_key.to_seed_hex()
     }
 
     pub fn public_key(&self) -> PublicKey {
@@ -132,9 +130,7 @@ impl Wallet {
 
         let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;
         if should_sign_on_tx_hash {
-            let mut h = Keccak256::new();
-            h.update(tx_bytes);
-            tx_bytes = h.finalize().to_vec();
+            tx_bytes = crypto::keccak256(&tx_bytes).to_vec();
         }
 
         self.private_key.sign(tx_bytes)
@@ -146,7 +142,7 @@ impl Wallet {
 
     pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {
         WalletPem {
-            private_key: self.private_key,
+            private_key: self.private_key.clone(),
             address: Bech32Address::encode_address(hrp, self.address.clone()),
         }
     }

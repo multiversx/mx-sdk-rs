@@ -106,7 +106,10 @@ impl Keystore {
             self.ciphertext.clone(),
         );
 
-        let private_key = PrivateKey::from_bytes(&private_key_bytes)?;
+        let private_key_arr: [u8; 64] = private_key_bytes
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("decrypted keystore has wrong key length"))?;
+        let private_key = PrivateKey::from_keypair_bytes(&private_key_arr)?;
         Ok(Wallet::new(
             private_key,
             super::WalletSource::Keystore(self.address.hrp),
@@ -118,12 +121,12 @@ impl Keystore {
     /// The wallet address stored in the keystore is derived from `private_key`
     /// and encoded with the given `hrp`.
     pub fn encrypt(
-        private_key: PrivateKey,
+        private_key: &PrivateKey,
         hrp: Bech32Hrp,
         password: &str,
         randomness: KeystoreRandomness,
     ) -> Self {
-        let public_key = PublicKey::from(&private_key);
+        let public_key = PublicKey::from(private_key);
         let address = public_key.to_address().to_bech32(hrp);
         let private_key_bytes = private_key.to_bytes();
 

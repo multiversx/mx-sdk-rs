@@ -1,27 +1,28 @@
 use std::fmt;
 
 use anyhow::Result;
+use multiversx_chain_core::std::crypto::ed25519;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-/// A 64-byte Ed25519 signature, serialized as a lowercase hex string.
+/// An Ed25519 signature, serialized as a lowercase hex string.
 #[derive(Copy, Clone, PartialEq, Eq)]
-pub struct WalletSignature([u8; 64]);
+pub struct WalletSignature(ed25519::Ed25519Signature);
 
 impl WalletSignature {
     pub fn from_bytes(bytes: [u8; 64]) -> Self {
-        Self(bytes)
+        Self(ed25519::Ed25519Signature::from_bytes(&bytes))
     }
 
     pub fn to_bytes(&self) -> [u8; 64] {
-        self.0
+        self.0.to_bytes()
     }
 
-    pub fn as_bytes(&self) -> &[u8; 64] {
+    pub fn inner(&self) -> &ed25519::Ed25519Signature {
         &self.0
     }
 
     pub fn to_hex(&self) -> String {
-        hex::encode(self.0)
+        hex::encode(self.to_bytes())
     }
 
     pub fn from_hex_str(s: &str) -> Result<Self> {
@@ -29,19 +30,19 @@ impl WalletSignature {
         let bits: [u8; 64] = bytes
             .try_into()
             .map_err(|_| anyhow::anyhow!("invalid signature length, expected 64 bytes"))?;
-        Ok(Self(bits))
+        Ok(Self::from_bytes(bits))
     }
 }
 
 impl From<[u8; 64]> for WalletSignature {
     fn from(bytes: [u8; 64]) -> Self {
-        Self(bytes)
+        Self::from_bytes(bytes)
     }
 }
 
-impl AsRef<[u8]> for WalletSignature {
-    fn as_ref(&self) -> &[u8] {
-        &self.0
+impl From<ed25519::Ed25519Signature> for WalletSignature {
+    fn from(sig: ed25519::Ed25519Signature) -> Self {
+        Self(sig)
     }
 }
 

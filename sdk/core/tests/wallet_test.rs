@@ -7,12 +7,12 @@ use multiversx_sdk::test_wallets;
 fn test_private_key_from_mnemonic() {
     let mnemonic: Mnemonic = Mnemonic::parse_normalized("acid twice post genre topic observe valid viable gesture fortune funny dawn around blood enemy page update reduce decline van bundle zebra rookie real").unwrap();
 
-    let private_key = PrivateKey::from_mnemonic(mnemonic.clone(), 0, 0);
+    let private_key = PrivateKey::from_mnemonic(mnemonic.clone(), 0, 0).unwrap();
     let public_key = PublicKey::from(&private_key);
     let address = public_key.to_address();
     assert_eq!(
         "0b7966138e80b8f3bb64046f56aea4250fd7bacad6ed214165cea6767fd0bc2c",
-        private_key.to_hex()
+        private_key.to_seed_hex()
     );
     assert_eq!(
         "dfefe0453840e5903f2bd519de9b0ed6e9621e57e28ba0b4c1b15115091dd72f",
@@ -23,12 +23,12 @@ fn test_private_key_from_mnemonic() {
         address.to_bech32_default().bech32
     );
 
-    let private_key = PrivateKey::from_mnemonic(mnemonic, 0, 1);
+    let private_key = PrivateKey::from_mnemonic(mnemonic, 0, 1).unwrap();
     let public_key = PublicKey::from(&private_key);
     let address = public_key.to_address();
     assert_eq!(
         "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
-        private_key.to_hex()
+        private_key.to_seed_hex()
     );
     assert_eq!(
         "af8fef070a581873912ccbafb6a78bb9eb4e003085ac43dbbdfa3e20eb93cede",

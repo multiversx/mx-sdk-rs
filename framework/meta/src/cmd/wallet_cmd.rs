@@ -50,7 +50,7 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("mnemonic", "pem") => match infile {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
-                let wallet = Wallet::from_mnemonic_string(mnemonic_str);
+                let wallet = Wallet::from_mnemonic_string(mnemonic_str).unwrap();
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
             None => {
@@ -58,7 +58,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                     "Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
-                let wallet = Wallet::from_mnemonic_string(mnemonic_str);
+                let wallet = Wallet::from_mnemonic_string(mnemonic_str).unwrap();
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
         },
@@ -87,7 +87,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 let wallet_pem = WalletPem::from_pem_file(file).expect("error reading PEM file");
                 let randomness = new_keystore_randomness();
                 let json_result = Keystore::encrypt(
-                    wallet_pem.private_key,
+                    &wallet_pem.private_key,
                     hrp,
                     &get_keystore_password(),
                     randomness,
@@ -179,7 +179,7 @@ struct NewWalletInfo {
 impl NewWalletInfo {
     fn generate() -> Self {
         let mnemonic = generate_mnemonic();
-        let wallet = Wallet::from_mnemonic_string(mnemonic.to_string());
+        let wallet = Wallet::from_mnemonic_string(mnemonic.to_string()).unwrap();
         NewWalletInfo { mnemonic, wallet }
     }
 
@@ -228,7 +228,7 @@ fn new(new_args: &WalletNewArgs) {
         Some("keystore-secret") => {
             let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
-                new_wallet_info.wallet.private_key,
+                &new_wallet_info.wallet.private_key,
                 hrp,
                 &get_keystore_password(),
                 randomness,

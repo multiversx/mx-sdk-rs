@@ -19,7 +19,7 @@ fn fixed_randomness() -> KeystoreRandomness {
 }
 
 fn alice_private_key() -> PrivateKey {
-    PrivateKey::from_hex_str(ALICE_PRIVATE_KEY_HEX).unwrap()
+    PrivateKey::from_seed_hex_str(ALICE_PRIVATE_KEY_HEX).unwrap()
 }
 
 fn erd_hrp() -> Bech32Hrp {
@@ -34,7 +34,7 @@ fn erd_hrp() -> Bech32Hrp {
 fn test_keystore_encrypt_decrypt_roundtrip() {
     let private_key = alice_private_key();
     let keystore = Keystore::encrypt(
-        private_key,
+        &private_key,
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),
@@ -53,7 +53,7 @@ fn test_keystore_encrypt_decrypt_roundtrip() {
 #[test]
 fn test_keystore_wrong_password_rejected() {
     let keystore = Keystore::encrypt(
-        alice_private_key(),
+        &alice_private_key(),
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),
@@ -73,7 +73,7 @@ fn test_keystore_wrong_password_rejected() {
 fn test_keystore_serialize_deserialize_roundtrip() {
     let private_key = alice_private_key();
     let keystore = Keystore::encrypt(
-        private_key,
+        &private_key,
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),
@@ -90,7 +90,7 @@ fn test_keystore_serialize_deserialize_roundtrip() {
 #[test]
 fn test_keystore_json_snapshot() {
     let keystore = Keystore::encrypt(
-        alice_private_key(),
+        &alice_private_key(),
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),
@@ -107,7 +107,7 @@ fn test_full_encrypt_serialize_deserialize_decrypt_sign() {
 
     // Encrypt.
     let keystore = Keystore::encrypt(
-        alice_private_key(),
+        &alice_private_key(),
         erd_hrp(),
         KEYSTORE_PASSWORD,
         fixed_randomness(),

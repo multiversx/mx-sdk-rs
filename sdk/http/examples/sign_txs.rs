@@ -5,21 +5,17 @@ use multiversx_sdk::{
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
-async fn main() {
-    let wallet = Wallet::from(
-        PrivateKey::from_hex_str(
-            "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
-        )
-        .unwrap(),
-    );
+async fn main() -> anyhow::Result<()> {
+    let wallet = Wallet::from(PrivateKey::from_seed_hex_str(
+        "1648ad209d6b157a289884933e3bb30f161ec7113221ec16f87c3578b05830b0",
+    )?);
     let addr = wallet.to_address();
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());
-    let network_config = blockchain.get_network_config().await.unwrap();
+    let network_config = blockchain.get_network_config().await?;
 
     let arg = blockchain
         .get_default_transaction_arguments(&addr, &network_config)
-        .await
-        .unwrap();
+        .await?;
 
     let mut unsign_tx = Transaction {
         nonce: arg.nonce,
@@ -49,8 +45,9 @@ async fn main() {
     unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 
-    let tx_hash = blockchain.send_transactions(&txs).await.unwrap();
+    let tx_hash = blockchain.send_transactions(&txs).await?;
 
     assert!(!tx_hash.is_empty());
     println!("tx_hashes {tx_hash:?}");
+    Ok(())
 }

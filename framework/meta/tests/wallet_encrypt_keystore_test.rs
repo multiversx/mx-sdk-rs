@@ -15,9 +15,9 @@ const KEYSTORE_PASSWORD: &str = "abcd";
 const ALICE_PRIVATE_KEY: &str = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
 
 fn create_keystore_file_from_scratch(hrp: &str, file: &str) -> Address {
-    let wallet = Wallet::from(PrivateKey::from_hex_str(ALICE_PRIVATE_KEY).unwrap());
+    let wallet = Wallet::from(PrivateKey::from_seed_hex_str(ALICE_PRIVATE_KEY).unwrap());
     let json_result = Keystore::encrypt(
-        wallet.private_key,
+        &wallet.private_key,
         hrp.try_into().expect("invalid HRP"),
         KEYSTORE_PASSWORD,
         new_keystore_randomness(),
