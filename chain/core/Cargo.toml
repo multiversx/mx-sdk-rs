@@ -17,10 +17,11 @@ keywords = ["multiversx", "blockchain", "vm", "tools"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [features]
-std = ["bech32", "serde", "hex", "blake2", "sha2", "sha3", "ed25519-dalek"]
+std = ["base64", "bech32", "serde", "hex", "blake2", "sha2", "sha3", "ed25519-dalek"]
 
 [dependencies]
 bitflags = "2.9"
+base64 = { version = "0.22", optional = true }
 bech32 = { version = "0.11", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }
 hex = { version = "0.4", optional = true }

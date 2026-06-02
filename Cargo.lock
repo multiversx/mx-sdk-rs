@@ -3115,6 +3115,7 @@ checksum = "049721bdb4abb82202cf8d9b7981ef0c080615b7cb4ef2de345694a5329f1216"
 name = "multiversx-chain-core"
 version = "0.23.0"
 dependencies = [
+ "base64",
  "bech32",
  "bitflags 2.11.1",
  "blake2",
@@ -3266,7 +3267,6 @@ name = "multiversx-sc-meta"
 version = "0.66.1"
 dependencies = [
  "anyhow",
- "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3381,7 +3381,6 @@ version = "0.16.0"
 dependencies = [
  "aes",
  "anyhow",
- "base64",
  "bip39",
  "ctr",
  "hex",

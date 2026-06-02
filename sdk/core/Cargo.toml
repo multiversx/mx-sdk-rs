@@ -25,7 +25,6 @@ sha2 = "0.11"
 sha3 = "0.12"
 hmac = "0.13"
 hex = "0.4"
-base64 = "0.22"
 pbkdf2 = { version = "0.13", default-features = false }
 zeroize = "1.4"
 itertools = "0.14"

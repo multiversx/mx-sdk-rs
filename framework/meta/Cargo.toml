@@ -47,7 +47,6 @@ rand = { version = "0.10", default-features = false }
 uuid = { version = "1.10", features = ["v4"] }
 anyhow = "1.0"
 hex = "0.4.3"
-base64 = "0.22"
 indexmap = { version = "2", features = ["serde"] }
 # warning: newer versions require Rust 1.88, hence we are not upgrading yet
 zip = { version = "7.2", features = ["deflate"], default-features = false }

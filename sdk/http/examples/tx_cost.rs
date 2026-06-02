@@ -1,5 +1,6 @@
 use multiversx_sdk::{
-    chain_core::std::Bech32Address, data::transaction::Transaction, utils::base64_encode,
+    chain_core::std::{Bech32Address, base64_encode},
+    data::transaction::Transaction,
 };
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 

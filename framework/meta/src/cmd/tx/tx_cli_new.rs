@@ -1,10 +1,8 @@
 use std::fs;
 
 use anyhow::{Context, Result};
-use multiversx_sc_snippets::{
-    imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction},
-    sdk::utils::{base64_decode, base64_encode},
-};
+use multiversx_chain_core::std::{base64_decode, base64_encode};
+use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
 use crate::cmd::tx::tx_cli_common::load_wallet;
@@ -55,11 +53,13 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
 
     // Decode the data field for the human-readable output.
-    let decoded_data = tx
-        .data
-        .as_ref()
-        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
-        .unwrap_or_default();
+    let decoded_data = match &tx.data {
+        None => String::new(),
+        Some(d) => {
+            let bytes = base64_decode(d)?;
+            String::from_utf8_lossy(&bytes).into_owned()
+        }
+    };
     tx.nonce = nonce;
     if let Some(gas_price) = args.tx.gas_price {
         tx.gas_price = gas_price;

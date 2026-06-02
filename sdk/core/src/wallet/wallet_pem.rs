@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::{Result, anyhow};
 use multiversx_chain_core::std::Bech32Address;
 
-use crate::utils::{base64_decode, base64_encode};
+use multiversx_chain_core::std::{base64_decode, base64_encode};
 
 use super::{PrivateKey, PublicKey};
 
@@ -41,7 +41,8 @@ impl WalletPem {
             .take_while(|line| !line.starts_with(PEM_END_PREFIX))
             .collect();
 
-        let decoded = base64_decode(b64_body);
+        let decoded =
+            base64_decode(b64_body).map_err(|e| anyhow!("invalid base64 in PEM body: {e}"))?;
         let private_key_bytes = &decoded[..decoded.len() / 2];
         let private_key_str = std::str::from_utf8(private_key_bytes)
             .map_err(|e| anyhow!("invalid UTF-8 in private key: {e}"))?;
