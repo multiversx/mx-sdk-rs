@@ -119,6 +119,11 @@ impl PrivateKey {
         seed
     }
 
+    /// Derives a [`PrivateKey`] from a BIP-39 mnemonic using the MultiversX HD path
+    /// `m/44'/508'/<account>'/0'/<address_index>'`.
+    ///
+    /// Returns an error if the internal BIP-32 key derivation produces a key of
+    /// unexpected length (should not happen in practice).
     pub fn from_mnemonic(
         mnemonic: Mnemonic,
         account: u32,
@@ -164,14 +169,17 @@ impl PrivateKey {
         Ok(PrivateKey::from_seed_bytes(seed))
     }
 
+    /// Returns the full 64-byte keypair as `[seed (32 bytes) || public_key (32 bytes)]`.
     pub fn to_bytes(&self) -> [u8; PRIVATE_KEY_LENGTH] {
         self.0.to_keypair_bytes()
     }
 
+    /// Returns the 32-byte seed encoded as a lowercase hex string (64 characters).
     pub fn to_seed_hex(&self) -> String {
         hex::encode(self.0.to_seed_bytes())
     }
 
+    /// Signs `message` with this key and returns a [`WalletSignature`].
     pub fn sign(&self, message: impl AsRef<[u8]>) -> WalletSignature {
         WalletSignature::from(self.0.sign(message.as_ref()))
     }

@@ -24,7 +24,7 @@ fn test_from_bytes_seed_length_ok() {
 
     let pk = PrivateKey::from_seed_bytes(seed.as_slice().try_into().unwrap());
 
-    // to_hex() encodes only the first 32 bytes (the seed).
+    // to_seed_hex() encodes only the first 32 bytes (the seed).
     assert_eq!(pk.to_seed_hex(), ALICE_SEED_HEX);
 }
 

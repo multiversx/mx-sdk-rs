@@ -16,22 +16,32 @@ pub const PUBLIC_KEY_LENGTH: usize = 32;
 pub struct PublicKey(ed25519::Ed25519VerifyingKey);
 
 impl PublicKey {
+    /// Returns the raw 32-byte public key.
     pub fn to_bytes(&self) -> [u8; PUBLIC_KEY_LENGTH] {
         self.0.to_bytes()
     }
 
+    /// Returns a reference to the raw 32-byte public key.
     pub fn as_bytes(&self) -> &[u8; PUBLIC_KEY_LENGTH] {
         self.0.as_bytes()
     }
 
+    /// Derives the MultiversX [`Address`] from this public key.
+    ///
+    /// The address is the raw 32-byte public key interpreted as an address.
     pub fn to_address(&self) -> Address {
         (*self.0.as_bytes()).into()
     }
 
+    /// Returns the public key encoded as a lowercase hex string (64 characters).
     pub fn to_hex(&self) -> String {
         hex::encode(self.0.as_bytes())
     }
 
+    /// Decodes a 64-character hex string into a [`PublicKey`].
+    ///
+    /// Returns an error if the string is not valid hex, does not decode to
+    /// exactly 32 bytes, or the bytes do not represent a valid ed25519 point.
     pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
         let bits: [u8; PUBLIC_KEY_LENGTH] = bytes
@@ -42,6 +52,8 @@ impl PublicKey {
             .ok_or_else(|| anyhow::anyhow!("invalid ed25519 public key"))
     }
 
+    /// Verifies that `signature` is a valid ed25519 signature over `message`
+    /// produced by the private key corresponding to this public key.
     pub fn verify(&self, message: &[u8], signature: &WalletSignature) -> bool {
         self.0.verify(message, signature.inner())
     }
