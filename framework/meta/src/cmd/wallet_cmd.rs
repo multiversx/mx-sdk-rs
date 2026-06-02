@@ -3,7 +3,7 @@ use std::{
     io::{self, Read, Write},
 };
 
-use bip39::{Language, Mnemonic};
+use bip39::Language;
 use rand::Rng;
 
 use multiversx_sc::types::Address;
@@ -15,7 +15,7 @@ use multiversx_sc_snippets::{
         wallet::{Keystore, KeystoreRandomness, Wallet},
     },
 };
-use multiversx_sdk::wallet::{KeystoreError, WalletPem};
+use multiversx_sdk::wallet::{KeystoreError, Mnemonic, WalletPem};
 
 use crate::cli::cli_args_sender::get_keystore_password;
 use crate::cli::{
@@ -50,7 +50,7 @@ fn convert(convert_args: &WalletConvertArgs) {
         ("mnemonic", "pem") => match infile {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
-                let wallet = Wallet::from_mnemonic_string(mnemonic_str).unwrap();
+                let wallet = Wallet::from(Mnemonic::parse(&mnemonic_str).unwrap());
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
             None => {
@@ -58,7 +58,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                     "Insert text below. Press 'Ctrl-D' (Linux / MacOS) or 'Ctrl-Z' (Windows) when done."
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
-                let wallet = Wallet::from_mnemonic_string(mnemonic_str).unwrap();
+                let wallet = Wallet::from(Mnemonic::parse(&mnemonic_str).unwrap());
                 write_resulted_pem(wallet.to_pem(hrp), outfile);
             }
         },
@@ -168,7 +168,7 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
 }
 
 pub fn generate_mnemonic() -> Mnemonic {
-    Mnemonic::generate_in(Language::English, 24).unwrap()
+    Mnemonic::from(bip39::Mnemonic::generate_in(Language::English, 24).unwrap())
 }
 
 struct NewWalletInfo {
@@ -179,7 +179,7 @@ struct NewWalletInfo {
 impl NewWalletInfo {
     fn generate() -> Self {
         let mnemonic = generate_mnemonic();
-        let wallet = Wallet::from_mnemonic_string(mnemonic.to_string()).unwrap();
+        let wallet = Wallet::from(mnemonic.clone());
         NewWalletInfo { mnemonic, wallet }
     }
 

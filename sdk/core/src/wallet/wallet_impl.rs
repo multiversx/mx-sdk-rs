@@ -2,7 +2,6 @@ use core::str;
 use std::path::Path;
 
 use anyhow::Result;
-use bip39::Mnemonic;
 use multiversx_chain_core::{
     std::{Bech32Address, Bech32Hrp, crypto},
     types::Address,
@@ -11,7 +10,7 @@ use serde_json::json;
 
 use crate::{
     data::transaction::Transaction,
-    wallet::{PrivateKey, PublicKey, WalletPem, WalletSignature, WalletSource},
+    wallet::{Mnemonic, PrivateKey, PublicKey, WalletPem, WalletSignature, WalletSource},
 };
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -47,13 +46,15 @@ impl From<PrivateKey> for Wallet {
     }
 }
 
-impl Wallet {
-    pub fn from_mnemonic_string(mnemonic_str: String) -> Result<Wallet> {
-        let mnemonic = Mnemonic::parse(mnemonic_str.replace('\n', ""))?;
-        let private_key = PrivateKey::from_mnemonic(mnemonic, 0u32, 0u32)?;
-        Ok(Self::new(private_key, WalletSource::Mnemonic))
+impl From<Mnemonic> for Wallet {
+    /// Derives the wallet at account 0, address index 0 from the mnemonic.
+    fn from(mnemonic: Mnemonic) -> Self {
+        let private_key = mnemonic.to_private_key(0, 0);
+        Self::new(private_key, WalletSource::Mnemonic)
     }
+}
 
+impl Wallet {
     #[deprecated(
         since = "0.67.0",
         note = "Use `PrivateKey::from_hex_str(hex).map(Wallet::from)` instead"
