@@ -8,7 +8,7 @@ use governance_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
     imports::*,
-    sdk::{gateway::SetStateAccount, utils::base64_decode},
+    sdk::{chain_core::std::base64_decode, gateway::SetStateAccount},
 };
 
 pub async fn governance_sc_interact_cli() {
