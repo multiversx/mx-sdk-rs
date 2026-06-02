@@ -3,10 +3,9 @@ use std::path::Path;
 use anyhow::{Result, anyhow};
 use multiversx_chain_core::std::Bech32Address;
 
-use crate::{
-    crypto::{private_key::PrivateKey, public_key::PublicKey},
-    utils::{base64_decode, base64_encode},
-};
+use crate::utils::{base64_decode, base64_encode};
+
+use super::{PrivateKey, PublicKey};
 
 const PEM_BEGIN_PREFIX: &str = "-----BEGIN PRIVATE KEY for ";
 const PEM_END_PREFIX: &str = "-----END PRIVATE KEY for ";

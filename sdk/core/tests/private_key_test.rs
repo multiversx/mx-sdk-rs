@@ -1,4 +1,4 @@
-use multiversx_sdk::crypto::private_key::{PRIVATE_KEY_LENGTH, PrivateKey, SEED_LENGTH};
+use multiversx_sdk::wallet::{PRIVATE_KEY_LENGTH, PrivateKey, SEED_LENGTH};
 
 // Alice's well-known key material (consistent with wallet_pem_test.rs).
 const ALICE_SEED_HEX: &str = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";

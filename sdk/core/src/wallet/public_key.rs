@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::private_key::PrivateKey;
+use super::PrivateKey;
 use super::wallet_signature::WalletSignature;
 use anyhow::Result;
 use multiversx_chain_core::std::crypto::ed25519;
