@@ -13,7 +13,7 @@ pub const PRIVATE_KEY_LENGTH: usize = 64;
 pub const SEED_LENGTH: usize = 32;
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct PrivateKey(pub ed25519::Ed25519SigningKey);
+pub struct PrivateKey(pub(crate) ed25519::Ed25519SigningKey);
 
 impl PrivateKey {
     /// Constructs a [`PrivateKey`] from a 32-byte ed25519 seed.
