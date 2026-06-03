@@ -1,9 +1,5 @@
-use multiversx_sc_snippets::{ConnectionConfig, WalletConfig};
+use multiversx_sc_snippets::{ConnectionConfig, InteractorConfig, WalletConfig, imports::Wallet};
 use serde::Deserialize;
-use std::io::Read;
-
-/// Config file
-const CONFIG_FILE: &str = "config.toml";
 
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
@@ -14,21 +10,14 @@ pub struct Config {
     pub wallet: WalletConfig,
 }
 
-impl Config {
-    // Deserializes config from file
-    pub fn load_config() -> Self {
-        let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
-        let mut content = String::new();
-        file.read_to_string(&mut content).unwrap();
-        toml::from_str(&content).unwrap()
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
     }
 
-    pub fn chain_simulator_config() -> Self {
-        Config {
-            contract_path: "../output/adder.mxsc.json".to_owned(),
-            connection: ConnectionConfig::chain_simulator(),
-            owner: WalletConfig::from_test_wallet("mike"),
-            wallet: WalletConfig::from_test_wallet("ivan"),
-        }
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
     }
 }
+
+impl Config {}

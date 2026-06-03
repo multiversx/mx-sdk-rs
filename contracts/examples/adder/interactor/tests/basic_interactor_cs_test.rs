@@ -1,12 +1,34 @@
 use basic_interactor::{BasicInteractor, Config};
-use multiversx_sc_snippets::{imports::Bech32Address, sdk::gateway::SetStateAccount, test_wallets};
+use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
 use serial_test::serial;
+
+fn chain_simulator_config() -> Config {
+    Config {
+        contract_path: "../output/adder.mxsc.json".to_owned(),
+        connection: ConnectionConfig::chain_simulator(),
+        owner: WalletConfig::from_test_wallet("mike"),
+        wallet: WalletConfig::from_test_wallet("ivan"),
+    }
+}
+
+async fn test_interactor() -> BasicInteractor {
+    let (interactor, config) = HttpInteractorBuilder::new()
+        .crate_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(chain_simulator_config())
+        .build()
+        .await;
+    BasicInteractor {
+        interactor,
+        config,
+        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+    }
+}
 
 #[tokio::test]
 #[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn simulator_upgrade_test() {
-    let mut basic_interact = BasicInteractor::new(Config::chain_simulator_config()).await;
+    let mut basic_interact = test_interactor().await;
 
     basic_interact.generate_blocks(2).await;
 
@@ -54,8 +76,8 @@ async fn simulator_upgrade_test() {
 async fn set_state_cs_test() {
     let account_address = test_wallets::mike();
 
-    let real_chain_interact = BasicInteractor::new(Config::load_config()).await;
-    let simulator_interact = BasicInteractor::new(Config::chain_simulator_config()).await;
+    let real_chain_interact = BasicInteractor::new().await;
+    let simulator_interact = test_interactor().await;
 
     let account = real_chain_interact
         .interactor
@@ -96,8 +118,8 @@ async fn set_state_from_file_cs_test() {
     let account_address = test_wallets::mike();
     let account_address_2 = test_wallets::ivan();
 
-    let mut real_chain_interact = BasicInteractor::new(Config::load_config()).await;
-    let simulator_interact = BasicInteractor::new(Config::chain_simulator_config()).await;
+    let mut real_chain_interact = BasicInteractor::new().await;
+    let simulator_interact = test_interactor().await;
 
     // now we should have current mike account in the set state file
     real_chain_interact
@@ -140,8 +162,8 @@ async fn set_state_overwrite_cs_test() {
     let account_address = test_wallets::mike();
     let account_address_2 = test_wallets::ivan();
 
-    let mut real_chain_interact = BasicInteractor::new(Config::load_config()).await;
-    let simulator_interact = BasicInteractor::new(Config::chain_simulator_config()).await;
+    let mut real_chain_interact = BasicInteractor::new().await;
+    let simulator_interact = test_interactor().await;
 
     // now we should have current mike and ivan accounts in the set state file
     real_chain_interact

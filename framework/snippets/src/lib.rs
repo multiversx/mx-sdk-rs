@@ -33,5 +33,11 @@ pub type HttpInteractor = crate::InteractorBase<multiversx_sdk_http::GatewayHttp
 #[cfg(feature = "http")]
 pub type Interactor = HttpInteractor;
 
+#[cfg(feature = "http")]
+mod http_interactor_builder;
+
+#[cfg(feature = "http")]
+pub use http_interactor_builder::HttpInteractorBuilder;
+
 #[cfg(feature = "dapp")]
 pub type DappInteractor = crate::InteractorBase<multiversx_sdk_dapp::GatewayDappProxy>;

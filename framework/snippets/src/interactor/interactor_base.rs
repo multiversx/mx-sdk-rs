@@ -150,4 +150,25 @@ where
         self.current_dir = path;
         self
     }
+
+    /// Loads `State` from `state.toml` in `current_dir` (or returns the default)
+    /// and wraps it in an [`AutoSave`] that persists changes on drop.
+    ///
+    /// Call [`AutoSave::disable`] or use [`AutoSave::no_save`] directly when you
+    /// do not want side-effects (e.g. in tests).
+    pub fn load_state<State>(&self) -> crate::AutoSave<State>
+    where
+        State: serde::Serialize + serde::de::DeserializeOwned + Default,
+    {
+        let path = self.current_dir.join("state.toml");
+        let value = if path.exists() {
+            let content = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()));
+            toml::from_str(&content)
+                .unwrap_or_else(|e| panic!("cannot parse {}: {e}", path.display()))
+        } else {
+            State::default()
+        };
+        crate::AutoSave::new(value, path)
+    }
 }

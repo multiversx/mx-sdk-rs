@@ -12,9 +12,7 @@ use multiversx_sc_snippets::imports::*;
 pub async fn adder_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut basic_interact = BasicInteractor::new(config).await;
+    let mut basic_interact = BasicInteractor::new().await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -41,29 +39,20 @@ pub async fn adder_cli() {
 pub struct BasicInteractor {
     pub interactor: Interactor,
     pub config: Config,
-    pub state: State,
+    pub state: AutoSave<State>,
 }
 
 impl BasicInteractor {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.connection.gateway_uri())
-            .await
-            .use_chain_simulator(config.connection.use_chain_simulator());
-        interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
-
-        interactor
-            .register_wallet(config.owner.wallet().clone())
+    pub async fn new() -> Self {
+        let (interactor, config) = HttpInteractorBuilder::new()
+            .crate_dir(env!("CARGO_MANIFEST_DIR"))
+            .build()
             .await;
-        interactor
-            .register_wallet(config.wallet.wallet().clone())
-            .await;
-
-        interactor.generate_blocks(30u64).await.unwrap();
-
+        let state = interactor.load_state::<State>();
         BasicInteractor {
             interactor,
             config,
-            state: State::load_state(),
+            state,
         }
     }
 
@@ -90,7 +79,7 @@ impl BasicInteractor {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.adder_address = Some(new_address);
     }
 
     pub async fn upgrade(&mut self, new_value: u32, sender: &Bech32Address, err: Option<&str>) {
