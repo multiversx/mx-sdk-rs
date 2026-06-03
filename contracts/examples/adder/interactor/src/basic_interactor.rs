@@ -1,13 +1,43 @@
 mod basic_interactor_cli;
-mod basic_interactor_config;
-mod basic_interactor_state;
 
 use adder::adder_proxy;
-pub use basic_interactor_config::Config;
-use basic_interactor_state::State;
 use clap::Parser;
-
 use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
+
+/// Adder Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub contract_path: String,
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+    }
+}
+
+/// Adder Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub adder_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the adder contract
+    pub fn current_adder_address(&self) -> &Bech32Address {
+        self.adder_address
+            .as_ref()
+            .expect("no known adder contract, deploy first")
+    }
+}
 
 pub async fn adder_cli() {
     env_logger::init();
