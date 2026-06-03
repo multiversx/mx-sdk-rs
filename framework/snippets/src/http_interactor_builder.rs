@@ -14,11 +14,11 @@ const DEFAULT_CONFIG_FILE: &str = "config.toml";
 /// # Typical usage
 ///
 /// ```rust,ignore
-/// let (interactor, config) = InteractorBuilder::<Config>::new()
+/// let (interactor, config) = HttpInteractorBuilder::<Config>::new()
 ///     .crate_dir(env!("CARGO_MANIFEST_DIR"))
 ///     .build()
 ///     .await;
-/// let state = interactor.load_autosave::<State>();
+/// let state = interactor.load_state::<State>();
 /// ```
 pub struct HttpInteractorBuilder<Config> {
     /// Directory that contains `config.toml` and `state.toml`.
@@ -96,7 +96,7 @@ where
     /// 4. Generates 30 initial blocks when running against the chain simulator
     ///    (no-op on a real network).
     ///
-    /// Use [`InteractorBase::load_autosave`] afterwards to load state.
+    /// Use [`InteractorBase::load_state`] afterwards to load state.
     pub async fn build(self) -> (crate::Interactor, Config) {
         let (config, crate_dir) = self.resolve_config();
 
@@ -124,6 +124,7 @@ fn load_toml<T: DeserializeOwned>(path: &Path) -> T {
     let mut file =
         std::fs::File::open(path).unwrap_or_else(|e| panic!("cannot open {}: {e}", path.display()));
     let mut content = String::new();
-    file.read_to_string(&mut content).unwrap();
+    file.read_to_string(&mut content)
+        .unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()));
     toml::from_str(&content).unwrap_or_else(|e| panic!("cannot parse {}: {e}", path.display()))
 }

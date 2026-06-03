@@ -3,9 +3,9 @@ use crate::sdk::wallet::Wallet;
 use super::ConnectionConfig;
 
 /// Trait implemented by a contract-specific `Config` struct to tell the
-/// [`InteractorBuilder`](crate::InteractorBuilder) how to initialise the interactor.
+/// [`HttpInteractorBuilder`](crate::HttpInteractorBuilder) how to initialise the interactor.
 ///
-/// The builder calls `connection()` to open the gateway and calls `wallets()` to
+/// The builder calls `connection()` to open the gateway and calls `register_wallets()` to
 /// register every wallet that will sign transactions.
 pub trait InteractorConfig {
     /// Returns the connection settings (gateway URI, chain type).
