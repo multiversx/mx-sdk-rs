@@ -1,21 +1,48 @@
 mod tiny_interactor_cli;
-mod tiny_interactor_config;
-mod tiny_interactor_state;
 
 use clap::Parser;
-pub use tiny_interactor_config::Config;
-use tiny_interactor_state::State;
-
 use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
+
+/// Tiny Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+    }
+}
+
+/// Tiny Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub sc_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the contract address
+    pub fn current_contract_address(&self) -> &Bech32Address {
+        self.sc_address
+            .as_ref()
+            .expect("no known contract, deploy first")
+    }
+}
 
 const CODE_PATH: FilePath = FilePath("../tiny.wasm");
 
 pub async fn tiny_interactor_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut basic_interact = TinyInteractor::new(config).await;
+    let mut basic_interact = TinyInteractor::new().await;
 
     let cli = tiny_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -31,27 +58,21 @@ pub async fn tiny_interactor_cli() {
 
 pub struct TinyInteractor {
     pub interactor: Interactor,
-    pub owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
-    pub state: State,
+    pub config: Config,
+    pub state: AutoSave<State>,
 }
 
 impl TinyInteractor {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
-
-        let owner_address = interactor.register_wallet(test_wallets::mike()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
-
-        interactor.generate_blocks(30u64).await.unwrap();
-
+    pub async fn new() -> Self {
+        let (interactor, config) = HttpInteractorBuilder::new()
+            .crate_dir(env!("CARGO_MANIFEST_DIR"))
+            .build()
+            .await;
+        let state = interactor.load_state::<State>();
         TinyInteractor {
             interactor,
-            owner_address: owner_address.into(),
-            wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            config,
+            state,
         }
     }
 
@@ -63,10 +84,11 @@ impl TinyInteractor {
     }
 
     pub async fn deploy(&mut self) {
+        let owner_address = self.config.owner.address();
         let new_address = self
             .interactor
             .tx()
-            .from(&self.owner_address.clone())
+            .from(&owner_address.clone())
             .gas(600_000)
             .raw_deploy()
             .code(CODE_PATH)
@@ -75,13 +97,14 @@ impl TinyInteractor {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_sc_address(new_address);
+        self.state.sc_address = Some(new_address);
     }
 
     pub async fn call_x(&mut self) {
+        let wallet_address = self.config.wallet.address();
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(&wallet_address)
             .to(self.state.current_contract_address())
             .gas(1_100_000)
             .raw_call("x")
