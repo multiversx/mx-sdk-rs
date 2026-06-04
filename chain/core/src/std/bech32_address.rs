@@ -223,7 +223,7 @@ impl<'de> Deserialize<'de> for Bech32Address {
         if let Some(stripped) = bech32.strip_prefix("bech32:") {
             bech32 = stripped.to_string();
         }
-        Ok(Bech32Address::from_bech32_string(bech32))
+        Bech32Address::try_from_bech32_string(bech32).map_err(serde::de::Error::custom)
     }
 }
 
@@ -350,5 +350,41 @@ mod tests {
         let bad_bech32 = bech32::encode::<bech32::Bech32>(hrp, &short_payload).unwrap();
         let result = Bech32Address::try_from_bech32_string(bad_bech32);
         assert!(matches!(result, Err(Bech32AddressError::InvalidLength(10))));
+    }
+
+    // --- serde Deserialize tests ---
+
+    #[test]
+    fn test_deserialize_valid() {
+        let json = format!("\"{VALID_BECH32}\"");
+        let addr: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(addr.bech32, VALID_BECH32);
+    }
+
+    #[test]
+    fn test_deserialize_bech32_prefix_stripped() {
+        // Old interactor format: "bech32:<address>"
+        let json = format!("\"bech32:{VALID_BECH32}\"");
+        let addr: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(addr.bech32, VALID_BECH32);
+    }
+
+    #[test]
+    fn test_deserialize_empty_string_returns_error() {
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"\"");
+        assert!(result.is_err(), "expected error for empty string, got Ok");
+    }
+
+    #[test]
+    fn test_deserialize_invalid_bech32_returns_error() {
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"not_valid!!!\"");
+        assert!(result.is_err(), "expected error for invalid bech32, got Ok");
+    }
+
+    #[test]
+    fn test_deserialize_bech32_prefix_only_returns_error() {
+        // "bech32:" strips to "" which should fail, not panic
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"bech32:\"");
+        assert!(result.is_err(), "expected error for bare prefix, got Ok");
     }
 }
