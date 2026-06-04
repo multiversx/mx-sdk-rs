@@ -1,14 +1,38 @@
-use multiversx_sc_snippets::imports::{DurationMillis, RustBigUint, TimestampMillis};
+use multiversx_sc_snippets::imports::{DurationMillis, RustBigUint, TimestampMillis, *};
 use ping_pong_egld_interact::{Config, PingPongEgldInteract};
 use serial_test::serial;
+
+fn chain_simulator_config() -> Config {
+    Config {
+        connection: ConnectionConfig::chain_simulator(),
+        owner: WalletConfig::from_test_wallet("mike"),
+        wallet: WalletConfig::from_test_wallet("ivan"),
+    }
+}
+
+async fn cs_interactor() -> PingPongEgldInteract {
+    let (interactor, config) = HttpInteractorBuilder::new()
+        .crate_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(chain_simulator_config())
+        .build()
+        .await;
+    let interactor = interactor
+        .with_tracer(ping_pong_egld_interact::INTERACTOR_SCENARIO_TRACE_PATH)
+        .await;
+    PingPongEgldInteract {
+        interactor,
+        config,
+        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+    }
+}
 
 #[tokio::test]
 #[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn test_ping_pong_egld() {
-    let mut interact = PingPongEgldInteract::init(Config::chain_simulator_config()).await;
-    let wallet_address = interact.wallet_address.clone();
-    let ping_pong_owner_address = interact.ping_pong_owner_address.clone();
+    let mut interact = cs_interactor().await;
+    let wallet_address = interact.config.wallet.address();
+    let ping_pong_owner_address = interact.config.owner.address();
 
     let ping_amount = 1u64;
 
