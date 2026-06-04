@@ -10,7 +10,7 @@ use clap::Parser;
 
 use multiversx_sc_snippets::imports::*;
 
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
+pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 const CODE_EXPR_STORAGE_BYTES: MxscPath =
     MxscPath::new("../output/basic-features-storage-bytes.mxsc.json");
@@ -20,9 +20,7 @@ const CODE_EXPR: MxscPath = MxscPath::new("../output/basic-features.mxsc.json");
 pub async fn basic_features_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut bf_interact = BasicFeaturesInteract::init(config).await;
+    let mut bf_interact = BasicFeaturesInteract::init().await;
 
     let cli = bf_interact_cli::InteractCli::parse();
     match cli.command {
@@ -72,27 +70,24 @@ pub async fn basic_features_cli() {
 pub struct BasicFeaturesInteract {
     pub interactor: Interactor,
     pub wallet_address: Bech32Address,
-    pub state: State,
+    pub state: AutoSave<State>,
     pub large_storage_payload: Vec<u8>,
 }
 
 impl BasicFeaturesInteract {
-    pub async fn init(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator())
-            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+    pub async fn init() -> Self {
+        let (interactor, config) = HttpInteractorBuilder::<Config>::new()
+            .crate_dir(env!("CARGO_MANIFEST_DIR"))
+            .build()
             .await;
-        interactor
-            .set_current_dir_from_workspace("contracts/feature-tests/basic-features/interact");
-        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
-
+        let interactor = interactor.with_tracer(INTERACTOR_SCENARIO_TRACE_PATH).await;
         interactor.generate_blocks_until_all_activations().await;
-
+        let wallet_address = config.wallet.address();
+        let state = interactor.load_state::<State>();
         Self {
             interactor,
-            wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            wallet_address,
+            state,
             large_storage_payload: Vec::new(),
         }
     }
