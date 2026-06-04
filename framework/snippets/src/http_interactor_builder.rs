@@ -93,7 +93,7 @@ where
     /// 1. Resolves `Config` (from file or pre-built).
     /// 2. Connects to the gateway described by `Config::connection()`.
     /// 3. Registers all wallets returned by `Config::register_wallets()`.
-    /// 4. Generates 30 initial blocks when running against the chain simulator
+    /// 4. Generates 2 initial blocks when running against the chain simulator
     ///    (no-op on a real network).
     ///
     /// Use [`InteractorBase::load_state`] afterwards to load state.
@@ -112,7 +112,7 @@ where
             interactor.register_wallet(wallet).await;
         }
 
-        interactor.generate_blocks(30).await.unwrap();
+        interactor.generate_blocks_until_all_activations().await;
 
         (interactor, config)
     }
