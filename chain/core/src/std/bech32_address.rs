@@ -220,7 +220,7 @@ impl<'de> Deserialize<'de> for Bech32Address {
     {
         // some old interactors have it serialized like this
         let mut bech32 = String::deserialize(deserializer)?;
-        if let Some(stripped) = bech32.strip_prefix("bech32:") {
+        if let Some(stripped) = bech32.strip_prefix(BECH32_PREFIX) {
             bech32 = stripped.to_string();
         }
         Bech32Address::try_from_bech32_string(bech32).map_err(serde::de::Error::custom)
