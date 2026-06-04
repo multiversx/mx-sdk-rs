@@ -1,2 +1,6 @@
+[connection]
 chain_type = 'simulator'
 gateway_uri = 'http://localhost:8085'
+
+[owner]
+test_wallet = 'mike'
