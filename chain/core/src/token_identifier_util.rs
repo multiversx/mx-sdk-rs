@@ -19,7 +19,6 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
         return false;
     }
 
-    let lowercase_letter_range = b'a'..=b'z';
     let uppercase_letter_range = b'A'..=b'Z';
     let number_range = b'0'..=b'9';
 
@@ -40,13 +39,14 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
         return false;
     }
 
-    // random chars are alphanumeric lowercase
+    // random chars are lowercase hex digits (the suffix is hex-encoded, so only [0-9a-f] is valid)
+    let hex_letter_range = b'a'..=b'f';
     let random_chars = &token_id_slice[(length - ADDITIONAL_RANDOM_CHARS_LENGTH)..];
     for rand_char in random_chars {
-        let is_lowercase_letter = lowercase_letter_range.contains(rand_char);
+        let is_hex_letter = hex_letter_range.contains(rand_char);
         let is_number = number_range.contains(rand_char);
 
-        if !is_lowercase_letter && !is_number {
+        if !is_hex_letter && !is_number {
             return false;
         }
     }
