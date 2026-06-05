@@ -5,6 +5,7 @@ use bitflags::bitflags;
 
 const UPGRADEABLE_STRING: &str = "Upgradeable";
 const READABLE_STRING: &str = "Readable";
+const GUARDED_STRING: &str = "Guarded";
 const PAYABLE_STRING: &str = "Payable";
 const PAYABLE_BY_SC_STRING: &str = "PayableBySC";
 const DEFAULT_STRING: &str = "Default";
@@ -21,6 +22,10 @@ bitflags! {
 
         /// The contract's storage can be read by other contracts.
         const READABLE = 0b0000_0100_0000_0000; // 3rd LSB of first byte
+
+        /// The contract is guarded: transactions must carry a second signature
+        /// from a guardian account in order to be executed.
+        const GUARDED = 0b0000_1000_0000_0000; // 4th LSB of first byte
 
         /// The contract can receive funds without having any endpoint called,
         /// just like user accounts.
@@ -57,6 +62,11 @@ impl CodeMetadata {
         *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
 
+    /// Returns `true` if the contract is guarded.
+    pub fn is_guarded(&self) -> bool {
+        *self & CodeMetadata::GUARDED != CodeMetadata::DEFAULT
+    }
+
     #[inline]
     pub fn to_byte_array(&self) -> [u8; 2] {
         self.bits().to_be_bytes()
@@ -77,6 +87,13 @@ impl CodeMetadata {
                 f("|");
             }
             f(READABLE_STRING);
+            nothing_printed = false;
+        }
+        if self.is_guarded() {
+            if !nothing_printed {
+                f("|");
+            }
+            f(GUARDED_STRING);
             nothing_printed = false;
         }
         if self.is_payable() {
@@ -222,38 +239,40 @@ mod tests {
         let all = CodeMetadata::UPGRADEABLE
             | CodeMetadata::PAYABLE
             | CodeMetadata::PAYABLE_BY_SC
-            | CodeMetadata::READABLE;
+            | CodeMetadata::READABLE
+            | CodeMetadata::GUARDED;
         assert!(all.is_upgradeable());
         assert!(all.is_payable());
         assert!(all.is_payable_by_sc());
         assert!(all.is_readable());
+        assert!(all.is_guarded());
 
-        assert_eq!(all.bits(), 0x0506);
+        assert_eq!(all.bits(), 0x0d06);
 
         assert_eq!(CodeMetadata::from_bits_truncate(0xffff), all);
     }
 
     #[test]
     fn test_each() {
-        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
-        assert!(!CodeMetadata::PAYABLE.is_upgradeable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_upgradeable());
-        assert!(!CodeMetadata::READABLE.is_upgradeable());
+        type CodeMetadataChecker = fn(&CodeMetadata) -> bool;
+        let flags_and_checkers: &[(CodeMetadata, CodeMetadataChecker)] = &[
+            (CodeMetadata::UPGRADEABLE, CodeMetadata::is_upgradeable),
+            (CodeMetadata::READABLE, CodeMetadata::is_readable),
+            (CodeMetadata::GUARDED, CodeMetadata::is_guarded),
+            (CodeMetadata::PAYABLE, CodeMetadata::is_payable),
+            (CodeMetadata::PAYABLE_BY_SC, CodeMetadata::is_payable_by_sc),
+        ];
 
-        assert!(!CodeMetadata::UPGRADEABLE.is_payable());
-        assert!(CodeMetadata::PAYABLE.is_payable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_payable());
-        assert!(!CodeMetadata::READABLE.is_payable());
-
-        assert!(!CodeMetadata::UPGRADEABLE.is_payable_by_sc());
-        assert!(!CodeMetadata::PAYABLE.is_payable_by_sc());
-        assert!(CodeMetadata::PAYABLE_BY_SC.is_payable_by_sc());
-        assert!(!CodeMetadata::READABLE.is_payable_by_sc());
-
-        assert!(!CodeMetadata::UPGRADEABLE.is_readable());
-        assert!(!CodeMetadata::PAYABLE.is_readable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_readable());
-        assert!(CodeMetadata::READABLE.is_readable());
+        // checking that checkers match, and are orthogonal (each checker only returns true for its own flag)
+        for (flag, checker) in flags_and_checkers {
+            for (other_flag, _) in flags_and_checkers {
+                assert_eq!(
+                    checker(other_flag),
+                    flag == other_flag,
+                    "{checker:?} returned unexpected result for flag {other_flag:?}",
+                );
+            }
+        }
     }
 
     #[test]
@@ -305,11 +324,17 @@ mod tests {
     fn test_try_from_array() {
         assert!(CodeMetadata::try_from([1u8, 0u8]).unwrap().is_upgradeable());
         assert!(!CodeMetadata::try_from([1u8, 0u8]).unwrap().is_readable());
+        assert!(!CodeMetadata::try_from([1u8, 0u8]).unwrap().is_guarded());
         assert!(CodeMetadata::try_from([0u8, 2u8]).unwrap().is_payable());
         assert!(CodeMetadata::try_from([4u8, 0u8]).unwrap().is_readable());
         assert!(!CodeMetadata::try_from([4u8, 0u8]).unwrap().is_upgradeable());
+        assert!(!CodeMetadata::try_from([4u8, 0u8]).unwrap().is_guarded());
+        assert!(CodeMetadata::try_from([8u8, 0u8]).unwrap().is_guarded());
+        assert!(!CodeMetadata::try_from([8u8, 0u8]).unwrap().is_upgradeable());
+        assert!(!CodeMetadata::try_from([8u8, 0u8]).unwrap().is_readable());
         assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_upgradeable());
         assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_payable());
         assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_readable());
+        assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_guarded());
     }
 }
