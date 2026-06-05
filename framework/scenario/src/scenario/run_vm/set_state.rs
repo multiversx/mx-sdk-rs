@@ -61,7 +61,9 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
             code_metadata: account
                 .code_metadata
                 .as_ref()
-                .map(|bytes_value| VMCodeMetadata::from(&bytes_value.value))
+                .map(|bytes_value| {
+                    VMCodeMetadata::try_from(&bytes_value.value).expect("invalid CodeMetadata")
+                })
                 .unwrap_or(DEFAULT_CODE_METADATA),
             contract_owner: account
                 .owner

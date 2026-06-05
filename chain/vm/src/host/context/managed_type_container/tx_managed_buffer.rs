@@ -35,8 +35,7 @@ impl ManagedTypeContainer {
     }
 
     pub fn mb_to_code_metadata(&self, handle: RawHandle) -> VMCodeMetadata {
-        let bytes: [u8; 2] = self.mb_get(handle).try_into().unwrap();
-        VMCodeMetadata::from(bytes)
+        VMCodeMetadata::from_bytes_or_default(self.mb_get(handle))
     }
 
     pub fn mb_get_slice(

@@ -42,7 +42,7 @@ impl ScenarioVMRunner {
         let (new_address, tx_result) = execution::commit_deploy(
             tx_input,
             contract_code,
-            VMCodeMetadata::from(sc_deploy_step.tx.code_metadata.bits()),
+            sc_deploy_step.tx.code_metadata,
             &mut self.blockchain_mock.state,
             &runtime,
             f,

@@ -98,32 +98,68 @@ impl CodeMetadata {
             f(DEFAULT_STRING);
         }
     }
-}
 
-impl From<[u8; 2]> for CodeMetadata {
-    #[inline]
-    fn from(arr: [u8; 2]) -> Self {
-        CodeMetadata::from(u16::from_be_bytes(arr))
-    }
-}
-
-impl From<u16> for CodeMetadata {
-    #[inline]
-    fn from(value: u16) -> Self {
+    /// Parses code metadata from a 2-byte slice, mirroring the MultiversX protocol implementation.
+    ///
+    /// If the slice is not exactly 2 bytes, returns [`CodeMetadata::DEFAULT`] (all flags cleared).
+    /// Unknown or reserved bits are silently ignored; only the bits corresponding to known flags
+    /// are extracted.
+    ///
+    /// This intentionally lenient behaviour matches the on-chain Go implementation
+    /// (`CodeMetadataFromBytes`). Prefer [`TryFrom<&[u8]>`] in tooling and off-chain code
+    /// where strict validation is desirable.
+    pub fn from_bytes_or_default(bytes: &[u8]) -> Self {
+        if bytes.len() != 2 {
+            return CodeMetadata::DEFAULT;
+        }
+        let value = u16::from_be_bytes([bytes[0], bytes[1]]);
         CodeMetadata::from_bits_truncate(value)
     }
 }
 
-impl From<&[u8]> for CodeMetadata {
-    fn from(slice: &[u8]) -> Self {
-        let arr: [u8; 2] = slice.try_into().unwrap_or_default();
-        CodeMetadata::from(arr)
+/// Error type returned when converting raw bytes or integers into [`CodeMetadata`] fails.
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum CodeMetadataError {
+    /// The input slice was not exactly 2 bytes long.
+    InvalidLength,
+    /// The bit pattern contains bits that do not correspond to any known flag.
+    InvalidBits(u16),
+}
+
+impl TryFrom<u16> for CodeMetadata {
+    type Error = CodeMetadataError;
+
+    #[inline]
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        CodeMetadata::from_bits(value).ok_or(CodeMetadataError::InvalidBits(value))
     }
 }
 
-impl From<&Vec<u8>> for CodeMetadata {
-    fn from(v: &Vec<u8>) -> Self {
-        CodeMetadata::from(v.as_slice())
+impl TryFrom<[u8; 2]> for CodeMetadata {
+    type Error = CodeMetadataError;
+
+    #[inline]
+    fn try_from(arr: [u8; 2]) -> Result<Self, Self::Error> {
+        CodeMetadata::try_from(u16::from_be_bytes(arr))
+    }
+}
+
+impl TryFrom<&[u8]> for CodeMetadata {
+    type Error = CodeMetadataError;
+
+    fn try_from(slice: &[u8]) -> Result<Self, Self::Error> {
+        let arr: [u8; 2] = slice
+            .try_into()
+            .map_err(|_| CodeMetadataError::InvalidLength)?;
+        CodeMetadata::try_from(arr)
+    }
+}
+
+impl TryFrom<&Vec<u8>> for CodeMetadata {
+    type Error = CodeMetadataError;
+
+    fn try_from(v: &Vec<u8>) -> Result<Self, Self::Error> {
+        CodeMetadata::try_from(v.as_slice())
     }
 }
 
@@ -155,7 +191,8 @@ impl NestedDecode for CodeMetadata {
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(CodeMetadata::from(u16::dep_decode_or_handle_err(input, h)?))
+        let value = u16::dep_decode_or_handle_err(input, h)?;
+        CodeMetadata::try_from(value).map_err(|_| h.handle_error(DecodeError::INVALID_VALUE))
     }
 }
 
@@ -219,16 +256,60 @@ mod tests {
         assert!(CodeMetadata::READABLE.is_readable());
     }
 
+    #[test]
+    fn test_try_from_slice_exact_length() {
+        assert!(
+            CodeMetadata::try_from(&[1u8, 0u8][..])
+                .unwrap()
+                .is_upgradeable()
+        );
+        assert!(
+            CodeMetadata::try_from(&[0u8, 2u8][..])
+                .unwrap()
+                .is_payable()
+        );
+        assert!(
+            !CodeMetadata::try_from(&[0u8, 0u8][..])
+                .unwrap()
+                .is_upgradeable()
+        );
+    }
+
+    #[test]
+    fn test_try_from_slice_wrong_length() {
+        assert_eq!(
+            CodeMetadata::try_from(&[1u8][..]),
+            Err(CodeMetadataError::InvalidLength)
+        );
+        assert_eq!(
+            CodeMetadata::try_from(&[][..]),
+            Err(CodeMetadataError::InvalidLength)
+        );
+        assert_eq!(
+            CodeMetadata::try_from(&[1u8, 0u8, 0u8][..]),
+            Err(CodeMetadataError::InvalidLength)
+        );
+    }
+
+    #[test]
+    fn test_try_from_invalid_bits() {
+        // 0x0001 has no defined flag in the second byte at bit 0
+        assert_eq!(
+            CodeMetadata::try_from(0x0001u16),
+            Err(CodeMetadataError::InvalidBits(0x0001))
+        );
+    }
+
     /// Translated from vm-wasm.
     #[test]
-    fn test_from_array() {
-        assert!(CodeMetadata::from([1, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([1, 0]).is_readable());
-        assert!(CodeMetadata::from([0, 2]).is_payable());
-        assert!(CodeMetadata::from([4, 0]).is_readable());
-        assert!(!CodeMetadata::from([4, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([0, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([0, 0]).is_payable());
-        assert!(!CodeMetadata::from([0, 0]).is_readable());
+    fn test_try_from_array() {
+        assert!(CodeMetadata::try_from([1u8, 0u8]).unwrap().is_upgradeable());
+        assert!(!CodeMetadata::try_from([1u8, 0u8]).unwrap().is_readable());
+        assert!(CodeMetadata::try_from([0u8, 2u8]).unwrap().is_payable());
+        assert!(CodeMetadata::try_from([4u8, 0u8]).unwrap().is_readable());
+        assert!(!CodeMetadata::try_from([4u8, 0u8]).unwrap().is_upgradeable());
+        assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_upgradeable());
+        assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_payable());
+        assert!(!CodeMetadata::try_from([0u8, 0u8]).unwrap().is_readable());
     }
 }
