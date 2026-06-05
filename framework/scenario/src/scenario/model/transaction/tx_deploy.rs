@@ -25,7 +25,7 @@ impl Default for TxDeploy {
         Self {
             from: Default::default(),
             egld_value: Default::default(),
-            code_metadata: CodeMetadata::all(),
+            code_metadata: CodeMetadata::default(),
             contract_code: Default::default(),
             arguments: Default::default(),
             gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
