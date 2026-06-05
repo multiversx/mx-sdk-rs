@@ -2,13 +2,10 @@ use crate::{
     multiversx_sc::types::heap::Address, scenario::model::ScDeployStep, scenario_model::TxResponse,
 };
 
-use multiversx_chain_vm::{
-    host::{
-        context::{TxFunctionName, TxInput, TxResult},
-        execution,
-        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
-    },
-    types::VMCodeMetadata,
+use multiversx_chain_vm::host::{
+    context::{TxFunctionName, TxInput, TxResult},
+    execution,
+    runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
 
 use super::{ScenarioVMRunner, check_tx_output, tx_input_util::generate_tx_hash};

@@ -5,14 +5,14 @@ use multiversx_chain_vm::{
         AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainState, EsdtData,
         EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
     },
-    types::VMCodeMetadata,
+    types::CodeMetadata,
 };
 use multiversx_sc::types::{TimestampMillis, TimestampSeconds};
 
 use super::ScenarioVMRunner;
 
 /// Refers to the default of the "setState" scenario step.
-pub const DEFAULT_CODE_METADATA: VMCodeMetadata = VMCodeMetadata::all();
+pub const DEFAULT_CODE_METADATA: CodeMetadata = CodeMetadata::all();
 
 impl ScenarioVMRunner {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
@@ -62,7 +62,7 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
                 .code_metadata
                 .as_ref()
                 .map(|bytes_value| {
-                    VMCodeMetadata::try_from(&bytes_value.value).expect("invalid CodeMetadata")
+                    CodeMetadata::try_from(&bytes_value.value).expect("invalid CodeMetadata")
                 })
                 .unwrap_or(DEFAULT_CODE_METADATA),
             contract_owner: account

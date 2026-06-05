@@ -3,7 +3,7 @@ use crate::{
     host::context::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
     host::execution,
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::VMCodeMetadata,
+    types::CodeMetadata,
 };
 
 use super::super::builtin_func_trait::BuiltinFunction;
@@ -33,7 +33,7 @@ impl BuiltinFunction for UpgradeContract {
         }
 
         let new_code = tx_input.args[0].clone();
-        let code_metadata = VMCodeMetadata::from_bytes_or_default(&tx_input.args[1]);
+        let code_metadata = CodeMetadata::from_bytes_or_default(&tx_input.args[1]);
 
         let args = if tx_input.args.len() > 2 {
             tx_input.args[2..].to_vec()

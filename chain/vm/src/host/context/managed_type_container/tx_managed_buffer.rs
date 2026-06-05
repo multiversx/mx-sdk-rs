@@ -1,6 +1,6 @@
 use crate::{
     host::context::{TxFunctionName, TxTokenTransfer},
-    types::{Address, RawHandle, VMCodeMetadata},
+    types::{Address, CodeMetadata, RawHandle},
 };
 
 use super::ManagedTypeContainer;
@@ -34,8 +34,8 @@ impl ManagedTypeContainer {
         TxFunctionName::from(self.mb_get(handle))
     }
 
-    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> VMCodeMetadata {
-        VMCodeMetadata::from_bytes_or_default(self.mb_get(handle))
+    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> CodeMetadata {
+        CodeMetadata::from_bytes_or_default(self.mb_get(handle))
     }
 
     pub fn mb_get_slice(
