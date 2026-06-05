@@ -107,52 +107,67 @@ impl CodeMetadata {
         *self & CodeMetadata::GUARDED != CodeMetadata::EMPTY
     }
 
+    /// Serialises the metadata to its 2-byte big-endian wire representation.
+    ///
+    /// The returned array is the canonical on-chain encoding: first byte carries
+    /// `UPGRADEABLE`, `READABLE`, and `GUARDED`; second byte carries `PAYABLE` and `PAYABLE_BY_SC`.
     #[inline]
     pub fn to_byte_array(&self) -> [u8; 2] {
         self.bits().to_be_bytes()
     }
 
+    /// Serialises the metadata to a 2-byte big-endian `Vec`.
+    ///
+    /// Convenience wrapper around [`to_byte_array`](Self::to_byte_array) for call sites
+    /// that need an owned buffer.
     pub fn to_vec(&self) -> Vec<u8> {
         self.to_byte_array().to_vec()
     }
 
-    pub fn for_each_string_token<F: FnMut(&'static str)>(&self, mut f: F) {
+    /// Calls `f` once for each token that makes up the human-readable display of these flags.
+    ///
+    /// Tokens are the flag name strings (`"Upgradeable"`, `"Readable"`, `"Guarded"`,
+    /// `"Payable"`, `"PayableBySC"`) and the `"|"` separator between them.
+    /// If no flags are set, `f` is called once with `"Default"`.
+    ///
+    /// The flag order matches the canonical display order used in scenario JSON files.
+    pub fn write_display_tokens<F: FnMut(&'static str)>(&self, mut write: F) {
         let mut nothing_printed: bool = true;
         if self.is_upgradeable() {
-            f(UPGRADEABLE_STRING);
+            write(UPGRADEABLE_STRING);
             nothing_printed = false;
         }
         if self.is_readable() {
             if !nothing_printed {
-                f("|");
+                write("|");
             }
-            f(READABLE_STRING);
+            write(READABLE_STRING);
             nothing_printed = false;
         }
         if self.is_guarded() {
             if !nothing_printed {
-                f("|");
+                write("|");
             }
-            f(GUARDED_STRING);
+            write(GUARDED_STRING);
             nothing_printed = false;
         }
         if self.is_payable() {
             if !nothing_printed {
-                f("|");
+                write("|");
             }
-            f(PAYABLE_STRING);
+            write(PAYABLE_STRING);
             nothing_printed = false;
         }
         if self.is_payable_by_sc() {
             if !nothing_printed {
-                f("|");
+                write("|");
             }
-            f(PAYABLE_BY_SC_STRING);
+            write(PAYABLE_BY_SC_STRING);
             nothing_printed = false;
         }
 
         if nothing_printed {
-            f(DEFAULT_STRING);
+            write(DEFAULT_STRING);
         }
     }
 
