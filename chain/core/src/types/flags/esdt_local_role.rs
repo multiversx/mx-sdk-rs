@@ -18,6 +18,19 @@ const ESDT_ROLE_MODIFY_CREATOR: &str = "ESDTRoleModifyCreator";
 const ESDT_ROLE_NFT_RECREATE: &str = "ESDTRoleNFTRecreate";
 const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
+/// An ESDT local role that can be granted to or revoked from an account for a specific token.
+///
+/// Each role has two canonical representations:
+/// - A **byte-string name** (e.g. `"ESDTRoleLocalMint"`) used in on-chain role
+///   assignment, decoded via `From<&[u8]>`.
+/// - A **numeric ID** (`u16`) used for `ManagedVecItem` payload encoding,
+///   accessed via [`as_u16`][EsdtLocalRole::as_u16] and decoded via `From<u16>`.
+///
+/// The numeric IDs and bit-flag positions correspond to the `Role*` iota constants
+/// in `vmhost/vmhooks/eei_helpers.go` of `mx-chain-vm-go`.
+///
+/// The declaration order matches the Go VM `iota` ordering so that the codec
+/// discriminant (declaration index) aligns with [`as_u16`][EsdtLocalRole::as_u16].
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
     None,
@@ -29,13 +42,18 @@ pub enum EsdtLocalRole {
     NftUpdateAttributes,
     NftAddUri,
     NftRecreate,
-    ModifyRoyalties,
     ModifyCreator,
+    ModifyRoyalties,
     SetNewUri,
     Transfer,
 }
 
 impl EsdtLocalRole {
+    /// Returns the numeric role ID used for `ManagedVecItem` encoding and VM-hook role flags.
+    ///
+    /// Values mirror the Go VM's `Role*` iota constants (`RoleMint = 1 << 0` …
+    /// `RoleSetNewURI = 1 << 10`). `Transfer` (12) has no counterpart in the
+    /// current Go VM. This is the inverse of `From<u16>`.
     pub fn as_u16(&self) -> u16 {
         match self {
             Self::None => 0,
@@ -54,10 +72,17 @@ impl EsdtLocalRole {
         }
     }
 
+    /// Returns the canonical byte-string name of this role (e.g. `b"ESDTRoleLocalMint"`).
+    ///
+    /// This is the format used in on-chain ESDT role grant/revoke operations.
     pub fn as_role_name(&self) -> &'static [u8] {
         self.name().as_bytes()
     }
 
+    /// Returns the canonical string name of this role (e.g. `"ESDTRoleLocalMint"`).
+    ///
+    /// This is the format used in on-chain ESDT role grant/revoke operations and
+    /// corresponds to the role-name constants in the Go VM.
     pub fn name(&self) -> &'static str {
         match self {
             Self::None => ESDT_ROLE_NONE,
@@ -76,6 +101,9 @@ impl EsdtLocalRole {
         }
     }
 
+    /// Converts this role to its corresponding bit-flag in [`EsdtLocalRoleFlags`].
+    ///
+    /// The bit position matches the Go VM's `Role*` iota constant for the same role.
     pub fn to_flag(&self) -> EsdtLocalRoleFlags {
         match self {
             Self::None => EsdtLocalRoleFlags::NONE,
@@ -106,19 +134,24 @@ const ALL_ROLES: [EsdtLocalRole; 12] = [
     EsdtLocalRole::NftUpdateAttributes,
     EsdtLocalRole::NftAddUri,
     EsdtLocalRole::NftRecreate,
-    EsdtLocalRole::ModifyRoyalties,
     EsdtLocalRole::ModifyCreator,
+    EsdtLocalRole::ModifyRoyalties,
     EsdtLocalRole::SetNewUri,
     EsdtLocalRole::Transfer,
 ];
 
 impl EsdtLocalRole {
+    /// Iterates over all non-`None` roles in canonical numeric-ID order.
     pub fn iter_all() -> core::slice::Iter<'static, EsdtLocalRole> {
         ALL_ROLES.iter()
     }
 }
 
 impl From<u16> for EsdtLocalRole {
+    /// Decodes a numeric role ID into an [`EsdtLocalRole`].
+    ///
+    /// This is the inverse of [`EsdtLocalRole::as_u16`]. Unknown values map to
+    /// [`EsdtLocalRole::None`].
     #[inline]
     fn from(value: u16) -> Self {
         match value {
@@ -130,8 +163,8 @@ impl From<u16> for EsdtLocalRole {
             6 => Self::NftUpdateAttributes,
             7 => Self::NftAddUri,
             8 => Self::NftRecreate,
-            9 => Self::ModifyRoyalties,
-            10 => Self::ModifyCreator,
+            9 => Self::ModifyCreator,
+            10 => Self::ModifyRoyalties,
             11 => Self::SetNewUri,
             12 => Self::Transfer,
             _ => Self::None,
@@ -140,6 +173,11 @@ impl From<u16> for EsdtLocalRole {
 }
 
 impl<'a> From<&'a [u8]> for EsdtLocalRole {
+    /// Decodes an ESDT role from its canonical byte-string name
+    /// (e.g. `b"ESDTRoleLocalMint"`).
+    ///
+    /// This is the primary decoding path for on-chain ESDT role data. Unknown
+    /// byte strings map to [`EsdtLocalRole::None`].
     #[inline]
     fn from(byte_slice: &'a [u8]) -> Self {
         if byte_slice == ESDT_ROLE_LOCAL_MINT.as_bytes() {
