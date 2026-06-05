@@ -11,11 +11,42 @@ const PAYABLE_BY_SC_STRING: &str = "PayableBySC";
 const DEFAULT_STRING: &str = "Default";
 
 bitflags! {
-    /// Flags representing the smart contract's allowed actions after deploy.
-    #[derive(Default, PartialEq, Debug, Clone, Copy)]
+    /// Bit-flags that govern a smart contract's permissions after deployment.
+    ///
+    /// Each flag corresponds to a protocol-level capability:
+    /// - [`UPGRADEABLE`](CodeMetadata::UPGRADEABLE) — the contract may be upgraded by its owner.
+    /// - [`READABLE`](CodeMetadata::READABLE) — other contracts may read this contract's storage.
+    /// - [`GUARDED`](CodeMetadata::GUARDED) — transactions require a second guardian signature.
+    /// - [`PAYABLE`](CodeMetadata::PAYABLE) — the contract accepts direct EGLD/ESDT transfers.
+    /// - [`PAYABLE_BY_SC`](CodeMetadata::PAYABLE_BY_SC) — the contract accepts transfers from other contracts only.
+    ///
+    /// # Wire format
+    ///
+    /// Metadata is serialised as exactly **2 big-endian bytes**. The first byte carries
+    /// `UPGRADEABLE` (bit 0), `READABLE` (bit 2), and `GUARDED` (bit 3); the second byte carries
+    /// `PAYABLE` (bit 1) and `PAYABLE_BY_SC` (bit 2).
+    ///
+    /// # Parsing
+    ///
+    /// - Use [`TryFrom<&[u8]>`] / [`TryFrom<u16>`] in **tooling and off-chain code** — these
+    ///   return [`CodeMetadataError`] on wrong-length input or unknown bits, enabling fail-closed
+    ///   validation.
+    /// - Use [`from_bytes_or_default`](CodeMetadata::from_bytes_or_default) in the **Rust VM** —
+    ///   this mirrors the lenient Go protocol implementation: wrong-length input yields
+    ///   [`EMPTY`](CodeMetadata::EMPTY) and unknown bits are silently truncated.
+    ///
+    /// # Default value
+    ///
+    /// [`Default::default()`] returns `UPGRADEABLE | READABLE | PAYABLE | PAYABLE_BY_SC`,
+    /// which is the permissive set used as a fallback in **scenario tests** when a deployed
+    /// contract's metadata field is left unset. This is intentionally *not* the zero value;
+    /// use [`EMPTY`](CodeMetadata::EMPTY) explicitly when you need all flags cleared.
+    #[derive(PartialEq, Debug, Clone, Copy)]
     pub struct CodeMetadata: u16 {
-        /// No flags set. The contract is not upgradeable, not readable, and not payable.
-        const DEFAULT = 0;
+        /// No flags set. The contract is not upgradeable, not readable, and not payable, has no guardian.
+        ///
+        /// Warning! This is not the default value, see CodeMetadata::default() for that.
+        const EMPTY = 0;
 
         /// The contract can be upgraded in the future.
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
@@ -40,31 +71,40 @@ bitflags! {
     }
 }
 
+impl Default for CodeMetadata {
+    fn default() -> Self {
+        CodeMetadata::UPGRADEABLE
+            | CodeMetadata::READABLE
+            | CodeMetadata::PAYABLE
+            | CodeMetadata::PAYABLE_BY_SC
+    }
+}
+
 impl CodeMetadata {
     /// Returns `true` if the contract is allowed to be upgraded.
     pub fn is_upgradeable(&self) -> bool {
-        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
+        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::EMPTY
     }
 
     /// Returns `true` if the contract can receive funds without an endpoint call.
     pub fn is_payable(&self) -> bool {
-        *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
+        *self & CodeMetadata::PAYABLE != CodeMetadata::EMPTY
     }
 
     /// Returns `true` if the contract can receive funds from other smart contracts
     /// without an endpoint call. Direct user transfers are rejected.
     pub fn is_payable_by_sc(&self) -> bool {
-        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
+        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::EMPTY
     }
 
     /// Returns `true` if the contract's storage can be read by other contracts.
     pub fn is_readable(&self) -> bool {
-        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
+        *self & CodeMetadata::READABLE != CodeMetadata::EMPTY
     }
 
     /// Returns `true` if the contract is guarded.
     pub fn is_guarded(&self) -> bool {
-        *self & CodeMetadata::GUARDED != CodeMetadata::DEFAULT
+        *self & CodeMetadata::GUARDED != CodeMetadata::EMPTY
     }
 
     #[inline]
@@ -118,7 +158,7 @@ impl CodeMetadata {
 
     /// Parses code metadata from a 2-byte slice, mirroring the MultiversX protocol implementation.
     ///
-    /// If the slice is not exactly 2 bytes, returns [`CodeMetadata::DEFAULT`] (all flags cleared).
+    /// If the slice is not exactly 2 bytes, returns [`CodeMetadata::EMPTY`] (all flags cleared).
     /// Unknown or reserved bits are silently ignored; only the bits corresponding to known flags
     /// are extracted.
     ///
@@ -127,7 +167,7 @@ impl CodeMetadata {
     /// where strict validation is desirable.
     pub fn from_bytes_or_default(bytes: &[u8]) -> Self {
         if bytes.len() != 2 {
-            return CodeMetadata::DEFAULT;
+            return CodeMetadata::EMPTY;
         }
         let value = u16::from_be_bytes([bytes[0], bytes[1]]);
         CodeMetadata::from_bits_truncate(value)
@@ -228,10 +268,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_default() {
-        assert!(!CodeMetadata::DEFAULT.is_upgradeable());
-        assert!(!CodeMetadata::DEFAULT.is_payable());
-        assert!(!CodeMetadata::DEFAULT.is_readable());
+    fn test_empty() {
+        assert!(!CodeMetadata::EMPTY.is_upgradeable());
+        assert!(!CodeMetadata::EMPTY.is_payable());
+        assert!(!CodeMetadata::EMPTY.is_payable_by_sc());
+        assert!(!CodeMetadata::EMPTY.is_readable());
+        assert!(!CodeMetadata::EMPTY.is_guarded());
     }
 
     #[test]

@@ -11,9 +11,6 @@ use multiversx_sc::types::{TimestampMillis, TimestampSeconds};
 
 use super::ScenarioVMRunner;
 
-/// Refers to the default of the "setState" scenario step.
-pub const DEFAULT_CODE_METADATA: CodeMetadata = CodeMetadata::all();
-
 impl ScenarioVMRunner {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
         execute(&mut self.blockchain_mock.state, set_state_step);
@@ -64,7 +61,7 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
                 .map(|bytes_value| {
                     CodeMetadata::try_from(&bytes_value.value).expect("invalid CodeMetadata")
                 })
-                .unwrap_or(DEFAULT_CODE_METADATA),
+                .unwrap_or_default(),
             contract_owner: account
                 .owner
                 .as_ref()
