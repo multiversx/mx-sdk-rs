@@ -1,7 +1,7 @@
 use multiversx_chain_core::types::{EsdtLocalRole, EsdtLocalRoleFlags};
 
 /// Every non-None role paired with its expected numeric ID, canonical name,
-/// and expected flag bit.  This is the single source of truth for all
+/// and expected flag bit. This is the single source of truth for all
 /// round-trip checks below.
 #[rustfmt::skip]
 const ROLE_TABLE: &[(EsdtLocalRole, u16, &str, EsdtLocalRoleFlags)] = &[

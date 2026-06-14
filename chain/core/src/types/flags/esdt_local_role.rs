@@ -49,11 +49,13 @@ pub enum EsdtLocalRole {
 }
 
 impl EsdtLocalRole {
-    /// Returns the numeric role ID used for `ManagedVecItem` encoding and VM-hook role flags.
+    /// Returns the 1-based ordinal role ID used for `ManagedVecItem` payload encoding.
     ///
-    /// Values mirror the Go VM's `Role*` iota constants (`RoleMint = 1 << 0` …
-    /// `RoleSetNewURI = 1 << 10`). `Transfer` (12) has no counterpart in the
-    /// current Go VM. This is the inverse of `From<u16>`.
+    /// This is a sequential index (1..=12), **not** a bitflag value. The
+    /// corresponding bitflag in [`EsdtLocalRoleFlags`] is `1 << (id - 1)`, which
+    /// aligns with the Go VM's `Role*` iota ordering in
+    /// `vmhost/vmhooks/eei_helpers.go`. `Transfer` (12) has no counterpart in
+    /// the current Go VM iota. This is the inverse of `From<u16>`.
     pub fn as_u16(&self) -> u16 {
         match self {
             Self::None => 0,
