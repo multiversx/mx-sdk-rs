@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    codec::{EncodeError, TopEncode, TopEncodeOutput},
+    codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput},
     types::{AnnotatedValue, ManagedBuffer, TxCodeValue, TxEnv},
 };
 
@@ -163,11 +163,12 @@ impl fmt::Display for BytesValue {
 }
 
 impl TopEncode for BytesValue {
-    fn top_encode<O>(&self, output: O) -> Result<(), EncodeError>
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
+        H: EncodeErrorHandler,
     {
-        self.value.top_encode(output)
+        self.value.top_encode_or_handle_err(output, h)
     }
 }
 
