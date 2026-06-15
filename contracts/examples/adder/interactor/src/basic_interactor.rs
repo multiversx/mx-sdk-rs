@@ -42,7 +42,7 @@ impl State {
 pub async fn adder_cli() {
     env_logger::init();
 
-    let mut basic_interact = BasicInteractor::new().await;
+    let mut basic_interact = BasicInteractor::new(ConfigLoader::<Config>::new(env!("CARGO_MANIFEST_DIR"))).await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -73,11 +73,11 @@ pub struct BasicInteractor {
 }
 
 impl BasicInteractor {
-    pub async fn new() -> Self {
-        let (interactor, config) = HttpInteractorBuilder::new()
-            .crate_dir(env!("CARGO_MANIFEST_DIR"))
-            .build()
-            .await;
+    pub async fn new<L: InteractorConfigLoader<LoadedConfig = Config>>(config_loader: L) -> Self {
+        let (interactor, config) =
+            Interactor::new_with_config(config_loader)
+                .await;
+        interactor.generate_blocks_until_all_activations().await;
         let state = interactor.load_state::<State>();
         BasicInteractor {
             interactor,

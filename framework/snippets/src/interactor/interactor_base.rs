@@ -1,4 +1,4 @@
-use crate::sdk::{data::network_config::NetworkConfig, wallet::Wallet};
+use crate::{InteractorConfigLoader, sdk::{data::network_config::NetworkConfig, wallet::Wallet}};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
@@ -19,7 +19,7 @@ use std::{
     time::Duration,
 };
 
-use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state};
+use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state, config::InteractorConfig};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
@@ -67,6 +67,32 @@ where
             gas_price,
             explorer_url,
         }
+    }
+
+    /// Constructs an interactor from a typed config.
+    ///
+    /// 1. Connects to the gateway described by [`InteractorConfig::connection`].
+    /// 2. Sets [`InteractorBase::current_dir`] from [`InteractorConfig::current_dir`].
+    /// 3. Registers all wallets returned by [`InteractorConfig::register_wallets`].
+    ///
+    /// Block generation (for the chain simulator) is **not** performed here; call
+    /// [`crate::InteractorBase::generate_blocks`] or
+    /// [`crate::InteractorBase::generate_blocks_until_all_activations`] afterwards if needed.
+    pub async fn new_with_config<L: InteractorConfigLoader>(config: L) -> (Self, L::LoadedConfig) {
+        let current_dir = config.current_dir();
+        let loaded = config.resolve_config();
+        let conn = loaded.connection();
+        let gateway_uri = conn.gateway_uri().to_owned();
+        let use_chain_simulator = conn.use_chain_simulator();
+        let wallets = loaded.register_wallets();
+        let mut interactor = Self::new(&gateway_uri)
+            .await
+            .use_chain_simulator(use_chain_simulator);
+        interactor.current_dir = current_dir;
+        for wallet in wallets {
+            interactor.register_wallet(wallet).await;
+        }
+        (interactor, loaded)
     }
 
     pub fn use_chain_simulator(mut self, use_chain_simulator: bool) -> Self {

@@ -19,3 +19,11 @@ pub trait InteractorConfig {
         Vec::new()
     }
 }
+
+/// A bare [`ConnectionConfig`] can be used directly as an [`InteractorConfig`]
+/// when no wallets or custom directory are needed.
+impl InteractorConfig for ConnectionConfig {
+    fn connection(&self) -> &ConnectionConfig {
+        self
+    }
+}
