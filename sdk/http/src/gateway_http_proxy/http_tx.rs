@@ -52,10 +52,10 @@ impl GatewayHttpProxy {
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
         let account = self
-            .get_account(&address.to_bech32(&network_configs.address_hrp))
+            .get_account(&address.to_bech32(network_configs.address_hrp))
             .await?;
 
-        let address_bech32 = address.to_bech32(&network_configs.address_hrp);
+        let address_bech32 = address.to_bech32(network_configs.address_hrp);
 
         Ok(ArgCreateTransaction {
             nonce: account.nonce,

@@ -1,6 +1,7 @@
 use crate::api::VmApiImpl;
 use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn getNumArguments() -> i32;
     fn getArgumentLength(id: i32) -> i32;

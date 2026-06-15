@@ -10,7 +10,7 @@ use delegation_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
     imports::*,
-    sdk::{gateway::SetStateAccount, utils::base64_decode},
+    sdk::{chain_core::std::base64_decode, gateway::SetStateAccount},
 };
 
 pub async fn delegation_sc_interact_cli() {
@@ -197,7 +197,7 @@ impl DelegateCallsInteract {
             .find(|log| log.endpoint == "SCDeploy")
             .expect("No SCDeploy log found");
 
-        let decode_deploy_address = base64_decode(deploy_log.topics[0].clone());
+        let decode_deploy_address = base64_decode(deploy_log.topics[0].clone()).unwrap();
 
         let deploy_address = Bech32Address::from(Address::from_slice(&decode_deploy_address));
         self.state.set_delegation_address(deploy_address);

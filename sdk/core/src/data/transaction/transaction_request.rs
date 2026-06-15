@@ -1,3 +1,4 @@
+use crate::wallet::WalletSignature;
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +17,7 @@ pub struct Transaction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub signature: Option<String>,
+    pub signature: Option<WalletSignature>,
     #[serde(rename = "chainID")]
     pub chain_id: String,
     pub version: u32,

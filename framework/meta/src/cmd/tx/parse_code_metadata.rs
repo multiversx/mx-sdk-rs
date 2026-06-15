@@ -5,7 +5,7 @@ use crate::cli::cli_args_tx::MetadataArgs;
 /// Build a [`CodeMetadata`] bitfield from the CLI [`MetadataArgs`] flags.
 /// Defaults match standard contract conventions: upgradeable + readable, not payable.
 pub fn parse_code_metadata(meta: &MetadataArgs) -> CodeMetadata {
-    let mut flags = CodeMetadata::DEFAULT;
+    let mut flags = CodeMetadata::EMPTY;
     if !meta.metadata_not_upgradeable {
         flags |= CodeMetadata::UPGRADEABLE;
     }

@@ -8,7 +8,7 @@ use crate::{
         BackTransfers, ManagedTypeContainer, TxErrorTrace, TxFunctionName, TxInput, TxLog, TxResult,
     },
     schedule::GasSchedule,
-    types::{Address, H256, VMCodeMetadata},
+    types::{Address, CodeMetadata, H256},
 };
 
 /// Abstracts away the borrowing of a managed types structure.
@@ -119,7 +119,7 @@ pub trait VMHooksContext: Debug {
         &mut self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit>;
 
