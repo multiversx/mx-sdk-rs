@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use multiversx_sc_snippets::{hex, sdk::utils::base64_decode};
+use multiversx_chain_core::std::base64_decode;
 
 use super::{
     output::TxOutputFile,
@@ -33,13 +33,15 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
     }
 
     let sig = wallet.sign_tx(&tx);
-    tx.signature = Some(hex::encode(sig));
+    tx.signature = Some(sig);
 
-    let decoded_data = tx
-        .data
-        .as_ref()
-        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
-        .unwrap_or_default();
+    let decoded_data = match &tx.data {
+        None => String::new(),
+        Some(d) => {
+            let bytes = base64_decode(d)?;
+            String::from_utf8_lossy(&bytes).into_owned()
+        }
+    };
 
     let output = TxOutputFile {
         emitted_transaction: tx,

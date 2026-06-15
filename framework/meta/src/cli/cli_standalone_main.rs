@@ -4,7 +4,7 @@ use crate::cmd::data::data_cli;
 use crate::cmd::retrieve_address::retrieve_address;
 use crate::cmd::scen_blackbox::scen_blackbox_tool;
 use crate::cmd::tx::tx_cli;
-use crate::cmd::wallet::wallet;
+use crate::cmd::wallet_cmd::wallet;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;

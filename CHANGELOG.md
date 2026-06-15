@@ -57,6 +57,15 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+
+### [sc 0.66.1] - 2026-06-01
+- Build fix for Rust 1.96.
+- `ManagedVecItem` implementation for time types (`TimestampMillis`, `TimestampSeconds`, `DurationMillis`, `DurationSeconds`).
+- sc-meta 
+	- Template fix for the interactor and snippets.sh associated to the downloaded contract;
+	- Fixed and edge case pertaining the rustc versioning system.
+
+
 ### [sc 0.66.0, chain 0.23.0, sdk 0.16.0, scenario-format 0.26.1] - 2026-05-21
 - Memory and thread safety:
 	- Managed type memory management: proper `Drop` implementations for managed types:

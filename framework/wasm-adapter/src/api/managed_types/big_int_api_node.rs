@@ -2,6 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{BigIntApiImpl, Sign};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn bigIntNew(value: i64) -> i32;
 

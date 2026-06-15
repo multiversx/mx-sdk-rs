@@ -17,7 +17,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
 
     // Create the interactor – fetches network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet).await;
+    let sender_address = interactor.register_wallet(wallet.clone()).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
 
     // Determine nonce.

@@ -16,7 +16,7 @@ use crate::{
         TxContextRef, TxFunctionName, TxInput, TxResult, async_call_tx_input,
     },
     host::execution,
-    types::{Address, VMCodeMetadata},
+    types::{Address, CodeMetadata},
     vm_err_msg,
 };
 
@@ -209,7 +209,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         &mut self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();

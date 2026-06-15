@@ -11,7 +11,7 @@ use crate::{
         },
         runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault, RuntimeRef},
     },
-    types::VMCodeMetadata,
+    types::CodeMetadata,
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -210,7 +210,7 @@ fn insert_ghost_account(
         username: Vec::new(),
         storage: HashMap::new(),
         contract_path: None,
-        code_metadata: VMCodeMetadata::empty(),
+        code_metadata: CodeMetadata::empty(),
         contract_owner: None,
         developer_rewards: BigUint::zero(),
     });

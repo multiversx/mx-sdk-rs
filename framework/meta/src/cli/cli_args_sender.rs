@@ -1,7 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use clap::Args;
-use multiversx_sc_snippets::sdk::{data::keystore::InsertPassword, wallet::Wallet};
-use std::path::PathBuf;
+use multiversx_sc_snippets::sdk::{wallet::Keystore, wallet::Wallet};
+use std::{io::Write, path::PathBuf};
 
 /// Wallet / sender arguments shared by commands that sign transactions.
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
@@ -24,13 +24,21 @@ pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
         Wallet::from_pem_file(pem).context("failed to load PEM wallet")
     } else if let Some(keyfile) = &sender.keyfile {
-        let insert_password = match &sender.keystore_password {
-            Some(pw) => InsertPassword::Plaintext(pw.clone()),
-            None => InsertPassword::StandardInput,
+        let password = match &sender.keystore_password {
+            Some(pw) => pw.clone(),
+            None => get_keystore_password(),
         };
-        Wallet::from_keystore_secret(keyfile, insert_password)
+        let keystore = Keystore::from_file(keyfile)?;
+        keystore
+            .decrypt_wallet(&password)
             .context("failed to load keystore wallet")
     } else {
         Err(anyhow!("a wallet is required: use --pem or --keyfile"))
     }
+}
+
+pub fn get_keystore_password() -> String {
+    print!("Insert password: ");
+    std::io::stdout().flush().unwrap();
+    rpassword::read_password().unwrap()
 }

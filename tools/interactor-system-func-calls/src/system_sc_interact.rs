@@ -11,7 +11,7 @@ use system_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
     imports::*,
-    sdk::{data::esdt::EsdtBalance, utils::base64_decode},
+    sdk::{chain_core::std::base64_decode, data::esdt::EsdtBalance},
 };
 
 pub async fn system_sc_interact_cli() {
@@ -1029,7 +1029,7 @@ impl SysFuncCallsInteract {
 
         assert_eq!(expected_uris.len(), uris.len());
         for (index, uri) in uris.iter().enumerate() {
-            let uri_string = String::from_utf8(base64_decode(uri)).unwrap();
+            let uri_string = String::from_utf8(base64_decode(uri).unwrap()).unwrap();
             assert_eq!(expected_uris[index], uri_string);
         }
     }
