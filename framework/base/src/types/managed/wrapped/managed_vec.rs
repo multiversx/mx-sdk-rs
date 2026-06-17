@@ -1,7 +1,7 @@
 use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi, ManagedTypeApiImpl},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
@@ -675,7 +675,7 @@ where
             let (dedup, tail) = slice.split_at_mut(next_write);
             // Drop the duplicate items moved into the tail, so their handles are freed
             // before the buffer is truncated to the dedup length.
-            if T::requires_drop() {
+            if T::requires_drop() && M::managed_type_impl().requires_managed_type_drop() {
                 for tail_item in tail.iter() {
                     unsafe {
                         let item = T::read_from_payload(&tail_item.encoded);
@@ -780,7 +780,7 @@ where
 {
     unsafe fn drop_items(&mut self) {
         unsafe {
-            if T::requires_drop() {
+            if T::requires_drop() && M::managed_type_impl().requires_managed_type_drop() {
                 let iter = ManagedVecPayloadIterator::<M, T::PAYLOAD>::new(self.get_handle());
                 for payload in iter {
                     let item = T::read_from_payload(&payload);
