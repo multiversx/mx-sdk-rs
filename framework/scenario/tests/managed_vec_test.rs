@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use multiversx_sc::types::{BigUint, ManagedBuffer, ManagedRef, ManagedVec};
-use multiversx_sc_scenario::api::StaticApi;
+use multiversx_sc_scenario::api::{DebugApi, StaticApi};
 
 #[test]
 fn test_managed_vec_iter_rev() {
@@ -782,6 +782,36 @@ fn test_slice_biguint() {
 
     // out of range
     assert!(vec.slice(3, 10).is_none());
+}
+
+#[test]
+fn test_slice_biguint_debug_api() {
+    // Keep this test on the DebugApi stack, where managed-type dropping semantics
+    // differ from StaticApi and previously exposed slice aliasing issues.
+    DebugApi::dummy();
+
+    let mut vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    let mut sliced = vec.slice(1, 4).unwrap();
+    assert_eq!(sliced.len(), 3);
+    assert_eq!(*sliced.get(0), BigUint::from(2u64));
+    assert_eq!(*sliced.get(1), BigUint::from(3u64));
+    assert_eq!(*sliced.get(2), BigUint::from(4u64));
+
+    // Mutating the slice must not mutate the source collection.
+    {
+        let mut first_sliced = sliced.get_mut(0);
+        *first_sliced += &BigUint::from(100u64);
+    }
+    assert_eq!(*sliced.get(0), BigUint::from(102u64));
+
+    // Original is intact after slicing and after mutating the slice.
+    assert_eq!(vec.len(), 5);
+    assert_eq!(*vec.get(0), BigUint::from(1u64));
+    assert_eq!(*vec.get(1), BigUint::from(2u64));
 }
 
 #[test]
