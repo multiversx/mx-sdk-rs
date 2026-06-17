@@ -556,6 +556,48 @@ fn test_append_vec() {
 }
 
 #[test]
+fn test_clone_u32_non_drop_path() {
+    assert!(!<u32 as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, u32>::new();
+    original.push(10u32);
+    original.push(20u32);
+    original.push(30u32);
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    let old = cloned.set(1, 99u32).unwrap();
+    assert_eq!(old, 20u32);
+
+    // Mutating the clone must not affect the source.
+    assert_eq!(cloned.get(1), 99u32);
+    assert_eq!(original.get(1), 20u32);
+}
+
+#[test]
+fn test_clone_biguint_drop_path() {
+    assert!(<BigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    original.push(BigUint::from(10u64));
+    original.push(BigUint::from(20u64));
+    original.push(BigUint::from(30u64));
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    {
+        let mut first = cloned.get_mut(0);
+        *first += 100u64;
+    }
+
+    // Clone changes are independent from source for managed, drop-requiring types too.
+    assert_eq!(*cloned.get(0), BigUint::from(110u64));
+    assert_eq!(*original.get(0), BigUint::from(10u64));
+}
+
+#[test]
 fn test_overwrite_with_single_item() {
     let mut vec = Vec::new();
     for i in 20u64..=30u64 {

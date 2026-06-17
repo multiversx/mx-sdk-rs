@@ -694,6 +694,10 @@ where
     T: ManagedVecItem + Clone,
 {
     fn clone(&self) -> Self {
+        if !T::requires_drop() {
+            return ManagedVec::new_from_raw_buffer(self.buffer.clone());
+        }
+
         let mut result = ManagedVec::new();
         for item in self.into_iter() {
             result.push(item.borrow().clone())
