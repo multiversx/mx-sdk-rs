@@ -292,13 +292,26 @@ where
         Ok(old_item)
     }
 
-    /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
-    /// Returns `None` if any index is out of range.
+    /// Returns a new `ManagedVec` containing the elements in the half-open range
+    /// `[start_index, end_index)`. Returns `None` if the range is invalid
+    /// (`start_index > end_index` or `end_index > self.len()`).
     ///
-    /// Note: for managed types that require handle-level drop (e.g. under `StaticApi`),
-    /// this performs a deep copy of each item so that both the original and the slice
-    /// hold independently owned handles.
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    /// ## Cloning strategy
+    ///
+    /// The implementation chooses between two paths based on whether `T` owns
+    /// VM-level resources (i.e. `T::requires_drop()`):
+    ///
+    /// - **Copy-like types** (`T::requires_drop() == false`, e.g. `u32`, `u64`,
+    ///   fixed-size structs of plain integers): the relevant slice of the underlying
+    ///   managed buffer is copied in a single VM call. No per-item work is done.
+    ///
+    /// - **Handle-owning types** (`T::requires_drop() == true`, e.g. `BigUint`,
+    ///   `ManagedBuffer`, or any struct containing them): copying raw bytes would
+    ///   alias the integer handles stored in the payload, causing both the original
+    ///   vec and the returned vec to attempt freeing the same VM object on drop
+    ///   (double-free). Instead each item in the range is cloned individually,
+    ///   allocating a fresh independent VM object for every element.
+    pub fn clone_range(&self, start_index: usize, end_index: usize) -> Option<Self>
     where
         T: Clone,
     {
@@ -323,6 +336,15 @@ where
         }
     }
 
+    /// Deprecated alias for [`clone_range`].
+    #[deprecated(since = "0.66.2", note = "Please use method `clone_range` instead.")]
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    where
+        T: Clone,
+    {
+        self.clone_range(start_index, end_index)
+    }
+
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
     /// Returns `None` if any index is out of range.
     ///
@@ -331,7 +353,7 @@ where
     /// Only safe when `T::requires_drop() == false` (e.g. all non-`StaticApi` backends).
     /// In all other cases, both the original vec and the returned slice will hold aliased
     /// handle integers, and both will attempt to free those handles on drop — causing a
-    /// double-free. Use the safe [`slice`] method instead.
+    /// double-free. Use the safe [`clone_range`] method instead.
     unsafe fn slice_no_copy_unchecked(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::payload_size();
         let byte_end = end_index * T::payload_size();
