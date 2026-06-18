@@ -11,5 +11,5 @@ name = "strip-path"
 path = "src/main.rs"
 
 [dependencies.multiversx-sc-meta]
-version = "0.66.1"
+version = "0.66.2"
 path = "../../framework/meta"
