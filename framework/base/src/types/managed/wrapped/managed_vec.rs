@@ -350,9 +350,10 @@ where
     ///
     /// # Safety
     ///
-    /// Only safe when `T::requires_drop() == false` (e.g. all non-`StaticApi` backends).
-    /// In all other cases, both the original vec and the returned slice will hold aliased
-    /// handle integers, and both will attempt to free those handles on drop — causing a
+    /// Only safe when `T::requires_drop() == false` (i.e. `T` stores no VM-level handles —
+    /// plain integers, fixed-size POD structs, etc.). When `T::requires_drop() == true`,
+    /// copying raw bytes aliases the handle integers stored in the payload; both the original
+    /// vec and the returned vec will attempt to free the same VM objects on drop, causing a
     /// double-free. Use the safe [`clone_range`] method instead.
     unsafe fn slice_no_copy_unchecked(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::payload_size();
