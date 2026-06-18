@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use multiversx_sc::types::{BigUint, ManagedBuffer, ManagedRef, ManagedVec};
-use multiversx_sc_scenario::api::StaticApi;
+use multiversx_sc_scenario::api::{DebugApi, StaticApi};
 
 #[test]
 fn test_managed_vec_iter_rev() {
@@ -556,6 +556,48 @@ fn test_append_vec() {
 }
 
 #[test]
+fn test_clone_u32_non_drop_path() {
+    assert!(!<u32 as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, u32>::new();
+    original.push(10u32);
+    original.push(20u32);
+    original.push(30u32);
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    let old = cloned.set(1, 99u32).unwrap();
+    assert_eq!(old, 20u32);
+
+    // Mutating the clone must not affect the source.
+    assert_eq!(cloned.get(1), 99u32);
+    assert_eq!(original.get(1), 20u32);
+}
+
+#[test]
+fn test_clone_biguint_drop_path() {
+    assert!(<BigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    original.push(BigUint::from(10u64));
+    original.push(BigUint::from(20u64));
+    original.push(BigUint::from(30u64));
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    {
+        let mut first = cloned.get_mut(0);
+        *first += 100u64;
+    }
+
+    // Clone changes are independent from source for managed, drop-requiring types too.
+    assert_eq!(*cloned.get(0), BigUint::from(110u64));
+    assert_eq!(*original.get(0), BigUint::from(10u64));
+}
+
+#[test]
 fn test_overwrite_with_single_item() {
     let mut vec = Vec::new();
     for i in 20u64..=30u64 {
@@ -742,7 +784,7 @@ fn test_slice_u32() {
         vec.push(i);
     }
 
-    let sliced = vec.slice(1, 4).unwrap();
+    let sliced = vec.clone_range(1, 4).unwrap();
     assert_eq!(sliced.len(), 3);
     assert_eq!(sliced.get(0), 2u32);
     assert_eq!(sliced.get(1), 3u32);
@@ -752,14 +794,14 @@ fn test_slice_u32() {
     assert_eq!(vec.len(), 5);
 
     // empty slice (start == end)
-    let empty = vec.slice(2, 2).unwrap();
+    let empty = vec.clone_range(2, 2).unwrap();
     assert!(empty.is_empty());
 
     // out of range
-    assert!(vec.slice(3, 10).is_none());
+    assert!(vec.clone_range(3, 10).is_none());
 
     // full slice
-    let full = vec.slice(0, 5).unwrap();
+    let full = vec.clone_range(0, 5).unwrap();
     assert_eq!(full.len(), 5);
 }
 
@@ -770,7 +812,7 @@ fn test_slice_biguint() {
         vec.push(BigUint::from(i));
     }
 
-    let sliced = vec.slice(1, 4).unwrap();
+    let sliced = vec.clone_range(1, 4).unwrap();
     assert_eq!(sliced.len(), 3);
     assert_eq!(*sliced.get(0), BigUint::from(2u64));
     assert_eq!(*sliced.get(1), BigUint::from(3u64));
@@ -781,7 +823,37 @@ fn test_slice_biguint() {
     assert_eq!(*vec.get(0), BigUint::from(1u64));
 
     // out of range
-    assert!(vec.slice(3, 10).is_none());
+    assert!(vec.clone_range(3, 10).is_none());
+}
+
+#[test]
+fn test_slice_biguint_debug_api() {
+    // Keep this test on the DebugApi stack, where managed-type dropping semantics
+    // differ from StaticApi and previously exposed slice aliasing issues.
+    DebugApi::dummy();
+
+    let mut vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    let mut sliced = vec.clone_range(1, 4).unwrap();
+    assert_eq!(sliced.len(), 3);
+    assert_eq!(*sliced.get(0), BigUint::from(2u64));
+    assert_eq!(*sliced.get(1), BigUint::from(3u64));
+    assert_eq!(*sliced.get(2), BigUint::from(4u64));
+
+    // Mutating the slice must not mutate the source collection.
+    {
+        let mut first_sliced = sliced.get_mut(0);
+        *first_sliced += &BigUint::from(100u64);
+    }
+    assert_eq!(*sliced.get(0), BigUint::from(102u64));
+
+    // Original is intact after slicing and after mutating the slice.
+    assert_eq!(vec.len(), 5);
+    assert_eq!(*vec.get(0), BigUint::from(1u64));
+    assert_eq!(*vec.get(1), BigUint::from(2u64));
 }
 
 #[test]
@@ -792,27 +864,27 @@ fn test_slice_out_of_bounds_u32() {
     }
 
     // end > len
-    assert!(vec.slice(0, 6).is_none());
-    assert!(vec.slice(3, 6).is_none());
+    assert!(vec.clone_range(0, 6).is_none());
+    assert!(vec.clone_range(3, 6).is_none());
 
     // start > end
-    assert!(vec.slice(3, 2).is_none());
-    assert!(vec.slice(5, 1).is_none());
+    assert!(vec.clone_range(3, 2).is_none());
+    assert!(vec.clone_range(5, 1).is_none());
 
     // start == end == len is a valid empty slice, not out of bounds
-    assert!(vec.slice(5, 5).is_some());
-    assert!(vec.slice(5, 5).unwrap().is_empty());
+    assert!(vec.clone_range(5, 5).is_some());
+    assert!(vec.clone_range(5, 5).unwrap().is_empty());
 
     // start > len
-    assert!(vec.slice(6, 6).is_none());
+    assert!(vec.clone_range(6, 6).is_none());
 
     // empty vec
     let empty = ManagedVec::<StaticApi, u32>::new();
-    assert!(empty.slice(0, 1).is_none());
-    assert!(empty.slice(1, 0).is_none());
+    assert!(empty.clone_range(0, 1).is_none());
+    assert!(empty.clone_range(1, 0).is_none());
     // empty slice from empty vec is valid
-    assert!(empty.slice(0, 0).is_some());
-    assert!(empty.slice(0, 0).unwrap().is_empty());
+    assert!(empty.clone_range(0, 0).is_some());
+    assert!(empty.clone_range(0, 0).unwrap().is_empty());
 }
 
 #[test]
@@ -823,27 +895,27 @@ fn test_slice_out_of_bounds_biguint() {
     }
 
     // end > len
-    assert!(vec.slice(0, 6).is_none());
-    assert!(vec.slice(3, 6).is_none());
+    assert!(vec.clone_range(0, 6).is_none());
+    assert!(vec.clone_range(3, 6).is_none());
 
     // start > end
-    assert!(vec.slice(3, 2).is_none());
-    assert!(vec.slice(5, 1).is_none());
+    assert!(vec.clone_range(3, 2).is_none());
+    assert!(vec.clone_range(5, 1).is_none());
 
     // start == end == len is a valid empty slice, not out of bounds
-    assert!(vec.slice(5, 5).is_some());
-    assert!(vec.slice(5, 5).unwrap().is_empty());
+    assert!(vec.clone_range(5, 5).is_some());
+    assert!(vec.clone_range(5, 5).unwrap().is_empty());
 
     // start > len
-    assert!(vec.slice(6, 6).is_none());
+    assert!(vec.clone_range(6, 6).is_none());
 
     // empty vec
     let empty = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
-    assert!(empty.slice(0, 1).is_none());
-    assert!(empty.slice(1, 0).is_none());
+    assert!(empty.clone_range(0, 1).is_none());
+    assert!(empty.clone_range(1, 0).is_none());
     // empty slice from empty vec is valid
-    assert!(empty.slice(0, 0).is_some());
-    assert!(empty.slice(0, 0).unwrap().is_empty());
+    assert!(empty.clone_range(0, 0).is_some());
+    assert!(empty.clone_range(0, 0).unwrap().is_empty());
 }
 
 #[test]
