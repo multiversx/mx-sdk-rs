@@ -1,11 +1,8 @@
 use std::fs;
 
 use anyhow::{Context, Result};
-use multiversx_sc_snippets::{
-    hex,
-    imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction},
-    sdk::utils::{base64_decode, base64_encode},
-};
+use multiversx_chain_core::std::{base64_decode, base64_encode};
+use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
 use crate::cmd::tx::tx_cli_common::load_wallet;
@@ -29,7 +26,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet).await;
+    let sender_address = interactor.register_wallet(wallet.clone()).await;
     let sender = sender_address.to_bech32(interactor.get_hrp());
 
     // Determine nonce (explicit override or recalled from network).
@@ -56,11 +53,13 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
 
     // Decode the data field for the human-readable output.
-    let decoded_data = tx
-        .data
-        .as_ref()
-        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
-        .unwrap_or_default();
+    let decoded_data = match &tx.data {
+        None => String::new(),
+        Some(d) => {
+            let bytes = base64_decode(d)?;
+            String::from_utf8_lossy(&bytes).into_owned()
+        }
+    };
     tx.nonce = nonce;
     if let Some(gas_price) = args.tx.gas_price {
         tx.gas_price = gas_price;
@@ -70,7 +69,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
 
     let sig = wallet.sign_tx(&tx);
-    tx.signature = Some(hex::encode(sig));
+    tx.signature = Some(sig);
 
     let output = TxOutputFile {
         emitted_transaction: tx,

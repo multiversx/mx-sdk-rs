@@ -1,5 +1,5 @@
 use anyhow::Result;
-use multiversx_sc_snippets::sdk::utils::base64_decode;
+use multiversx_chain_core::std::base64_decode;
 
 use super::{
     output::TxOutputFile,
@@ -17,11 +17,13 @@ pub async fn tx_send(args: &SendArgs) {
 async fn tx_send_inner(args: &SendArgs) -> Result<()> {
     let tx = load_transaction_from_file(&args.infile)?;
 
-    let decoded_data = tx
-        .data
-        .as_ref()
-        .map(|d| String::from_utf8_lossy(&base64_decode(d)).into_owned())
-        .unwrap_or_default();
+    let decoded_data = match &tx.data {
+        None => String::new(),
+        Some(d) => {
+            let bytes = base64_decode(d)?;
+            String::from_utf8_lossy(&bytes).into_owned()
+        }
+    };
 
     let output = TxOutputFile {
         emitted_transaction: tx,

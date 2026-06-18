@@ -3075,7 +3075,7 @@ dependencies = [
 
 [[package]]
 name = "multisig"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3115,12 +3115,16 @@ checksum = "049721bdb4abb82202cf8d9b7981ef0c080615b7cb4ef2de345694a5329f1216"
 name = "multiversx-chain-core"
 version = "0.23.1"
 dependencies = [
+ "base64",
  "bech32",
  "bitflags 2.11.1",
  "blake2",
+ "ed25519-dalek",
  "hex",
+ "hex-literal",
  "multiversx-sc-codec",
  "serde",
+ "serde_json",
  "sha2 0.11.0",
  "sha3",
 ]
@@ -3145,7 +3149,6 @@ dependencies = [
  "anyhow",
  "bitflags 2.11.1",
  "colored 3.1.1",
- "ed25519-dalek",
  "hex",
  "itertools 0.14.0",
  "log",
@@ -3212,10 +3215,38 @@ dependencies = [
  "bitflags 2.11.1",
  "generic-array 1.4.3",
  "multiversx-chain-core",
+ "multiversx-sc-abi",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
  "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi"
+version = "0.25.0"
+dependencies = [
+ "bitflags 2.11.1",
+ "multiversx-chain-core",
+ "multiversx-sc-codec",
+ "num-bigint",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive"
+version = "0.25.0"
+dependencies = [
+ "multiversx-sc-abi-derive-common",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive-common"
+version = "0.25.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.117",
 ]
 
 [[package]]
@@ -3252,7 +3283,7 @@ dependencies = [
 name = "multiversx-sc-derive"
 version = "0.66.2"
 dependencies = [
- "hex",
+ "multiversx-sc-abi-derive-common",
  "proc-macro2",
  "quote",
  "radix_trie",
@@ -3264,7 +3295,6 @@ name = "multiversx-sc-meta"
 version = "0.66.2"
 dependencies = [
  "anyhow",
- "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3280,8 +3310,10 @@ dependencies = [
  "multiversx-sc-snippets",
  "multiversx-sdk",
  "pathdiff",
+ "rand 0.10.1",
  "regex",
  "reqwest",
+ "rpassword",
  "ruplacer",
  "semver",
  "serde",
@@ -3289,6 +3321,7 @@ dependencies = [
  "serial_test",
  "tokio",
  "toml",
+ "uuid",
  "zip",
 ]
 
@@ -3376,7 +3409,6 @@ version = "0.16.1"
 dependencies = [
  "aes",
  "anyhow",
- "base64",
  "bip39",
  "ctr",
  "hex",
@@ -3386,15 +3418,12 @@ dependencies = [
  "multiversx-chain-core",
  "pbkdf2",
  "pem",
- "rand 0.10.1",
- "rpassword",
  "scrypt",
  "serde",
  "serde_json",
  "serde_repr",
  "sha2 0.11.0",
  "sha3",
- "uuid",
  "zeroize",
 ]
 

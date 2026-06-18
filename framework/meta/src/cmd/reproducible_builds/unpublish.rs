@@ -1,6 +1,5 @@
 use std::io::{self, Write};
 
-use hex::ToHex;
 use multiversx_sc_snippets::imports::Bech32Address;
 
 use crate::cli::ReproducibleBuildUnpublishArgs;
@@ -38,11 +37,10 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
 
     // Sign using the same MultiversX message signing protocol as verify.
     let bytes_to_sign = compute_bytes_for_signing(&contract, &payload);
-    let signature: [u8; 64] = wallet.sign_bytes(bytes_to_sign);
-    let signature_hex: String = signature.encode_hex();
+    let signature = wallet.sign_bytes(bytes_to_sign);
 
     let request_body = serde_json::json!({
-        "signature": signature_hex,
+        "signature": signature,
         "payload": payload_obj,
     });
 
