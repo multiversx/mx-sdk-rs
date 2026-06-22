@@ -11,18 +11,16 @@ fn chain_simulator_config() -> Config {
     }
 }
 
-// async fn test_interactor() -> BasicInteractor {
-//     let (interactor, config) = HttpInteractorBuilder::new()
-//         .crate_dir(env!("CARGO_MANIFEST_DIR"))
-//         .with_config(chain_simulator_config())
-//         .build()
-//         .await;
-//     BasicInteractor {
-//         interactor,
-//         config,
-//         state: multiversx_sc_snippets::AutoSave::no_save_default(),
-//     }
-// }
+async fn test_interactor() -> BasicInteractor {
+    let (interactor, config) =
+        Interactor::new_with_config(InteractorConfigLoader::Direct(chain_simulator_config())).await;
+    interactor.generate_blocks_until_all_activations().await;
+    BasicInteractor {
+        interactor,
+        config,
+        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+    }
+}
 
 #[tokio::test]
 #[serial]
@@ -76,7 +74,8 @@ async fn simulator_upgrade_test() {
 async fn set_state_cs_test() {
     let account_address = test_wallets::mike();
 
-    let real_chain_interact = BasicInteractor::new(chain_simulator_config()).await;
+    let real_chain_interact =
+        BasicInteractor::new(InteractorConfigLoader::Direct(chain_simulator_config())).await;
     let simulator_interact = test_interactor().await;
 
     let account = real_chain_interact
@@ -118,7 +117,8 @@ async fn set_state_from_file_cs_test() {
     let account_address = test_wallets::mike();
     let account_address_2 = test_wallets::ivan();
 
-    let mut real_chain_interact = BasicInteractor::new(chain_simulator_config()).await;
+    let mut real_chain_interact =
+        BasicInteractor::new(InteractorConfigLoader::Direct(chain_simulator_config())).await;
     let simulator_interact = test_interactor().await;
 
     // now we should have current mike account in the set state file
@@ -162,7 +162,8 @@ async fn set_state_overwrite_cs_test() {
     let account_address = test_wallets::mike();
     let account_address_2 = test_wallets::ivan();
 
-    let mut real_chain_interact = BasicInteractor::new(chain_simulator_config()).await;
+    let mut real_chain_interact =
+        BasicInteractor::new(InteractorConfigLoader::Direct(chain_simulator_config())).await;
     let simulator_interact = test_interactor().await;
 
     // now we should have current mike and ivan accounts in the set state file

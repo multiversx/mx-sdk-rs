@@ -1,4 +1,7 @@
-use crate::{InteractorConfigLoader, sdk::{data::network_config::NetworkConfig, wallet::Wallet}};
+use crate::{
+    config::InteractorConfigLoader,
+    sdk::{data::network_config::NetworkConfig, wallet::Wallet},
+};
 use multiversx_sc_scenario::{
     imports::{Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
@@ -19,7 +22,9 @@ use std::{
     time::Duration,
 };
 
-use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state, config::InteractorConfig};
+use crate::{
+    Sender, account_tool::retrieve_account_as_scenario_set_state, config::InteractorConfig,
+};
 
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
@@ -69,18 +74,40 @@ where
         }
     }
 
-    /// Constructs an interactor from a typed config.
+    /// Constructs an interactor from an enum config source.
     ///
-    /// 1. Connects to the gateway described by [`InteractorConfig::connection`].
-    /// 2. Sets [`InteractorBase::current_dir`] from [`InteractorConfig::current_dir`].
-    /// 3. Registers all wallets returned by [`InteractorConfig::register_wallets`].
+    /// It accepts [`crate::config::InteractorConfigLoader`] so callers can choose
+    /// config source at runtime:
+    ///
+    /// - [`crate::config::InteractorConfigLoader::Direct`]: use an already-built config.
+    /// - [`crate::config::InteractorConfigLoader::FromFile`]: load config from a TOML file path.
+    /// - [`crate::config::InteractorConfigLoader::FromDir`]: load `config.toml` from a directory.
+    ///
+    /// Behavior:
+    ///
+    /// 1. Resolve `(current_dir, config)` from the enum source.
+    /// 2. Connect to `config.connection().gateway_uri()`.
+    /// 3. Apply `use_chain_simulator(config.connection().use_chain_simulator())`.
+    /// 4. Set [`InteractorBase::current_dir`] to the resolved directory.
+    /// 5. Register all wallets from `config.register_wallets()`.
+    ///
+    /// Returns both the constructed interactor and the resolved config `(Self, C)`.
     ///
     /// Block generation (for the chain simulator) is **not** performed here; call
     /// [`crate::InteractorBase::generate_blocks`] or
     /// [`crate::InteractorBase::generate_blocks_until_all_activations`] afterwards if needed.
-    pub async fn new_with_config<L: InteractorConfigLoader>(config: L) -> (Self, L::LoadedConfig) {
-        let current_dir = config.current_dir();
-        let loaded = config.resolve_config();
+    ///
+    /// # Panics
+    ///
+    /// May panic when loading config from disk (`FromFile` / `FromDir`) if the file
+    /// cannot be opened/read or parsed as TOML into `C`. Panic messages include file
+    /// paths for easier diagnostics.
+    pub async fn new_with_config<C>(config_source: InteractorConfigLoader<C>) -> (Self, C)
+    where
+        C: InteractorConfig + serde::de::DeserializeOwned,
+    {
+        let (current_dir, loaded) = config_source.resolve_with_current_dir();
+
         let conn = loaded.connection();
         let gateway_uri = conn.gateway_uri().to_owned();
         let use_chain_simulator = conn.use_chain_simulator();
