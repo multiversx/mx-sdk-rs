@@ -15,10 +15,8 @@ impl ComposabilityInteract {
         let gateway_config = &config.gateway;
         let mut interactor = Interactor::new(&gateway_config.uri)
             .await
-            .use_chain_simulator(gateway_config.use_chain_simulator());
-        interactor.set_current_dir_from_workspace(
-            "contracts/feature-tests/composability/mesh-interactor",
-        );
+            .use_chain_simulator(gateway_config.use_chain_simulator())
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let shard_wallet_addresses = [
             interactor
                 .register_wallet(test_wallets::for_shard(0u32.into()))

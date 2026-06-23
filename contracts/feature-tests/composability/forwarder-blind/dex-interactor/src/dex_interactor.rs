@@ -113,11 +113,10 @@ pub struct ContractInteract {
 
 impl ContractInteract {
     pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri()).await;
+        let mut interactor = Interactor::new(config.gateway_uri())
+            .await
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         interactor.gas_price *= 25;
-        interactor.set_current_dir_from_workspace(
-            "contracts/feature-tests/composability/forwarder-blind/dex-interactor",
-        );
 
         let wallet_addresses: Vec<Bech32Address> = if config.wallet_pem_paths.is_empty() {
             println!("WARNING: no wallet_pem_paths configured — all operations will be skipped.");

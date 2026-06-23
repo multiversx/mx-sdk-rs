@@ -88,10 +88,10 @@ impl MultisigInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"))
             .use_chain_simulator(config.use_chain_simulator())
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        interactor.set_current_dir_from_workspace("contracts/examples/multisig/interact");
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
         let multisig_code = BytesValue::interpret_from(
             "mxsc:../output/multisig.mxsc.json",
