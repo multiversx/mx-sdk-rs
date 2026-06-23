@@ -29,13 +29,42 @@ const DEFAULT_CONFIG_FILE_NAME: &str = "config.toml";
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
 
+/// Holds the gateway connection and chain network configuration together.
+///
+/// `proxy` and `network_config` are always obtained from the same gateway call, so
+/// they are stored as a unit in [`InteractorBase::connection`] and are either both
+/// present or both absent.
+pub struct InteractorConnection<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    /// The async gateway used to communicate with the blockchain network.
+    pub proxy: GatewayProxy,
+    /// Chain-level parameters (chain ID, gas price, HRP, …) fetched from the gateway.
+    pub network_config: NetworkConfig,
+}
+
+/// Core interactor state shared across all contract-specific interactors.
+///
+/// An `InteractorBase` is created in two phases:
+///
+/// 1. **Construction** – call [`Self::empty`] (or [`Self::new`] for the
+///    backwards-compatible path) to obtain an instance whose gateway fields are
+///    still uninitialised.
+/// 2. **Initialisation** – connect to a gateway via [`Self::with_connection`] or
+///    load a full typed config via [`Self::load_config`] /
+///    [`Self::load_config_toml`] / [`Self::load_config_from_file`].
+///
+/// Once initialised the interactor exposes helpers for sending transactions,
+/// querying state, registering wallets, managing chain-simulator blocks, and
+/// persisting/restoring account state to/from disk.
 pub struct InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub proxy: Option<GatewayProxy>,
+    /// Gateway proxy and network config, initialised together by [`Self::with_connection`].
+    connection: Option<InteractorConnection<GatewayProxy>>,
     pub use_chain_simulator: bool,
-    pub network_config: Option<NetworkConfig>,
     pub sender_map: HashMap<Address, Sender>,
     pub gas_price: u64,
 
@@ -56,9 +85,8 @@ where
     /// Use [`Self::with_connection`] to initialize gateway-dependent fields.
     pub fn empty() -> Self {
         Self {
-            proxy: None,
+            connection: None,
             use_chain_simulator: false,
-            network_config: None,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
             pre_runners: ScenarioRunnerList::empty(),
@@ -83,8 +111,8 @@ where
     /// Initializes gateway-specific fields from a gateway URI.
     ///
     /// This sets:
-    /// - `proxy`
-    /// - `network_config`
+    /// - `connection.proxy`
+    /// - `connection.network_config`
     /// - `gas_price`
     /// - `explorer_url`
     async fn init_connection(&mut self, gateway_uri: &str) {
@@ -95,17 +123,19 @@ where
             .expect("could not get network config");
         self.gas_price = network_config.min_gas_price;
         self.explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
-        self.network_config = Some(network_config);
-        self.proxy = Some(proxy);
+        self.connection = Some(InteractorConnection {
+            proxy,
+            network_config,
+        });
     }
 
     /// Ensures config-loading initialization runs only once.
     ///
     /// # Panics
     ///
-    /// Panics if connection fields are already initialized.
+    /// Panics if connection is already initialized.
     fn assert_uninitialized_for_config_loading(&self) {
-        if self.proxy.is_some() || self.network_config.is_some() {
+        if self.connection.is_some() {
             panic!(
                 "interactor connection already initialized; config loading must be called only on an uninitialized interactor"
             );
@@ -189,9 +219,13 @@ where
     ///
     /// Panics if connection has not been initialized.
     pub fn proxy(&self) -> &GatewayProxy {
-        self.proxy.as_ref().expect(
+        &self
+            .connection
+            .as_ref()
+            .expect(
             "interactor proxy is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-        )
+            )
+            .proxy
     }
 
     /// Returns the initialized network configuration.
@@ -200,9 +234,13 @@ where
     ///
     /// Panics if connection has not been initialized.
     pub fn network_config(&self) -> &NetworkConfig {
-        self.network_config.as_ref().expect(
+        &self
+            .connection
+            .as_ref()
+            .expect(
             "interactor network_config is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-        )
+            )
+            .network_config
     }
 
     /// Enables or disables chain-simulator mode.
