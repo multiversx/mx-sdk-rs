@@ -64,12 +64,10 @@ pub struct TinyInteractor {
 
 impl TinyInteractor {
     pub async fn new() -> Self {
-        let (interactor, config) = HttpInteractorBuilder::new()
-            .crate_dir(env!("CARGO_MANIFEST_DIR"))
-            .build()
-            .await;
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
         let state = interactor.load_state::<State>();
-        TinyInteractor {
+        Self {
             interactor,
             config,
             state,

@@ -76,14 +76,10 @@ pub struct BasicFeaturesInteract {
 
 impl BasicFeaturesInteract {
     pub async fn init() -> Self {
-        let (interactor, config) = HttpInteractorBuilder::<Config>::new()
-            .crate_dir(env!("CARGO_MANIFEST_DIR"))
-            .build()
-            .await;
-        let interactor = interactor.with_tracer(INTERACTOR_SCENARIO_TRACE_PATH).await;
-        interactor.generate_blocks_until_all_activations().await;
-        let wallet_address = config.wallet.address();
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
         let state = interactor.load_state::<State>();
+        let wallet_address = config.wallet.address();
         Self {
             interactor,
             wallet_address,

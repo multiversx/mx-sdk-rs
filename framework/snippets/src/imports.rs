@@ -11,7 +11,7 @@ pub use crate::sdk::{test_wallets, validator::Validator, wallet::Wallet};
 pub use env_logger;
 
 #[cfg(feature = "http")]
-pub use crate::{HttpInteractor, HttpInteractorBuilder, Interactor};
+pub use crate::{HttpInteractor, Interactor};
 
 #[cfg(feature = "http")]
 pub use multiversx_sdk_http::GatewayHttpProxy;

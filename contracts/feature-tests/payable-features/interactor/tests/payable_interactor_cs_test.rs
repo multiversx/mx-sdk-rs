@@ -11,10 +11,10 @@ fn chain_simulator_config() -> Config {
 }
 
 async fn cs_interactor() -> PayableInteract {
-    let (interactor, config) = HttpInteractorBuilder::new()
-        .crate_dir(env!("CARGO_MANIFEST_DIR"))
-        .with_config(chain_simulator_config())
-        .build()
+    let config = chain_simulator_config();
+    let interactor = HttpInteractor::empty()
+        .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(&config)
         .await;
     PayableInteract {
         interactor,

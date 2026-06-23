@@ -144,9 +144,11 @@ pub struct PingPongEgldInteract {
 
 impl PingPongEgldInteract {
     pub async fn new() -> Self {
-        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let mut interactor = Interactor::empty()
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
         let config: Config = interactor.load_config_toml().await;
-        let interactor = interactor.with_tracer(INTERACTOR_SCENARIO_TRACE_PATH).await;
         let state = interactor.load_state::<State>();
         Self {
             interactor,

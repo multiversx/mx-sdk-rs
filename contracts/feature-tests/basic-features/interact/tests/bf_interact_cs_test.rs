@@ -15,15 +15,11 @@ fn chain_simulator_config() -> Config {
 }
 
 async fn cs_interactor() -> BasicFeaturesInteract {
-    let (interactor, config) = HttpInteractorBuilder::new()
-        .crate_dir(env!("CARGO_MANIFEST_DIR"))
-        .with_config(chain_simulator_config())
-        .build()
+    let config = chain_simulator_config();
+    let interactor = HttpInteractor::empty()
+        .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(&config)
         .await;
-    let interactor = interactor
-        .with_tracer(basic_features_interact::INTERACTOR_SCENARIO_TRACE_PATH)
-        .await;
-    interactor.generate_blocks_until_all_activations().await;
     let wallet_address = config.wallet.address();
     BasicFeaturesInteract {
         interactor,

@@ -158,62 +158,29 @@ impl State {
 }
 
 pub struct ContractInteract {
-    interactor: Interactor,
+    pub interactor: Interactor,
     pub wallet_address: Bech32Address,
-    contract_code: BytesValue,
+    pub contract_code: BytesValue,
     pub state: AutoSave<State>,
 }
 
 impl ContractInteract {
     pub async fn new(trace_path: Option<&str>) -> Self {
-        let (mut interactor, config) = HttpInteractorBuilder::<Config>::new()
-            .crate_dir(env!("CARGO_MANIFEST_DIR"))
-            .build()
-            .await;
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
 
         if let Some(path) = trace_path {
             interactor = interactor.with_tracer(path).await;
         }
 
-        let wallet_address = config.wallet.address();
-        let contract_code = BytesValue::interpret_from(
-            "mxsc:../forwarder/output/forwarder.mxsc.json",
-            &InterpreterContext::default(),
-        );
+        let config: Config = interactor.load_config_toml().await;
         let state = interactor.load_state::<State>();
-
-        ContractInteract {
+        Self {
             interactor,
-            wallet_address,
-            contract_code,
-            state,
-        }
-    }
-
-    pub async fn new_with_config(config: Config, trace_path: Option<&str>) -> Self {
-        let (mut interactor, config) = HttpInteractorBuilder::<Config>::new()
-            .crate_dir(env!("CARGO_MANIFEST_DIR"))
-            .with_config(config)
-            .build()
-            .await;
-
-        if let Some(path) = trace_path {
-            interactor = interactor.with_tracer(path).await;
-        }
-
-        interactor.generate_blocks_until_all_activations().await;
-
-        let wallet_address = config.wallet.address();
-        let contract_code = BytesValue::interpret_from(
-            "mxsc:../forwarder/output/forwarder.mxsc.json",
-            &InterpreterContext::default(),
-        );
-        let state = AutoSave::no_save_default();
-
-        ContractInteract {
-            interactor,
-            wallet_address,
-            contract_code,
+            wallet_address: config.wallet.address(),
+            contract_code: BytesValue::interpret_from(
+                "mxsc:../forwarder/output/forwarder.mxsc.json",
+                &InterpreterContext::default(),
+            ),
             state,
         }
     }

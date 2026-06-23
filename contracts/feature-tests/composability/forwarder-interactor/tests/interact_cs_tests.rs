@@ -10,7 +10,21 @@ fn chain_simulator_config() -> Config {
 }
 
 async fn cs_interactor() -> ContractInteract {
-    ContractInteract::new_with_config(chain_simulator_config(), None).await
+    let config = chain_simulator_config();
+    let interactor = HttpInteractor::empty()
+        .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(&config)
+        .await;
+    let wallet_address = config.wallet.address();
+    ContractInteract {
+        interactor,
+        wallet_address,
+        contract_code: BytesValue::interpret_from(
+            "mxsc:../forwarder/output/forwarder.mxsc.json",
+            &InterpreterContext::default(),
+        ),
+        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+    }
 }
 
 // Simple deploy test that runs using the chain simulator configuration.
