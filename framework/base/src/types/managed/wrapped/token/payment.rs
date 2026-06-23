@@ -3,7 +3,7 @@ use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApiImpl, ManagedTypeApi, ManagedTypeApiImpl},
+    api::{ErrorApiImpl, ManagedTypeApi},
     codec::{
         self, NestedDecode, TopDecode,
         derive::{NestedEncode, TopEncode},
@@ -354,6 +354,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for Payment<M> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }

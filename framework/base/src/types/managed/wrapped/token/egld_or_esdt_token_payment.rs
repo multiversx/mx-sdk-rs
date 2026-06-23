@@ -3,7 +3,7 @@ use multiversx_sc_codec::IntoMultiValue;
 
 use crate::{
     abi::TypeAbiFrom,
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::ManagedTypeApi,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentMultiValue,
         EgldOrEsdtTokenPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedVecItem,
@@ -180,6 +180,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPayment<M> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }

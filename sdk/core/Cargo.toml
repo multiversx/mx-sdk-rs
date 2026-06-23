@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.16.0"
+version = "0.16.1"
 edition = "2024"
 
 authors = [
@@ -35,6 +35,6 @@ aes = "0.9"
 ctr = "0.10"
 
 [dependencies.multiversx-chain-core]
-version = "=0.23.0"
+version = "=0.23.1"
 features = ["std"]
 path = "../../chain/core"

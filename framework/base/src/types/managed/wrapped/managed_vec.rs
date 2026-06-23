@@ -1,7 +1,7 @@
 use super::{EncodedManagedVecItem, ManagedVecItemPayload};
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
+    api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi, ManagedTypeApiImpl},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
         NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
@@ -292,13 +292,26 @@ where
         Ok(old_item)
     }
 
-    /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
-    /// Returns `None` if any index is out of range.
+    /// Returns a new `ManagedVec` containing the elements in the half-open range
+    /// `[start_index, end_index)`. Returns `None` if the range is invalid
+    /// (`start_index > end_index` or `end_index > self.len()`).
     ///
-    /// Note: for managed types that require handle-level drop (e.g. under `StaticApi`),
-    /// this performs a deep copy of each item so that both the original and the slice
-    /// hold independently owned handles.
-    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    /// ## Cloning strategy
+    ///
+    /// The implementation chooses between two paths based on whether `T` owns
+    /// VM-level resources (i.e. `T::requires_drop()`):
+    ///
+    /// - **Copy-like types** (`T::requires_drop() == false`, e.g. `u32`, `u64`,
+    ///   fixed-size structs of plain integers): the relevant slice of the underlying
+    ///   managed buffer is copied in a single VM call. No per-item work is done.
+    ///
+    /// - **Handle-owning types** (`T::requires_drop() == true`, e.g. `BigUint`,
+    ///   `ManagedBuffer`, or any struct containing them): copying raw bytes would
+    ///   alias the integer handles stored in the payload, causing both the original
+    ///   vec and the returned vec to attempt freeing the same VM object on drop
+    ///   (double-free). Instead each item in the range is cloned individually,
+    ///   allocating a fresh independent VM object for every element.
+    pub fn clone_range(&self, start_index: usize, end_index: usize) -> Option<Self>
     where
         T: Clone,
     {
@@ -323,15 +336,25 @@ where
         }
     }
 
+    /// Deprecated alias for [`clone_range`].
+    #[deprecated(since = "0.66.2", note = "Please use method `clone_range` instead.")]
+    pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
+    where
+        T: Clone,
+    {
+        self.clone_range(start_index, end_index)
+    }
+
     /// Returns a new `ManagedVec`, containing the [start_index, end_index) range of elements.
     /// Returns `None` if any index is out of range.
     ///
     /// # Safety
     ///
-    /// Only safe when `T::requires_drop() == false` (e.g. all non-`StaticApi` backends).
-    /// In all other cases, both the original vec and the returned slice will hold aliased
-    /// handle integers, and both will attempt to free those handles on drop — causing a
-    /// double-free. Use the safe [`slice`] method instead.
+    /// Only safe when `T::requires_drop() == false` (i.e. `T` stores no VM-level handles —
+    /// plain integers, fixed-size POD structs, etc.). When `T::requires_drop() == true`,
+    /// copying raw bytes aliases the handle integers stored in the payload; both the original
+    /// vec and the returned vec will attempt to free the same VM objects on drop, causing a
+    /// double-free. Use the safe [`clone_range`] method instead.
     unsafe fn slice_no_copy_unchecked(&self, start_index: usize, end_index: usize) -> Option<Self> {
         let byte_start = start_index * T::payload_size();
         let byte_end = end_index * T::payload_size();
@@ -675,7 +698,7 @@ where
             let (dedup, tail) = slice.split_at_mut(next_write);
             // Drop the duplicate items moved into the tail, so their handles are freed
             // before the buffer is truncated to the dedup length.
-            if T::requires_drop() {
+            if T::requires_drop() && M::managed_type_impl().requires_managed_type_drop() {
                 for tail_item in tail.iter() {
                     unsafe {
                         let item = T::read_from_payload(&tail_item.encoded);
@@ -694,6 +717,10 @@ where
     T: ManagedVecItem + Clone,
 {
     fn clone(&self) -> Self {
+        if !T::requires_drop() {
+            return ManagedVec::new_from_raw_buffer(self.buffer.clone());
+        }
+
         let mut result = ManagedVec::new();
         for item in self.into_iter() {
             result.push(item.borrow().clone())
@@ -780,7 +807,7 @@ where
 {
     unsafe fn drop_items(&mut self) {
         unsafe {
-            if T::requires_drop() {
+            if T::requires_drop() && M::managed_type_impl().requires_managed_type_drop() {
                 let iter = ManagedVecPayloadIterator::<M, T::PAYLOAD>::new(self.get_handle());
                 for payload in iter {
                     let item = T::read_from_payload(&payload);
