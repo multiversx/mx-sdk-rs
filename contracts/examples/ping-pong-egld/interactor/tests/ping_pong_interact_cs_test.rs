@@ -1,23 +1,21 @@
-use multiversx_sc_snippets::imports::{DurationMillis, RustBigUint, TimestampMillis, *};
+use multiversx_sc_snippets::imports::*;
 use ping_pong_egld_interact::{Config, PingPongEgldInteract};
 use serial_test::serial;
 
 fn chain_simulator_config() -> Config {
     Config {
         connection: ConnectionConfig::chain_simulator(),
-        owner: WalletConfig::from_test_wallet("mike"),
-        wallet: WalletConfig::from_test_wallet("ivan"),
+        owner: WalletConfig::from_test_wallet("eve"),
+        wallet: WalletConfig::from_test_wallet("mallory"),
     }
 }
 
 async fn cs_interactor() -> PingPongEgldInteract {
-    let (interactor, config) = HttpInteractorBuilder::new()
-        .crate_dir(env!("CARGO_MANIFEST_DIR"))
-        .with_config(chain_simulator_config())
-        .build()
-        .await;
-    let interactor = interactor
-        .with_tracer(ping_pong_egld_interact::INTERACTOR_SCENARIO_TRACE_PATH)
+    let config = chain_simulator_config();
+    let interactor = Interactor::empty()
+        .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+        .use_chain_simulator(true)
+        .with_config(&config)
         .await;
     PingPongEgldInteract {
         interactor,
