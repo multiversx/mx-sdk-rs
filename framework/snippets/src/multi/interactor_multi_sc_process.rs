@@ -34,13 +34,13 @@ where
 
         for tx in &txs {
             let tx_hash = self
-                .proxy
+                .proxy()
                 .request(SendTxRequest(tx))
                 .await
                 .expect("failed to send transaction");
 
             println!("process tx hash: {tx_hash} with nonce: {}", tx.nonce);
-            futures.push(retrieve_tx_on_network(&self.proxy, tx_hash.clone()));
+            futures.push(retrieve_tx_on_network(self.proxy(), tx_hash.clone()));
         }
 
         self.generate_blocks(4).await.unwrap();

@@ -4,7 +4,6 @@ use adder::adder_proxy;
 use clap::Parser;
 use multiversx_sc_snippets::imports::*;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
@@ -43,9 +42,7 @@ impl State {
 pub async fn adder_cli() {
     env_logger::init();
 
-    let config_path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("config.toml");
-    let mut basic_interact =
-        BasicInteractor::new(InteractorConfigLoader::FromFile(config_path)).await;
+    let mut basic_interact = BasicInteractor::from_config().await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -76,9 +73,9 @@ pub struct BasicInteractor {
 }
 
 impl BasicInteractor {
-    pub async fn new(config_loader: InteractorConfigLoader<Config>) -> Self {
-        let (interactor, config) = Interactor::new_with_config(config_loader).await;
-        interactor.generate_blocks_until_all_activations().await;
+    pub async fn from_config() -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
         let state = interactor.load_state::<State>();
         BasicInteractor {
             interactor,
