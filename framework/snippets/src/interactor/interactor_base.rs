@@ -62,18 +62,43 @@ pub struct InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Working directory used to resolve file paths such as `config.toml`,
+    /// `state.toml`, and the set-state snapshot file.
+    ///
+    /// Set at construction time via [`Self::with_current_dir`] or
+    /// [`Self::set_current_dir_from_workspace`].
+    pub current_dir: PathBuf,
+
+    /// When `true` the interactor is connected to the MultiversX Chain Simulator
+    /// and will issue simulator-specific requests (fund accounts, generate blocks,
+    /// set state, …).  When `false` those requests are silently skipped.
+    pub use_chain_simulator: bool,
+
     /// Gateway proxy and network config, initialised together by [`Self::with_connection`].
     connection: Option<InteractorConnection<GatewayProxy>>,
-    pub use_chain_simulator: bool,
-    pub sender_map: HashMap<Address, Sender>,
+
+    /// Gas price used when building transactions, derived from
+    /// `connection.network_config.min_gas_price` at connection time.
     pub gas_price: u64,
 
-    pub waiting_time_ms: u64,
+    /// All wallets registered as transaction signers, keyed by their on-chain
+    /// address.  Populated by [`Self::register_wallet`].
+    pub sender_map: HashMap<Address, Sender>,
+
+    /// Scenario runners executed **before** each step (e.g. pre-condition checks
+    /// or state loading).
     pub pre_runners: ScenarioRunnerList,
+
+    /// Scenario runners executed **after** each step (e.g. trace file writers).
     pub post_runners: ScenarioRunnerList,
 
-    pub current_dir: PathBuf,
+    /// Optional block-explorer base URL derived from the network chain ID.  Used
+    /// to pretty-print transaction and address links in log output.
     pub explorer_url: Option<ExplorerUrl>,
+
+    /// Cumulative wall-clock time (in milliseconds) spent waiting inside
+    /// [`Self::sleep`] calls.
+    pub waiting_time_ms: u64,
 }
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
