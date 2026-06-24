@@ -5833,6 +5833,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "wallet-miner"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "multiversx-sc-meta",
+ "multiversx-sdk",
+]
+
+[[package]]
 name = "want"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

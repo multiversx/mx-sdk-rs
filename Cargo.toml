@@ -32,6 +32,7 @@ members = [
   "tools/mxpy-snippet-generator",
   "tools/op-test-gen",
   "tools/strip-path",
+  "tools/wallet-miner",
   "tools/wat-gen",
 
   "contracts/modules",
