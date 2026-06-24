@@ -1,10 +1,12 @@
-use basic_interactor::{BasicInteractor, Config};
+use basic_interactor::{BasicInteractor, Config, GeneralConfig};
 use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
 use serial_test::serial;
 
 fn chain_simulator_config() -> Config {
     Config {
-        contract_path: "../output/adder.mxsc.json".to_owned(),
+        general: GeneralConfig {
+            contract_path: "../output/adder.mxsc.json".to_owned(),
+        },
         connection: ConnectionConfig::chain_simulator(),
         owner: WalletConfig::from_test_wallet("mike"),
         wallet: WalletConfig::from_test_wallet("ivan"),

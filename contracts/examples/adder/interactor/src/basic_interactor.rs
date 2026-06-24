@@ -5,10 +5,16 @@ use clap::Parser;
 use multiversx_sc_snippets::imports::*;
 use serde::{Deserialize, Serialize};
 
+/// Adder Interact general settings
+#[derive(Debug, Deserialize)]
+pub struct GeneralConfig {
+    pub contract_path: String,
+}
+
 /// Adder Interact configuration
 #[derive(Debug, Deserialize)]
 pub struct Config {
-    pub contract_path: String,
+    pub general: GeneralConfig,
     pub connection: ConnectionConfig,
     pub owner: WalletConfig,
     pub wallet: WalletConfig,
@@ -101,7 +107,7 @@ impl BasicInteractor {
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
-            .code(MxscPath::new(&self.config.contract_path))
+            .code(MxscPath::new(&self.config.general.contract_path))
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
@@ -119,7 +125,7 @@ impl BasicInteractor {
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(new_value)
-            .code(MxscPath::new(&self.config.contract_path))
+            .code(MxscPath::new(&self.config.general.contract_path))
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsHandledOrError::new())
             .run()
