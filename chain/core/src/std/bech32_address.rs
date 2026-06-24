@@ -220,10 +220,10 @@ impl<'de> Deserialize<'de> for Bech32Address {
     {
         // some old interactors have it serialized like this
         let mut bech32 = String::deserialize(deserializer)?;
-        if let Some(stripped) = bech32.strip_prefix("bech32:") {
+        if let Some(stripped) = bech32.strip_prefix(BECH32_PREFIX) {
             bech32 = stripped.to_string();
         }
-        Ok(Bech32Address::from_bech32_string(bech32))
+        Bech32Address::try_from_bech32_string(bech32).map_err(serde::de::Error::custom)
     }
 }
 
@@ -308,24 +308,37 @@ impl FromStr for Bech32Address {
 mod tests {
     use super::*;
 
-    // A known valid bech32 address on the MultiversX network (32-byte payload).
-    const VALID_BECH32: &str = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu";
+    // Alice's address, used as a representative non-trivial test address.
+    const ALICE_BECH32: &str = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
+
+    // The zero address (all-zero 32-byte payload), kept for tests that specifically
+    // exercise that edge case.
+    const ZERO_BECH32: &str = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu";
 
     #[test]
     fn test_try_from_bech32_string_valid() {
-        let result = Bech32Address::try_from_bech32_string(VALID_BECH32.to_string());
+        let result = Bech32Address::try_from_bech32_string(ALICE_BECH32.to_string());
         assert!(result.is_ok());
         let addr = result.unwrap();
-        assert_eq!(addr.bech32, VALID_BECH32);
+        assert_eq!(addr.bech32, ALICE_BECH32);
         assert_eq!(addr.hrp, "erd");
         assert_eq!(addr.address.as_bytes().len(), 32);
     }
 
     #[test]
+    fn test_try_from_bech32_string_zero_address() {
+        let result = Bech32Address::try_from_bech32_string(ZERO_BECH32.to_string());
+        assert!(result.is_ok());
+        let addr = result.unwrap();
+        assert_eq!(addr.bech32, ZERO_BECH32);
+        assert!(addr.address.as_bytes().iter().all(|&b| b == 0));
+    }
+
+    #[test]
     fn test_try_from_bech32_string_roundtrip() {
-        let original = Bech32Address::try_from_bech32_string(VALID_BECH32.to_string()).unwrap();
+        let original = Bech32Address::try_from_bech32_string(ALICE_BECH32.to_string()).unwrap();
         let re_encoded = Bech32Address::encode_address(original.hrp, original.address.clone());
-        assert_eq!(re_encoded.bech32, VALID_BECH32);
+        assert_eq!(re_encoded.bech32, ALICE_BECH32);
     }
 
     #[test]
@@ -350,5 +363,67 @@ mod tests {
         let bad_bech32 = bech32::encode::<bech32::Bech32>(hrp, &short_payload).unwrap();
         let result = Bech32Address::try_from_bech32_string(bad_bech32);
         assert!(matches!(result, Err(Bech32AddressError::InvalidLength(10))));
+    }
+
+    // --- serde Deserialize tests ---
+
+    #[test]
+    fn test_deserialize_valid() {
+        let json = format!("\"{ALICE_BECH32}\"");
+        let addr: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(addr.bech32, ALICE_BECH32);
+    }
+
+    #[test]
+    fn test_deserialize_zero_address() {
+        let json = format!("\"{ZERO_BECH32}\"");
+        let addr: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(addr.bech32, ZERO_BECH32);
+        assert!(addr.address.as_bytes().iter().all(|&b| b == 0));
+    }
+
+    #[test]
+    fn test_deserialize_bech32_prefix_stripped() {
+        // Old interactor format: "bech32:<address>"
+        let json = format!("\"bech32:{ALICE_BECH32}\"");
+        let addr: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(addr.bech32, ALICE_BECH32);
+    }
+
+    #[test]
+    fn test_deserialize_empty_string_returns_error() {
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"\"");
+        assert!(result.is_err(), "expected error for empty string, got Ok");
+    }
+
+    #[test]
+    fn test_deserialize_invalid_bech32_returns_error() {
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"not_valid!!!\"");
+        assert!(result.is_err(), "expected error for invalid bech32, got Ok");
+    }
+
+    #[test]
+    fn test_deserialize_bech32_prefix_only_returns_error() {
+        // "bech32:" strips to "" which should fail, not panic
+        let result: Result<Bech32Address, _> = serde_json::from_str("\"bech32:\"");
+        assert!(result.is_err(), "expected error for bare prefix, got Ok");
+    }
+
+    // --- serde Serialize tests ---
+
+    #[test]
+    fn test_serialize_valid() {
+        let addr = Bech32Address::try_from_bech32_string(ALICE_BECH32.to_string()).unwrap();
+        let json = serde_json::to_string(&addr).unwrap();
+        assert_eq!(json, format!("\"{ALICE_BECH32}\""));
+    }
+
+    #[test]
+    fn test_serde_roundtrip() {
+        let original = Bech32Address::try_from_bech32_string(ALICE_BECH32.to_string()).unwrap();
+        let json = serde_json::to_string(&original).unwrap();
+        let decoded: Bech32Address = serde_json::from_str(&json).unwrap();
+        assert_eq!(decoded.bech32, original.bech32);
+        assert_eq!(decoded.address, original.address);
     }
 }
