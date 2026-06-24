@@ -45,6 +45,8 @@ const WALLETS: &[(&str, &str)] = &[
     ("s0phie", SOPHIE_PEM),
     ("siobhan", SIOBHAN_PEM),
     ("s1obhan", SIOBHAN_PEM),
+    ("silvia", SILVIA_PEM),
+    ("s1lvia", SILVIA_PEM),
     ("simon", SIMON_PEM),
     ("s1mon", SIMON_PEM),
     ("szabolcs", SZABOLCS_PEM),
@@ -117,20 +119,20 @@ pub fn mike() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// S0crates' wallet will always be in shard 0.
+/// Socrates' wallet will always be in shard 0.
 ///
 /// Address: 0x3d55ffd949781d5f0b5eaf57a3f0797d1db2d76a759ae6df7e335302b7d90000
 pub fn socrates() -> Wallet {
-    Wallet::new_test_wallet("s0crates", SOCRATES_PEM)
+    Wallet::new_test_wallet("socrates", SOCRATES_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// S0phocles' wallet will always be in shard 0.
+/// Sophocles' wallet will always be in shard 0.
 ///
 /// Address: 0x35e2358aa3191bcedf6eddf6e14f138765b38a704647ed691130703852620000
 pub fn sophocles() -> Wallet {
-    Wallet::new_test_wallet("s0phocles", SOPHOCLES_PEM)
+    Wallet::new_test_wallet("sophocles", SOPHOCLES_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -144,11 +146,11 @@ pub fn sophie() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// S1obhan's wallet will always be in shard 1.
+/// Siobhan's wallet will always be in shard 1.
 ///
 /// Address: 0xe624b62f5dcad961ceaf9ce23e56db72377ea8a8dcc7065b73089778522d0001
 pub fn siobhan() -> Wallet {
-    Wallet::new_test_wallet("s1obhan", SIOBHAN_PEM)
+    Wallet::new_test_wallet("siobhan", SIOBHAN_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -171,7 +173,7 @@ pub fn simon() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// Szabolcs' wallet will always be in shard 2.
+/// Szabolcs's wallet will always be in shard 2.
 ///
 /// Address: 0x99337fe8455f5798fc548037c1ceea4d95d8f89ca468663877719f7d31eb0002
 pub fn szabolcs() -> Wallet {
@@ -180,11 +182,11 @@ pub fn szabolcs() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// S2ilard's wallet will always be in shard 2.
+/// Szilárd's wallet will always be in shard 2.
 ///
 /// Address: 0xf7a7c49bb4d2f63fd82ca0859f2e01c13f320a79c0962dfdc43fcb621cde0002
 pub fn szilard() -> Wallet {
-    Wallet::new_test_wallet("s2ilard", SZILARD_PEM)
+    Wallet::new_test_wallet("szilard", SZILARD_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.

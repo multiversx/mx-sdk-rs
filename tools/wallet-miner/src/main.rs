@@ -18,7 +18,7 @@ fn main() -> Result<()> {
 
     loop {
         let mnemonic = generate_mnemonic();
-        let wallet = Wallet::try_from(mnemonic.clone()).unwrap();
+        let wallet = Wallet::try_from(mnemonic.clone())?;
         let address_hex = wallet.address.to_hex();
 
         for suffix in SUFFIXES {
@@ -53,7 +53,8 @@ fn main() -> Result<()> {
 }
 
 fn write_pem(suffix: &str, address_hex: &str, contents: String) -> Result<()> {
-    let outfile = format!("wallet-{suffix}-{address_hex}.pem");
+    let dir = env!("CARGO_MANIFEST_DIR");
+    let outfile = format!("{dir}/wallet-{suffix}-{address_hex}.pem");
     let mut file = File::create(&outfile)?;
     file.write_all(contents.as_bytes())?;
     println!("Wallet saved to '{outfile}'");
