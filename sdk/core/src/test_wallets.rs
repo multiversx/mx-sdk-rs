@@ -20,7 +20,7 @@ const SOPHIE_PEM: &str = include_str!("test_wallets/s0phie.pem");
 const SILVIA_PEM: &str = include_str!("test_wallets/s1lvia.pem");
 const SIOBHAN_PEM: &str = include_str!("test_wallets/s1obhan.pem");
 const SIMON_PEM: &str = include_str!("test_wallets/s1mon.pem");
-const SZABOLCS_PEM: &str = include_str!("test_wallets/s2abolcs.pem");
+const SZIDONIA_PEM: &str = include_str!("test_wallets/s2idonia.pem");
 const SZILARD_PEM: &str = include_str!("test_wallets/s2ilard.pem");
 const SZONJA_PEM: &str = include_str!("test_wallets/s2onja.pem");
 
@@ -49,8 +49,8 @@ const WALLETS: &[(&str, &str)] = &[
     ("s1lvia", SILVIA_PEM),
     ("simon", SIMON_PEM),
     ("s1mon", SIMON_PEM),
-    ("szabolcs", SZABOLCS_PEM),
-    ("s2abolcs", SZABOLCS_PEM),
+    ("szidonia", SZIDONIA_PEM),
+    ("s2idonia", SZIDONIA_PEM),
     ("szilard", SZILARD_PEM),
     ("s2ilard", SZILARD_PEM),
     ("szonja", SZONJA_PEM),
@@ -173,11 +173,11 @@ pub fn simon() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
-/// Szabolcs's wallet will always be in shard 2.
+/// Szidonia's wallet will always be in shard 2.
 ///
 /// Address: 0x99337fe8455f5798fc548037c1ceea4d95d8f89ca468663877719f7d31eb0002
-pub fn szabolcs() -> Wallet {
-    Wallet::new_test_wallet("szabolcs", SZABOLCS_PEM)
+pub fn szidonia() -> Wallet {
+    Wallet::new_test_wallet("szidonia", SZIDONIA_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.

@@ -64,7 +64,7 @@ fn test_get_shard() {
     assert_eq!(1, test_wallets::siobhan().address.shard_of_3().as_u32());
     assert_eq!(1, test_wallets::simon().address.shard_of_3().as_u32());
 
-    assert_eq!(2, test_wallets::szabolcs().address.shard_of_3().as_u32());
+    assert_eq!(2, test_wallets::szidonia().address.shard_of_3().as_u32());
     assert_eq!(2, test_wallets::szilard().address.shard_of_3().as_u32());
     assert_eq!(2, test_wallets::szonja().address.shard_of_3().as_u32());
 }
