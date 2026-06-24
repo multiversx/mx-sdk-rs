@@ -1,4 +1,23 @@
+[connection]
 chain_type = 'real'
 gateway_uri = 'https://devnet-gateway.multiversx.com'
+
+[general]
+contract_path = '../output/multisig.mxsc.json'
 quorum = 2
 wegld_address = "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782"
+
+[wallet]
+test_wallet = 'mike'
+
+[[board]]
+test_wallet = 'mike'
+
+[[board]]
+test_wallet = 'carol'
+
+[[board]]
+test_wallet = 'dan'
+
+[[board]]
+test_wallet = 'eve'
