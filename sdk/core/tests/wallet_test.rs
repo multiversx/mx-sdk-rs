@@ -55,4 +55,16 @@ fn test_get_shard() {
 
     let mike = test_wallets::mike(); // [227, 42, 254, 220, 144, 79, 225, 147, 151, 70, 173, 151, 59, 235, 56, 53, 99, 207, 99, 100, 43, 166, 105, 179, 4, 15, 155, 148, 40, 165, 237, 96]
     assert_eq!(0, mike.address.shard_of_3().as_u32());
+
+    assert_eq!(0, test_wallets::socrates().address.shard_of_3().as_u32());
+    assert_eq!(0, test_wallets::sophocles().address.shard_of_3().as_u32());
+    assert_eq!(0, test_wallets::sophie().address.shard_of_3().as_u32());
+
+    assert_eq!(1, test_wallets::silvia().address.shard_of_3().as_u32());
+    assert_eq!(1, test_wallets::siobhan().address.shard_of_3().as_u32());
+    assert_eq!(1, test_wallets::simon().address.shard_of_3().as_u32());
+
+    assert_eq!(2, test_wallets::szabolcs().address.shard_of_3().as_u32());
+    assert_eq!(2, test_wallets::szilard().address.shard_of_3().as_u32());
+    assert_eq!(2, test_wallets::szonja().address.shard_of_3().as_u32());
 }

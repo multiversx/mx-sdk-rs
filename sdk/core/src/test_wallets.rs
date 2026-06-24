@@ -14,8 +14,14 @@ const IVAN_PEM: &str = include_str!("test_wallets/ivan.pem");
 const JUDY_PEM: &str = include_str!("test_wallets/judy.pem");
 const MALLORY_PEM: &str = include_str!("test_wallets/mallory.pem");
 const MIKE_PEM: &str = include_str!("test_wallets/mike.pem");
+const SOCRATES_PEM: &str = include_str!("test_wallets/s0crates.pem");
+const SOPHOCLES_PEM: &str = include_str!("test_wallets/s0phocles.pem");
 const SOPHIE_PEM: &str = include_str!("test_wallets/s0phie.pem");
+const SILVIA_PEM: &str = include_str!("test_wallets/s1lvia.pem");
+const SIOBHAN_PEM: &str = include_str!("test_wallets/s1obhan.pem");
 const SIMON_PEM: &str = include_str!("test_wallets/s1mon.pem");
+const SZABOLCS_PEM: &str = include_str!("test_wallets/s2abolcs.pem");
+const SZILARD_PEM: &str = include_str!("test_wallets/s2ilard.pem");
 const SZONJA_PEM: &str = include_str!("test_wallets/s2onja.pem");
 
 const WALLETS: &[(&str, &str)] = &[
@@ -31,10 +37,20 @@ const WALLETS: &[(&str, &str)] = &[
     ("judy", JUDY_PEM),
     ("mallory", MALLORY_PEM),
     ("mike", MIKE_PEM),
+    ("s0crates", SOCRATES_PEM),
+    ("socrates", SOCRATES_PEM),
+    ("s0phocles", SOPHOCLES_PEM),
+    ("sophocles", SOPHOCLES_PEM),
     ("sophie", SOPHIE_PEM),
     ("s0phie", SOPHIE_PEM),
+    ("siobhan", SIOBHAN_PEM),
+    ("s1obhan", SIOBHAN_PEM),
     ("simon", SIMON_PEM),
     ("s1mon", SIMON_PEM),
+    ("szabolcs", SZABOLCS_PEM),
+    ("s2abolcs", SZABOLCS_PEM),
+    ("szilard", SZILARD_PEM),
+    ("s2ilard", SZILARD_PEM),
     ("szonja", SZONJA_PEM),
     ("s2onja", SZONJA_PEM),
 ];
@@ -101,6 +117,24 @@ pub fn mike() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
+/// S0crates' wallet will always be in shard 0.
+///
+/// Address: 0x3d55ffd949781d5f0b5eaf57a3f0797d1db2d76a759ae6df7e335302b7d90000
+pub fn socrates() -> Wallet {
+    Wallet::new_test_wallet("s0crates", SOCRATES_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// S0phocles' wallet will always be in shard 0.
+///
+/// Address: 0x35e2358aa3191bcedf6eddf6e14f138765b38a704647ed691130703852620000
+pub fn sophocles() -> Wallet {
+    Wallet::new_test_wallet("s0phocles", SOPHOCLES_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
 /// Sophie's wallet will always be in shard 0.
 ///
 /// Address: 0x14af28ce7d79117f689228b1af89d16e8b0c16a3d36062a2b6eeb8fbab6c0000
@@ -110,11 +144,47 @@ pub fn sophie() -> Wallet {
 
 /// Test wallet. Do not use on mainnet.
 ///
+/// S1obhan's wallet will always be in shard 1.
+///
+/// Address: 0xe624b62f5dcad961ceaf9ce23e56db72377ea8a8dcc7065b73089778522d0001
+pub fn siobhan() -> Wallet {
+    Wallet::new_test_wallet("s1obhan", SIOBHAN_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Silvia's wallet will always be in shard 1.
+///
+/// Address: 0x7bbaef4fae6aa454929e0038bf01da4907e7814609db6e46c9990b5ae9d30001
+pub fn silvia() -> Wallet {
+    Wallet::new_test_wallet("silvia", SILVIA_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
 /// Simon's wallet will always be in shard 1.
 ///
 /// Address: 0x4b9ab2524a7d15416fb78d4d88249dc30272bd6ee1b8a07d4342c33a40a00001
 pub fn simon() -> Wallet {
     Wallet::new_test_wallet("simon", SIMON_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Szabolcs' wallet will always be in shard 2.
+///
+/// Address: 0x99337fe8455f5798fc548037c1ceea4d95d8f89ca468663877719f7d31eb0002
+pub fn szabolcs() -> Wallet {
+    Wallet::new_test_wallet("szabolcs", SZABOLCS_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// S2ilard's wallet will always be in shard 2.
+///
+/// Address: 0xf7a7c49bb4d2f63fd82ca0859f2e01c13f320a79c0962dfdc43fcb621cde0002
+pub fn szilard() -> Wallet {
+    Wallet::new_test_wallet("s2ilard", SZILARD_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.

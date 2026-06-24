@@ -8,10 +8,9 @@ use multiversx_sc_meta::cmd::wallet_cmd::generate_mnemonic;
 use multiversx_sdk::{chain_core::std::Bech32Hrp, wallet::Wallet};
 
 const SUFFIXES: [&str; 3] = ["0000", "0001", "0002"];
-const HRP: &str = "erd";
 
 fn main() -> Result<()> {
-    let hrp = Bech32Hrp::try_from(HRP).expect("invalid HRP");
+    let hrp = Bech32Hrp::default();
     let mut mined_count = 0usize;
     let mut retries = 0u64;
 
@@ -34,17 +33,17 @@ fn main() -> Result<()> {
             println!("Mined wallet ending in 0x{suffix}:");
             println!("Mnemonic: {}", mnemonic);
             println!("Wallet address:");
-            println!("  - bech32: {}", wallet.address.to_bech32(hrp.clone()));
+            println!("  - bech32: {}", wallet.address.to_bech32(hrp));
             println!("  - hex:    0x{address_hex}");
 
-            let pem_content = wallet.to_pem(hrp.clone()).to_pem_str();
+            let pem_content = wallet.to_pem(hrp).to_pem_str();
             write_pem(suffix, &address_hex, pem_content)?;
 
             println!();
         }
 
         retries += 1;
-        if retries % 100 == 0 {
+        if retries.is_multiple_of(100) {
             print!("\rMining suffixes forever: {retries} retries, {mined_count} wallets mined");
             io::stdout().flush()?;
         }
