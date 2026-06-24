@@ -74,6 +74,11 @@ impl BoxedBytes {
             index -= 1;
             result_len += slices[index].len();
         }
+        // Calling `alloc` with a zero-sized layout is undefined behavior.
+        // Return a valid empty instance directly instead of entering the unsafe path.
+        if result_len == 0 {
+            return BoxedBytes::empty();
+        }
         unsafe {
             let layout = Layout::from_size_align(result_len, core::mem::align_of::<u8>()).unwrap();
             let result_ptr = alloc(layout);
@@ -254,6 +259,40 @@ mod tests {
     fn test_concat_empty_2() {
         let bb = BoxedBytes::from_concat(&[]);
         assert_eq!(bb, BoxedBytes::from(&b""[..]));
+    }
+
+    /// Regression test: previously triggered UB by calling `alloc(size=0)`.
+    #[test]
+    fn test_concat_single_empty_slice() {
+        let bb = BoxedBytes::from_concat(&[&b""[..]]);
+        assert_eq!(bb, BoxedBytes::empty());
+        assert!(bb.is_empty());
+    }
+
+    #[test]
+    fn test_concat_single_nonempty_slice() {
+        let bb = BoxedBytes::from_concat(&[&b"hello"[..]]);
+        assert_eq!(bb, BoxedBytes::from(&b"hello"[..]));
+    }
+
+    #[test]
+    fn test_concat_leading_empty_slices() {
+        let bb = BoxedBytes::from_concat(&[&b""[..], &b""[..], &b"abc"[..]]);
+        assert_eq!(bb, BoxedBytes::from(&b"abc"[..]));
+    }
+
+    #[test]
+    fn test_concat_trailing_empty_slices() {
+        let bb = BoxedBytes::from_concat(&[&b"abc"[..], &b""[..], &b""[..]]);
+        assert_eq!(bb, BoxedBytes::from(&b"abc"[..]));
+    }
+
+    #[test]
+    fn test_concat_result_is_empty_instance() {
+        // All-empty concat must return a proper empty BoxedBytes, not a dangling pointer.
+        let bb = BoxedBytes::from_concat(&[&b""[..], &b""[..]]);
+        assert_eq!(bb.len(), 0);
+        assert_eq!(bb.as_slice(), &b""[..]);
     }
 
     #[test]
