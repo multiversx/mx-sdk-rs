@@ -71,17 +71,24 @@ pub async fn ping_pong_egld_cli() {
         }
         Some(interact_cli::InteractCliCommand::Ping(args)) => {
             let sender = interact.config.owner.address();
-            interact
-                .ping(args.cost.unwrap_or_default(), None, &sender)
-                .await
+            match interact.ping(&sender, args.cost.unwrap_or_default()).await {
+                Ok(_) => println!("Ping successful!"),
+                Err(err) => println!("Ping failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::Pong) => {
             let sender = interact.config.owner.address();
-            interact.pong(None, &sender).await;
+            match interact.pong(&sender).await {
+                Ok(_) => println!("Pong successful!"),
+                Err(err) => println!("Pong failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::PongAll) => {
             let sender = interact.config.owner.address();
-            interact.pong_all(None, &sender).await;
+            match interact.pong_all(&sender).await {
+                Ok(_) => println!("Pong All successful!"),
+                Err(err) => println!("Pong All failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
             let user_addresses = interact.get_user_addresses().await;
@@ -219,7 +226,11 @@ impl PingPongEgldInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn ping(&mut self, egld_amount: u64, message: Option<&str>, sender: &Bech32Address) {
+    pub async fn ping(
+        &mut self,
+        sender: &Bech32Address,
+        egld_amount: u64,
+    ) -> Result<(), TxResponseStatus> {
         let _data: IgnoreValue = IgnoreValue;
 
         let response = self
@@ -235,16 +246,15 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Ping successful!"),
-            Err(err) => {
-                println!("Ping failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Ping failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
-    pub async fn pong(&mut self, message: Option<&str>, sender: &Bech32Address) {
+    pub async fn pong(&mut self, sender: &Bech32Address) -> Result<(), TxResponseStatus> {
         let response = self
             .interactor
             .tx()
@@ -257,16 +267,15 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Pong successful!"),
-            Err(err) => {
-                println!("Pong failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Pong failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
-    pub async fn pong_all(&mut self, message: Option<String>, sender: &Bech32Address) {
+    pub async fn pong_all(&mut self, sender: &Bech32Address) -> Result<(), TxResponseStatus> {
         let response = self
             .interactor
             .tx()
@@ -279,13 +288,12 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Pong All successful!"),
-            Err(err) => {
-                println!("Pong All failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Pong All failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
     pub async fn get_user_addresses(&mut self) -> Vec<String> {

@@ -45,13 +45,8 @@ async fn test_ping_unmatched_amount() {
         )
         .await;
 
-    interact
-        .ping(
-            0u64,
-            Some("the payment must match the fixed sum"),
-            &wallet_address,
-        )
-        .await;
+    let err = interact.ping(&wallet_address, 0u64).await.unwrap_err();
+    assert_eq!(err.message, "the payment must match the fixed sum");
 }
 
 #[tokio::test]
@@ -75,9 +70,8 @@ async fn test_ping_inactive_contract() {
         )
         .await;
 
-    interact
-        .ping(1u64, Some("smart contract not active yet"), &wallet_address)
-        .await;
+    let err = interact.ping(&wallet_address, 1u64).await.unwrap_err();
+    assert_eq!(err.message, "smart contract not active yet");
 }
 
 #[tokio::test]
@@ -101,9 +95,8 @@ async fn test_ping_passed_deadline() {
         )
         .await;
 
-    interact
-        .ping(1u64, Some("deadline has passed"), &wallet_address)
-        .await;
+    let err = interact.ping(&wallet_address, 1u64).await.unwrap_err();
+    assert_eq!(err.message, "deadline has passed");
 }
 
 #[tokio::test]
@@ -126,9 +119,8 @@ async fn test_ping_max_funds() {
         )
         .await;
 
-    interact
-        .ping(10u64, Some("smart contract full"), &wallet_address)
-        .await;
+    let err = interact.ping(&wallet_address, 10u64).await.unwrap_err();
+    assert_eq!(err.message, "smart contract full");
 }
 
 #[tokio::test]
@@ -151,10 +143,9 @@ async fn test_ping_twice() {
         )
         .await;
 
-    interact.ping(1u64, None, &wallet_address).await;
-    interact
-        .ping(1u64, Some("can only ping once"), &wallet_address)
-        .await;
+    interact.ping(&wallet_address, 1u64).await.unwrap();
+    let err = interact.ping(&wallet_address, 1u64).await.unwrap_err();
+    assert_eq!(err.message, "can only ping once");
 }
 
 #[tokio::test]
@@ -177,13 +168,12 @@ async fn test_pong_before_deadline() {
         )
         .await;
 
-    interact.ping(1u64, None, &wallet_address).await;
+    interact.ping(&wallet_address, 1u64).await.unwrap();
 
     assert_eq!(interact.get_ping_amount().await, RustBigUint::from(1u64));
 
-    interact
-        .pong(Some("can't withdraw before deadline"), &wallet_address)
-        .await;
+    let err = interact.pong(&wallet_address).await.unwrap_err();
+    assert_eq!(err.message, "can't withdraw before deadline");
 }
 
 #[tokio::test]
@@ -207,11 +197,10 @@ async fn test_pong_all() {
         )
         .await;
 
-    interact.ping(1u64, None, &ping_pong_owner_address).await;
-    interact.ping(1u64, None, &wallet_address).await;
+    interact.ping(&ping_pong_owner_address, 1u64).await.unwrap();
+    interact.ping(&wallet_address, 1u64).await.unwrap();
 
-    interact.pong_all(None, &ping_pong_owner_address).await;
-    interact
-        .pong(Some("already withdrawn"), &wallet_address)
-        .await;
+    interact.pong_all(&ping_pong_owner_address).await.unwrap();
+    let err = interact.pong(&wallet_address).await.unwrap_err();
+    assert_eq!(err.message, "already withdrawn");
 }
