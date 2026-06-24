@@ -1,3 +1,5 @@
+#![allow(clippy::manual_is_multiple_of)]
+
 use std::{
     fs::File,
     io::{self, Write},
@@ -43,7 +45,7 @@ fn main() -> Result<()> {
         }
 
         retries += 1;
-        if retries.is_multiple_of(100) {
+        if retries % 100 == 0 {
             print!("\rMining suffixes forever: {retries} retries, {mined_count} wallets mined");
             io::stdout().flush()?;
         }
