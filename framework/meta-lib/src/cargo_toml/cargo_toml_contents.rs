@@ -12,6 +12,7 @@ use super::DependencyRawValue;
 
 pub const CARGO_TOML_DEPENDENCIES: &str = "dependencies";
 pub const CARGO_TOML_DEV_DEPENDENCIES: &str = "dev-dependencies";
+pub const WORKSPACE: &str = "workspace";
 pub const PACKAGE: &str = "package";
 pub const AUTHORS: &str = "authors";
 const DEFAULT_WORKSPACE_RESOLVER: &str = "3";
@@ -151,6 +152,14 @@ impl CargoTomlContents {
     /// Interprets the dependency value and organizes values in a struct.
     pub fn dependency_raw_value(&self, crate_name: &str) -> Option<DependencyRawValue> {
         self.dependency(crate_name)
+            .map(DependencyRawValue::parse_toml_value)
+    }
+
+    pub fn workspace_dependency_raw_value(&self, crate_name: &str) -> Option<DependencyRawValue> {
+        self.toml_value
+            .get(WORKSPACE)
+            .and_then(|workspace| workspace.get(CARGO_TOML_DEPENDENCIES))
+            .and_then(|deps| deps.get(crate_name))
             .map(DependencyRawValue::parse_toml_value)
     }
 
@@ -458,8 +467,16 @@ version = "=0.54.1"
 git = "https://github.com/multiversx/repo1"
 rev = "85c31b9ce730bd5ffe41589c353d935a14baaa96"
 
+[dependencies.by-workspace]
+workspace = true
+features = ["alloc", "std"]
+
 [dependencies.by-path-1]
 path = "a/b/c"
+
+[workspace.dependencies.by-workspace-root]
+version = "0.54.4"
+path = "g/h/i"
 
 [dependencies]
 by-version-2 = "0.54.2"
@@ -566,6 +583,31 @@ by-git-commit-2 = { git = "https://github.com/multiversx/repo2", rev = "e990be82
                 git: "https://github.com/multiversx/repo2".to_owned(),
                 rev: "e990be823f26d1e7f59c71536d337b7240dc3fa2".to_owned(),
             })
+        );
+
+        // workspace
+        let raw_value = cargo_toml.dependency_raw_value("by-workspace").unwrap();
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                workspace: true,
+                features: ["alloc".to_owned(), "std".to_owned()].into(),
+                ..Default::default()
+            },
+        );
+        assert_eq!(raw_value.interpret(), DependencyReference::Workspace,);
+
+        let raw_value = cargo_toml
+            .workspace_dependency_raw_value("by-workspace-root")
+            .unwrap();
+        let path = Path::new("g").join("h").join("i");
+        assert_eq!(
+            raw_value,
+            DependencyRawValue {
+                version: Some("0.54.4".to_owned()),
+                path: Some(path),
+                ..Default::default()
+            },
         );
 
         // path

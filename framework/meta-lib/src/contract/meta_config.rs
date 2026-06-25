@@ -6,7 +6,7 @@ use std::{
 use multiversx_sc::abi::ContractAbi;
 
 use crate::{
-    cargo_toml::CargoTomlContents,
+    cargo_toml::{CargoTomlContents, DependencyRawValue},
     cli::BuildArgs,
     print_util::{print_removing_wasm_crate, print_workspace_target_dir},
     tools::{check_tools_installed, find_current_workspace},
@@ -71,11 +71,26 @@ impl MetaConfig {
         let main_cargo_toml_contents =
             CargoTomlContents::load_from_file(Path::new("..").join("Cargo.toml"));
         let crate_name = main_cargo_toml_contents.package_name();
+        let workspace_cargo_toml_contents = find_current_workspace().map(|workspace_path| {
+            (
+                workspace_path.clone(),
+                CargoTomlContents::load_from_file(workspace_path.join("Cargo.toml")),
+            )
+        });
 
         for contract in self.sc_config.contracts.iter() {
             let mut framework_dependency = main_cargo_toml_contents
                 .dependency_raw_value(FRAMEWORK_NAME_BASE)
                 .expect("missing framework dependency in Cargo.toml");
+            if framework_dependency.workspace {
+                framework_dependency = resolve_workspace_dependency(
+                    FRAMEWORK_NAME_BASE,
+                    framework_dependency,
+                    workspace_cargo_toml_contents
+                        .as_ref()
+                        .expect("missing workspace for workspace dependency"),
+                );
+            }
             if contract.settings.std {
                 framework_dependency.features.insert("std".to_owned());
             }
@@ -206,6 +221,59 @@ fn copy_to_wasm_unmanaged_ei() {
     }
 }
 
+fn resolve_workspace_dependency(
+    crate_name: &str,
+    local_dependency: DependencyRawValue,
+    (workspace_path, workspace_cargo_toml_contents): &(PathBuf, CargoTomlContents),
+) -> DependencyRawValue {
+    let mut workspace_dependency = workspace_cargo_toml_contents
+        .workspace_dependency_raw_value(crate_name)
+        .unwrap_or_else(|| panic!("missing workspace dependency in Cargo.toml: {crate_name}"));
+    workspace_dependency
+        .features
+        .extend(local_dependency.features);
+    if let Some(path) = &mut workspace_dependency.path {
+        *path = path_relative_to_current_contract(workspace_path, path);
+    }
+    workspace_dependency
+}
+
+fn path_relative_to_current_contract(
+    workspace_path: &Path,
+    workspace_dependency_path: &Path,
+) -> PathBuf {
+    let current_dir = std::env::current_dir().expect("failed to get current directory");
+    let contract_dir = current_dir
+        .join("..")
+        .canonicalize()
+        .expect("failed to resolve contract directory");
+    let absolute_dependency_path = workspace_path
+        .join(workspace_dependency_path)
+        .canonicalize()
+        .expect("failed to resolve workspace dependency path");
+
+    path_relative_from_to(&absolute_dependency_path, &contract_dir)
+}
+
+fn path_relative_from_to(path: &Path, base: &Path) -> PathBuf {
+    let path_components: Vec<_> = path.components().collect();
+    let base_components: Vec<_> = base.components().collect();
+    let common_len = path_components
+        .iter()
+        .zip(base_components.iter())
+        .take_while(|(path_component, base_component)| path_component == base_component)
+        .count();
+
+    let mut relative_path = PathBuf::new();
+    for _ in common_len..base_components.len() {
+        relative_path.push("..");
+    }
+    for component in &path_components[common_len..] {
+        relative_path.push(component.as_os_str());
+    }
+    relative_path
+}
+
 #[cfg(test)]
 mod tests {
     use std::path::Path;
@@ -276,6 +344,21 @@ members = [\".\"]
         assert_eq!(
             generated_contents.to_string_pretty(),
             EXPECTED_CARGO_TOML_CONTENTS.to_string()
+        );
+    }
+
+    #[test]
+    fn test_path_relative_from_to() {
+        assert_eq!(
+            super::path_relative_from_to(
+                Path::new("/repo/framework/base"),
+                Path::new("/repo/contracts/examples/adder"),
+            ),
+            Path::new("..")
+                .join("..")
+                .join("..")
+                .join("framework")
+                .join("base"),
         );
     }
 }

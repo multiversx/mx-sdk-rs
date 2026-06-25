@@ -3,6 +3,7 @@ use std::{collections::BTreeSet, path::PathBuf};
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 pub struct DependencyRawValue {
     pub version: Option<String>,
+    pub workspace: bool,
     pub git: Option<String>,
     pub rev: Option<String>,
     pub branch: Option<String>,
@@ -27,6 +28,9 @@ impl DependencyRawValue {
                 if let Some(toml::Value::String(version)) = table.get("version") {
                     result.version = Some(version.to_owned());
                 }
+                if let Some(toml::Value::Boolean(workspace)) = table.get("workspace") {
+                    result.workspace = *workspace;
+                }
                 if let Some(toml::Value::String(path)) = table.get("path") {
                     result.path = Some(PathBuf::from(path));
                 }
@@ -42,6 +46,13 @@ impl DependencyRawValue {
                 if let Some(toml::Value::String(tag)) = table.get("tag") {
                     result.tag = Some(tag.to_owned());
                 }
+                if let Some(toml::Value::Array(features)) = table.get("features") {
+                    result.features = features
+                        .iter()
+                        .map(|feature| feature.as_str().expect("feature is not a string"))
+                        .map(str::to_owned)
+                        .collect();
+                }
                 result
             }
             _ => panic!("Unsupported dependency value"),
@@ -53,6 +64,10 @@ impl DependencyRawValue {
 
         if let Some(version) = self.version {
             table.insert("version".to_string(), toml::Value::String(version));
+        }
+
+        if self.workspace {
+            table.insert("workspace".to_string(), toml::Value::Boolean(true));
         }
 
         if let Some(git) = self.git {
