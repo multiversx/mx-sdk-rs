@@ -30,16 +30,34 @@ impl InteractorConfig for ConnectionConfig {
     }
 }
 
+/// Deserializes a TOML config file into a value of type `C`.
+///
+/// Before parsing, sets the config file's parent directory as the base for
+/// resolving relative [`WalletConfig`] paths (see [`WalletConfig::set_config_base_dir`]).
+/// The base directory is cleared after parsing.
+///
+/// # Panics
+///
+/// Panics if the file cannot be opened, read, or parsed as valid TOML for `C`.
 pub fn load_toml_config<C>(config_path: &PathBuf) -> C
 where
     C: InteractorConfig + serde::de::DeserializeOwned,
 {
+    use super::wallet_config::WalletConfig;
+    use std::io::Read;
+
+    let base_dir = config_path.parent().map(|p| p.to_path_buf());
+    WalletConfig::set_config_base_dir(base_dir);
+
     let mut file = std::fs::File::open(config_path)
         .unwrap_or_else(|e| panic!("cannot open {}: {e}", config_path.display()));
     let mut content = String::new();
-    use std::io::Read;
     file.read_to_string(&mut content)
         .unwrap_or_else(|e| panic!("cannot read {}: {e}", config_path.display()));
-    toml::from_str(&content)
-        .unwrap_or_else(|e| panic!("cannot parse {}: {e}", config_path.display()))
+    let result = toml::from_str(&content)
+        .unwrap_or_else(|e| panic!("cannot parse {}: {e}", config_path.display()));
+
+    WalletConfig::set_config_base_dir(None);
+
+    result
 }
