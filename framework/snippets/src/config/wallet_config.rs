@@ -1,26 +1,20 @@
 use multiversx_sc_scenario::imports::Bech32Address;
 use serde::Deserialize;
-use std::{cell::RefCell, path::PathBuf, sync::OnceLock};
+use std::{path::PathBuf, sync::OnceLock};
 
 use crate::sdk::{
     test_wallets,
     wallet::{Keystore, Wallet},
 };
 
-thread_local! {
-    /// Set by [`load_toml_config`] to the parent directory of the config file
-    /// before deserialization begins. Consumed by [`WalletConfig`]'s `From` impl
-    /// to resolve relative `pem` / `keyfile` paths automatically, with no
-    /// per-config boilerplate needed.
-    pub static CONFIG_BASE_DIR: RefCell<Option<PathBuf>> = RefCell::new(None);
-}
+use super::ConfigPath;
 
 /// Raw helper used only for serde deserialization.
 #[derive(Deserialize)]
 struct WalletConfigRaw {
     test_wallet: Option<String>,
-    pem: Option<PathBuf>,
-    keyfile: Option<PathBuf>,
+    pem: Option<ConfigPath>,
+    keyfile: Option<ConfigPath>,
     keystore_password: Option<String>,
 }
 
@@ -47,30 +41,17 @@ pub struct WalletConfig {
 
 impl From<WalletConfigRaw> for WalletConfig {
     fn from(raw: WalletConfigRaw) -> Self {
-        let mut config = WalletConfig {
+        WalletConfig {
             test_wallet: raw.test_wallet,
-            pem: raw.pem,
-            keyfile: raw.keyfile,
+            pem: raw.pem.map(Into::into),
+            keyfile: raw.keyfile.map(Into::into),
             keystore_password: raw.keystore_password,
             cache: OnceLock::new(),
-        };
-        CONFIG_BASE_DIR.with(|cell| {
-            if let Some(ref base_dir) = *cell.borrow() {
-                config.set_base_dir(base_dir);
-            }
-        });
-        config
+        }
     }
 }
 
 impl WalletConfig {
-    /// Sets the base directory used to resolve relative `pem` / `keyfile` paths
-    /// during deserialization. Called by [`load_toml_config`] before parsing the
-    /// config file; pass `None` to clear after parsing.
-    pub(crate) fn set_config_base_dir(base_dir: Option<PathBuf>) {
-        CONFIG_BASE_DIR.with(|cell| *cell.borrow_mut() = base_dir);
-    }
-
     /// Creates a `WalletConfig` from a built-in test wallet name.
     pub fn from_test_wallet(name: impl Into<String>) -> Self {
         WalletConfig {
@@ -90,24 +71,6 @@ impl WalletConfig {
             keyfile: None,
             keystore_password: None,
             cache: OnceLock::new(),
-        }
-    }
-
-    /// Resolves any relative `pem` / `keyfile` paths against `base_dir`.
-    ///
-    /// Call this after deserializing a `WalletConfig` from a TOML/JSON file,
-    /// passing the directory that contains the config file as `base_dir`.
-    /// Absolute paths and `test_wallet` names are left unchanged.
-    pub fn set_base_dir(&mut self, base_dir: &std::path::Path) {
-        if let Some(pem) = &self.pem {
-            if pem.is_relative() {
-                self.pem = Some(base_dir.join(pem));
-            }
-        }
-        if let Some(keyfile) = &self.keyfile {
-            if keyfile.is_relative() {
-                self.keyfile = Some(base_dir.join(keyfile));
-            }
         }
     }
 

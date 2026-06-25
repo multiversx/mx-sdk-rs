@@ -43,11 +43,11 @@ pub fn load_toml_config<C>(config_path: &PathBuf) -> C
 where
     C: InteractorConfig + serde::de::DeserializeOwned,
 {
-    use super::wallet_config::WalletConfig;
+    use super::config_path::ConfigPath;
     use std::io::Read;
 
     let base_dir = config_path.parent().map(|p| p.to_path_buf());
-    WalletConfig::set_config_base_dir(base_dir);
+    ConfigPath::set_config_base_dir(base_dir);
 
     let mut file = std::fs::File::open(config_path)
         .unwrap_or_else(|e| panic!("cannot open {}: {e}", config_path.display()));
@@ -57,7 +57,7 @@ where
     let result = toml::from_str(&content)
         .unwrap_or_else(|e| panic!("cannot parse {}: {e}", config_path.display()));
 
-    WalletConfig::set_config_base_dir(None);
+    ConfigPath::set_config_base_dir(None);
 
     result
 }
