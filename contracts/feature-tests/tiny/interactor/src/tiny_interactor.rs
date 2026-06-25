@@ -99,10 +99,9 @@ impl TinyInteractor {
     }
 
     pub async fn call_x(&mut self) {
-        let wallet_address = self.config.wallet.address();
         self.interactor
             .tx()
-            .from(&wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_contract_address())
             .gas(1_100_000)
             .raw_call("x")

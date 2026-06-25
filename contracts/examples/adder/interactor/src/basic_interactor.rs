@@ -143,11 +143,10 @@ impl BasicInteractor {
     }
 
     pub async fn add(&mut self, value: u32) {
-        let wallet_address = self.config.wallet.address();
         self.interactor
             .tx()
             .id("interactor add")
-            .from(&wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
             .typed(adder_proxy::AdderProxy)

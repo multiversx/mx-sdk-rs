@@ -124,7 +124,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .id("deploy multisig")
-            .from(&self.config.wallet.address())
+            .from(self.config.wallet.address())
             .typed(multisig_proxy::MultisigProxy)
             .init(quorum, board)
             .code(&self.multisig_code)
@@ -218,12 +218,11 @@ impl MultisigInteract {
 
         self.sign(&actions_no_quorum_reached).await;
 
-        let from = self.config.wallet.address();
         let mut buffer = self.interactor.homogenous_call_buffer();
         let multisig_address = self.state.current_multisig_address();
         for action_id in action_ids {
             buffer.push_tx(|tx| {
-                tx.from(&from)
+                tx.from(self.config.wallet.address())
                     .to(multisig_address)
                     .gas(gas_expr)
                     .typed(multisig_proxy::MultisigProxy)

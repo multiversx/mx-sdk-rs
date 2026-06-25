@@ -100,14 +100,13 @@ impl PayableInteract {
     }
 
     pub async fn check_multi_transfer_only_egld_transfer(&mut self) {
-        let wallet_address = self.config.wallet.address();
         let mut payment = MultiEgldOrEsdtPayment::new();
         payment.push(EgldOrEsdtTokenPayment::egld_payment(1_0000u64.into()));
 
         let result = self
             .interactor
             .tx()
-            .from(&wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_payable_features_address())
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)
@@ -121,7 +120,6 @@ impl PayableInteract {
     }
 
     pub async fn check_all_transfers(&mut self) {
-        let wallet_address = self.config.wallet.address();
         let mut payment = MultiEgldOrEsdtPayment::new();
         payment.push(EgldOrEsdtTokenPayment::egld_payment(1_0000u64.into()));
         payment.push(EgldOrEsdtTokenPayment::egld_payment(2_0000u64.into()));
@@ -129,7 +127,7 @@ impl PayableInteract {
         let result = self
             .interactor
             .tx()
-            .from(&wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_payable_features_address())
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)

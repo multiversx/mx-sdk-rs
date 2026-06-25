@@ -209,12 +209,11 @@ impl PingPongEgldInteract {
         opt_activation_timestamp: Option<TimestampMillis>,
         max_funds: OptionalValue<RustBigUint>,
     ) {
-        let wallet_address = self.config.wallet.address();
         let response = self
             .interactor
             .tx()
             .to(self.state.current_ping_pong_egld_address())
-            .from(&wallet_address)
+            .from(self.config.wallet.address())
             .gas(30_000_000u64)
             .typed(proxy::PingPongEgldProxy)
             .upgrade(ping_amount, duration, opt_activation_timestamp, max_funds)
