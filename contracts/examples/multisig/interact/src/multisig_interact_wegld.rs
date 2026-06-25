@@ -54,7 +54,11 @@ impl MultisigInteract {
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(&self.config.general.wegld_address, WRAP_AMOUNT, function_call)
+            .propose_async_call(
+                &self.config.general.wegld_address,
+                WRAP_AMOUNT,
+                function_call,
+            )
             .returns(ReturnsResult)
             .run()
             .await;

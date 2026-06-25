@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::imports::Bech32Address;
-use multiversx_sc_snippets::imports::{ConnectionConfig, Wallet, WalletConfig};
 use multiversx_sc_snippets::InteractorConfig;
+use multiversx_sc_snippets::imports::{ConnectionConfig, Wallet, WalletConfig};
 use serde::Deserialize;
 
 /// General settings for the multisig interact.
