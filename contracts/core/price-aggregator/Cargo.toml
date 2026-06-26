@@ -19,8 +19,7 @@ edition = "2024"
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../framework/base"
+workspace = true
 
 [dependencies.multiversx-sc-modules]
 version = "0.66.2"

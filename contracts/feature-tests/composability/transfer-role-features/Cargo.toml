@@ -12,8 +12,7 @@ path = "src/lib.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../../framework/base"
+workspace = true
 
 [dependencies.multiversx-sc-modules]
 version = "0.66.2"

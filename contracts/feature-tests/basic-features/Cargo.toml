@@ -12,8 +12,7 @@ path = "src/basic_features_main.rs"
 small-int-bug = ["multiversx-sc/small-int-bug"]
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../framework/base"
+workspace = true
 
 # BLS doesn't currently work on Windows
 [target.'cfg(not(target_os = "windows"))'.dev-dependencies.multiversx-sc-scenario]

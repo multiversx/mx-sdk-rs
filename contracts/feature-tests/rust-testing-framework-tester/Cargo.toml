@@ -6,8 +6,7 @@ edition = "2024"
 publish = false
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../framework/base"
+workspace = true
 features = [ "alloc" ]
 
 [dev-dependencies.adder]

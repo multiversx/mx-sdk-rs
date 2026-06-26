@@ -12,8 +12,7 @@ path = "src/lottery.rs"
 path = "../erc20"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../../framework/base"
+workspace = true
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]

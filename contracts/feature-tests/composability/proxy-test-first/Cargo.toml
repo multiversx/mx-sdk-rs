@@ -9,8 +9,7 @@ publish = false
 path = "src/proxy-test-first.rs"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../../framework/base"
+workspace = true
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
