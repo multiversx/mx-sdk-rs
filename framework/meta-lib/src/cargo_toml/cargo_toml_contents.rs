@@ -704,7 +704,7 @@ path = "framework/scenario"
             DependencyRawValue {
                 version: Some("0.54.0".to_owned()),
                 path: Some(path),
-                features: ["alloc".to_owned(), "std".to_owned()].into(),
+                features: ["std".to_owned()].into(),
                 ..Default::default()
             },
         );
