@@ -1,4 +1,5 @@
 use crate::{cli::TemplateArgs, version::FrameworkVersion, version_history::LAST_TEMPLATE_VERSION};
+use multiversx_sc_meta_lib::cargo_toml::WorkspaceDependencies;
 
 use super::{
     ContractCreatorTarget, RepoSource, RepoVersion, TemplateAdjuster,
@@ -77,6 +78,9 @@ impl<'a> ContractCreator<'a> {
             .unwrap_or_else(|| panic!("Unknown template {template_name}"));
 
         let metadata = template_source.metadata.clone();
+        let workspace_dependencies =
+            WorkspaceDependencies::load_from_dir(repo_source.repo_path());
+        
         ContractCreator {
             repo_source,
             template_source,
@@ -86,12 +90,14 @@ impl<'a> ContractCreator<'a> {
                 target,
                 keep_paths,
                 new_author,
+                workspace_dependencies,
             },
         }
     }
 
     pub fn create_contract(&self, args_tag: FrameworkVersion) {
         self.copy_template(args_tag);
+        self.resolve_workspace_dependencies();
         self.update_dependencies();
         self.rename_template();
     }
@@ -103,6 +109,11 @@ impl<'a> ContractCreator<'a> {
 
     pub fn update_dependencies(&self) {
         self.adjuster.update_cargo_toml_files();
+    }
+
+    pub fn resolve_workspace_dependencies(&self) {
+        self.adjuster
+            .resolve_workspace_dependencies();
     }
 
     pub fn rename_template(&self) {
