@@ -5,7 +5,7 @@ use serial_test::serial;
 fn chain_simulator_config() -> Config {
     Config {
         general: GeneralConfig {
-            contract_path: "../output/adder.mxsc.json".to_owned(),
+            contract_path: "../output/adder.mxsc.json".into(),
         },
         connection: ConnectionConfig::chain_simulator(),
         owner: WalletConfig::from_test_wallet("mike"),

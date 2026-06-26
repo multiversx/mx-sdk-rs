@@ -142,7 +142,7 @@ impl ContractInteract {
                     .gas(80_000_000u64)
                     .typed(forwarder_blind_proxy::ForwarderBlindProxy)
                     .init()
-                    .code(FilePath(&self.config.general.contract_path))
+                    .code(&self.config.general.contract_path)
                     .code_metadata(CodeMetadata::PAYABLE)
                     .returns(ReturnsNewBech32Address)
             });

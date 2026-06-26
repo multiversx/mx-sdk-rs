@@ -1,11 +1,10 @@
-use multiversx_sc_snippets::InteractorConfig;
-use multiversx_sc_snippets::imports::{Bech32Address, ConnectionConfig, Wallet, WalletConfig};
+use multiversx_sc_snippets::imports::*;
 use serde::Deserialize;
 
 /// General settings for the forwarder-blind dex interact.
 #[derive(Debug, Deserialize)]
 pub struct GeneralConfig {
-    pub contract_path: String,
+    pub contract_path: ConfigPath,
     pub wegld_address: Bech32Address,
     pub pair_address: Bech32Address,
     pub wegld_token_id: String,

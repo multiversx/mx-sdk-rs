@@ -1,12 +1,10 @@
-use multiversx_sc_scenario::imports::Bech32Address;
-use multiversx_sc_snippets::InteractorConfig;
-use multiversx_sc_snippets::imports::{ConnectionConfig, Wallet, WalletConfig};
+use multiversx_sc_snippets::imports::*;
 use serde::Deserialize;
 
 /// General settings for the multisig interact.
 #[derive(Debug, Deserialize)]
 pub struct GeneralConfig {
-    pub contract_path: String,
+    pub contract_path: ConfigPath,
     pub quorum: usize,
     pub wegld_address: Bech32Address,
 }

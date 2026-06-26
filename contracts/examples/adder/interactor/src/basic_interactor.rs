@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 /// Adder Interact general settings
 #[derive(Debug, Deserialize)]
 pub struct GeneralConfig {
-    pub contract_path: String,
+    pub contract_path: ConfigPath,
 }
 
 /// Adder Interact configuration
@@ -107,7 +107,7 @@ impl BasicInteractor {
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
-            .code(MxscPath::new(&self.config.general.contract_path))
+            .code(&self.config.general.contract_path)
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
@@ -125,7 +125,7 @@ impl BasicInteractor {
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(new_value)
-            .code(MxscPath::new(&self.config.general.contract_path))
+            .code(&self.config.general.contract_path)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsHandledOrError::new())
             .run()
