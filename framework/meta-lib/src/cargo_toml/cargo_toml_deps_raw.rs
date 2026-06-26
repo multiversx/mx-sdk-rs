@@ -109,6 +109,8 @@ impl DependencyRawValue {
     }
 
     /// Removes the `workspace = true` flag and replaces the dependency fields from `workspace_dep`.
+    ///
+    /// Doesn't touch anything other than dependency specification fields (version, git, rev, branch, tag, path). No features.
     pub fn replace_workspace_dep(&mut self, workspace_dep: &DependencyRawValue) {
         self.workspace = false;
         self.version = workspace_dep.version.clone();

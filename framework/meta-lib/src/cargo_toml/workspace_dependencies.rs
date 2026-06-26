@@ -5,6 +5,8 @@ use std::{
 
 use toml::value::Table;
 
+use crate::tools::find_workspace;
+
 use super::{CARGO_TOML_DEPENDENCIES, CargoTomlContents, DependencyRawValue};
 
 const WORKSPACE: &str = "workspace";
@@ -22,6 +24,23 @@ impl WorkspaceDependencies {
             CargoTomlContents::load_from_file(workspace_path.join("Cargo.toml"));
 
         Self::from_cargo_toml(workspace_path, &cargo_toml_contents)
+    }
+
+    /// Like [`load_from_dir`](Self::load_from_dir), but returns an empty
+    /// `WorkspaceDependencies` if no `Cargo.toml` exists at `workspace_path`
+    /// instead of panicking.
+    pub fn try_load_from_dir(workspace_path: impl AsRef<Path>) -> Option<Self> {
+        let workspace_path = workspace_path.as_ref();
+        let cargo_toml_path = workspace_path.join("Cargo.toml");
+        if !cargo_toml_path.is_file() {
+            return None;
+        }
+        Some(Self::load_from_dir(workspace_path))
+    }
+
+    pub fn find_from_dir(dir: impl AsRef<Path>) -> Option<Self> {
+        let workspace_path = find_workspace(dir.as_ref())?;
+        Self::try_load_from_dir(workspace_path)
     }
 
     pub fn from_cargo_toml(
