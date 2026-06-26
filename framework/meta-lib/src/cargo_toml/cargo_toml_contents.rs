@@ -199,7 +199,7 @@ fn resolve_workspace_dependencies_in_table(
             continue;
         }
 
-        let workspace_dep = workspace_dependencies.resolve_dependency(&crate_name, manifest_dir);
+        let workspace_dep = workspace_dependencies.resolve_dependency(crate_name, manifest_dir);
         local_dep.replace_workspace_dep(&workspace_dep);
         *value = local_dep.into_toml_value();
     }
