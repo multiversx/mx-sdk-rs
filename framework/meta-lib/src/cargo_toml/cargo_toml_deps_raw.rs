@@ -107,4 +107,15 @@ impl DependencyRawValue {
 
         toml::Value::Table(table)
     }
+
+    /// Removes the `workspace = true` flag and replaces the dependency fields from `workspace_dep`.
+    pub fn replace_workspace_dep(&mut self, workspace_dep: &DependencyRawValue) {
+        self.workspace = false;
+        self.version = workspace_dep.version.clone();
+        self.git = workspace_dep.git.clone();
+        self.rev = workspace_dep.rev.clone();
+        self.branch = workspace_dep.branch.clone();
+        self.tag = workspace_dep.tag.clone();
+        self.path = workspace_dep.path.clone();
+    }
 }

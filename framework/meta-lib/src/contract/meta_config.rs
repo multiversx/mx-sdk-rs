@@ -80,6 +80,7 @@ impl MetaConfig {
             let mut framework_dependency = main_cargo_toml_contents
                 .dependency_raw_value(FRAMEWORK_NAME_BASE)
                 .expect("missing framework dependency in Cargo.toml");
+            framework_dependency.features.clear();
             if contract.settings.std {
                 framework_dependency.features.insert("std".to_owned());
             }

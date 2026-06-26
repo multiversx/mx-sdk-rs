@@ -78,9 +78,8 @@ impl<'a> ContractCreator<'a> {
             .unwrap_or_else(|| panic!("Unknown template {template_name}"));
 
         let metadata = template_source.metadata.clone();
-        let workspace_dependencies =
-            WorkspaceDependencies::load_from_dir(repo_source.repo_path());
-        
+        let workspace_dependencies = WorkspaceDependencies::load_from_dir(repo_source.repo_path());
+
         ContractCreator {
             repo_source,
             template_source,
@@ -112,8 +111,7 @@ impl<'a> ContractCreator<'a> {
     }
 
     pub fn resolve_workspace_dependencies(&self) {
-        self.adjuster
-            .resolve_workspace_dependencies();
+        self.adjuster.resolve_workspace_dependencies();
     }
 
     pub fn rename_template(&self) {

@@ -159,18 +159,6 @@ impl CargoTomlContents {
         self.path.parent().unwrap_or_else(|| Path::new("."))
     }
 
-    /// Resolves a single inherited `workspace = true` dependency to a concrete dependency value.
-    ///
-    /// The workspace-relative `path` entries are rebased relative to this manifest's directory.
-    pub fn resolve_dependency_from_workspace(
-        &self,
-        workspace_dependencies: &WorkspaceDependencies,
-        crate_name: &str,
-        local_dependency: DependencyRawValue,
-    ) -> DependencyRawValue {
-        workspace_dependencies.resolve_dependency(crate_name, local_dependency, self.manifest_dir())
-    }
-
     /// Resolves inherited `workspace = true` dependencies in both `[dependencies]` and
     /// `[dev-dependencies]` using dependencies declared in the workspace root.
     pub fn resolve_workspace_dependencies(
@@ -206,21 +194,15 @@ fn resolve_workspace_dependencies_in_table(
     manifest_dir: &Path,
 ) {
     for (crate_name, value) in deps_map {
-        if !dependency_uses_workspace(value) {
+        let mut local_dep = DependencyRawValue::parse_toml_value(value);
+        if !local_dep.workspace {
             continue;
         }
-        let local_dependency = DependencyRawValue::parse_toml_value(value);
-        let resolved_dependency =
-            workspace_dependencies.resolve_dependency(&crate_name, local_dependency, manifest_dir);
-        *value = resolved_dependency.into_toml_value();
-    }
-}
 
-fn dependency_uses_workspace(value: &Value) -> bool {
-    value
-        .get("workspace")
-        .and_then(|workspace| workspace.as_bool())
-        .unwrap_or_default()
+        let workspace_dep = workspace_dependencies.resolve_dependency(&crate_name, manifest_dir);
+        local_dep.replace_workspace_dep(&workspace_dep);
+        *value = local_dep.into_toml_value();
+    }
 }
 
 impl CargoTomlContents {

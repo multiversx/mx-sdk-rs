@@ -52,16 +52,12 @@ impl WorkspaceDependencies {
     pub(crate) fn resolve_dependency(
         &self,
         crate_name: &str,
-        local_dependency: DependencyRawValue,
         relative_dir: &Path,
     ) -> DependencyRawValue {
         let mut workspace_dependency = self
             .get(crate_name)
             .unwrap_or_else(|| panic!("missing workspace dependency in Cargo.toml: {crate_name}"))
             .clone();
-        workspace_dependency
-            .features
-            .extend(local_dependency.features);
 
         if let Some(path) = &mut workspace_dependency.path {
             *path = path_relative_from_to(
