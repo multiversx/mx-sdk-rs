@@ -24,5 +24,4 @@ path = "../kitty-genetic-alg"
 workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../../framework/scenario"
+workspace = true

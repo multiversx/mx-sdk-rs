@@ -17,5 +17,4 @@ path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../../framework/scenario"
+workspace = true

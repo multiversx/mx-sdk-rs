@@ -16,14 +16,12 @@ workspace = true
 
 # BLS doesn't currently work on Windows
 [target.'cfg(not(target_os = "windows"))'.dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
+workspace = true
 features = ["wasmer-experimental", "bls"]
-path = "../../../framework/scenario"
 
 [target.'cfg(target_os = "windows")'.dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
+workspace = true
 features = ["wasmer-experimental"]
-path = "../../../framework/scenario"
 
 [dependencies.multiversx-sc-modules]
 version = "0.66.2"

@@ -11,8 +11,7 @@ path = "src/gas_tests.rs"
 workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../framework/scenario"
+workspace = true
 
 [dependencies.multiversx-chain-vm-wasmer-prod]
 path = "../../../chain/wasmer-prod"

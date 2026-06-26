@@ -13,5 +13,4 @@ path = "src/lib.rs"
 workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../../../framework/scenario"
+workspace = true

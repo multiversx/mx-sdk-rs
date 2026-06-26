@@ -13,8 +13,7 @@ workspace = true
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../../framework/scenario"
+workspace = true
 
 [dev-dependencies.erc1155-user-mock]
 path="../erc1155-user-mock"

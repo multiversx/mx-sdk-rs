@@ -12,8 +12,7 @@ path = "src/proxy_pause.rs"
 workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../framework/scenario"
+workspace = true
 
 [dev-dependencies.check-pause]
 path = "../check-pause"

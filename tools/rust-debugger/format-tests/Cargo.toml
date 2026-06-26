@@ -12,8 +12,7 @@ path = "src/format_tests.rs"
 workspace = true
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.66.2"
-path = "../../../framework/scenario"
+workspace = true
 
 [dependencies.multiversx-chain-vm]
 version = "=0.23.1"
