@@ -14,6 +14,4 @@ path = ".."
 workspace = true
 
 [dependencies.multiversx-sc-meta-lib]
-version = "0.66.2"
-path = "../../../../framework/meta-lib"
-default-features = false
+workspace = true
