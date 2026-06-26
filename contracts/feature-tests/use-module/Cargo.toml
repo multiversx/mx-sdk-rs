@@ -16,9 +16,8 @@ path = "../../../contracts/modules"
 workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
+workspace = true
 features = ["wasmer-experimental"]
-path = "../../../framework/scenario"
 
 [dev-dependencies.multiversx-sc-meta-lib]
 workspace = true

@@ -19,8 +19,7 @@ toml = "1.0"
 workspace = true
 
 [dependencies.multiversx-sc-snippets]
-version = "0.66.2"
-path = "../../../../framework/snippets"
+workspace = true
 
 [dependencies.mesh-node]
 path = "../mesh-node"
