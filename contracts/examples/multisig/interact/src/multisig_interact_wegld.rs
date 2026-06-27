@@ -34,7 +34,7 @@ impl MultisigInteract {
 
     pub async fn wegld_swap_set_state(&mut self) {
         self.interactor
-            .retrieve_account(&self.config.wegld_address)
+            .retrieve_account(&self.config.general.wegld_address)
             .await;
     }
 
@@ -42,7 +42,7 @@ impl MultisigInteract {
         let function_call = self
             .interactor
             .tx()
-            .to(&self.config.wegld_address)
+            .to(&self.config.general.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .wrap_egld()
             .into_function_call();
@@ -50,11 +50,15 @@ impl MultisigInteract {
         let action_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(&self.config.wegld_address, WRAP_AMOUNT, function_call)
+            .propose_async_call(
+                &self.config.general.wegld_address,
+                WRAP_AMOUNT,
+                function_call,
+            )
             .returns(ReturnsResult)
             .run()
             .await;
@@ -67,7 +71,7 @@ impl MultisigInteract {
         let wegld_token_id = self
             .interactor
             .query()
-            .to(&self.config.wegld_address)
+            .to(&self.config.general.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .wrapped_egld_token_id()
             .returns(ReturnsResult)
@@ -85,7 +89,7 @@ impl MultisigInteract {
         let normalized_tx = self
             .interactor
             .tx()
-            .to(&self.config.wegld_address)
+            .to(&self.config.general.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .unwrap_egld()
             .single_esdt(&wegld_token_id, 0u64, &UNWRAP_AMOUNT.into())
@@ -96,7 +100,7 @@ impl MultisigInteract {
         let action_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)

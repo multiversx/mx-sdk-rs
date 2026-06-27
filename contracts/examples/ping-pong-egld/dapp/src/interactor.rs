@@ -42,8 +42,9 @@ pub struct ContractInteract {
 impl ContractInteract {
     pub async fn new() -> Self {
         let config = Config::new();
-        let mut interactor = DappInteractor::new(&config.gateway).await;
-        interactor.set_current_dir_from_workspace("contracts/examples/ping-pong-egld/dapp");
+        let mut interactor = DappInteractor::new(&config.gateway)
+            .await
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
 
         let contract_code = BytesValue::from(PING_PONG_CODE);

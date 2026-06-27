@@ -90,6 +90,16 @@ impl Wallet {
         self.address.clone()
     }
 
+    /// Returns the address as a [`Bech32Address`], using the HRP from the wallet source
+    /// (`PemFile` or `Keystore`) when available, and the default HRP (`"erd"`) otherwise.
+    pub fn to_bech32(&self) -> Bech32Address {
+        let hrp = match &self.source {
+            WalletSource::PemFile(hrp) | WalletSource::Keystore(hrp) => *hrp,
+            _ => Bech32Hrp::default(),
+        };
+        Bech32Address::encode_address(hrp, self.address.clone())
+    }
+
     pub fn private_key_hex(&self) -> String {
         self.private_key.to_seed_hex()
     }

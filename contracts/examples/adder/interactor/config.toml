@@ -1,7 +1,26 @@
+[general]
+contract_path = '../output/adder.mxsc.json'
 
+[connection]
 # chain_type = 'simulator'
 # gateway_uri = 'http://localhost:8085'
 
 chain_type = 'real'
 gateway_uri = 'https://devnet-gateway.multiversx.com'
 
+# Owner wallet - used for deploying and upgrading the contract.
+# Provide exactly one of: test_wallet, pem, or keyfile.
+[owner]
+test_wallet = 'mike'
+# pem = 'path/to/owner.pem'
+# keyfile = 'path/to/owner.json'
+# keystore_password = 'password'
+
+# User wallet - used for calling contract endpoints.
+# Provide exactly one of: test_wallet, pem, or keyfile.
+# Can be the same as the owner wallet if desired.
+[wallet]
+test_wallet = 'ivan'
+# pem = 'path/to/wallet.pem'
+# keyfile = 'path/to/wallet.json'
+# keystore_password = 'password'

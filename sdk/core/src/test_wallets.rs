@@ -211,6 +211,16 @@ pub fn for_shard(shard_id: ShardId) -> Wallet {
     }
 }
 
+/// Returns the wallet for the named test wallet, or `None` if the name is unknown.
+///
+/// For the list of valid names see [`valid_names()`].
+pub fn by_name(name: &str) -> Option<Wallet> {
+    WALLETS
+        .iter()
+        .find(|(n, _)| *n == name)
+        .map(|(static_name, pem)| Wallet::new_test_wallet(static_name, pem))
+}
+
 pub fn valid_names() -> Vec<&'static str> {
     WALLETS.iter().map(|(n, _)| *n).collect()
 }

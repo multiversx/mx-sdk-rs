@@ -5,6 +5,7 @@ pub use crate::{
     InteractorSimulateGasAsync, SimulateGas, StepBuffer, dns_address_for_name,
 };
 
+pub use crate::config::*;
 pub use crate::sdk::{test_wallets, validator::Validator, wallet::Wallet};
 
 pub use env_logger;

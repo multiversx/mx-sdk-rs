@@ -1,22 +1,54 @@
 mod basic_interactor_cli;
-mod basic_interactor_config;
-mod basic_interactor_state;
 
 use adder::adder_proxy;
-pub use basic_interactor_config::Config;
-use basic_interactor_state::State;
 use clap::Parser;
-
 use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
 
-const ADDER_CODE_PATH: MxscPath = MxscPath::new("../output/adder.mxsc.json");
+/// Adder Interact general settings
+#[derive(Debug, Deserialize)]
+pub struct GeneralConfig {
+    pub contract_path: ConfigPath,
+}
+
+/// Adder Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub general: GeneralConfig,
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+    }
+}
+
+/// Adder Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub adder_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the adder contract
+    pub fn current_adder_address(&self) -> &Bech32Address {
+        self.adder_address
+            .as_ref()
+            .expect("no known adder contract, deploy first")
+    }
+}
 
 pub async fn adder_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut basic_interact = BasicInteractor::new(config).await;
+    let mut basic_interact = BasicInteractor::from_config().await;
 
     let cli = basic_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -24,7 +56,7 @@ pub async fn adder_cli() {
             basic_interact.deploy().await;
         }
         Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
-            let owner_address = basic_interact.adder_owner_address.clone();
+            let owner_address = basic_interact.config.owner.address();
             basic_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
@@ -42,28 +74,19 @@ pub async fn adder_cli() {
 
 pub struct BasicInteractor {
     pub interactor: Interactor,
-    pub adder_owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
-    pub state: State,
+    pub config: Config,
+    pub state: AutoSave<State>,
 }
 
 impl BasicInteractor {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
-        interactor.set_current_dir_from_workspace("contracts/examples/adder/interactor");
-
-        let adder_owner_address = interactor.register_wallet(test_wallets::mike()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
-
-        interactor.generate_blocks(30u64).await.unwrap();
-
+    pub async fn from_config() -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
+        let state = interactor.load_state::<State>();
         BasicInteractor {
             interactor,
-            adder_owner_address: adder_owner_address.into(),
-            wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            config,
+            state,
         }
     }
 
@@ -75,21 +98,22 @@ impl BasicInteractor {
     }
 
     pub async fn deploy(&mut self) {
+        let owner_address = self.config.owner.address();
         let new_address = self
             .interactor
             .tx()
             .id("interactor deploy")
-            .from(&self.adder_owner_address.clone())
+            .from(&owner_address)
             .gas(100_000_000)
             .typed(adder_proxy::AdderProxy)
             .init(0u64)
-            .code(ADDER_CODE_PATH)
+            .code(&self.config.general.contract_path)
             .returns(ReturnsNewBech32Address)
             .run()
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_adder_address(new_address);
+        self.state.adder_address = Some(new_address);
     }
 
     pub async fn upgrade(&mut self, new_value: u32, sender: &Bech32Address, err: Option<&str>) {
@@ -101,7 +125,7 @@ impl BasicInteractor {
             .gas(6_000_000)
             .typed(adder_proxy::AdderProxy)
             .upgrade(new_value)
-            .code(ADDER_CODE_PATH)
+            .code(&self.config.general.contract_path)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsHandledOrError::new())
             .run()
@@ -122,7 +146,7 @@ impl BasicInteractor {
         self.interactor
             .tx()
             .id("interactor add")
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
             .typed(adder_proxy::AdderProxy)
