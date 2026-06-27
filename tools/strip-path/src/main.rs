@@ -4,8 +4,7 @@ use std::path::Path;
 
 fn main() {
     let root = std::env::args().nth(1).unwrap_or_else(|| ".".to_string());
-    let workspace_dependencies =
-        WorkspaceDependencies::find_from_dir(&root).unwrap_or_default();
+    let workspace_dependencies = WorkspaceDependencies::find_from_dir(&root).unwrap_or_default();
     strip_path(
         Path::new(&root),
         &["target".to_string()],

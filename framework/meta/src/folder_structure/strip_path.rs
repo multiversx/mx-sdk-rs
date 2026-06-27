@@ -44,16 +44,15 @@ fn strip_framework_paths(
     }
 
     let mut cargo_toml = CargoTomlContents::load_from_file(&cargo_toml_path);
-    cargo_toml.resolve_workspace_dependencies(workspace_dependencies);
-    let changed = cargo_toml.strip_dependency_paths(FRAMEWORK_CRATE_NAMES);
+    let ws_changed = cargo_toml.resolve_workspace_dependencies(workspace_dependencies);
+    let paths_stripped = cargo_toml.strip_dependency_paths(FRAMEWORK_CRATE_NAMES);
 
-    if changed {
+    if paths_stripped {
         println!("Stripped: {}", cargo_toml_path.display());
-        cargo_toml.save_to_file(&cargo_toml_path);
-    } else if !workspace_dependencies.is_empty() {
-        // Still save if workspace deps were resolved even if no path stripping occurred.
+    }
+    if ws_changed || paths_stripped {
         cargo_toml.save_to_file(&cargo_toml_path);
     }
 
-    changed
+    paths_stripped
 }
