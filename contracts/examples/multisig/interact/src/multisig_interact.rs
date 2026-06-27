@@ -128,6 +128,7 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .init(quorum, board)
             .code(&self.multisig_code)
+            .code_metadata(CodeMetadata::PAYABLE)
             .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewBech32Address)
             .run()
@@ -182,7 +183,8 @@ impl MultisigInteract {
             .tx()
             .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
-            .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
+            .egld(50_000_000_000_000_000u64) // 0,05 or 5 * 10^16
+            .gas(50_000)
             .run()
             .await;
     }
