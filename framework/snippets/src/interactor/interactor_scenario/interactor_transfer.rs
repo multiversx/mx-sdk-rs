@@ -28,7 +28,11 @@ where
             .await
             .unwrap();
 
-        println!("transfer tx hash: {tx_hash}");
+        if let Some(ex) = &self.explorer_url {
+            println!("transfer: {}", ex.tx_url(&tx_hash));
+        } else {
+            println!("transfer tx hash: {tx_hash}");
+        }
         info!("transfer tx hash: {}", tx_hash);
 
         retrieve_tx_on_network(self.proxy(), tx_hash.clone())
