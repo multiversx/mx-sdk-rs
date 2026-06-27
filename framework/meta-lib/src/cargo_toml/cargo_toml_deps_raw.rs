@@ -10,7 +10,27 @@ pub struct DependencyRawValue {
     pub tag: Option<String>,
     pub path: Option<PathBuf>,
     pub features: BTreeSet<String>,
+    pub default_features: Option<bool>,
+    pub optional: Option<bool>,
+    pub package: Option<String>,
+    pub registry: Option<String>,
 }
+
+/// All dependency table keys recognized by Cargo and modeled in [`DependencyRawValue`].
+const KNOWN_DEP_KEYS: &[&str] = &[
+    "version",
+    "workspace",
+    "path",
+    "git",
+    "rev",
+    "branch",
+    "tag",
+    "features",
+    "default-features",
+    "optional",
+    "package",
+    "registry",
+];
 
 impl DependencyRawValue {
     pub fn from_version(version: &str) -> Self {
@@ -24,6 +44,12 @@ impl DependencyRawValue {
         match toml_value {
             toml::Value::String(version) => DependencyRawValue::from_version(version),
             toml::Value::Table(table) => {
+                for key in table.keys() {
+                    assert!(
+                        KNOWN_DEP_KEYS.contains(&key.as_str()),
+                        "unknown dependency key: {key:?}"
+                    );
+                }
                 let mut result = DependencyRawValue::default();
                 if let Some(toml::Value::String(version)) = table.get("version") {
                     result.version = Some(version.to_owned());
@@ -52,6 +78,20 @@ impl DependencyRawValue {
                         .map(|feature| feature.as_str().expect("feature is not a string"))
                         .map(str::to_owned)
                         .collect();
+                }
+                if let Some(toml::Value::Boolean(default_features)) =
+                    table.get("default-features")
+                {
+                    result.default_features = Some(*default_features);
+                }
+                if let Some(toml::Value::Boolean(optional)) = table.get("optional") {
+                    result.optional = Some(*optional);
+                }
+                if let Some(toml::Value::String(package)) = table.get("package") {
+                    result.package = Some(package.to_owned());
+                }
+                if let Some(toml::Value::String(registry)) = table.get("registry") {
+                    result.registry = Some(registry.to_owned());
                 }
                 result
             }
@@ -105,12 +145,33 @@ impl DependencyRawValue {
             );
         }
 
+        if let Some(default_features) = self.default_features {
+            table.insert(
+                "default-features".to_string(),
+                toml::Value::Boolean(default_features),
+            );
+        }
+
+        if let Some(optional) = self.optional {
+            table.insert("optional".to_string(), toml::Value::Boolean(optional));
+        }
+
+        if let Some(package) = self.package {
+            table.insert("package".to_string(), toml::Value::String(package));
+        }
+
+        if let Some(registry) = self.registry {
+            table.insert("registry".to_string(), toml::Value::String(registry));
+        }
+
         toml::Value::Table(table)
     }
 
     /// Removes the `workspace = true` flag and replaces the dependency fields from `workspace_dep`.
     ///
-    /// Doesn't touch anything other than dependency specification fields (version, git, rev, branch, tag, path). No features.
+    /// Copies specification fields (version, git, rev, branch, tag, path, default-features,
+    /// package, registry) from the workspace dep. Does not touch `features` or `optional`,
+    /// which are local-only attributes that the crate controls independently.
     pub fn replace_workspace_dep(&mut self, workspace_dep: &DependencyRawValue) {
         self.workspace = false;
         self.version = workspace_dep.version.clone();
@@ -119,5 +180,8 @@ impl DependencyRawValue {
         self.branch = workspace_dep.branch.clone();
         self.tag = workspace_dep.tag.clone();
         self.path = workspace_dep.path.clone();
+        self.default_features = workspace_dep.default_features;
+        self.package = workspace_dep.package.clone();
+        self.registry = workspace_dep.registry.clone();
     }
 }
