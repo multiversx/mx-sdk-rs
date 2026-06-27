@@ -32,6 +32,7 @@ members = [
   "tools/mxpy-snippet-generator",
   "tools/op-test-gen",
   "tools/strip-path",
+  "tools/wallet-miner",
   "tools/wat-gen",
 
   "contracts/modules",
@@ -211,3 +212,19 @@ members = [
   # "chain/wasmer-prod", ## not included, references wasmer 2.2
   # "contracts/feature-tests/gas-tests", ## uncomment for easier development
 ]
+
+[workspace.dependencies.multiversx-sc]
+version = "0.66.2"
+path = "framework/base"
+
+[workspace.dependencies.multiversx-sc-scenario]
+version = "0.66.2"
+path = "framework/scenario"
+
+[workspace.dependencies.multiversx-sc-meta-lib]
+version = "0.66.2"
+path = "framework/meta-lib"
+
+[workspace.dependencies.multiversx-sc-snippets]
+version = "0.66.2"
+path = "framework/snippets"

@@ -4,7 +4,7 @@ use std::time::Duration;
 use hex::ToHex;
 use multiversx_chain_core::std::crypto;
 use multiversx_sc_snippets::imports::Bech32Address;
-use multiversx_sc_snippets::sdk::wallet::Wallet;
+use multiversx_sc_snippets::sdk::wallet::{Wallet, WalletSignature};
 
 use crate::cli::ReproducibleBuildPublishArgs;
 use crate::cli::cli_args_sender::load_wallet;
@@ -52,12 +52,12 @@ pub async fn publish_contract(args: &ReproducibleBuildPublishArgs) {
     );
 
     // Sign the payload.
-    let signature_hex = sign_payload(&wallet, &contract, &payload);
+    let signature = sign_payload(&wallet, &contract, &payload);
 
     let url = format!("{}/verifier", args.verifier_url.trim_end_matches('/'));
     let (status, body) = post_verification_request(
         &url,
-        &signature_hex,
+        signature,
         &contract,
         &args.docker_image,
         &source_code,
@@ -106,17 +106,20 @@ pub(super) fn compute_bytes_for_signing(contract: &Bech32Address, payload: &str)
     crypto::keccak256(&content).to_vec()
 }
 
-/// Signs the payload using the MultiversX message signing protocol and returns the hex signature.
-pub(super) fn sign_payload(wallet: &Wallet, contract: &Bech32Address, payload: &str) -> String {
+/// Signs the payload using the MultiversX message signing protocol and returns the signature.
+pub(super) fn sign_payload(
+    wallet: &Wallet,
+    contract: &Bech32Address,
+    payload: &str,
+) -> WalletSignature {
     let bytes_to_sign = compute_bytes_for_signing(contract, payload);
-    let signature: [u8; 64] = wallet.sign_bytes(bytes_to_sign);
-    signature.encode_hex()
+    wallet.sign_bytes(bytes_to_sign)
 }
 
 /// POSTs the verification request and returns the HTTP status code and parsed response body.
 async fn post_verification_request(
     url: &str,
-    signature: &str,
+    signature: WalletSignature,
     contract: &Bech32Address,
     docker_image: &str,
     source_code: &serde_json::Value,
@@ -228,7 +231,6 @@ async fn poll_task(verifier_url: &str, task_id: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hex::ToHex;
     use multiversx_chain_core::std::crypto::{keccak256, sha256};
 
     /// Independently re-implements the signing bytes computation and checks it matches.

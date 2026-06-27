@@ -3115,12 +3115,16 @@ checksum = "049721bdb4abb82202cf8d9b7981ef0c080615b7cb4ef2de345694a5329f1216"
 name = "multiversx-chain-core"
 version = "0.23.1"
 dependencies = [
+ "base64",
  "bech32",
  "bitflags 2.11.1",
  "blake2",
+ "ed25519-dalek",
  "hex",
+ "hex-literal",
  "multiversx-sc-codec",
  "serde",
+ "serde_json",
  "sha2 0.11.0",
  "sha3",
 ]
@@ -3145,7 +3149,6 @@ dependencies = [
  "anyhow",
  "bitflags 2.11.1",
  "colored 3.1.1",
- "ed25519-dalek",
  "hex",
  "itertools 0.14.0",
  "log",
@@ -3264,7 +3267,6 @@ name = "multiversx-sc-meta"
 version = "0.66.2"
 dependencies = [
  "anyhow",
- "base64",
  "bip39",
  "clap",
  "colored 3.1.1",
@@ -3280,8 +3282,10 @@ dependencies = [
  "multiversx-sc-snippets",
  "multiversx-sdk",
  "pathdiff",
+ "rand 0.10.1",
  "regex",
  "reqwest",
+ "rpassword",
  "ruplacer",
  "semver",
  "serde",
@@ -3289,6 +3293,7 @@ dependencies = [
  "serial_test",
  "tokio",
  "toml",
+ "uuid",
  "zip",
 ]
 
@@ -3376,7 +3381,6 @@ version = "0.16.1"
 dependencies = [
  "aes",
  "anyhow",
- "base64",
  "bip39",
  "ctr",
  "hex",
@@ -3386,15 +3390,12 @@ dependencies = [
  "multiversx-chain-core",
  "pbkdf2",
  "pem",
- "rand 0.10.1",
- "rpassword",
  "scrypt",
  "serde",
  "serde_json",
  "serde_repr",
  "sha2 0.11.0",
  "sha3",
- "uuid",
  "zeroize",
 ]
 
@@ -5829,6 +5830,15 @@ checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
 dependencies = [
  "same-file",
  "winapi-util",
+]
+
+[[package]]
+name = "wallet-miner"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "multiversx-sc-meta",
+ "multiversx-sdk",
 ]
 
 [[package]]

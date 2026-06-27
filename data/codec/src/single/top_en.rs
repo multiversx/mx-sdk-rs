@@ -20,13 +20,7 @@ pub trait TopEncode: Sized {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
-        H: EncodeErrorHandler,
-    {
-        match self.top_encode(output) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(h.handle_error(e)),
-        }
-    }
+        H: EncodeErrorHandler;
 }
 
 pub fn top_encode_from_nested<T, O, H>(obj: &T, output: O, h: H) -> Result<(), H::HandledErr>
