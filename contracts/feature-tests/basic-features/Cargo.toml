@@ -24,8 +24,7 @@ workspace = true
 features = ["wasmer-experimental"]
 
 [dependencies.multiversx-sc-modules]
-version = "0.66.2"
-path = "../../../contracts/modules"
+workspace = true
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"

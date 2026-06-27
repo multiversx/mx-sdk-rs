@@ -9,8 +9,7 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.multiversx-sc-modules]
-version = "0.66.2"
-path = "../../../contracts/modules"
+workspace = true
 
 [dependencies.multiversx-sc]
 workspace = true

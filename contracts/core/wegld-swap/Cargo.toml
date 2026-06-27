@@ -23,8 +23,7 @@ path = "src/wegld.rs"
 workspace = true
 
 [dependencies.multiversx-sc-modules]
-version = "0.66.2"
-path = "../../../contracts/modules"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

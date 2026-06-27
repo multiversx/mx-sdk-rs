@@ -228,3 +228,7 @@ path = "framework/meta-lib"
 [workspace.dependencies.multiversx-sc-snippets]
 version = "0.66.2"
 path = "framework/snippets"
+
+[workspace.dependencies.multiversx-sc-modules]
+version = "0.66.2"
+path = "contracts/modules"
