@@ -29,6 +29,7 @@ pub struct GitTagReference {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DependencyReference {
     Version(VersionReq),
+    Workspace,
     GitCommit(GitCommitReference),
     GitBranch(GitBranchReference),
     GitTag(GitTagReference),
@@ -57,6 +58,10 @@ impl DependencyReference {
 impl DependencyRawValue {
     /// Interprets the raw dependency value as one of several possible formats.
     pub fn interpret(self) -> DependencyReference {
+        if self.workspace {
+            return DependencyReference::Workspace;
+        }
+
         // path is top priority
         if let Some(path) = self.path {
             return DependencyReference::Path(path);

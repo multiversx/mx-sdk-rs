@@ -1,9 +1,9 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::{ContractCreatorTarget, template_metadata::TemplateMetadata};
 use crate::cmd::upgrade::upgrade_common::{rename_files, replace_in_files};
 use convert_case::{Case, Casing};
-use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, WorkspaceDependencies};
 use ruplacer::Query;
 use toml::value::Table;
 
@@ -16,8 +16,21 @@ pub struct TemplateAdjuster {
     pub target: ContractCreatorTarget,
     pub keep_paths: bool,
     pub new_author: Option<String>,
+    pub workspace_dependencies: WorkspaceDependencies,
 }
 impl TemplateAdjuster {
+    pub fn resolve_workspace_dependencies(&self) {
+        for cargo_toml_path in self.cargo_toml_paths() {
+            if !cargo_toml_path.exists() {
+                continue;
+            }
+
+            let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+            toml.resolve_workspace_dependencies(&self.workspace_dependencies);
+            toml.save_to_file(&cargo_toml_path);
+        }
+    }
+
     pub fn update_cargo_toml_files(&self) {
         let author_as_str = self
             .new_author
@@ -27,6 +40,23 @@ impl TemplateAdjuster {
         self.update_cargo_toml_meta();
         self.update_cargo_toml_wasm();
         self.update_cargo_toml_interact(author_as_str);
+    }
+
+    fn cargo_toml_paths(&self) -> Vec<PathBuf> {
+        let mut paths = vec![
+            self.target.contract_dir().join(CARGO_TOML),
+            self.target.contract_dir().join("meta").join(CARGO_TOML),
+            self.target.contract_dir().join("wasm").join(CARGO_TOML),
+        ];
+        if self.metadata.has_interactor {
+            paths.push(
+                self.target
+                    .contract_dir()
+                    .join("interactor")
+                    .join(CARGO_TOML),
+            );
+        }
+        paths
     }
 
     fn update_cargo_toml_root(&self, author: String) {
