@@ -12,10 +12,8 @@ path = "src/crowdfunding_erc20.rs"
 path = "../erc20"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../../framework/base"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
-path = "../../../../framework/scenario"
+workspace = true
 
