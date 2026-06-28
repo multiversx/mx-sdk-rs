@@ -8,6 +8,7 @@ pub mod cmd;
 pub mod folder_structure;
 
 pub use multiversx_sc_meta_lib::abi_json;
+pub use multiversx_sc_meta_lib::cargo_toml;
 pub use multiversx_sc_meta_lib::ei;
 pub use multiversx_sc_meta_lib::ei_check_json;
 pub use multiversx_sc_meta_lib::version;

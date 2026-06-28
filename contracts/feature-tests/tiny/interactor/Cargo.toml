@@ -13,8 +13,7 @@ path = "src/tiny_interactor_main.rs"
 path = "src/tiny_interactor.rs"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.66.2"
-path = "../../../../framework/snippets"
+workspace = true
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

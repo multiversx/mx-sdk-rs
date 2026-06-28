@@ -6,7 +6,7 @@ use std::{
 use multiversx_sc::abi::ContractAbi;
 
 use crate::{
-    cargo_toml::CargoTomlContents,
+    cargo_toml::{CargoTomlContents, WorkspaceDependencies},
     cli::BuildArgs,
     print_util::{print_removing_wasm_crate, print_workspace_target_dir},
     tools::{check_tools_installed, find_current_workspace},
@@ -68,14 +68,19 @@ impl MetaConfig {
     /// Cargo.toml files for all wasm crates are generated from the main contract Cargo.toml,
     /// by changing the package name.
     pub fn generate_cargo_toml_for_all_wasm_crates(&mut self) {
-        let main_cargo_toml_contents =
+        let mut main_cargo_toml_contents =
             CargoTomlContents::load_from_file(Path::new("..").join("Cargo.toml"));
         let crate_name = main_cargo_toml_contents.package_name();
+        if let Some(workspace_path) = find_current_workspace() {
+            let workspace_dependencies = WorkspaceDependencies::load_from_dir(workspace_path);
+            main_cargo_toml_contents.resolve_workspace_dependencies(&workspace_dependencies);
+        }
 
         for contract in self.sc_config.contracts.iter() {
             let mut framework_dependency = main_cargo_toml_contents
                 .dependency_raw_value(FRAMEWORK_NAME_BASE)
                 .expect("missing framework dependency in Cargo.toml");
+            framework_dependency.features.clear();
             if contract.settings.std {
                 framework_dependency.features.insert("std".to_owned());
             }

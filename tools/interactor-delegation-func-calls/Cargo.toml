@@ -24,8 +24,7 @@ version = "1.0"
 features = ["derive"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.66.2"
-path = "../../framework/snippets"
+workspace = true
 
 [features]
 chain-simulator-tests = []
