@@ -131,7 +131,6 @@ impl TemplateAdjuster {
         let old_snake = self.metadata.name.to_case(Case::Snake);
         let new_trait = self.target.new_name.to_case(Case::UpperCamel);
         let old_trait = &self.metadata.contract_trait;
-        let new_src_file = rs_file_name(&new_snake);
         let old_wasm = wasm_file_name(&self.metadata.name);
         let new_wasm = wasm_file_name(&self.target.new_name);
         let old_mxsc = mxsc_file_name(&self.metadata.name);
@@ -149,6 +148,10 @@ impl TemplateAdjuster {
             Query::simple(old_trait, &new_trait),
             Query::simple(&format!("{old_snake}::"), &format!("{new_snake}::")),
             Query::simple(&format!("{old_snake}_proxy"), &format!("{new_snake}_proxy")),
+            Query::simple(
+                &format!("{old_snake}_interactor"),
+                &format!("{new_snake}_interactor"),
+            ),
             Query::simple(
                 &as_path(&self.metadata.name),
                 &as_path(&self.target.new_name),
@@ -176,7 +179,15 @@ impl TemplateAdjuster {
                     &package_name_expr(&self.metadata.name),
                     &package_name_expr(&self.target.new_name),
                 ),
-                Query::simple(&self.metadata.src_file, &new_src_file),
+                Query::simple(&self.metadata.src_file, &rs_file_name(&new_snake)),
+                Query::simple(
+                    &format!("{old_snake}_interactor.rs"),
+                    &format!("{new_snake}_interactor.rs"),
+                ),
+                Query::simple(
+                    &format!("{old_snake}_interactor_main.rs"),
+                    &format!("{new_snake}_interactor_main.rs"),
+                ),
                 Query::simple(
                     &package_name_expr(&format!("{}-meta", self.metadata.name)),
                     &package_name_expr(&format!("{}-meta", self.target.new_name)),
@@ -188,6 +199,10 @@ impl TemplateAdjuster {
                 Query::simple(
                     &package_name_expr(&format!("{}-wasm", self.metadata.name)),
                     &package_name_expr(&format!("{}-wasm", self.target.new_name)),
+                ),
+                Query::simple(
+                    &package_name_expr(&format!("{}-interactor", self.metadata.name)),
+                    &package_name_expr(&format!("{}-interactor", self.target.new_name)),
                 ),
             ],
         );

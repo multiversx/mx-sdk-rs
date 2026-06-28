@@ -1,4 +1,4 @@
-use basic_interactor::{BasicInteractor, Config, GeneralConfig};
+use adder_interactor::{BasicInteractor, Config, GeneralConfig};
 use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
 use serial_test::serial;
 

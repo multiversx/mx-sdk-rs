@@ -1,4 +1,4 @@
-mod basic_interactor_cli;
+mod adder_interactor_cli;
 
 use adder::adder_proxy;
 use clap::Parser;
@@ -50,21 +50,21 @@ pub async fn adder_cli() {
 
     let mut basic_interact = BasicInteractor::from_config().await;
 
-    let cli = basic_interactor_cli::InteractCli::parse();
+    let cli = adder_interactor_cli::InteractCli::parse();
     match &cli.command {
-        Some(basic_interactor_cli::InteractCliCommand::Deploy) => {
+        Some(adder_interactor_cli::InteractCliCommand::Deploy) => {
             basic_interact.deploy().await;
         }
-        Some(basic_interactor_cli::InteractCliCommand::Upgrade(args)) => {
+        Some(adder_interactor_cli::InteractCliCommand::Upgrade(args)) => {
             let owner_address = basic_interact.config.owner.address();
             basic_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
         }
-        Some(basic_interactor_cli::InteractCliCommand::Add(args)) => {
+        Some(adder_interactor_cli::InteractCliCommand::Add(args)) => {
             basic_interact.add(args.value).await;
         }
-        Some(basic_interactor_cli::InteractCliCommand::Sum) => {
+        Some(adder_interactor_cli::InteractCliCommand::Sum) => {
             let sum = basic_interact.get_sum().await;
             println!("sum: {sum}");
         }
