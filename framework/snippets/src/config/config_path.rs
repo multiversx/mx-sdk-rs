@@ -57,42 +57,13 @@ impl ConfigPath {
     /// - `mxsc:` for `.mxsc.json` contract bundles
     /// - `file:` for all other paths
     pub fn scenario_expr(&self, base: &Path) -> String {
-        let rebased = self.rebase_to(base);
+        let rebased = pathdiff::diff_paths(&self.absolute_path, base)
+            .unwrap_or_else(|| self.absolute_path.clone());
         let prefix = match self.absolute_path.to_str() {
             Some(s) if s.ends_with(".mxsc.json") => "mxsc:",
             _ => "file:",
         };
         format!("{prefix}{}", rebased.display())
-    }
-
-    /// Returns this path expressed relative to `base`.
-    ///
-    /// Walks up from `base` with `../` steps for each non-shared component,
-    /// then appends the remaining components of the absolute path.
-    /// Falls back to the absolute path if no common root exists (e.g. different
-    /// drive letters on Windows).
-    pub fn rebase_to(&self, base: &Path) -> PathBuf {
-        let base_comps: Vec<_> = base.components().collect();
-        let abs_comps: Vec<_> = self.absolute_path.components().collect();
-
-        let common = base_comps
-            .iter()
-            .zip(abs_comps.iter())
-            .take_while(|(b, a)| b == a)
-            .count();
-
-        if common == 0 {
-            return self.absolute_path.clone();
-        }
-
-        let mut rel = PathBuf::new();
-        for _ in &base_comps[common..] {
-            rel.push("..");
-        }
-        for comp in &abs_comps[common..] {
-            rel.push(comp.as_os_str());
-        }
-        rel
     }
 
     /// Sets the base directory used to resolve relative paths during

@@ -39,9 +39,9 @@ semver = "1.0.20"
 ruplacer = { version = "0.10", default-features = false }
 regex = "1.11"
 reqwest = { version = "0.13", features = ["rustls", "blocking", "json"] }
-copy_dir = "0.1.2"
-pathdiff = "0.2.1"
-common-path = "1.0.0"
+copy_dir = "0.1"
+pathdiff = "0.2"
+common-path = "1.0"
 bip39 = { version = "2.0", features = ["rand"] }
 rand = { version = "0.10", default-features = false }
 uuid = { version = "1.10", features = ["v4"] }
