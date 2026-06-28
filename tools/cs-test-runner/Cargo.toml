@@ -7,7 +7,7 @@ authors = ["MultiversX <contact@multiversx.com>"]
 
 [[bin]]
 name = "cs-test-runner"
-path = "src/main.rs"
+path = "src/cs_test_runner.rs"
 
 [dependencies.multiversx-sc-meta-lib]
 workspace = true
