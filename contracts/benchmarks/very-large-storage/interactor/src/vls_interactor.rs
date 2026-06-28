@@ -1,22 +1,48 @@
 mod vls_interactor_cli;
-mod vls_interactor_config;
-mod vls_interactor_state;
 
 use clap::Parser;
-use very_large_storage::very_large_storage_proxy;
-pub use vls_interactor_config::Config;
-use vls_interactor_state::State;
-
 use multiversx_sc_snippets::imports::*;
+use serde::{Deserialize, Serialize};
+use very_large_storage::very_large_storage_proxy;
+
+/// Very Large Storage Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone()]
+    }
+}
+
+/// Very Large Storage Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub contract_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the contract address
+    pub fn current_contract_address(&self) -> &Bech32Address {
+        self.contract_address
+            .as_ref()
+            .expect("no known contract, deploy first")
+    }
+}
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/very-large-storage.mxsc.json");
 
 pub async fn very_large_storage_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut basic_interact = VeryLargeStorageInteractor::new(config).await;
+    let mut basic_interact = VeryLargeStorageInteractor::new().await;
 
     let cli = vls_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -32,34 +58,28 @@ pub async fn very_large_storage_cli() {
 
 pub struct VeryLargeStorageInteractor {
     pub interactor: Interactor,
-    pub owner_address: Bech32Address,
-    pub state: State,
+    pub config: Config,
+    pub state: AutoSave<State>,
 }
 
 impl VeryLargeStorageInteractor {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
-        interactor
-            .set_current_dir_from_workspace("contracts/benchmarks/very-large-storage/interactor");
-
-        let owner_address = interactor.register_wallet(test_wallets::mike()).await;
-
-        interactor.generate_blocks(30u64).await.unwrap();
-
-        VeryLargeStorageInteractor {
+    pub async fn new() -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
+        let state = interactor.load_state::<State>();
+        Self {
             interactor,
-            owner_address: owner_address.into(),
-            state: State::load_state(),
+            config,
+            state,
         }
     }
 
     pub async fn deploy(&mut self) {
+        let owner_address = self.config.owner.address();
         let new_address = self
             .interactor
             .tx()
-            .from(&self.owner_address)
+            .from(&owner_address)
             .gas(10_000_000u64)
             .typed(very_large_storage_proxy::VeryLargeStorageProxy)
             .init()
@@ -69,14 +89,15 @@ impl VeryLargeStorageInteractor {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_contract_address(new_address);
+        self.state.contract_address = Some(new_address);
     }
 
     pub async fn append(&mut self, num_bytes: u64) {
+        let owner_address = self.config.owner.address();
         let gas_used = self
             .interactor
             .tx()
-            .from(&self.owner_address)
+            .from(&owner_address)
             .to(self.state.current_contract_address())
             .gas(SimulateGas)
             .typed(very_large_storage_proxy::VeryLargeStorageProxy)

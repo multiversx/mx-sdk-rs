@@ -16,12 +16,12 @@ use multiversx_sc_snippets::imports::*;
 
 impl ComposabilityInteract {
     fn load_layout(&self) -> CallTreeLayout {
-        CallTreeLayout::load_from_file(&self.config.call_tree_path)
+        CallTreeLayout::load_from_file(&self.config.general.call_tree_path)
     }
 
     async fn cmd_update_gas(&mut self) {
         println!("Updating gas estimates...");
-        let layout_path = self.config.call_tree_path.clone();
+        let layout_path = self.config.general.call_tree_path.clone();
         let mut layout = self.load_layout();
         layout.fill_gas_estimates();
         layout.save_to_file(&layout_path);

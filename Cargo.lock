@@ -3364,8 +3364,11 @@ dependencies = [
  "multiversx-sdk",
  "multiversx-sdk-dapp",
  "multiversx-sdk-http",
+ "pathdiff",
+ "serde",
  "serde_json",
  "tokio",
+ "toml",
 ]
 
 [[package]]

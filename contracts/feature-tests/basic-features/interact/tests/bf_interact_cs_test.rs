@@ -7,11 +7,33 @@ use system_sc_interact::SysFuncCallsInteract;
 
 const ISSUE_COST: u64 = 50000000000000000u64;
 
+fn chain_simulator_config() -> Config {
+    Config {
+        connection: ConnectionConfig::chain_simulator(),
+        wallet: WalletConfig::from_test_wallet("mike"),
+    }
+}
+
+async fn cs_interactor() -> BasicFeaturesInteract {
+    let config = chain_simulator_config();
+    let interactor = HttpInteractor::empty()
+        .with_current_dir(env!("CARGO_MANIFEST_DIR"))
+        .with_config(&config)
+        .await;
+    let wallet_address = config.wallet.address();
+    BasicFeaturesInteract {
+        interactor,
+        wallet_address,
+        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        large_storage_payload: Vec::new(),
+    }
+}
+
 #[tokio::test]
 #[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn simulator_basic_features_test() {
-    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut bf_interact = cs_interactor().await;
 
     bf_interact.add_validator_key().await;
     bf_interact.deploy_storage_bytes(false).await;
@@ -50,8 +72,7 @@ async fn send_esdt_to_non_existent_address_test() {
     let registered_wallet_address = test_wallets::mike().to_address();
     let not_registered_wallet_address = test_wallets::alice().to_address();
 
-    let mut chain_simulator_interact =
-        BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut chain_simulator_interact = cs_interactor().await;
 
     let token = chain_simulator_interact
         .interactor
@@ -96,7 +117,7 @@ async fn send_esdt_to_non_existent_address_test() {
 #[serial]
 #[ignore = "signature verification is currently unavailable"]
 async fn simulator_crypto_test() {
-    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut bf_interact = cs_interactor().await;
 
     bf_interact.deploy().await;
 
@@ -258,7 +279,7 @@ async fn verify_bls_aggregated_signature(interact: &mut BasicFeaturesInteract) {
 #[serial]
 #[cfg_attr(not(feature = "chain-simulator-tests"), ignore)]
 async fn chain_simulator_bf_get_special_roles_test() {
-    let mut bf_interact = BasicFeaturesInteract::init(Config::chain_simulator_config()).await;
+    let mut bf_interact = cs_interactor().await;
     let mut system_interact =
         SysFuncCallsInteract::init(system_sc_interact::Config::chain_simulator_config()).await;
 

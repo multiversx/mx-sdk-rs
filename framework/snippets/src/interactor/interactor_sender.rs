@@ -25,7 +25,7 @@ where
 {
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
-            .proxy
+            .proxy()
             .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account nonce");
@@ -34,14 +34,14 @@ where
     }
 
     pub async fn get_account(&self, address: &Address) -> Account {
-        self.proxy
+        self.proxy()
             .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account")
     }
 
     pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
-        self.proxy
+        self.proxy()
             .request(GetAccountStorageRequest::new(
                 &address.to_bech32(self.get_hrp()),
             ))
@@ -63,7 +63,7 @@ where
     }
 
     pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {
-        self.proxy
+        self.proxy()
             .request(GetAccountEsdtTokensRequest::new(
                 &address.to_bech32(self.get_hrp()),
             ))
