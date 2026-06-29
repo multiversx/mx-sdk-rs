@@ -23,8 +23,8 @@ static CS_TESTS: &[CsTest] = &[
     },
     CsTest {
         build_paths: &["contracts/examples/adder"],
-        package: "basic-interactor",
-        test_file: "basic_interactor_cs_test",
+        package: "adder-interactor",
+        test_file: "adder_interactor_cs_test",
     },
     CsTest {
         build_paths: &["contracts/examples/ping-pong-egld"],
