@@ -6,7 +6,9 @@ pub use crate::{
 };
 
 pub use crate::config::*;
-pub use crate::sdk::{test_wallets, validator::Validator, wallet::Wallet};
+pub use crate::sdk::{
+    gateway::SetStateAccount, test_wallets, validator::Validator, wallet::Wallet,
+};
 
 pub use env_logger;
 

@@ -1,5 +1,5 @@
 use adder_interactor::{BasicInteractor, Config, GeneralConfig};
-use multiversx_sc_snippets::{imports::*, sdk::gateway::SetStateAccount};
+use multiversx_sc_snippets::imports::*;
 use serial_test::serial;
 
 fn chain_simulator_config() -> Config {
@@ -22,7 +22,7 @@ async fn test_interactor() -> BasicInteractor {
     BasicInteractor {
         interactor,
         config,
-        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        state: AutoSave::no_save_default(),
     }
 }
 
@@ -32,7 +32,7 @@ async fn real_chain_reader_interactor() -> BasicInteractor {
     BasicInteractor {
         interactor,
         config,
-        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        state: AutoSave::no_save_default(),
     }
 }
 

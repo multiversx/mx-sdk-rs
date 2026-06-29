@@ -23,7 +23,7 @@ async fn cs_interactor() -> ContractInteract {
             "mxsc:../forwarder/output/forwarder.mxsc.json",
             &InterpreterContext::default(),
         ),
-        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        state: AutoSave::no_save_default(),
     }
 }
 

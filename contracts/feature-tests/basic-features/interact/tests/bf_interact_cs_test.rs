@@ -24,7 +24,7 @@ async fn cs_interactor() -> BasicFeaturesInteract {
     BasicFeaturesInteract {
         interactor,
         wallet_address,
-        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        state: AutoSave::no_save_default(),
         large_storage_payload: Vec::new(),
     }
 }
