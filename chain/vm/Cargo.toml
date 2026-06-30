@@ -27,7 +27,7 @@ wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
-itertools = "0.14"
+itertools = "0.15"
 bitflags = "2.9"
 colored = "3.0"
 rand = { version = "0.10", optional = true }

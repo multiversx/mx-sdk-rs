@@ -13,7 +13,7 @@ path = "src/mxpy_snippet_generator.rs"
 workspace = true
 
 [dependencies]
-bech32 = "0.11"
+bech32 = "0.12"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
