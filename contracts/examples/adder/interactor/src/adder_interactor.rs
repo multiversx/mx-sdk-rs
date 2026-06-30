@@ -48,42 +48,42 @@ impl State {
 pub async fn adder_cli() {
     env_logger::init();
 
-    let mut basic_interact = BasicInteractor::from_config().await;
+    let mut adder_interact = AdderInteractor::from_config().await;
 
     let cli = adder_interactor_cli::InteractCli::parse();
     match &cli.command {
         Some(adder_interactor_cli::InteractCliCommand::Deploy) => {
-            basic_interact.deploy().await;
+            adder_interact.deploy().await;
         }
         Some(adder_interactor_cli::InteractCliCommand::Upgrade(args)) => {
-            let owner_address = basic_interact.config.owner.address();
-            basic_interact
+            let owner_address = adder_interact.config.owner.address();
+            adder_interact
                 .upgrade(args.value, &owner_address, None)
                 .await
         }
         Some(adder_interactor_cli::InteractCliCommand::Add(args)) => {
-            basic_interact.add(args.value).await;
+            adder_interact.add(args.value).await;
         }
         Some(adder_interactor_cli::InteractCliCommand::Sum) => {
-            let sum = basic_interact.get_sum().await;
+            let sum = adder_interact.get_sum().await;
             println!("sum: {sum}");
         }
         None => {}
     }
 }
 
-pub struct BasicInteractor {
+pub struct AdderInteractor {
     pub interactor: Interactor,
     pub config: Config,
     pub state: AutoSave<State>,
 }
 
-impl BasicInteractor {
+impl AdderInteractor {
     pub async fn from_config() -> Self {
         let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let config: Config = interactor.load_config_toml().await;
         let state = interactor.load_state::<State>();
-        BasicInteractor {
+        AdderInteractor {
             interactor,
             config,
             state,
