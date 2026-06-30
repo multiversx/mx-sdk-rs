@@ -17,6 +17,7 @@ categories = ["cryptography::cryptocurrencies"]
 default = ["http"]
 http = ["multiversx-sdk-http", "tokio"]
 dapp = ["multiversx-sdk-dapp"]
+chain-simulator-tests = []
 
 [dependencies]
 hex = "0.4"
@@ -54,3 +55,6 @@ default-features = false
 version = "=0.16.1"
 path = "../../sdk/dapp"
 optional = true
+
+[dev-dependencies]
+serial_test = "3.2"

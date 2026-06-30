@@ -21,6 +21,18 @@ static CS_TESTS: &[CsTest] = &[
         package: "multiversx-sc-meta",
         test_file: "cs_tx_cli_test",
     },
+    // Tests framework functionality directly, no contracts
+    CsTest {
+        build_paths: &[],
+        package: "multiversx-sc-snippets",
+        test_file: "set_state_cs_test",
+    },
+    // Tests built-in system contracts — no wasm build step required.
+    CsTest {
+        build_paths: &[],
+        package: "system-sc-interact",
+        test_file: "chain_simulator_token_tests",
+    },
     CsTest {
         build_paths: &["contracts/examples/adder"],
         package: "adder-interactor",
@@ -45,12 +57,6 @@ static CS_TESTS: &[CsTest] = &[
         build_paths: &["contracts/feature-tests/payable-features"],
         package: "payable-interactor",
         test_file: "payable_interactor_cs_test",
-    },
-    // Tests built-in system contracts — no wasm build step required.
-    CsTest {
-        build_paths: &[],
-        package: "system-sc-interact",
-        test_file: "chain_simulator_token_tests",
     },
 ];
 
