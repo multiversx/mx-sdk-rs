@@ -17,13 +17,11 @@ fn single_tx_api_test() {
 
     // check directly in storage
     SingleTxApi::with_global_default_account(|account| {
-        let value = account.storage.get(storage_key.as_bytes()).unwrap();
-        assert_eq!(value, &vec![5u8]);
+        let value = account.storage_get(storage_key.as_bytes());
+        assert_eq!(value, vec![5u8]);
 
         // change value directly in storage
-        account
-            .storage
-            .insert(storage_key.as_bytes().to_vec(), vec![7u8]);
+        account.storage_set(storage_key.as_bytes(), &[7u8]);
     });
 
     // read again
@@ -37,11 +35,7 @@ fn single_tx_api_test() {
 
     // checking directly in storage
     SingleTxApi::with_global_default_account(|account| {
-        let value = account
-            .storage
-            .get(storage_key.as_bytes())
-            .cloned()
-            .unwrap_or_default();
+        let value = account.storage_get(storage_key.as_bytes());
         assert!(value.is_empty());
     });
 }
