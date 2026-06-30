@@ -53,7 +53,7 @@ pub trait DeployContractModule {
         self.tx()
             .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
-            .code_metadata(CodeMetadata::DEFAULT)
+            .code_metadata(CodeMetadata::EMPTY)
             .from_source(source_address)
             .returns(ReturnsNewManagedAddress)
             .returns(ReturnsResult)

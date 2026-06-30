@@ -1,23 +1,22 @@
 [package]
-name = "basic-interactor"
+name = "adder-interactor"
 version = "0.0.0"
 authors = ["MultiversX <contact@multiversx.com>"]
 edition = "2024"
 publish = false
 
 [[bin]]
-name = "basic-interactor"
-path = "src/basic_interactor_main.rs"
+name = "adder-interactor"
+path = "src/adder_interactor_main.rs"
 
 [lib]
-path = "src/basic_interactor.rs"
+path = "src/adder_interactor.rs"
 
 [dependencies.adder]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.66.2"
-path = "../../../../framework/snippets"
+workspace = true
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

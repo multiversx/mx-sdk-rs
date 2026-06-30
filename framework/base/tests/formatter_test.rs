@@ -140,7 +140,7 @@ fn test_display_code_metadata() {
             | CodeMetadata::PAYABLE_BY_SC,
         "Upgradeable|Readable|Payable|PayableBySC",
     );
-    check_code_metadata_display(CodeMetadata::DEFAULT, "Default");
+    check_code_metadata_display(CodeMetadata::EMPTY, "Default");
 }
 
 fn check_lower_hex_eq<T: SCLowerHex>(item: T, expected: &str) {

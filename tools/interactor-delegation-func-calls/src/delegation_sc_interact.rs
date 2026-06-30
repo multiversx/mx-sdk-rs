@@ -10,7 +10,7 @@ use delegation_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
     imports::*,
-    sdk::{gateway::SetStateAccount, utils::base64_decode},
+    sdk::{chain_core::std::base64_decode, gateway::SetStateAccount},
 };
 
 pub async fn delegation_sc_interact_cli() {
@@ -134,9 +134,8 @@ impl DelegateCallsInteract {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
-            .use_chain_simulator(config.is_chain_simulator());
-
-        interactor.set_current_dir_from_workspace("tools/interactor-delegation-func-calls");
+            .use_chain_simulator(config.is_chain_simulator())
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
         let delegator1 = interactor.register_wallet(test_wallets::bob()).await;
         let delegator2 = interactor.register_wallet(test_wallets::dan()).await;
@@ -197,7 +196,7 @@ impl DelegateCallsInteract {
             .find(|log| log.endpoint == "SCDeploy")
             .expect("No SCDeploy log found");
 
-        let decode_deploy_address = base64_decode(deploy_log.topics[0].clone());
+        let decode_deploy_address = base64_decode(deploy_log.topics[0].clone()).unwrap();
 
         let deploy_address = Bech32Address::from(Address::from_slice(&decode_deploy_address));
         self.state.set_delegation_address(deploy_address);

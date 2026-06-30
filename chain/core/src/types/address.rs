@@ -48,7 +48,7 @@ impl Address {
 
     /// Encodes the address as a bech32 string using the given human-readable part (HRP).
     #[cfg(feature = "std")]
-    pub fn to_bech32(&self, hrp: &str) -> crate::std::Bech32Address {
+    pub fn to_bech32(&self, hrp: crate::std::Bech32Hrp) -> crate::std::Bech32Address {
         crate::std::Bech32Address::encode_address(hrp, self.clone())
     }
 

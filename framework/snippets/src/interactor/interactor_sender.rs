@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::sdk::{data::transaction::Transaction, wallet::Wallet};
 use multiversx_sc_scenario::{imports::Bech32Address, multiversx_sc::types::Address};
+use multiversx_sdk::chain_core::std::Bech32Hrp;
 use multiversx_sdk::data::account::Account;
 use multiversx_sdk::data::esdt::EsdtBalance;
 use multiversx_sdk::gateway::{
@@ -13,7 +14,7 @@ use crate::InteractorBase;
 /// A user account that can sign transactions (a pem is present).
 pub struct Sender {
     pub address: Address,
-    pub hrp: String,
+    pub hrp: Bech32Hrp,
     pub wallet: Wallet,
     pub current_nonce: Option<u64>,
 }
@@ -24,7 +25,7 @@ where
 {
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let account = self
-            .proxy
+            .proxy()
             .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account nonce");
@@ -33,14 +34,14 @@ where
     }
 
     pub async fn get_account(&self, address: &Address) -> Account {
-        self.proxy
+        self.proxy()
             .request(GetAccountRequest::new(&address.to_bech32(self.get_hrp())))
             .await
             .expect("failed to retrieve account")
     }
 
     pub async fn get_account_storage(&self, address: &Address) -> HashMap<String, String> {
-        self.proxy
+        self.proxy()
             .request(GetAccountStorageRequest::new(
                 &address.to_bech32(self.get_hrp()),
             ))
@@ -62,7 +63,7 @@ where
     }
 
     pub async fn get_account_esdt(&self, address: &Address) -> HashMap<String, EsdtBalance> {
-        self.proxy
+        self.proxy()
             .request(GetAccountEsdtTokensRequest::new(
                 &address.to_bech32(self.get_hrp()),
             ))
@@ -109,6 +110,6 @@ where
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);
-        transaction.signature = Some(hex::encode(signature));
+        transaction.signature = Some(signature);
     }
 }

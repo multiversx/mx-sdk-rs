@@ -17,7 +17,7 @@ where
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
         let transaction = self.launch_transfer(&transfer_step).await;
 
-        let tx_hash = match self.proxy.request(SendTxRequest(&transaction)).await {
+        let tx_hash = match self.proxy().request(SendTxRequest(&transaction)).await {
             Ok(hash) => hash,
             Err(err) => {
                 transfer_err_message(&err);
@@ -28,10 +28,14 @@ where
             .await
             .unwrap();
 
-        println!("transfer tx hash: {tx_hash}");
+        if let Some(ex) = &self.explorer_url {
+            println!("transfer: {}", ex.tx_url(&tx_hash));
+        } else {
+            println!("transfer tx hash: {tx_hash}");
+        }
         info!("transfer tx hash: {}", tx_hash);
 
-        retrieve_tx_on_network(&self.proxy, tx_hash.clone())
+        retrieve_tx_on_network(self.proxy(), tx_hash.clone())
             .await
             .expect("failed to fetch transfer tx result");
 
@@ -43,7 +47,7 @@ where
     pub async fn simulate_gas_transfer(&mut self, transfer_step: TransferStep) -> u64 {
         let transaction = self.launch_transfer(&transfer_step).await;
 
-        match self.proxy.request(SimulateTxRequest(&transaction)).await {
+        match self.proxy().request(SimulateTxRequest(&transaction)).await {
             Ok(gas) => {
                 println!("Gas simulation for the SC transfer: {gas} units.");
                 log::info!("Gas simulation for the SC transfer: {gas} units.");

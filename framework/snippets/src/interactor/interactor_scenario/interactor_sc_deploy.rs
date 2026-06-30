@@ -7,9 +7,8 @@ use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep},
 };
-use multiversx_sdk::{
-    data::transaction::Transaction, gateway::SimulateTxRequest, utils::base64_encode,
-};
+use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
 use multiversx_sdk::{
     gateway::{GatewayAsyncService, SendTxRequest},
     retrieve_tx_on_network,
@@ -20,19 +19,19 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     pub(crate) fn sc_deploy_to_blockchain_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
-        let hrp = self.network_config.address_hrp.clone();
+        let hrp = self.network_config().address_hrp;
 
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
-            sender: sc_deploy_step.tx.from.to_address().to_bech32(&hrp),
-            receiver: Bech32Address::zero(&hrp),
+            sender: sc_deploy_step.tx.from.to_address().to_bech32(hrp),
+            receiver: Bech32Address::zero(hrp),
             gas_price: self.gas_price,
             gas_limit: sc_deploy_step.tx.gas_limit.value,
             data: Some(base64_encode(sc_deploy_step.tx.to_tx_data())),
             signature: None,
-            chain_id: self.network_config.chain_id.clone(),
-            version: self.network_config.min_transaction_version,
+            chain_id: self.network_config().chain_id.clone(),
+            version: self.network_config().min_transaction_version,
             options: 0,
         }
     }
@@ -51,7 +50,7 @@ where
     }
 
     async fn launch_sc_deploy(&mut self, transaction: &Transaction) -> String {
-        let tx_hash_result = self.proxy.request(SendTxRequest(transaction)).await;
+        let tx_hash_result = self.proxy().request(SendTxRequest(transaction)).await;
 
         match tx_hash_result {
             Ok(tx_hash) => {
@@ -93,7 +92,7 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash.clone())
+        let (tx, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash.clone())
             .await
             .expect("failed to fetch transaction result");
 
@@ -122,7 +121,7 @@ where
     }
 
     async fn sc_deploy_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
-        let gas_result = self.proxy.request(SimulateTxRequest(transaction)).await;
+        let gas_result = self.proxy().request(SimulateTxRequest(transaction)).await;
 
         match gas_result {
             Ok(gas) => {

@@ -7,9 +7,8 @@ use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
-use multiversx_sdk::{
-    data::transaction::Transaction, gateway::SimulateTxRequest, utils::base64_encode,
-};
+use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
 use multiversx_sdk::{
     gateway::{GatewayAsyncService, SendTxRequest},
     retrieve_tx_on_network,
@@ -40,7 +39,7 @@ where
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash)
+        let (tx, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash)
             .await
             .expect("failed to fetch transaction result");
 
@@ -74,7 +73,7 @@ where
     }
 
     async fn launch_sc_call(&mut self, transaction: &Transaction) -> String {
-        let tx_hash = self.proxy.request(SendTxRequest(transaction)).await;
+        let tx_hash = self.proxy().request(SendTxRequest(transaction)).await;
 
         match tx_hash {
             Ok(tx_hash) => {
@@ -96,7 +95,7 @@ where
     }
 
     async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
-        let result = self.proxy.request(SimulateTxRequest(transaction)).await;
+        let result = self.proxy().request(SimulateTxRequest(transaction)).await;
 
         match result {
             Ok(gas) => {
@@ -132,8 +131,8 @@ where
             gas_limit: normalized.gas_limit.value,
             data,
             signature: None,
-            chain_id: self.network_config.chain_id.clone(),
-            version: self.network_config.min_transaction_version,
+            chain_id: self.network_config().chain_id.clone(),
+            version: self.network_config().min_transaction_version,
             options: 0,
         }
     }

@@ -1,18 +1,10 @@
 #![allow(non_snake_case)]
 
-mod config;
 mod proxy;
 
-pub use config::Config;
 use multiversx_sc_snippets::imports::*;
 pub use proxy::Color;
-use serde::{Deserialize, Serialize};
-use std::{
-    io::{Read, Write},
-    path::Path,
-};
 
-const STATE_FILE: &str = "state.toml";
 pub const FORWARDER_DEPLOY_INTERACTOR_TRACE_PATH: &str =
     "scenarios/forwarder_deploy_scenario.scen.json";
 pub const FORWARDER_BUILTIN_INTERACTOR_TRACE_PATH: &str =
@@ -30,7 +22,7 @@ pub async fn forwarder_cli() {
     let mut args = std::env::args();
     let _ = args.next();
     let cmd = args.next().expect("at least one argument required");
-    let mut interact = ContractInteract::new(Config::new(), None).await;
+    let mut interact = ContractInteract::new(None).await;
     match cmd.as_str() {
         "deploy" => interact.deploy().await,
         "send_egld" => interact.send_egld().await,
@@ -129,24 +121,29 @@ pub async fn forwarder_cli() {
     }
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+/// Contract Interact configuration
+#[derive(Debug, serde::Deserialize)]
+pub struct Config {
+    pub connection: ConnectionConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.wallet.wallet().clone()]
+    }
+}
+
+#[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct State {
     contract_address: Option<Bech32Address>,
 }
 
 impl State {
-    // Deserializes state from file
-    pub fn load_state() -> Self {
-        if Path::new(STATE_FILE).exists() {
-            let mut file = std::fs::File::open(STATE_FILE).unwrap();
-            let mut content = String::new();
-            file.read_to_string(&mut content).unwrap();
-            toml::from_str(&content).unwrap()
-        } else {
-            Self::default()
-        }
-    }
-
     /// Sets the contract address
     pub fn set_address(&mut self, address: Bech32Address) {
         self.contract_address = Some(address);
@@ -160,49 +157,31 @@ impl State {
     }
 }
 
-impl Drop for State {
-    // Serializes state to file
-    fn drop(&mut self) {
-        let mut file = std::fs::File::create(STATE_FILE).unwrap();
-        file.write_all(toml::to_string(self).unwrap().as_bytes())
-            .unwrap();
-    }
-}
-
 pub struct ContractInteract {
-    interactor: Interactor,
-    pub wallet_address: Address,
-    contract_code: BytesValue,
-    pub state: State,
+    pub interactor: Interactor,
+    pub wallet_address: Bech32Address,
+    pub contract_code: BytesValue,
+    pub state: AutoSave<State>,
 }
 
 impl ContractInteract {
-    pub async fn new(config: Config, trace_path: Option<&str>) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
+    pub async fn new(trace_path: Option<&str>) -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
 
         if let Some(path) = trace_path {
             interactor = interactor.with_tracer(path).await;
         }
 
-        interactor.set_current_dir_from_workspace("forwarder-interactor");
-        let wallet_address = interactor.register_wallet(test_wallets::alice()).await;
-
-        // Useful in the chain simulator setting
-        // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_all_activations().await;
-
-        let contract_code = BytesValue::interpret_from(
-            "mxsc:../forwarder/output/forwarder.mxsc.json",
-            &InterpreterContext::default(),
-        );
-
-        ContractInteract {
+        let config: Config = interactor.load_config_toml().await;
+        let state = interactor.load_state::<State>();
+        Self {
             interactor,
-            wallet_address,
-            contract_code,
-            state: State::load_state(),
+            wallet_address: config.wallet.address(),
+            contract_code: BytesValue::interpret_from(
+                "mxsc:../forwarder/output/forwarder.mxsc.json",
+                &InterpreterContext::default(),
+            ),
+            state,
         }
     }
 

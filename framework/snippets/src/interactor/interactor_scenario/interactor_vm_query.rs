@@ -17,9 +17,9 @@ where
     GatewayProxy: GatewayAsyncService,
 {
     pub async fn perform_sc_query(&mut self, step: &mut ScQueryStep) {
-        let hrp = self.network_config.address_hrp.clone();
+        let hrp = self.network_config().address_hrp;
 
-        let sc_address = step.tx.to.to_address().to_bech32(&hrp);
+        let sc_address = step.tx.to.to_address().to_bech32(hrp);
         let req = VMQueryInput {
             sc_address,
             func_name: step.tx.function.clone(),
@@ -30,7 +30,7 @@ where
                 .map(|arg| hex::encode(&arg.value))
                 .collect(),
         };
-        let result = match self.proxy.request(VMQueryRequest(&req)).await {
+        let result = match self.proxy().request(VMQueryRequest(&req)).await {
             Ok(r) => r,
             Err(err) => {
                 query_err_message(&err);
