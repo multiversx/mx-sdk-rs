@@ -39,6 +39,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "adder-interactor"
+version = "0.0.0"
+dependencies = [
+ "adder",
+ "clap",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+]
+
+[[package]]
 name = "adder-meta"
 version = "0.0.0"
 dependencies = [
@@ -262,19 +275,6 @@ version = "0.0.0"
 dependencies = [
  "basic-features",
  "multiversx-sc-meta-lib",
-]
-
-[[package]]
-name = "basic-interactor"
-version = "0.0.0"
-dependencies = [
- "adder",
- "clap",
- "multiversx-sc-snippets",
- "serde",
- "serial_test",
- "tokio",
- "toml",
 ]
 
 [[package]]
@@ -3367,6 +3367,7 @@ dependencies = [
  "pathdiff",
  "serde",
  "serde_json",
+ "serial_test",
  "tokio",
  "toml",
 ]

@@ -19,7 +19,7 @@ async fn cs_interactor() -> PayableInteract {
     PayableInteract {
         interactor,
         config,
-        state: multiversx_sc_snippets::AutoSave::no_save_default(),
+        state: AutoSave::no_save_default(),
     }
 }
 

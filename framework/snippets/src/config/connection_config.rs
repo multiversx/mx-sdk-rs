@@ -1,11 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum ChainType {
-    Real,
-    Simulator,
-}
+use super::ChainType;
 
 /// Configuration for connecting to the MultiversX network.
 #[derive(Debug, Deserialize)]
