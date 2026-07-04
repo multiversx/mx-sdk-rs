@@ -92,14 +92,13 @@ impl VMHooksContext for SingleTxApiVMHooksContext {
     }
 
     fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
-        self.0.with_account_mut(address, |account| {
-            account.storage.get(key).cloned().unwrap_or_default()
-        })
+        self.0
+            .with_account_mut(address, |account| account.storage_get(key))
     }
 
     fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
         self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
-            account.storage.insert(key.to_vec(), value.to_vec());
+            account.storage_set(key, value);
         });
         Ok(())
     }
