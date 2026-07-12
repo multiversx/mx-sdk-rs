@@ -5180,6 +5180,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "storage-examples"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "storage-examples-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "storage-examples",
+]
+
+[[package]]
 name = "str-repeat"
 version = "0.0.0"
 dependencies = [
