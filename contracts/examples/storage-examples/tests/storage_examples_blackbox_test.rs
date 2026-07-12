@@ -51,18 +51,49 @@ fn single_value_mapper_set_and_get() {
 }
 
 #[test]
+fn single_value_mapper_overwrite() {
+    let mut world = world();
+    deploy(&mut world);
+
+    world
+        .tx()
+        .from(OWNER)
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .set_counter(BigUint::<StaticApi>::from(10u64))
+        .run();
+
+    // A second set must overwrite the first — not accumulate.
+    world
+        .tx()
+        .from(OWNER)
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .set_counter(BigUint::<StaticApi>::from(99u64))
+        .run();
+
+    world
+        .query()
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .counter()
+        .returns(ExpectValue(BigUint::<StaticApi>::from(99u64)))
+        .run();
+}
+
+#[test]
 fn vec_mapper_is_one_indexed() {
     let mut world = world();
     deploy(&mut world);
 
-    // Push three items; VecMapper's own doc comment says indexes start
-    // at 1 — confirm index 1 is the FIRST push, not the second.
+    // Push returns the 1-based index of the newly appended item.
     world
         .tx()
         .from(OWNER)
         .to(CONTRACT)
         .typed(storage_examples_proxy::StorageMappersProxy)
         .push_item(ManagedBuffer::<StaticApi>::from(b"first"))
+        .returns(ExpectValue(1usize))
         .run();
     world
         .tx()
@@ -70,6 +101,7 @@ fn vec_mapper_is_one_indexed() {
         .to(CONTRACT)
         .typed(storage_examples_proxy::StorageMappersProxy)
         .push_item(ManagedBuffer::<StaticApi>::from(b"second"))
+        .returns(ExpectValue(2usize))
         .run();
 
     world
@@ -109,6 +141,8 @@ fn set_mapper_contains_and_ordering() {
             .to(CONTRACT)
             .typed(storage_examples_proxy::StorageMappersProxy)
             .add_to_ordered_set(value)
+            // A fresh insert must return true.
+            .returns(ExpectValue(true))
             .run();
     }
 
@@ -135,6 +169,24 @@ fn set_mapper_contains_and_ordering() {
         .ordered_set_len()
         .returns(ExpectValue(3usize))
         .run();
+
+    // Inserting a duplicate must return false and leave the length unchanged.
+    world
+        .tx()
+        .from(OWNER)
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .add_to_ordered_set(10u64)
+        .returns(ExpectValue(false))
+        .run();
+
+    world
+        .query()
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .ordered_set_len()
+        .returns(ExpectValue(3usize))
+        .run();
 }
 
 #[test]
@@ -148,6 +200,8 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
         .to(CONTRACT)
         .typed(storage_examples_proxy::StorageMappersProxy)
         .add_to_unordered_set(7u64)
+        // A fresh insert must return true.
+        .returns(ExpectValue(true))
         .run();
 
     world
@@ -163,6 +217,24 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
         .to(CONTRACT)
         .typed(storage_examples_proxy::StorageMappersProxy)
         .unordered_set_contains(8u64)
+        .returns(ExpectValue(false))
+        .run();
+
+    world
+        .query()
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .unordered_set_len()
+        .returns(ExpectValue(1usize))
+        .run();
+
+    // Inserting a duplicate must return false and leave the length unchanged.
+    world
+        .tx()
+        .from(OWNER)
+        .to(CONTRACT)
+        .typed(storage_examples_proxy::StorageMappersProxy)
+        .add_to_unordered_set(7u64)
         .returns(ExpectValue(false))
         .run();
 
