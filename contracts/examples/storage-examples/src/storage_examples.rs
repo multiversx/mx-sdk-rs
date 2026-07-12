@@ -2,7 +2,7 @@
 
 use multiversx_sc::imports::*;
 
-pub mod storage_examples_proxy;
+pub mod proxy;
 
 /// Demonstrates the six most commonly used storage mapper types in
 /// `multiversx-sc`, one endpoint group per mapper.  Each group exposes a
@@ -13,12 +13,12 @@ pub mod storage_examples_proxy;
 /// |----------------------|------------|------------|------------|-------------------|
 /// | `SingleValueMapper`  | —          | one slot   | —          | 1                 |
 /// | `VecMapper`          | sequential | allowed    | O(n)       | N + 1             |
-/// | `SetMapper`          | ordered    | rejected   | O(1)       | 4N + 1            |
+/// | `SetMapper`          | ordered    | rejected   | O(1)       | ~3N + 1           |
 /// | `UnorderedSetMapper` | unordered  | rejected   | O(1)       | 2N + 1            |
 /// | `WhitelistMapper`    | —          | rejected   | O(1)       | N                 |
 /// | `MapMapper`          | keys only  | —          | O(1)       | 4N + 1            |
 #[multiversx_sc::contract]
-pub trait StorageMappers {
+pub trait StorageExamples {
     #[init]
     fn init(&self) {}
 
@@ -66,7 +66,7 @@ pub trait StorageMappers {
     // Internally maintains a doubly-linked list of nodes plus a
     // value→node-id index, giving O(1) `contains`, `insert`, and `remove`.
     // `insert` returns `true` when the value was newly added, `false` if
-    // it was already present.  Uses ~4N + 1 storage entries for N elements.
+    // it was already present.  Uses ~3N + 1 storage entries for N elements.
     #[endpoint(addToOrderedSet)]
     fn add_to_ordered_set(&self, value: u64) -> bool {
         self.ordered_set().insert(value)

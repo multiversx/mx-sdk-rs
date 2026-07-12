@@ -12,7 +12,8 @@ files_include = [
     "scenarios",
     "src",
     "tests",
+    "wasm/Cargo.lock",
     "Cargo.toml",
     "multiversx.json",
-    "wasm/Cargo.lock",
+    
 ]

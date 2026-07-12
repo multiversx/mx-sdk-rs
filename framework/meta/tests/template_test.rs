@@ -25,7 +25,9 @@ fn test_template_list() {
             "adder".to_string(),
             "crypto-zombies".to_string(),
             "empty".to_string(),
+            "greeter".to_string(),
             "ping-pong-egld".to_string(),
+            "storage-examples".to_string(),
         ]
     );
 }
@@ -56,11 +58,27 @@ fn template_current_empty() {
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_greeter() {
+    template_test_current("greeter", TEMPLATE_TEST_CURRENT_SUB_PATH, "new-greeter");
+}
+
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_ping_pong_egld() {
     template_test_current(
         "ping-pong-egld",
         TEMPLATE_TEST_CURRENT_SUB_PATH,
         "new-ping-pong-egld",
+    );
+}
+
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_storage_examples() {
+    template_test_current(
+        "storage-examples",
+        TEMPLATE_TEST_CURRENT_SUB_PATH,
+        "new-storage-examples",
     );
 }
 
@@ -161,6 +179,24 @@ async fn template_released_crypto_zombies() {
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_empty() {
     template_test_released("empty", "released-empty").await;
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_released_greeter() {
+    template_test_released("greeter", "released-greeter").await;
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_released_ping_pong_egld() {
+    template_test_released("ping-pong-egld", "released-ping-pong-egld").await;
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_released_storage_examples() {
+    template_test_released("storage-examples", "released-storage-examples").await;
 }
 
 /// These tests fully replicate the templating process. They
