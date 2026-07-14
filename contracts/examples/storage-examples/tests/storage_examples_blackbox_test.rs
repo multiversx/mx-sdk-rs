@@ -21,7 +21,7 @@ fn deploy(world: &mut ScenarioWorld) {
     world
         .tx()
         .from(OWNER)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .init()
         .code(CODE_PATH)
         .new_address(CONTRACT)
@@ -37,14 +37,14 @@ fn single_value_mapper_set_and_get() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .set_counter(BigUint::<StaticApi>::from(42u64))
         .run();
 
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .counter()
         .returns(ExpectValue(BigUint::<StaticApi>::from(42u64)))
         .run();
@@ -59,7 +59,7 @@ fn single_value_mapper_overwrite() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .set_counter(BigUint::<StaticApi>::from(10u64))
         .run();
 
@@ -68,14 +68,14 @@ fn single_value_mapper_overwrite() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .set_counter(BigUint::<StaticApi>::from(99u64))
         .run();
 
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .counter()
         .returns(ExpectValue(BigUint::<StaticApi>::from(99u64)))
         .run();
@@ -91,7 +91,7 @@ fn vec_mapper_is_one_indexed() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .push_item(ManagedBuffer::<StaticApi>::from(b"first"))
         .returns(ExpectValue(1usize))
         .run();
@@ -99,7 +99,7 @@ fn vec_mapper_is_one_indexed() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .push_item(ManagedBuffer::<StaticApi>::from(b"second"))
         .returns(ExpectValue(2usize))
         .run();
@@ -107,7 +107,7 @@ fn vec_mapper_is_one_indexed() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .item_count()
         .returns(ExpectValue(2usize))
         .run();
@@ -115,7 +115,7 @@ fn vec_mapper_is_one_indexed() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .get_item(1usize)
         .returns(ExpectValue(ManagedBuffer::<StaticApi>::from(b"first")))
         .run();
@@ -123,7 +123,7 @@ fn vec_mapper_is_one_indexed() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .get_item(2usize)
         .returns(ExpectValue(ManagedBuffer::<StaticApi>::from(b"second")))
         .run();
@@ -139,7 +139,7 @@ fn set_mapper_contains_and_ordering() {
             .tx()
             .from(OWNER)
             .to(CONTRACT)
-            .typed(proxy::StorageMappersProxy)
+            .typed(proxy::StorageExamplesProxy)
             .add_to_ordered_set(value)
             // A fresh insert must return true.
             .returns(ExpectValue(true))
@@ -149,7 +149,7 @@ fn set_mapper_contains_and_ordering() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .ordered_set_contains(10u64)
         .returns(ExpectValue(true))
         .run();
@@ -157,7 +157,7 @@ fn set_mapper_contains_and_ordering() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .ordered_set_contains(99u64)
         .returns(ExpectValue(false))
         .run();
@@ -165,7 +165,7 @@ fn set_mapper_contains_and_ordering() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .ordered_set_len()
         .returns(ExpectValue(3usize))
         .run();
@@ -175,7 +175,7 @@ fn set_mapper_contains_and_ordering() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .add_to_ordered_set(10u64)
         .returns(ExpectValue(false))
         .run();
@@ -183,7 +183,7 @@ fn set_mapper_contains_and_ordering() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .ordered_set_len()
         .returns(ExpectValue(3usize))
         .run();
@@ -198,7 +198,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .add_to_unordered_set(7u64)
         // A fresh insert must return true.
         .returns(ExpectValue(true))
@@ -207,7 +207,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .unordered_set_contains(7u64)
         .returns(ExpectValue(true))
         .run();
@@ -215,7 +215,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .unordered_set_contains(8u64)
         .returns(ExpectValue(false))
         .run();
@@ -223,7 +223,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .unordered_set_len()
         .returns(ExpectValue(1usize))
         .run();
@@ -233,7 +233,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .add_to_unordered_set(7u64)
         .returns(ExpectValue(false))
         .run();
@@ -241,7 +241,7 @@ fn unordered_set_mapper_contains_after_insert_and_absent_value() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .unordered_set_len()
         .returns(ExpectValue(1usize))
         .run();
@@ -260,14 +260,14 @@ fn whitelist_mapper_membership_only() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .add_to_whitelist(allowed.to_address())
         .run();
 
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .is_whitelisted(allowed.to_address())
         .returns(ExpectValue(true))
         .run();
@@ -275,7 +275,7 @@ fn whitelist_mapper_membership_only() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .is_whitelisted(stranger.to_address())
         .returns(ExpectValue(false))
         .run();
@@ -294,14 +294,14 @@ fn map_mapper_insert_get_and_contains_key() {
         .tx()
         .from(OWNER)
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .set_balance(holder.to_address(), BigUint::<StaticApi>::from(500u64))
         .run();
 
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .get_balance(holder.to_address())
         .returns(ExpectValue(BigUint::<StaticApi>::from(500u64)))
         .run();
@@ -309,7 +309,7 @@ fn map_mapper_insert_get_and_contains_key() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .has_balance_entry(holder.to_address())
         .returns(ExpectValue(true))
         .run();
@@ -322,7 +322,7 @@ fn map_mapper_insert_get_and_contains_key() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .has_balance_entry(nobody.to_address())
         .returns(ExpectValue(false))
         .run();
@@ -330,7 +330,7 @@ fn map_mapper_insert_get_and_contains_key() {
     world
         .query()
         .to(CONTRACT)
-        .typed(proxy::StorageMappersProxy)
+        .typed(proxy::StorageExamplesProxy)
         .get_balance(nobody.to_address())
         .returns(ExpectValue(BigUint::<StaticApi>::from(0u64)))
         .run();
