@@ -15,5 +15,6 @@ files_include = [
     "wasm/Cargo.lock",
     "Cargo.toml",
     "multiversx.json",
+    "README.md",
     
 ]

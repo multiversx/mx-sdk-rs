@@ -150,11 +150,31 @@ fn setup_template_test_current(
     target
 }
 
+fn check_files_exist(target: &ContractCreatorTarget, template_name: &str) {
+    assert!(
+        target.contract_dir().join("README.md").exists(),
+        "README.md not found in generated contract for template '{template_name}'"
+    );
+
+    assert!(
+        target.contract_dir().join("multiversx.json").exists(),
+        "multiversx.json not found in generated contract for template '{template_name}'"
+    );
+
+    assert!(
+        !target.contract_dir().join("mxsc-template.toml").exists(),
+        "mxsc-template.toml should not be present in generated contract for template '{template_name}'"
+    );
+}
+
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
 fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let target = setup_template_test_current(template_name, sub_path, new_name);
+
+    check_files_exist(&target, template_name);
+
     if BUILD_CONTRACTS {
         build_contract(&target);
     }
@@ -182,7 +202,8 @@ async fn template_released_empty() {
 }
 
 #[tokio::test]
-#[cfg_attr(not(feature = "template-test-released"), ignore)]
+#[ignore = "TODO: un-ignore after release"]
+// #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_greeter() {
     template_test_released("greeter", "released-greeter").await;
 }
@@ -194,7 +215,8 @@ async fn template_released_ping_pong_egld() {
 }
 
 #[tokio::test]
-#[cfg_attr(not(feature = "template-test-released"), ignore)]
+#[ignore = "TODO: un-ignore after release"]
+// #[cfg_attr(not(feature = "template-test-released"), ignore)]
 async fn template_released_storage_examples() {
     template_test_released("storage-examples", "released-storage-examples").await;
 }
