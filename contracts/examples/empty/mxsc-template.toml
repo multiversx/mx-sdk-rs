@@ -16,5 +16,4 @@ files_include = [
     "Cargo.toml",
     "multiversx.json",
     "README.md",
-    
 ]

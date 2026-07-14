@@ -1,2 +1,2 @@
 [[proxy]]
-path = "src/storage_examples_proxy.rs"
+path = "src/proxy.rs"

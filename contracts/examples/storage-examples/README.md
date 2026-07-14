@@ -36,7 +36,7 @@ Note: `SetMapper` and `UnorderedSetMapper` both provide O(1) `contains()` — th
 storage-examples/
 ├── src/
 │   ├── storage_examples.rs          # Contract source
-│   └── storage_examples_proxy.rs    # Auto-generated proxy (sc-meta all proxy)
+│   └── proxy.rs                     # Auto-generated proxy (sc-meta all proxy)
 ├── tests/
 │   └── storage_examples_blackbox_test.rs
 ├── meta/                            # Build metadata
