@@ -13,6 +13,3 @@ workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true
-
-[dev-dependencies]
-num-bigint = "0.4"

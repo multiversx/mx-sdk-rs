@@ -1,19 +1,15 @@
 [package]
-name = "check-pause"
+name = "storage-examples"
 version = "0.0.0"
-authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 edition = "2024"
 publish = false
+authors = ["you"]
 
 [lib]
-path = "src/check_pause.rs"
+path = "src/storage_examples.rs"
 
 [dependencies.multiversx-sc]
 workspace = true
 
-[dependencies.multiversx-sc-modules]
-workspace = true
-
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true
-

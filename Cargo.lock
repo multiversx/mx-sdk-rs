@@ -180,9 +180,9 @@ checksum = "2a4385e2e34eb35d6b3efe798b9eb88096925d87726c0798709bf56d9ed84af3"
 
 [[package]]
 name = "arrayvec"
-version = "0.7.7"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f02882884d3e1bc524fb12c79f107f6ad0e1cfd498c536ffb494301740995dfe"
+checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
 
 [[package]]
 name = "atomic-waker"
@@ -555,7 +555,6 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
- "num-bigint",
 ]
 
 [[package]]
@@ -1274,7 +1273,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "num-bigint",
 ]
 
 [[package]]
@@ -2173,6 +2171,22 @@ dependencies = [
  "serde",
  "tokio",
  "toml",
+]
+
+[[package]]
+name = "greeter"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "greeter-meta"
+version = "0.0.0"
+dependencies = [
+ "greeter",
+ "multiversx-sc-meta-lib",
 ]
 
 [[package]]
@@ -5168,7 +5182,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "num-bigint",
 ]
 
 [[package]]
@@ -5177,6 +5190,22 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc-meta-lib",
  "std-contract",
+]
+
+[[package]]
+name = "storage-examples"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "storage-examples-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "storage-examples",
 ]
 
 [[package]]

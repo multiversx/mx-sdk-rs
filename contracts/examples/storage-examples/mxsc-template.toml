@@ -1,14 +1,15 @@
-name = "crypto-zombies"
-contract_trait = "CryptoZombies"
-src_file = "lib.rs"
+name = "storage-examples"
+contract_trait = "StorageExamples"
+src_file = "storage_examples.rs"
 rename_pairs = []
 files_include = [
     "meta",
     "scenarios",
     "src",
     "tests",
+    "wasm/Cargo.lock",
     "Cargo.toml",
     "multiversx.json",
     "README.md",
-    "wasm/Cargo.lock",
+    "sc-config.toml",
 ]
