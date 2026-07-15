@@ -166,8 +166,19 @@ where
     /// If the map did not have this key present, `true` is returned.
     ///
     /// If the map did have this value present, `false` is returned.
+    ///
+    /// Any residual storage at the nested namespace for this key is cleared before
+    /// the key is inserted, ensuring the new entry always starts from a clean state.
     pub fn insert_default(&mut self, k: K) -> bool {
-        self.keys_set.insert(k)
+        if !self.keys_set.contains(&k) {
+            // Clear any residual nested storage before inserting the key to prevent
+            // stale state from a previous occupant of the same key from becoming visible.
+            self.get_mapped_storage_value(&k).clear();
+            self.keys_set.insert(k);
+            true
+        } else {
+            false
+        }
     }
 
     /// Removes the entry from the map.
@@ -530,6 +541,19 @@ where
     }
 
     /// Gets the value in the entry.
+    ///
+    /// Returns an owned mapper handle that points to the deterministic nested storage
+    /// namespace for this key.
+    ///
+    /// # Warning
+    ///
+    /// The returned mapper is a lightweight handle to a derived storage key prefix.
+    /// It is not invalidated when the entry is subsequently removed via [`OccupiedEntry::remove`].
+    /// Writing through a mapper obtained before removal will recreate storage at the same
+    /// namespace even though the key is no longer tracked in `keys_set`, producing hidden
+    /// state that is invisible to normal map lookups until the key is reinserted.
+    /// Do **not** retain and write through a mapper handle after calling `remove()` on
+    /// the entry it was obtained from.
     pub fn get(&self) -> V {
         self.map.get(&self.key).unwrap()
     }
@@ -549,7 +573,14 @@ where
         f(&mut value)
     }
 
-    /// Removes the entry from the map.
+    /// Removes the entry from the map and clears all nested storage under the entry's key.
+    ///
+    /// # Warning
+    ///
+    /// Any mapper handle previously obtained via [`OccupiedEntry::get`] for this entry
+    /// still points to the same storage prefix. Writing through such a handle after
+    /// calling `remove()` recreates storage at that namespace outside `keys_set` tracking.
+    /// Ensure all mapper handles obtained from this entry are dropped before calling `remove()`.
     pub fn remove(self) {
         self.map.remove(&self.key);
     }
