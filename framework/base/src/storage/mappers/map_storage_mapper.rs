@@ -170,11 +170,14 @@ where
     /// Any residual storage at the nested namespace for this key is cleared before
     /// the key is inserted, ensuring the new entry always starts from a clean state.
     pub fn insert_default(&mut self, k: K) -> bool {
-        if !self.keys_set.contains(&k) {
-            // Clear any residual nested storage before inserting the key to prevent
-            // stale state from a previous occupant of the same key from becoming visible.
-            self.get_mapped_storage_value(&k).clear();
-            self.keys_set.insert(k);
+        // Build the mapper handle before consuming `k` so the key is encoded once.
+        // `SetMapper::insert` already performs the `contains` check internally,
+        // avoiding a redundant storage read compared to calling `contains` first.
+        let mut mapped = self.get_mapped_storage_value(&k);
+        if self.keys_set.insert(k) {
+            // Clear any residual nested storage to prevent stale state from a previous
+            // occupant of the same key from becoming visible.
+            mapped.clear();
             true
         } else {
             false
