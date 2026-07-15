@@ -1,7 +1,7 @@
 use core::str;
 use std::path::Path;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use multiversx_chain_core::{
     std::{Bech32Address, Bech32Hrp, crypto},
     types::Address,
@@ -10,23 +10,38 @@ use serde_json::json;
 
 use crate::{
     data::transaction::Transaction,
-    wallet::{Mnemonic, PrivateKey, PublicKey, WalletPem, WalletSignature, WalletSource},
+    wallet::{Mnemonic, PrivateKey, PublicKey, Signer, WalletPem, WalletSignature, WalletSource},
 };
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Wallet {
-    pub private_key: PrivateKey,
+    pub signer: Signer,
     pub address: Address,
     pub source: WalletSource,
 }
 
 impl Wallet {
+    /// Creates a wallet backed by a local private key.
+    /// The on-chain address is derived automatically from the key.
     pub fn new(private_key: PrivateKey, source: WalletSource) -> Self {
         let address = PublicKey::from(&private_key).to_address();
         Wallet {
-            private_key,
+            signer: Signer::PrivateKey(Box::new(private_key)),
             address,
             source,
+        }
+    }
+
+    /// Creates a wallet backed by a Ledger hardware device.
+    ///
+    /// The `address` must already be fetched from the device (via
+    /// [`LedgerApp::get_address`]); it is stored as-is and used for
+    /// transaction-sender validation.
+    pub fn new_ledger(address: Address, hrp: Bech32Hrp, address_index: u32) -> Self {
+        Wallet {
+            signer: Signer::Ledger { address_index },
+            address,
+            source: WalletSource::Ledger { address_index, hrp },
         }
     }
 }
@@ -90,50 +105,136 @@ impl Wallet {
         self.address.clone()
     }
 
-    /// Returns the address as a [`Bech32Address`], using the HRP from the wallet source
-    /// (`PemFile` or `Keystore`) when available, and the default HRP (`"erd"`) otherwise.
+    /// Returns the address as a [`Bech32Address`], using the HRP from the wallet
+    /// source (`PemFile`, `Keystore`, or `Ledger`) when available, and the
+    /// default HRP (`"erd"`) otherwise.
     pub fn to_bech32(&self) -> Bech32Address {
         let hrp = match &self.source {
-            WalletSource::PemFile(hrp) | WalletSource::Keystore(hrp) => *hrp,
+            WalletSource::PemFile(hrp)
+            | WalletSource::Keystore(hrp)
+            | WalletSource::Ledger { hrp, .. } => *hrp,
             _ => Bech32Hrp::default(),
         };
         Bech32Address::encode_address(hrp, self.address.clone())
     }
 
-    pub fn private_key_hex(&self) -> String {
-        self.private_key.to_seed_hex()
+    /// Returns a reference to the private key, or `None` for Ledger wallets.
+    pub fn private_key(&self) -> Option<&PrivateKey> {
+        match &self.signer {
+            Signer::PrivateKey(pk) => Some(pk),
+            Signer::Ledger { .. } => None,
+        }
     }
 
-    pub fn public_key(&self) -> PublicKey {
-        PublicKey::from(&self.private_key)
+    /// Returns the private key as a hex-encoded seed string, or `None` for Ledger wallets.
+    pub fn private_key_hex(&self) -> Option<String> {
+        self.private_key().map(|pk| pk.to_seed_hex())
     }
 
-    pub fn public_key_hex(&self) -> String {
-        PublicKey::from(&self.private_key).to_hex()
+    /// Returns the public key derived from the private key, or `None` for Ledger wallets.
+    pub fn public_key(&self) -> Option<PublicKey> {
+        self.private_key().map(PublicKey::from)
     }
 
-    pub fn sign_tx(&self, unsign_tx: &Transaction) -> WalletSignature {
+    /// Returns the public key as a hex string, or `None` for Ledger wallets.
+    pub fn public_key_hex(&self) -> Option<String> {
+        self.public_key().map(|pk| pk.to_hex())
+    }
+
+    /// Signs a transaction.
+    ///
+    /// For `PrivateKey` wallets the signing is local and infallible (barring
+    /// bugs). For `Ledger` wallets the device must be connected and the user
+    /// must confirm on-screen; errors are returned as `Err`.
+    ///
+    /// The Ledger path requires `tx.version >= 2` and `tx.options & 1 == 1`
+    /// (hash-based signing). Returns an error if those are not set.
+    pub fn sign_tx(&self, unsign_tx: &Transaction) -> Result<WalletSignature> {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
 
-        let mut tx_bytes = json!(unsign_tx).to_string().as_bytes().to_vec();
-
-        let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;
-        if should_sign_on_tx_hash {
-            tx_bytes = crypto::keccak256(&tx_bytes).to_vec();
+        match &self.signer {
+            Signer::PrivateKey(pk) => {
+                let mut tx_bytes = json!(unsign_tx).to_string().into_bytes();
+                let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;
+                if should_sign_on_tx_hash {
+                    tx_bytes = crypto::keccak256(&tx_bytes).to_vec();
+                }
+                Ok(pk.sign(tx_bytes))
+            }
+            Signer::Ledger { address_index } => ledger_sign_tx(*address_index, &unsign_tx),
         }
-
-        self.private_key.sign(tx_bytes)
     }
 
-    pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> WalletSignature {
-        self.private_key.sign(data)
+    /// Signs arbitrary bytes.
+    ///
+    /// For `Ledger` wallets the message bytes are prefixed with a 4-byte
+    /// big-endian length before being sent to the device (matching the Python SDK).
+    pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> Result<WalletSignature> {
+        match &self.signer {
+            Signer::PrivateKey(pk) => Ok(pk.sign(data)),
+            Signer::Ledger { address_index } => ledger_sign_bytes(*address_index, data),
+        }
     }
 
-    pub fn to_pem(&self, hrp: Bech32Hrp) -> WalletPem {
-        WalletPem {
-            private_key: self.private_key.clone(),
+    /// Converts this wallet to a PEM representation.
+    /// Returns an error for Ledger wallets (the private key is never exported).
+    pub fn to_pem(&self, hrp: Bech32Hrp) -> Result<WalletPem> {
+        let pk = self.private_key().ok_or_else(|| {
+            anyhow!("cannot export a Ledger wallet to PEM: the private key is not available")
+        })?;
+        Ok(WalletPem {
+            private_key: pk.clone(),
             address: Bech32Address::encode_address(hrp, self.address.clone()),
-        }
+        })
     }
+}
+
+#[cfg(feature = "ledger")]
+fn ledger_sign_tx(address_index: u32, tx: &Transaction) -> Result<WalletSignature> {
+    use crate::wallet::ledger::LedgerApp;
+
+    if tx.version < 2 || tx.options & 1 == 0 {
+        return Err(anyhow!(
+            "Ledger signing requires hash-based options: \
+             set tx.version >= 2 and tx.options bit 0 to 1"
+        ));
+    }
+    let tx_bytes = json!(tx).to_string().into_bytes();
+    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
+    app.set_address(address_index).map_err(|e| anyhow!("{e}"))?;
+    let sig_bytes = app
+        .sign_transaction(&tx_bytes)
+        .map_err(|e| anyhow!("{e}"))?;
+    Ok(WalletSignature::from_bytes(sig_bytes))
+}
+
+#[cfg(not(feature = "ledger"))]
+fn ledger_sign_tx(_address_index: u32, _tx: &Transaction) -> Result<WalletSignature> {
+    Err(anyhow!(
+        "Ledger signing is not available; recompile with the `ledger` feature enabled"
+    ))
+}
+
+#[cfg(feature = "ledger")]
+fn ledger_sign_bytes(address_index: u32, data: impl AsRef<[u8]>) -> Result<WalletSignature> {
+    use crate::wallet::ledger::LedgerApp;
+
+    let data_ref = data.as_ref();
+    let len_prefix = (data_ref.len() as u32).to_be_bytes();
+    let mut msg_bytes = Vec::with_capacity(4 + data_ref.len());
+    msg_bytes.extend_from_slice(&len_prefix);
+    msg_bytes.extend_from_slice(data_ref);
+
+    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
+    app.set_address(address_index).map_err(|e| anyhow!("{e}"))?;
+    let sig_bytes = app.sign_message(&msg_bytes).map_err(|e| anyhow!("{e}"))?;
+    Ok(WalletSignature::from_bytes(sig_bytes))
+}
+
+#[cfg(not(feature = "ledger"))]
+fn ledger_sign_bytes(_address_index: u32, _data: impl AsRef<[u8]>) -> Result<WalletSignature> {
+    Err(anyhow!(
+        "Ledger signing is not available; recompile with the `ledger` feature enabled"
+    ))
 }

@@ -16,6 +16,10 @@ struct WalletConfigRaw {
     pem: Option<ConfigPath>,
     keyfile: Option<ConfigPath>,
     keystore_password: Option<String>,
+    #[serde(default)]
+    ledger: bool,
+    #[serde(default)]
+    ledger_address_index: u32,
 }
 
 /// Wallet configuration embeddable in a TOML/JSON config file.
@@ -36,6 +40,12 @@ pub struct WalletConfig {
     /// Keystore password (plain text). Required when `keyfile` is set.
     pub keystore_password: Option<String>,
 
+    /// Use the Ledger hardware device for signing.
+    pub ledger: bool,
+
+    /// Address index to use on the Ledger device (default: 0).
+    pub ledger_address_index: u32,
+
     cache: OnceLock<Wallet>,
 }
 
@@ -46,6 +56,8 @@ impl From<WalletConfigRaw> for WalletConfig {
             pem: raw.pem.map(Into::into),
             keyfile: raw.keyfile.map(Into::into),
             keystore_password: raw.keystore_password,
+            ledger: raw.ledger,
+            ledger_address_index: raw.ledger_address_index,
             cache: OnceLock::new(),
         }
     }
@@ -59,6 +71,8 @@ impl WalletConfig {
             pem: None,
             keyfile: None,
             keystore_password: None,
+            ledger: false,
+            ledger_address_index: 0,
             cache: OnceLock::new(),
         }
     }
@@ -70,13 +84,15 @@ impl WalletConfig {
             pem: Some(path.into()),
             keyfile: None,
             keystore_password: None,
+            ledger: false,
+            ledger_address_index: 0,
             cache: OnceLock::new(),
         }
     }
 
     /// Returns the wallet, loading and caching it on first call.
     ///
-    /// Priority: `test_wallet` > `pem` > `keyfile`.
+    /// Priority: `test_wallet` > `pem` > `keyfile` > `ledger`.
     /// Panics if none of the sources are set, or if loading fails.
     pub fn wallet(&self) -> &Wallet {
         self.cache.get_or_init(|| self.load_wallet())
@@ -102,8 +118,31 @@ impl WalletConfig {
             keystore
                 .decrypt_wallet(password)
                 .expect("failed to decrypt wallet")
+        } else if self.ledger {
+            self.load_ledger_wallet()
         } else {
-            panic!("WalletConfig requires one of: `test_wallet`, `pem`, or `keyfile`")
+            panic!("WalletConfig requires one of: `test_wallet`, `pem`, `keyfile`, or `ledger`")
         }
+    }
+
+    #[cfg(feature = "ledger")]
+    fn load_ledger_wallet(&self) -> Wallet {
+        use crate::sdk::wallet::ledger::LedgerApp;
+        use multiversx_chain_core::std::Bech32Hrp;
+
+        let app = LedgerApp::new().expect("failed to connect to Ledger device");
+        let bech32_str = app
+            .get_address(self.ledger_address_index)
+            .expect("failed to get address from Ledger");
+        let bech32_addr =
+            multiversx_sc_scenario::imports::Bech32Address::from_bech32_string(bech32_str);
+        let hrp: Bech32Hrp = bech32_addr.hrp;
+        let address = bech32_addr.address;
+        Wallet::new_ledger(address, hrp, self.ledger_address_index)
+    }
+
+    #[cfg(not(feature = "ledger"))]
+    fn load_ledger_wallet(&self) -> Wallet {
+        panic!("Ledger support is not compiled in; rebuild with the `ledger` feature enabled")
     }
 }

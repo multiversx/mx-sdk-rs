@@ -28,7 +28,7 @@ async fn main() -> anyhow::Result<()> {
         options: arg.options,
     };
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     let tx_hash = blockchain.send_transaction(&unsign_tx).await?;
 

@@ -33,7 +33,7 @@ async fn main() -> anyhow::Result<()> {
 
     let mut txs: Vec<Transaction> = vec![];
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 
@@ -41,7 +41,7 @@ async fn main() -> anyhow::Result<()> {
     unsign_tx.options = 1;
     unsign_tx.nonce += 1;
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 

@@ -165,7 +165,7 @@ pub async fn sign_and_dispatch(
         }
     };
 
-    let sig = wallet.sign_tx(&tx);
+    let sig = wallet.sign_tx(&tx)?;
     tx.signature = Some(sig);
 
     let output = TxOutputFile {

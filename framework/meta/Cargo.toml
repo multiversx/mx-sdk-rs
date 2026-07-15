@@ -21,6 +21,8 @@ name = "sc-meta"
 path = "src/main.rs"
 
 [features]
+default = ["ledger"]
+ledger = ["multiversx-sdk/ledger"]
 template-test-current = []
 template-test-released = []
 chain-simulator-tests = []

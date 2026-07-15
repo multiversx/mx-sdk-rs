@@ -4,10 +4,14 @@ mod keystore_json;
 mod mnemonic;
 mod private_key;
 mod public_key;
+mod signer;
 mod wallet_impl;
 mod wallet_pem;
 mod wallet_signature;
 mod wallet_source;
+
+#[cfg(feature = "ledger")]
+pub mod ledger;
 
 pub use keystore::Keystore;
 pub use keystore::KeystoreRandomness;
@@ -16,6 +20,7 @@ pub use keystore_json::*;
 pub use mnemonic::Mnemonic;
 pub use private_key::{PRIVATE_KEY_LENGTH, PrivateKey, SEED_LENGTH};
 pub use public_key::{PUBLIC_KEY_LENGTH, PublicKey};
+pub use signer::Signer;
 pub use wallet_impl::Wallet;
 pub use wallet_pem::WalletPem;
 pub use wallet_signature::WalletSignature;

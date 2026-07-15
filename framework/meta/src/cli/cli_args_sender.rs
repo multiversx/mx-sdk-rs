@@ -17,9 +17,17 @@ pub struct SenderArgs {
     /// Keystore password (plain text). If omitted, will prompt interactively.
     #[arg(long = "keystore-password", verbatim_doc_comment)]
     pub keystore_password: Option<String>,
+
+    /// Use a Ledger hardware wallet for signing.
+    #[arg(long, group = "wallet_source")]
+    pub ledger: bool,
+
+    /// Address index to use on the Ledger device.
+    #[arg(long = "ledger-address-index", default_value = "0")]
+    pub ledger_address_index: u32,
 }
 
-/// Load a wallet from a PEM file or JSON keystore.
+/// Load a wallet from a PEM file, JSON keystore, or Ledger device.
 pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
         Wallet::from_pem_file(pem).context("failed to load PEM wallet")
@@ -32,9 +40,34 @@ pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
         keystore
             .decrypt_wallet(&password)
             .context("failed to load keystore wallet")
+    } else if sender.ledger {
+        load_ledger_wallet(sender.ledger_address_index)
     } else {
-        Err(anyhow!("a wallet is required: use --pem or --keyfile"))
+        Err(anyhow!(
+            "a wallet is required: use --pem, --keyfile, or --ledger"
+        ))
     }
+}
+
+#[cfg(feature = "ledger")]
+fn load_ledger_wallet(address_index: u32) -> Result<Wallet> {
+    use multiversx_chain_core::std::Bech32Address;
+    use multiversx_sc_snippets::sdk::wallet::ledger::LedgerApp;
+
+    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
+    let bech32_str = app.get_address(address_index).map_err(|e| anyhow!("{e}"))?;
+    let bech32_addr = Bech32Address::from_bech32_string(bech32_str);
+    let hrp = bech32_addr.hrp;
+    let address = bech32_addr.address;
+    Ok(Wallet::new_ledger(address, hrp, address_index))
+}
+
+#[cfg(not(feature = "ledger"))]
+fn load_ledger_wallet(address_index: u32) -> Result<Wallet> {
+    let _ = address_index;
+    Err(anyhow!(
+        "Ledger support is not available; recompile with the `ledger` feature enabled"
+    ))
 }
 
 pub fn get_keystore_password() -> String {
