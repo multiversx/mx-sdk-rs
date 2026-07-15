@@ -83,8 +83,7 @@ fn test_remove_clears_nested_storage() {
     assert!(nested.is_empty());
 }
 
-/// `OccupiedEntry` manipulation via `and_modify` followed by `MapStorageMapper::remove`
-/// must fully clear the nested storage.
+/// `OccupiedEntry` manipulation via `or_insert_default` followed by `MapStorageMapper::remove`
 #[test]
 fn test_entry_remove_clears_nested_storage() {
     let mut map = create_map_storage_custom_key(b"entry_remove_clears_test");
@@ -122,19 +121,13 @@ fn test_insert_default_clears_residual_nested_storage() {
     // Build the raw storage key for the nested VecMapper's `.len` slot.
     // Layout: <base_key> + b".storage" + NestedEncode(99u64) + b".len"
     // NestedEncode of u64 is 8 big-endian bytes.
-    let stale_len_key: Vec<u8> = {
-        let mut k = base_key.to_vec();
-        k.extend_from_slice(b".storage");
-        k.extend_from_slice(&99u64.to_be_bytes());
-        k.extend_from_slice(b".len");
-        k
-    };
+    let mut nested_base_key = StorageKey::new(&base_key[..]);
+    nested_base_key.append_bytes(b".storage");
+    nested_base_key.append_item(&99u64);
 
-    // TopEncode of `1usize` is a single byte `[0x01]` (minimal big-endian).
-    // Writing this directly simulates residual data at the nested VecMapper namespace.
-    SingleTxApi::with_global_default_account(|account| {
-        account.storage.insert(stale_len_key, vec![0x01]);
-    });
+    let mut stale_vec = VecMapper::<SingleTxApi, u64>::new(nested_base_key);
+    stale_vec.push(&123u64);
+    assert_eq!(stale_vec.len(), 1);
 
     // Now insert key 99 via the public API using a VecMapper as the nested type.
     // The fix ensures insert_default clears the nested namespace before registering
