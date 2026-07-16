@@ -128,14 +128,14 @@ impl WalletConfig {
     #[cfg(feature = "ledger")]
     fn load_ledger_wallet(&self) -> Wallet {
         use crate::sdk::wallet::ledger::LedgerApp;
-        use multiversx_chain_core::std::Bech32Hrp;
+        use multiversx_sdk::chain_core::std::Bech32Hrp;
 
         let app = LedgerApp::new().expect("failed to connect to Ledger device");
         let bech32_str = app
             .get_address(self.ledger_address_index)
             .expect("failed to get address from Ledger");
         let bech32_addr =
-            multiversx_sc_scenario::imports::Bech32Address::from_bech32_string(bech32_str);
+            multiversx_sdk::chain_core::std::Bech32Address::from_bech32_string(bech32_str);
         let hrp: Bech32Hrp = bech32_addr.hrp;
         let address = bech32_addr.address;
         Wallet::new_ledger(address, hrp, self.ledger_address_index)
