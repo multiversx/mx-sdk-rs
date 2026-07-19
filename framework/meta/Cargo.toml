@@ -21,13 +21,12 @@ name = "sc-meta"
 path = "src/main.rs"
 
 [features]
-default = ["ledger"]
-ledger = ["multiversx-sdk/ledger"]
 template-test-current = []
 template-test-released = []
 chain-simulator-tests = []
 repro-build-test = []
 install-debugger-test = []
+ledger = ["multiversx-sdk/ledger"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
