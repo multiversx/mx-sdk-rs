@@ -51,6 +51,7 @@ impl<M> TypeAbiFrom<&Self> for ManagedBufferReadToEnd<M> where M: ManagedTypeApi
 
 impl<M: ManagedTypeApi> TypeAbi for ManagedBufferReadToEnd<M> {
     type Unmanaged = multiversx_sc_codec::Vec<u8>;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "bytes-read-to-end".into()

@@ -10,6 +10,7 @@ impl TypeAbiFrom<Self> for H256 {}
 
 impl TypeAbi for H256 {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "H256".into()
@@ -24,6 +25,7 @@ impl TypeAbiFrom<Self> for Address {}
 
 impl TypeAbi for Address {
     type Unmanaged = Self;
+    type Abi = AddressAbi;
 
     fn type_name() -> TypeName {
         "Address".into()
@@ -38,6 +40,7 @@ impl TypeAbiFrom<Self> for BoxedBytes {}
 
 impl TypeAbi for BoxedBytes {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "bytes".into()
@@ -51,6 +54,7 @@ impl TypeAbi for BoxedBytes {
 impl TypeAbiFrom<Self> for CodeMetadata {}
 impl TypeAbi for CodeMetadata {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "CodeMetadata".into()
@@ -64,6 +68,7 @@ impl TypeAbi for CodeMetadata {
 impl TypeAbiFrom<Self> for BLSKey {}
 impl TypeAbi for BLSKey {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         <[u8; BLSKey::len()]>::type_name()
@@ -79,6 +84,7 @@ impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
 impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
 impl TypeAbi for BLSSignature {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         <[u8; BLSSignature::len()]>::type_name()
@@ -95,6 +101,7 @@ impl TypeAbiFrom<&Self> for EsdtTokenType {}
 // implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtTokenType {
     type Unmanaged = Self;
+    type Abi = Self;
     fn type_name() -> TypeName {
         "EsdtTokenType".into()
     }
@@ -159,6 +166,7 @@ impl TypeAbiFrom<&Self> for EsdtLocalRole {}
 // implementation originally generated via #[type_abi] attribute
 impl TypeAbi for EsdtLocalRole {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "EsdtLocalRole".into()
@@ -236,6 +244,7 @@ impl TypeAbiFrom<Self> for DurationMillis {}
 
 impl TypeAbi for DurationMillis {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "u64".into()
@@ -254,6 +263,7 @@ impl TypeAbiFrom<Self> for DurationSeconds {}
 
 impl TypeAbi for DurationSeconds {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "u64".into()
@@ -272,6 +282,7 @@ impl TypeAbiFrom<Self> for TimestampMillis {}
 
 impl TypeAbi for TimestampMillis {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "u64".into()
@@ -290,6 +301,7 @@ impl TypeAbiFrom<Self> for TimestampSeconds {}
 
 impl TypeAbi for TimestampSeconds {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "u64".into()

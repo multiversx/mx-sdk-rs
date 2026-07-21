@@ -272,6 +272,7 @@ where
     M: ManagedTypeApi,
 {
     type Unmanaged = crate::types::heap::Address;
+    type Abi = crate::abi::AddressAbi;
 
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {

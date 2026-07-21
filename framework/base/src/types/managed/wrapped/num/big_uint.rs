@@ -1,7 +1,7 @@
 use core::convert::TryInto;
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{BigUintAbi, TypeAbi, TypeAbiFrom, TypeName},
     api::{
         BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
         RawHandle, const_handles, quick_signal_error, use_raw_handle,
@@ -225,8 +225,10 @@ impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
     #[cfg(not(feature = "num-bigint"))]
     type Unmanaged = Self;
 
+    type Abi = BigUintAbi;
+
     fn type_name() -> TypeName {
-        TypeName::from("BigUint")
+        BigUintAbi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

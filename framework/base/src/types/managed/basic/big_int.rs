@@ -184,6 +184,7 @@ impl<M> TypeAbiFrom<&Self> for BigInt<M> where M: ManagedTypeApi {}
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     #[cfg(feature = "num-bigint")]
     type Unmanaged = crate::codec::num_bigint::BigInt;
+    type Abi = crate::abi::BigIntAbi;
 
     #[cfg(not(feature = "num-bigint"))]
     type Unmanaged = Self;

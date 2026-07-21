@@ -246,6 +246,7 @@ where
     M: ManagedTypeApi,
 {
     type Unmanaged = [u8; N];
+    type Abi = [u8; N];
 
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> TypeName {

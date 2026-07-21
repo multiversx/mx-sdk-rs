@@ -18,6 +18,7 @@ use core::{
     borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData,
     mem::MaybeUninit,
 };
+use multiversx_sc_abi::ListAbi;
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -936,10 +937,11 @@ where
     T: ManagedVecItem + TypeAbi,
 {
     type Unmanaged = Vec<T::Unmanaged>;
+    type Abi = ListAbi<T::Abi>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
-        <&[T] as TypeAbi>::type_name()
+        <ListAbi<T> as TypeAbi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

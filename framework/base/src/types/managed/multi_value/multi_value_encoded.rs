@@ -369,6 +369,7 @@ where
     T: TypeAbi,
 {
     type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = MultiValueVec<T::Abi>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()

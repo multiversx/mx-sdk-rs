@@ -112,6 +112,7 @@ where
     M: ManagedTypeApi,
 {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         MultiValue3::<EsdtTokenIdentifier<M>, u64, NonZeroBigUint<M>>::type_name()

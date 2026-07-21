@@ -328,6 +328,7 @@ where
     T: TopEncode + TopDecode + TypeAbi,
 {
     type Unmanaged = T::Unmanaged;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         T::type_name()
