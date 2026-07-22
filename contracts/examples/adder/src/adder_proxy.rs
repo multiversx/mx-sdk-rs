@@ -44,7 +44,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUintAbi>,
     >(
         self,
         initial_value: Arg0,
@@ -67,7 +67,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn upgrade<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUintAbi>,
     >(
         self,
         initial_value: Arg0,
@@ -91,7 +91,7 @@ where
 {
     pub fn sum(
         self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUintAbi> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getSum")
@@ -100,7 +100,7 @@ where
 
     /// Add desired amount to the storage variable. 
     pub fn add<
-        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUintAbi>,
     >(
         self,
         value: Arg0,
