@@ -1,14 +1,10 @@
 use anyhow::Result;
 use multiversx_sdk::{
-    chain_core::types::Address,
-    data::{
-        network_config::NetworkConfig,
-        transaction::{
-            ApiTransactionResult, ArgCreateTransaction, Transaction, TxCostResponseData,
-        },
-        vm::{VMQueryInput, VmValuesResponseData},
-    },
-    gateway::{
+    chain_core::types::Address, data::{
+        network_config::NetworkConfig, transaction::{
+            ApiTransactionResult, ArgCreateTransaction, Transaction, TransactionOptions, TransactionVersion, TxCostResponseData,
+        }, vm::{VMQueryInput, VmValuesResponseData},
+    }, gateway::{
         GetTxCost, GetTxInfo, GetTxProcessStatus, GetTxStatus, SendMultiTxRequest, SendTxRequest,
         VMQueryRequest,
     },
@@ -67,8 +63,8 @@ impl GatewayHttpProxy {
             data: None,
             signature: "".to_string(),
             chain_id: network_configs.chain_id.clone(),
-            version: network_configs.min_transaction_version,
-            options: 0,
+            version: TransactionVersion::default(),
+            options: Some(TransactionOptions::default()),
             available_balance: account.balance,
         })
     }

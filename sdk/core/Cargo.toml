@@ -36,6 +36,7 @@ log = "0.4"
 scrypt = { version = "0.12", default-features = false }
 aes = "0.9"
 ctr = "0.10"
+bitflags = "2.13"
 ledger-transport-hid = { version = "0.10", optional = true }
 ledger-apdu          = { version = "0.10", optional = true }
 

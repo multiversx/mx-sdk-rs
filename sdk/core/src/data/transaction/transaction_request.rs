@@ -2,6 +2,9 @@ use crate::wallet::WalletSignature;
 use multiversx_chain_core::std::Bech32Address;
 use serde::{Deserialize, Serialize};
 
+use super::transaction_options::TransactionOptions;
+use super::transaction_version::TransactionVersion;
+
 /// Represents the structure that maps and validates user input for publishing a new transaction.
 ///
 /// Corresponds to [`Transaction`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
@@ -20,13 +23,20 @@ pub struct Transaction {
     pub signature: Option<WalletSignature>,
     #[serde(rename = "chainID")]
     pub chain_id: String,
-    pub version: u32,
-    #[serde(skip_serializing_if = "is_zero", default)]
-    pub options: u32,
+    pub version: TransactionVersion,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<TransactionOptions>,
 }
 
-/// This is only used for serialization.
-#[allow(clippy::trivially_copy_pass_by_ref)]
-fn is_zero(num: &u32) -> bool {
-    *num == 0
+impl Transaction {
+    pub fn should_sign_with_hash(&self) -> bool {
+        if !self.version.supports_options() {
+            return false;
+        }
+
+        self.options
+            .as_ref()
+            .map(|o| o.sign_with_hash())
+            .unwrap_or(false)
+    }
 }

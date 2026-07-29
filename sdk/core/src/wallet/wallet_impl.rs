@@ -146,9 +146,6 @@ impl Wallet {
     /// For `PrivateKey` wallets the signing is local and infallible (barring
     /// bugs). For `Ledger` wallets the device must be connected and the user
     /// must confirm on-screen; errors are returned as `Err`.
-    ///
-    /// The Ledger path requires `tx.version >= 2` and `tx.options & 1 == 1`
-    /// (hash-based signing). Returns an error if those are not set.
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> Result<WalletSignature> {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
@@ -156,8 +153,7 @@ impl Wallet {
         match &self.signer {
             Signer::PrivateKey(pk) => {
                 let mut tx_bytes = json!(unsign_tx).to_string().into_bytes();
-                let should_sign_on_tx_hash = unsign_tx.version >= 2 && unsign_tx.options & 1 > 0;
-                if should_sign_on_tx_hash {
+                if unsign_tx.should_sign_with_hash() {
                     tx_bytes = crypto::keccak256(&tx_bytes).to_vec();
                 }
                 Ok(pk.sign(tx_bytes))
@@ -192,20 +188,24 @@ impl Wallet {
 
 #[cfg(feature = "ledger")]
 fn ledger_sign_tx(address_index: u32, tx: &Transaction) -> Result<WalletSignature> {
+    use anyhow::Context as _;
     use crate::wallet::ledger::LedgerApp;
 
-    if tx.version < 2 || tx.options & 1 == 0 {
+    if !tx.should_sign_with_hash() {
         return Err(anyhow!(
             "Ledger signing requires hash-based options: \
-             set tx.version >= 2 and tx.options bit 0 to 1"
+             set version to V2 and options to SIGN_WITH_HASH"
         ));
     }
+
     let tx_bytes = json!(tx).to_string().into_bytes();
-    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
-    app.set_address(address_index).map_err(|e| anyhow!("{e}"))?;
+    let app = LedgerApp::new()
+        .context("failed to open Ledger device — check that it is plugged in, unlocked, and the MultiversX app is open")?;
+    app.set_address(address_index)
+        .with_context(|| format!("failed to set Ledger address index {address_index}"))?;
     let sig_bytes = app
         .sign_transaction(&tx_bytes)
-        .map_err(|e| anyhow!("{e}"))?;
+        .context("Ledger rejected the transaction — confirm it on the device screen or check that the transaction is valid")?;
     Ok(WalletSignature::from_bytes(sig_bytes))
 }
 

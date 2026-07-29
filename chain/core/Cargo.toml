@@ -20,7 +20,7 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 std = ["base64", "bech32", "serde", "hex", "blake2", "sha2", "sha3", "ed25519-dalek"]
 
 [dependencies]
-bitflags = "2.9"
+bitflags = "2.13"
 base64 = { version = "0.22", optional = true }
 bech32 = { version = "0.12", optional = true }
 serde = { version = "1.0", features = ["derive"], optional = true }

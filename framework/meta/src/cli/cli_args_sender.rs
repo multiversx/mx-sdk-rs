@@ -23,8 +23,8 @@ pub struct SenderArgs {
     pub ledger: bool,
 
     /// Address index to use on the Ledger device.
-    #[arg(long = "ledger-address-index", default_value = "0")]
-    pub ledger_address_index: u32,
+    #[arg(long, default_value = "0")]
+    pub sender_wallet_index: u32,
 }
 
 /// Load a wallet from a PEM file, JSON keystore, or Ledger device.
@@ -41,7 +41,7 @@ pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
             .decrypt_wallet(&password)
             .context("failed to load keystore wallet")
     } else if sender.ledger {
-        load_ledger_wallet(sender.ledger_address_index)
+        load_ledger_wallet(sender.sender_wallet_index)
     } else {
         Err(anyhow!(
             "a wallet is required: use --pem, --keyfile, or --ledger"

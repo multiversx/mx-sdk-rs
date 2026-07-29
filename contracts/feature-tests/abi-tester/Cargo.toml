@@ -19,4 +19,4 @@ workspace = true
 workspace = true
 
 [dependencies]
-bitflags = "2.9"
+bitflags = "2.13"

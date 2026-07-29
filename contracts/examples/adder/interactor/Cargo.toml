@@ -17,6 +17,7 @@ path = ".."
 
 [dependencies.multiversx-sc-snippets]
 workspace = true
+features = ["ledger"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
