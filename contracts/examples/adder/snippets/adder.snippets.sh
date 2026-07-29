@@ -123,3 +123,23 @@ add_v2() {
         --infile="${OUTFILE_CALL_SIGNED}" \
         || return
 }
+
+# Signs the add call with a Ledger hardware wallet instead of a PEM file.
+# Uses --ledger (address index 0 by default); override with LEDGER_ADDRESS_INDEX.
+add_ledger() {
+    NUMBER=5
+    LEDGER_ADDRESS_INDEX="${LEDGER_ADDRESS_INDEX:-0}"
+
+    "${TX_TOOL[@]}" call "${ADDRESS}" \
+        --ledger \
+        --sender-wallet-index "${LEDGER_ADDRESS_INDEX}" \
+        --gas-limit=5000000 \
+        --function="add" \
+        --arguments "${NUMBER}" \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --send \
+        --outfile="${OUTFILE_CALL}" \
+        --wait-result \
+        || return
+}
