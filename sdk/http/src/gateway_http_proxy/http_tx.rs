@@ -1,10 +1,15 @@
 use anyhow::Result;
 use multiversx_sdk::{
-    chain_core::types::Address, data::{
-        network_config::NetworkConfig, transaction::{
-            ApiTransactionResult, ArgCreateTransaction, Transaction, TransactionOptions, TransactionVersion, TxCostResponseData,
-        }, vm::{VMQueryInput, VmValuesResponseData},
-    }, gateway::{
+    chain_core::types::Address,
+    data::{
+        network_config::NetworkConfig,
+        transaction::{
+            ApiTransactionResult, ArgCreateTransaction, Transaction, TransactionOptions,
+            TransactionVersion, TxCostResponseData,
+        },
+        vm::{VMQueryInput, VmValuesResponseData},
+    },
+    gateway::{
         GetTxCost, GetTxInfo, GetTxProcessStatus, GetTxStatus, SendMultiTxRequest, SendTxRequest,
         VMQueryRequest,
     },

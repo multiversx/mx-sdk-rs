@@ -188,8 +188,8 @@ impl Wallet {
 
 #[cfg(feature = "ledger")]
 fn ledger_sign_tx(address_index: u32, tx: &Transaction) -> Result<WalletSignature> {
-    use anyhow::Context as _;
     use crate::wallet::ledger::LedgerApp;
+    use anyhow::Context as _;
 
     if !tx.should_sign_with_hash() {
         return Err(anyhow!(

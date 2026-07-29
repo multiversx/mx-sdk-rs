@@ -1,5 +1,6 @@
 use multiversx_sdk::{
-    data::transaction::{Transaction, TransactionOptions, TransactionVersion}, wallet::{PrivateKey, Wallet},
+    data::transaction::{Transaction, TransactionOptions, TransactionVersion},
+    wallet::{PrivateKey, Wallet},
 };
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
