@@ -17,7 +17,7 @@ path = ".."
 
 [dependencies.multiversx-sc-snippets]
 workspace = true
-features = ["ledger"]
+# features = ["ledger"] # TODO: fix CI
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
