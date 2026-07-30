@@ -18,6 +18,8 @@ pub struct Config {
     pub connection: ConnectionConfig,
     pub owner: WalletConfig,
     pub wallet: WalletConfig,
+    #[serde(rename = "ledger-wallet")]
+    pub ledger_wallet: Option<WalletConfig>,
 }
 
 impl InteractorConfig for Config {
@@ -26,7 +28,11 @@ impl InteractorConfig for Config {
     }
 
     fn register_wallets(&self) -> Vec<Wallet> {
-        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+        let mut wallets = vec![self.owner.wallet().clone(), self.wallet.wallet().clone()];
+        if let Some(ledger_wallet) = &self.ledger_wallet {
+            wallets.push(ledger_wallet.wallet().clone());
+        }
+        wallets
     }
 }
 
@@ -61,12 +67,15 @@ pub async fn adder_cli() {
                 .upgrade(args.value, &owner_address, None)
                 .await
         }
-        Some(adder_interactor_cli::InteractCliCommand::Add(args)) => {
-            adder_interact.add(args.value).await;
-        }
         Some(adder_interactor_cli::InteractCliCommand::Sum) => {
             let sum = adder_interact.get_sum().await;
             println!("sum: {sum}");
+        }
+        Some(adder_interactor_cli::InteractCliCommand::Add(args)) => {
+            adder_interact.add(args.value).await;
+        }
+        Some(adder_interactor_cli::InteractCliCommand::AddLedger(args)) => {
+            adder_interact.add_ledger(args.value).await;
         }
         None => {}
     }
@@ -142,6 +151,17 @@ impl AdderInteractor {
         }
     }
 
+    pub async fn get_sum(&mut self) -> RustBigUint {
+        self.interactor
+            .query()
+            .to(self.state.current_adder_address())
+            .typed(adder_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsResultUnmanaged)
+            .run()
+            .await
+    }
+
     pub async fn add(&mut self, value: u32) {
         self.interactor
             .tx()
@@ -157,14 +177,23 @@ impl AdderInteractor {
         println!("Successfully performed add");
     }
 
-    pub async fn get_sum(&mut self) -> RustBigUint {
+    pub async fn add_ledger(&mut self, value: u32) {
+        let ledger_wallet = self
+            .config
+            .ledger_wallet
+            .as_ref()
+            .expect("ledger wallet not configured");
         self.interactor
-            .query()
+            .tx()
+            .id("interactor add")
+            .from(ledger_wallet.address())
             .to(self.state.current_adder_address())
+            .gas(6_000_000u64)
             .typed(adder_proxy::AdderProxy)
-            .sum()
-            .returns(ReturnsResultUnmanaged)
+            .add(value)
             .run()
-            .await
+            .await;
+
+        println!("Successfully performed add via ledger");
     }
 }

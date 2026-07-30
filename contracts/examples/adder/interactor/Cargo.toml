@@ -12,12 +12,15 @@ path = "src/adder_interactor_main.rs"
 [lib]
 path = "src/adder_interactor.rs"
 
+[features]
+ledger = ["multiversx-sc-snippets/ledger"]
+chain-simulator-tests = []
+
 [dependencies.adder]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
 workspace = true
-# features = ["ledger"] # TODO: fix CI
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -27,6 +30,3 @@ tokio = { version = "1.24" }
 
 [dev-dependencies]
 serial_test = "3.2"
-
-[features]
-chain-simulator-tests = []
