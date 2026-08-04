@@ -22,6 +22,9 @@ jobs:
           toolchain: 1.96
           target: wasm32v1-none
 
+      - name: Install libudev (required by hidapi/ledger feature)
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev
+
       - name: Install sc-meta
         run: cargo install --path framework/meta --locked
 
