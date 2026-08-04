@@ -8,6 +8,7 @@ use multiversx_sc_scenario::{
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
 use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
 use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
 use multiversx_sdk::{
     gateway::{GatewayAsyncService, SendTxRequest},
@@ -132,8 +133,8 @@ where
             data,
             signature: None,
             chain_id: self.network_config().chain_id.clone(),
-            version: self.network_config().min_transaction_version,
-            options: 0,
+            version: TransactionVersion::V2,
+            options: Some(TransactionOptions::SIGN_WITH_HASH),
         }
     }
 }

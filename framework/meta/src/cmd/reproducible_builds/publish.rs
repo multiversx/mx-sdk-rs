@@ -113,7 +113,9 @@ pub(super) fn sign_payload(
     payload: &str,
 ) -> WalletSignature {
     let bytes_to_sign = compute_bytes_for_signing(contract, payload);
-    wallet.sign_bytes(bytes_to_sign)
+    wallet
+        .sign_bytes(bytes_to_sign)
+        .expect("failed to sign payload")
 }
 
 /// POSTs the verification request and returns the HTTP status code and parsed response body.

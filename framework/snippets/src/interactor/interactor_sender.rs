@@ -109,7 +109,10 @@ where
             .expect("the wallet that was supposed to sign is not registered");
 
         // sign
-        let signature = sender.wallet.sign_tx(transaction);
+        let signature = sender
+            .wallet
+            .sign_tx(transaction)
+            .expect("failed to sign transaction");
         transaction.signature = Some(signature);
     }
 }

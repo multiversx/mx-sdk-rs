@@ -10,6 +10,7 @@ fn chain_simulator_config() -> Config {
         connection: ConnectionConfig::chain_simulator(),
         owner: WalletConfig::from_test_wallet("mike"),
         wallet: WalletConfig::from_test_wallet("ivan"),
+        ledger_wallet: None,
     }
 }
 

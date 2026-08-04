@@ -32,7 +32,7 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         tx.chain_id = chain_id.clone();
     }
 
-    let sig = wallet.sign_tx(&tx);
+    let sig = wallet.sign_tx(&tx)?;
     tx.signature = Some(sig);
 
     let decoded_data = match &tx.data {

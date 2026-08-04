@@ -24,3 +24,6 @@ test_wallet = 'ivan'
 # pem = 'path/to/wallet.pem'
 # keyfile = 'path/to/wallet.json'
 # keystore_password = 'password'
+
+[ledger-wallet]
+ledger = true

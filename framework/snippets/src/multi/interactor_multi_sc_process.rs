@@ -56,6 +56,9 @@ pub(crate) fn update_nonces_and_sign_tx(transaction: &mut Transaction, sender: &
     transaction.nonce = sender.current_nonce.unwrap();
     sender.current_nonce = Some(sender.current_nonce.unwrap() + 1);
 
-    let signature = sender.wallet.sign_tx(&*transaction);
+    let signature = sender
+        .wallet
+        .sign_tx(&*transaction)
+        .expect("failed to sign transaction");
     transaction.signature = Some(signature);
 }

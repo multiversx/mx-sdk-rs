@@ -26,6 +26,7 @@ template-test-released = []
 chain-simulator-tests = []
 repro-build-test = []
 install-debugger-test = []
+ledger = ["multiversx-sdk/ledger"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

@@ -68,7 +68,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         tx.chain_id = chain_id.clone();
     }
 
-    let sig = wallet.sign_tx(&tx);
+    let sig = wallet.sign_tx(&tx)?;
     tx.signature = Some(sig);
 
     let output = TxOutputFile {

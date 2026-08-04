@@ -42,7 +42,7 @@ fn test_keystore_encrypt_decrypt_roundtrip() {
 
     let wallet = keystore.decrypt_wallet(KEYSTORE_PASSWORD).unwrap();
 
-    assert_eq!(wallet.private_key, private_key);
+    assert_eq!(wallet.private_key().unwrap(), &private_key);
     assert_eq!(
         wallet.source,
         WalletSource::Keystore(Bech32Hrp::try_from("erd").unwrap())
@@ -84,7 +84,7 @@ fn test_keystore_serialize_deserialize_roundtrip() {
     let keystore2: Keystore = Keystore::from_json(serde_json::from_str(&json).unwrap()).unwrap();
     let wallet = keystore2.decrypt_wallet(KEYSTORE_PASSWORD).unwrap();
 
-    assert_eq!(wallet.private_key, private_key);
+    assert_eq!(wallet.private_key().unwrap(), &private_key);
 }
 
 #[test]
@@ -119,13 +119,13 @@ fn test_full_encrypt_serialize_deserialize_decrypt_sign() {
 
     // Decrypt into a Wallet.
     let wallet = keystore2.decrypt_wallet(KEYSTORE_PASSWORD).unwrap();
-    assert_eq!(wallet.private_key, alice_private_key());
+    assert_eq!(wallet.private_key().unwrap(), &alice_private_key());
 
     // Sign the message.
-    let sig = wallet.sign_bytes(MESSAGE);
+    let sig = wallet.sign_bytes(MESSAGE).unwrap();
 
     // Ed25519 is deterministic: same key + same message always gives the same signature.
-    assert_eq!(sig, wallet.sign_bytes(MESSAGE));
+    assert_eq!(sig, wallet.sign_bytes(MESSAGE).unwrap());
 
     // Snapshot: exact signature bytes must match.
     assert_eq!(sig.to_hex(), EXPECTED_SIGNATURE_HEX);

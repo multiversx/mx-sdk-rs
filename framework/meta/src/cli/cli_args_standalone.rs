@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 pub use super::cli_args_reproducible_builds::*;
 
+use crate::cli::cli_args_ledger::LedgerArgs;
 use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
@@ -112,6 +113,12 @@ pub enum StandaloneCliAction {
         about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
     )]
     Tx(TxCliArgs),
+
+    #[command(
+        name = "ledger",
+        about = "Interact with a Ledger hardware wallet (list addresses, get app version)."
+    )]
+    Ledger(LedgerArgs),
 
     #[command(
         name = "data",

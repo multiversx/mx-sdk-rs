@@ -18,6 +18,7 @@ default = ["http"]
 http = ["multiversx-sdk-http", "tokio"]
 dapp = ["multiversx-sdk-dapp"]
 chain-simulator-tests = []
+ledger = ["multiversx-sdk/ledger"]
 
 [dependencies]
 hex = "0.4"

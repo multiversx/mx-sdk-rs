@@ -5,6 +5,7 @@ pub mod code_report;
 pub mod data;
 pub mod info;
 pub mod install;
+pub mod ledger_cmd;
 pub mod print_util;
 pub mod reproducible_builds;
 pub mod retrieve_address;
