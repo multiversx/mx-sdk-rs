@@ -18,7 +18,7 @@ fn ledger_cmd_inner(args: &LedgerArgs) -> anyhow::Result<()> {
 fn print_addresses(num_addresses: u32) -> anyhow::Result<()> {
     use multiversx_sc_snippets::sdk::wallet::ledger::LedgerApp;
 
-    let app = LedgerApp::new()?;
+    let mut app = LedgerApp::new()?;
     for i in 0..num_addresses {
         let address = app.get_address(i)?;
         println!("account index = 0 | address index = {i} | address: {address}");
@@ -35,7 +35,7 @@ fn print_addresses(_num_addresses: u32) -> anyhow::Result<()> {
 fn print_version() -> anyhow::Result<()> {
     use multiversx_sc_snippets::sdk::wallet::ledger::LedgerApp;
 
-    let app = LedgerApp::new()?;
+    let mut app = LedgerApp::new()?;
     let version = app.get_version()?;
     println!("MultiversX App version: {version}");
     Ok(())

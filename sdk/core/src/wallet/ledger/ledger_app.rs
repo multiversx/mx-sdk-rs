@@ -3,30 +3,21 @@ use ledger_transport_hid::{TransportNativeHID, hidapi::HidApi};
 
 use super::{LedgerAppConfiguration, LedgerError, LedgerTransport};
 
-const CLA: u8 = 0xED;
-const INS_GET_APP_CONFIG: u8 = 0x02;
-const INS_GET_ADDRESS: u8 = 0x03;
-const INS_SET_ADDRESS: u8 = 0x05;
-const INS_SIGN_MESSAGE: u8 = 0x06;
-const INS_SIGN_HASH_TX: u8 = 0x07;
+pub(super) const CLA: u8 = 0xED;
+pub(super) const INS_GET_APP_CONFIG: u8 = 0x02;
+pub(super) const INS_GET_ADDRESS: u8 = 0x03;
+pub(super) const INS_SET_ADDRESS: u8 = 0x05;
+pub(super) const INS_SIGN_MESSAGE: u8 = 0x06;
+pub(super) const INS_SIGN_HASH_TX: u8 = 0x07;
 
 // Account index is always 0 for MultiversX.
 const DEFAULT_ACCOUNT_INDEX: u32 = 0;
 
-const MAX_CHUNK_SIZE: usize = 150;
+pub(super) const MAX_CHUNK_SIZE: usize = 150;
 // Ledger responses: first byte is the length prefix (0x40 = 64), followed by 64 signature bytes.
-const EXPECTED_SIG_FIRST_BYTE: u8 = 0x40;
-const SIG_RESPONSE_LEN: usize = 65;
-const SIG_LEN: usize = 64;
-
-/// Abstraction over the physical transport layer.
-///
-/// Implementors send a single APDU command and return the response payload
-/// (already status-word-checked).  The only production implementation is
-/// [`TransportNativeHID`]; tests provide a [`MockTransport`].
-pub trait LedgerTransport {
-    fn exchange(&mut self, command: &APDUCommand<Vec<u8>>) -> Result<Vec<u8>, LedgerError>;
-}
+pub(super) const EXPECTED_SIG_FIRST_BYTE: u8 = 0x40;
+pub(super) const SIG_RESPONSE_LEN: usize = 65;
+pub(super) const SIG_LEN: usize = 64;
 
 /// Communicates with the MultiversX app on a connected Ledger hardware device.
 ///
@@ -87,10 +78,15 @@ impl LedgerApp {
     pub fn get_address(&mut self, address_index: u32) -> Result<String, LedgerError> {
         let data = build_account_address_data(address_index);
         let response = self.exchange(INS_GET_ADDRESS, 0x00, 0x00, &data)?;
-        // First byte is the length of the address string.
-        let address_bytes = response
-            .get(1..)
-            .ok_or_else(|| LedgerError::InvalidResponse("empty GET_ADDRESS response".into()))?;
+        let len = *response
+            .first()
+            .ok_or_else(|| LedgerError::InvalidResponse("empty GET_ADDRESS response".into()))?
+            as usize;
+        let address_bytes = response.get(1..1 + len).ok_or_else(|| {
+            LedgerError::InvalidResponse(format!(
+                "GET_ADDRESS: response too short for length prefix {len}"
+            ))
+        })?;
         String::from_utf8(address_bytes.to_vec())
             .map_err(|e| LedgerError::InvalidResponse(format!("non-UTF8 address: {e}")))
     }
@@ -163,7 +159,7 @@ impl LedgerApp {
     }
 }
 
-fn build_account_address_data(address_index: u32) -> Vec<u8> {
+pub(super) fn build_account_address_data(address_index: u32) -> Vec<u8> {
     let mut data = Vec::with_capacity(8);
     data.extend_from_slice(&DEFAULT_ACCOUNT_INDEX.to_be_bytes());
     data.extend_from_slice(&address_index.to_be_bytes());

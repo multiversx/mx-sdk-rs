@@ -54,7 +54,7 @@ fn load_ledger_wallet(address_index: u32) -> Result<Wallet> {
     use multiversx_chain_core::std::Bech32Address;
     use multiversx_sc_snippets::sdk::wallet::ledger::LedgerApp;
 
-    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
+    let mut app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
     let bech32_str = app.get_address(address_index).map_err(|e| anyhow!("{e}"))?;
     let bech32_addr = Bech32Address::from_bech32_string(bech32_str);
     let hrp = bech32_addr.hrp;

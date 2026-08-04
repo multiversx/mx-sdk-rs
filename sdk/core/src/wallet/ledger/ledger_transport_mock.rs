@@ -4,8 +4,7 @@ use std::rc::Rc;
 
 use ledger_apdu::APDUCommand;
 
-use super::super::LedgerError;
-use super::{LedgerApp, LedgerTransport, SIG_LEN};
+use super::{LedgerError, LedgerTransport};
 
 /// A deterministic mock transport for unit testing.
 ///
@@ -54,27 +53,30 @@ impl LedgerTransport for MockTransport {
     }
 }
 
-/// Creates a valid 65-byte mock signature response for a given 64-byte
-/// signature payload.
-pub fn sig_response(sig: [u8; SIG_LEN]) -> Vec<u8> {
-    let mut r = vec![0x40u8];
-    r.extend_from_slice(&sig);
-    r
-}
-
-/// Returns a fixed 64-byte dummy signature (all `0xAB`).
-pub fn dummy_sig() -> [u8; SIG_LEN] {
-    [0xABu8; SIG_LEN]
-}
-
-pub fn app_with(responses: impl IntoIterator<Item = Result<Vec<u8>, LedgerError>>) -> LedgerApp {
-    LedgerApp::with_transport(Box::new(MockTransport::new(responses)))
-}
-
 #[cfg(test)]
 mod tests {
-    use super::mock::*;
+    use crate::wallet::ledger::{LedgerApp, ledger_app};
+
     use super::*;
+
+    /// Creates a valid 65-byte mock signature response for a given 64-byte
+    /// signature payload.
+    pub fn sig_response(sig: [u8; ledger_app::SIG_LEN]) -> Vec<u8> {
+        let mut r = vec![0x40u8];
+        r.extend_from_slice(&sig);
+        r
+    }
+
+    /// Returns a fixed 64-byte dummy signature (all `0xAB`).
+    pub fn dummy_sig() -> [u8; ledger_app::SIG_LEN] {
+        [0xABu8; ledger_app::SIG_LEN]
+    }
+
+    pub fn app_with(
+        responses: impl IntoIterator<Item = Result<Vec<u8>, LedgerError>>,
+    ) -> LedgerApp {
+        LedgerApp::with_transport(Box::new(MockTransport::new(responses)))
+    }
 
     // ── get_app_configuration ────────────────────────────────────────────────
 
@@ -132,8 +134,8 @@ mod tests {
 
         let cmds = commands.borrow();
         let cmd = &cmds[0];
-        assert_eq!(cmd.cla, CLA);
-        assert_eq!(cmd.ins, INS_GET_ADDRESS);
+        assert_eq!(cmd.cla, ledger_app::CLA);
+        assert_eq!(cmd.ins, ledger_app::INS_GET_ADDRESS);
         assert_eq!(cmd.p1, 0x00);
         assert_eq!(cmd.p2, 0x00);
         // data = account_index(4 BE) + address_index(4 BE) = 0x00000000 + 0x00000003
@@ -160,7 +162,7 @@ mod tests {
 
         let cmds = commands.borrow();
         let cmd = &cmds[0];
-        assert_eq!(cmd.ins, INS_SIGN_HASH_TX);
+        assert_eq!(cmd.ins, ledger_app::INS_SIGN_HASH_TX);
         assert_eq!(cmd.p1, 0x00); // first chunk
     }
 
@@ -227,7 +229,7 @@ mod tests {
         let mut app = LedgerApp::with_transport(Box::new(transport));
         let _ = app.sign_message(data).unwrap();
 
-        assert_eq!(commands.borrow()[0].ins, INS_SIGN_MESSAGE);
+        assert_eq!(commands.borrow()[0].ins, ledger_app::INS_SIGN_MESSAGE);
     }
 
     // ── error mapping ────────────────────────────────────────────────────────
@@ -254,7 +256,7 @@ mod tests {
 
     #[test]
     fn test_address_data_encoding() {
-        let data = build_account_address_data(7);
+        let data = ledger_app::build_account_address_data(7);
         // account index 0 (4 bytes BE) + address index 7 (4 bytes BE)
         assert_eq!(data, [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07]);
     }

@@ -1,8 +1,7 @@
 use ledger_apdu::APDUCommand;
 use ledger_transport_hid::TransportNativeHID;
 
-use super::LedgerError;
-
+use super::{LedgerError, LedgerTransport};
 
 impl LedgerTransport for TransportNativeHID {
     fn exchange(&mut self, command: &APDUCommand<Vec<u8>>) -> Result<Vec<u8>, LedgerError> {
