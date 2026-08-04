@@ -38,7 +38,7 @@ fn main() -> Result<()> {
             println!("  - bech32: {}", wallet.address.to_bech32(hrp));
             println!("  - hex:    0x{address_hex}");
 
-            let pem_content = wallet.to_pem(hrp).unwrap().to_pem_str();
+            let pem_content = wallet.to_pem(hrp)?.to_pem_str();
             write_pem(suffix, &address_hex, pem_content)?;
 
             println!();
