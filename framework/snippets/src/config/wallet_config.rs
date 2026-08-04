@@ -130,7 +130,7 @@ impl WalletConfig {
         use crate::sdk::wallet::ledger::LedgerApp;
         use multiversx_sdk::chain_core::std::Bech32Hrp;
 
-        let app = LedgerApp::new().expect("failed to connect to Ledger device");
+        let mut app = LedgerApp::new().expect("failed to connect to Ledger device");
         let bech32_str = app
             .get_address(self.ledger_address_index)
             .expect("failed to get address from Ledger");

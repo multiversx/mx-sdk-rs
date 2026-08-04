@@ -199,7 +199,7 @@ fn ledger_sign_tx(address_index: u32, tx: &Transaction) -> Result<WalletSignatur
     }
 
     let tx_bytes = json!(tx).to_string().into_bytes();
-    let app = LedgerApp::new()
+    let mut app = LedgerApp::new()
         .context("failed to open Ledger device — check that it is plugged in, unlocked, and the MultiversX app is open")?;
     app.set_address(address_index)
         .with_context(|| format!("failed to set Ledger address index {address_index}"))?;
@@ -226,7 +226,7 @@ fn ledger_sign_bytes(address_index: u32, data: impl AsRef<[u8]>) -> Result<Walle
     msg_bytes.extend_from_slice(&len_prefix);
     msg_bytes.extend_from_slice(data_ref);
 
-    let app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
+    let mut app = LedgerApp::new().map_err(|e| anyhow!("{e}"))?;
     app.set_address(address_index).map_err(|e| anyhow!("{e}"))?;
     let sig_bytes = app.sign_message(&msg_bytes).map_err(|e| anyhow!("{e}"))?;
     Ok(WalletSignature::from_bytes(sig_bytes))

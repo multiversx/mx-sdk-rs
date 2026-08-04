@@ -1,0 +1,62 @@
+name: Interactor Tests, with ledger mock
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  adder-ledger-interactor-test:
+    name: Adder ledger interactor test (chain simulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.96
+          target: wasm32v1-none
+
+      - name: Install sc-meta
+        run: cargo install --path framework/meta --locked
+
+      - name: Install wasm-opt
+        run: cargo install wasm-opt
+
+      - name: Build adder contract
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta all build --path contracts/examples/adder
+
+      - name: Pull chain simulator docker image
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta cs install
+
+      - name: Start chain simulator
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta cs start &
+
+      - name: Wait for chain simulator to be ready
+        run: sleep 5
+
+      - name: Run ledger interactor test
+        env:
+          RUSTFLAGS: ""
+        run: >
+          cargo test
+          -p adder-interactor
+          --test adder_interactor_ledger_test
+          --features ledger,chain-simulator-tests
+
+      - name: Stop chain simulator
+        if: always()
+        env:
+          RUSTFLAGS: ""
+        run: sc-meta cs stop
