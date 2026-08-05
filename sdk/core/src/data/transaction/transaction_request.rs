@@ -26,6 +26,10 @@ pub struct Transaction {
     pub version: TransactionVersion,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<TransactionOptions>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relayer: Option<Bech32Address>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relayer_signature: Option<WalletSignature>,
 }
 
 impl Transaction {

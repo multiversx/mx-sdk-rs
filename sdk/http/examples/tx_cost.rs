@@ -22,6 +22,8 @@ async fn main() {
         gas_limit: 0,
         gas_price: 0,
         signature: None,
+        relayer: None,
+        relayer_signature: None,
     };
 
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());

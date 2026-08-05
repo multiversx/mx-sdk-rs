@@ -5,7 +5,7 @@ use multiversx_chain_core::std::{base64_decode, base64_encode};
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
-use crate::cmd::tx::tx_cli_common::load_wallet;
+use crate::cmd::tx::tx_cli_common::{load_relayer_wallet, load_wallet};
 
 use super::{
     output::TxOutputFile,
@@ -68,8 +68,35 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         tx.chain_id = chain_id.clone();
     }
 
+    // Set relayer address before signing — it is included in the signing bytes.
+    // Priority: explicit --relayer flag > address derived from --relayer-pem.
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
+    if let Some(relayer_str) = &args.tx.relayer {
+        let relayer_addr = Bech32Address::try_from_bech32_string(relayer_str.clone())
+            .map_err(|e| anyhow::anyhow!("invalid --relayer address: {e}"))?;
+        tx.relayer = Some(relayer_addr);
+    } else if let Some(ref rw) = relayer_wallet {
+        tx.relayer = Some(rw.to_address().to_bech32_default());
+    }
+
     let sig = wallet.sign_tx(&tx)?;
     tx.signature = Some(sig);
+
+    // Optionally sign as relayer.
+    if let Some(relayer_w) = relayer_wallet {
+        let relayer_addr = relayer_w.to_address().to_bech32_default();
+        if let Some(tx_relayer) = &tx.relayer {
+            if relayer_addr != *tx_relayer {
+                return Err(anyhow::anyhow!(
+                    "relayer wallet address {} does not match --relayer {}",
+                    relayer_addr.to_bech32_str(),
+                    tx_relayer.to_bech32_str(),
+                ));
+            }
+        }
+        let relayer_sig = relayer_w.sign_tx(&tx)?;
+        tx.relayer_signature = Some(relayer_sig);
+    }
 
     let output = TxOutputFile {
         emitted_transaction: tx,

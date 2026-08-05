@@ -1,7 +1,7 @@
 use clap::{Args, Subcommand};
 use std::path::PathBuf;
 
-pub use super::cli_args_sender::SenderArgs;
+pub use super::cli_args_sender::{RelayerArgs, SenderArgs};
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct TxCliArgs {
@@ -31,6 +31,11 @@ pub enum TxCliAction {
 
     #[command(about = "Signs an unsigned transaction from a file.")]
     Sign(SignArgs),
+
+    #[command(
+        about = "Adds the relayer signature to a previously signed transaction (relayed v3)."
+    )]
+    Relay(RelayArgs),
 }
 
 /// Gateway / network arguments shared by commands that talk to the blockchain.
@@ -61,6 +66,11 @@ pub struct TxArgs {
     /// Explicit nonce to use. If omitted, the current account nonce is fetched automatically.
     #[arg(long)]
     pub nonce: Option<u64>,
+
+    /// Bech32 address of the relayer that will pay the gas fees (relayed v3).
+    /// The gas limit must include the extra base cost for the relayed operation.
+    #[arg(long)]
+    pub relayer: Option<String>,
 
     /// If set, the transaction is broadcast to the network.
     /// Without this flag the signed tx JSON is written to --outfile or stdout.
@@ -131,6 +141,9 @@ pub struct DeployArgs {
     pub sender: SenderArgs,
 
     #[command(flatten)]
+    pub relayer: RelayerArgs,
+
+    #[command(flatten)]
     pub tx: TxArgs,
 
     #[command(flatten)]
@@ -158,6 +171,9 @@ pub struct CallArgs {
 
     #[command(flatten)]
     pub sender: SenderArgs,
+
+    #[command(flatten)]
+    pub relayer: RelayerArgs,
 
     #[command(flatten)]
     pub tx: TxArgs,
@@ -188,6 +204,9 @@ pub struct UpgradeArgs {
 
     #[command(flatten)]
     pub sender: SenderArgs,
+
+    #[command(flatten)]
+    pub relayer: RelayerArgs,
 
     #[command(flatten)]
     pub tx: TxArgs,
@@ -237,6 +256,9 @@ pub struct NewArgs {
     pub sender: SenderArgs,
 
     #[command(flatten)]
+    pub relayer: RelayerArgs,
+
+    #[command(flatten)]
     pub tx: TxArgs,
 
     #[command(flatten)]
@@ -284,5 +306,35 @@ pub struct SignArgs {
     pub sender: SenderArgs,
 
     #[command(flatten)]
+    pub relayer: RelayerArgs,
+
+    #[command(flatten)]
     pub gateway: GatewayArgs,
+}
+
+/// Arguments for the `tx relay` command: sign a transaction as the relayer.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct RelayArgs {
+    /// Path to the input transaction JSON file.
+    /// Must already contain the sender signature and the `relayer` field.
+    #[arg(long)]
+    pub infile: PathBuf,
+
+    #[command(flatten)]
+    pub relayer: RelayerArgs,
+
+    #[command(flatten)]
+    pub gateway: GatewayArgs,
+
+    /// If set, the transaction is broadcast after signing.
+    #[arg(long, default_value = "false")]
+    pub send: bool,
+
+    /// Wait for the transaction result. Requires --send.
+    #[arg(long, default_value = "false", requires = "send")]
+    pub wait_result: bool,
+
+    /// Path to write the output to. Defaults to stdout.
+    #[arg(long)]
+    pub outfile: Option<PathBuf>,
 }

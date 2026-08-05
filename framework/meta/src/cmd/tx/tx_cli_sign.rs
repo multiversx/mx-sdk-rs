@@ -3,7 +3,10 @@ use multiversx_chain_core::std::base64_decode;
 
 use super::{
     output::TxOutputFile,
-    tx_cli_common::{broadcast_and_save, load_transaction_from_file, load_wallet, save_output},
+    tx_cli_common::{
+        broadcast_and_save, load_relayer_wallet, load_transaction_from_file, load_wallet,
+        save_output,
+    },
 };
 use crate::cli::cli_args_tx::SignArgs;
 
@@ -34,6 +37,25 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
 
     let sig = wallet.sign_tx(&tx)?;
     tx.signature = Some(sig);
+
+    // Optionally sign as relayer.
+    if let Some(relayer_w) = load_relayer_wallet(&args.relayer)? {
+        let relayer_addr = relayer_w.to_address().to_bech32_default();
+        if let Some(tx_relayer) = &tx.relayer {
+            if relayer_addr != *tx_relayer {
+                return Err(anyhow!(
+                    "relayer wallet address {} does not match transaction relayer {}",
+                    relayer_addr.to_bech32_str(),
+                    tx_relayer.to_bech32_str(),
+                ));
+            }
+        } else {
+            // No relayer field in the tx yet — derive it from the wallet.
+            tx.relayer = Some(relayer_addr);
+        }
+        let relayer_sig = relayer_w.sign_tx(&tx)?;
+        tx.relayer_signature = Some(relayer_sig);
+    }
 
     let decoded_data = match &tx.data {
         None => String::new(),

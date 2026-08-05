@@ -14,10 +14,12 @@ DATA_TOOL=("${BASE[@]}" data)
 # ──────────────────────────────────────────────────────────────────────────────
 
 PEM="alice.pem"
+RELAYER_PEM="s1mon.pem"
 
 # Creates a test wallet (alice.pem). Only works with sc-meta.
 setup() {
     sc-meta wallet test-wallet --name alice
+    sc-meta wallet test-wallet --name s1mon   # will act as the relayer
 }
 
 case "${NETWORK}" in
@@ -136,6 +138,63 @@ add_ledger() {
         --gas-limit=5000000 \
         --function="add" \
         --arguments "${NUMBER}" \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --send \
+        --outfile="${OUTFILE_CALL}" \
+        --wait-result \
+        || return
+}
+
+# Demonstrates relayed v3 transactions (sc-meta only):
+# Bob (relayer) pays the gas so Alice (sender) needs no EGLD for fees.
+#
+# Two-step flow:
+#   1. Alice builds + signs the call with --relayer pointing to Bob's address.
+#      The gas limit includes an extra base cost (50 000) for the relay operation.
+#      The transaction is saved to a file — not broadcast yet.
+#   2. Bob signs as relayer with `tx relay` and broadcasts.
+add_relayed() {
+    NUMBER=5
+    RELAYER_ADDRESS="erd1fwdty5j20525zmah34xcsfyacvp890twuxu2ql2rgtpn5s9qqqqsajtqv5"
+    OUTFILE_CALL_UNSIGNED="call-unsigned-${NETWORK}.interaction.json"
+    OUTFILE_CALL_RELAYED="call-relayed-${NETWORK}.interaction.json"
+
+    # Step 1: Alice signs (gas = 5 000 000 execution + 50 000 extra relay base cost).
+    "${TX_TOOL[@]}" call "${ADDRESS}" \
+        --pem="${PEM}" \
+        --gas-limit=5050000 \
+        --function="add" \
+        --arguments "${NUMBER}" \
+        --relayer="${RELAYER_ADDRESS}" \
+        --proxy="${PROXY}" \
+        --chain="${CHAIN}" \
+        --outfile="${OUTFILE_CALL_UNSIGNED}" \
+        || return
+
+    # Step 2: Bob adds his relayer signature and broadcasts.
+    "${BASE[@]}" tx relay \
+        --infile="${OUTFILE_CALL_UNSIGNED}" \
+        --relayer-pem="${RELAYER_PEM}" \
+        --proxy="${PROXY}" \
+        --send \
+        --outfile="${OUTFILE_CALL_RELAYED}" \
+        --wait-result \
+        || return
+}
+
+# One-step variant: Alice signs and Bob co-signs in a single command.
+# Requires both PEM files to be present on the same machine.
+# The relayer address is derived automatically from --relayer-pem.
+add_relayed_onestep() {
+    NUMBER=5
+
+    "${TX_TOOL[@]}" call "${ADDRESS}" \
+        --pem="${PEM}" \
+        --gas-limit=5050000 \
+        --function="add" \
+        --arguments "${NUMBER}" \
+        --relayer-pem="${RELAYER_PEM}" \
         --proxy="${PROXY}" \
         --chain="${CHAIN}" \
         --send \

@@ -6,7 +6,7 @@ use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
 use super::parse_code_metadata::parse_code_metadata;
-use super::tx_cli_common::{build_arg_buffer, load_wallet, sign_and_dispatch};
+use super::tx_cli_common::{build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::DeployArgs;
 
 pub async fn tx_deploy(args: &DeployArgs) {
@@ -64,8 +64,10 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         println!("new contract address: {contract_address}");
     }
 
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
     sign_and_dispatch(
         wallet,
+        relayer_wallet,
         tx,
         nonce,
         &args.tx,

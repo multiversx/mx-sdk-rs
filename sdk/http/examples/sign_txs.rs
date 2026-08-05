@@ -29,6 +29,8 @@ async fn main() -> anyhow::Result<()> {
         chain_id: arg.chain_id,
         version: TransactionVersion::V1,
         options: None,
+        relayer: None,
+        relayer_signature: None,
     };
 
     let mut txs: Vec<Transaction> = vec![];

@@ -7,7 +7,7 @@ use multiversx_sc_snippets::imports::{
 };
 
 use super::parse_code_metadata::parse_code_metadata;
-use super::tx_cli_common::{build_arg_buffer, load_wallet, sign_and_dispatch};
+use super::tx_cli_common::{build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch};
 use crate::cli::cli_args_tx::UpgradeArgs;
 
 pub async fn tx_upgrade(args: &UpgradeArgs) {
@@ -56,5 +56,15 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
 
     let tx = tx_builder.into_sdk_transaction();
 
-    sign_and_dispatch(wallet, tx, nonce, &args.tx, &args.gateway, None).await
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
+    sign_and_dispatch(
+        wallet,
+        relayer_wallet,
+        tx,
+        nonce,
+        &args.tx,
+        &args.gateway,
+        None,
+    )
+    .await
 }

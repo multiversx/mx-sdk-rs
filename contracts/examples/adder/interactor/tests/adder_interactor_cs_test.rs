@@ -11,6 +11,7 @@ fn chain_simulator_config() -> Config {
         owner: WalletConfig::from_test_wallet("mike"),
         wallet: WalletConfig::from_test_wallet("ivan"),
         ledger_wallet: None,
+        relayer: Some(WalletConfig::from_test_wallet("s1mon")),
     }
 }
 
@@ -71,4 +72,12 @@ async fn deploy_add_upgrade_test() {
     // Sum will remain 7
     let sum = adder_interact.get_sum().await;
     assert_eq!(sum, 7u32.into());
+
+    adder_interact.add_relayed(3u32).await;
+
+    adder_interact.generate_blocks(2).await;
+
+    // Sum will be 7 + 3 = 10
+    let sum = adder_interact.get_sum().await;
+    assert_eq!(sum, 10u32.into());
 }

@@ -20,6 +20,7 @@ pub struct Config {
     pub wallet: WalletConfig,
     #[serde(rename = "ledger-wallet")]
     pub ledger_wallet: Option<WalletConfig>,
+    pub relayer: Option<WalletConfig>,
 }
 
 impl InteractorConfig for Config {
@@ -32,6 +33,9 @@ impl InteractorConfig for Config {
         #[cfg(feature = "ledger")]
         if let Some(ledger_wallet) = &self.ledger_wallet {
             wallets.push(ledger_wallet.wallet().clone());
+        }
+        if let Some(relayer) = &self.relayer {
+            wallets.push(relayer.wallet().clone());
         }
         wallets
     }
@@ -74,6 +78,9 @@ pub async fn adder_cli() {
         }
         Some(adder_interactor_cli::InteractCliCommand::Add(args)) => {
             adder_interact.add(args.value).await;
+        }
+        Some(adder_interactor_cli::InteractCliCommand::AddRelayed(args)) => {
+            adder_interact.add_relayed(args.value).await;
         }
         Some(adder_interactor_cli::InteractCliCommand::AddLedger(args)) => {
             adder_interact.add_ledger(args.value).await;
@@ -196,5 +203,29 @@ impl AdderInteractor {
             .await;
 
         println!("Successfully performed add via ledger");
+    }
+
+    /// Same as `add`, but uses the configured relayer to pay the gas.
+    /// Requires `[relayer]` to be set in config.toml.
+    /// The gas limit includes an extra base cost (50 000) for the relay operation.
+    pub async fn add_relayed(&mut self, value: u32) {
+        let relayer = self
+            .config
+            .relayer
+            .as_ref()
+            .expect("relayer expected in config");
+        self.interactor
+            .tx()
+            .id("interactor add relayed")
+            .from(self.config.wallet.address())
+            .relayer(relayer.address())
+            .to(self.state.current_adder_address())
+            .gas(6_050_000u64)
+            .typed(adder_proxy::AdderProxy)
+            .add(value)
+            .run()
+            .await;
+
+        println!("Successfully performed relayed add");
     }
 }
