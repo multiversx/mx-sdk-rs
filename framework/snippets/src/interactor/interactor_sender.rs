@@ -101,11 +101,11 @@ where
         sender.current_nonce = Some(nonce + 1);
     }
 
-    pub(crate) fn sign_tx(&self, sender_address: &Address, transaction: &mut Transaction) {
+    pub(crate) fn sign_tx(&self, transaction: &mut Transaction) {
         // read
         let sender = self
             .sender_map
-            .get(sender_address)
+            .get(transaction.sender.as_address())
             .expect("the wallet that was supposed to sign is not registered");
 
         // sign

@@ -28,8 +28,7 @@ where
             transaction.gas_limit = gas;
 
             // sign again, because gas changed
-            let sender_address = &sc_call_step.tx.from.value;
-            self.sign_tx(sender_address, &mut transaction);
+            self.sign_tx(&mut transaction);
         }
 
         self.pre_runners.run_sc_call_step(sc_call_step);
@@ -68,7 +67,7 @@ where
         // Set relayer field before signing — it is included in the signing bytes.
         self.set_tx_nonce_update_sender(sender_address, &mut transaction)
             .await;
-        self.sign_tx(sender_address, &mut transaction);
+        self.sign_tx(&mut transaction);
         self.sign_tx_as_relayer(&mut transaction);
 
         transaction
