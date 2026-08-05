@@ -266,6 +266,76 @@ async fn test_adder_deploy_add_get_sum() {
         vec!["05"],
         "getSum returned unexpected value after upgrade"
     );
+
+    // ── add(3) via relayed transaction (one-step) ─────────────────────────────
+    let relayer_pem_path = test_artefacts_dir.join("s1mon.pem");
+    let outfile_call_relayed = outfiles_dir.join("adder-call-relayed-cs.interaction.json");
+
+    generate_test_wallet(sc_meta_bin, "s1mon", &relayer_pem_path);
+
+    let relayer_wallet = Wallet::from_pem_file(&relayer_pem_path).unwrap();
+    let relayer_address = relayer_wallet.to_address().to_bech32_default();
+    interactor.send_user_funds(&relayer_address).await.unwrap();
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    let status = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "call",
+            contract_address,
+            "--pem",
+            wallet_pem_path.to_str().unwrap(),
+            "--relayer-pem",
+            relayer_pem_path.to_str().unwrap(),
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--chain",
+            CHAIN_SIMULATOR_CHAIN_ID,
+            "--gas-limit",
+            "5050000",
+            "--function",
+            "add",
+            "--arguments",
+            "3",
+            "--send",
+            "--outfile",
+            outfile_call_relayed.to_str().unwrap(),
+        ])
+        .status()
+        .expect("failed to execute sc-meta tx call (relayed)");
+
+    assert!(status.success(), "relayed add call failed");
+
+    interactor.generate_blocks(10).await.unwrap();
+
+    // getSum must return 5 + 3 = 8 after the relayed add.
+    let query_after_relayed = Command::new(sc_meta_bin)
+        .args([
+            "tx",
+            "query",
+            contract_address,
+            "--proxy",
+            CHAIN_SIMULATOR_URL,
+            "--function",
+            "getSum",
+        ])
+        .output()
+        .expect("failed to execute sc-meta tx query after relayed add");
+
+    assert!(
+        query_after_relayed.status.success(),
+        "getSum query after relayed add failed"
+    );
+
+    let stdout_relayed = String::from_utf8_lossy(&query_after_relayed.stdout);
+    let result_relayed: Vec<String> =
+        serde_json::from_str(stdout_relayed.trim()).expect("failed to parse query output as JSON");
+    assert_eq!(
+        result_relayed,
+        vec!["08"],
+        "getSum returned unexpected value after relayed add"
+    );
 }
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
@@ -281,18 +351,7 @@ async fn test_egld_transfer_alice_to_bob() {
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
     // Generate alice.pem via the CLI so the file is not stored in the repo.
-    let status = Command::new(sc_meta_bin)
-        .args([
-            "wallet",
-            "test-wallet",
-            "--name",
-            "alice",
-            "--path",
-            alice_pem_path.to_str().unwrap(),
-        ])
-        .status()
-        .expect("failed to generate alice.pem");
-    assert!(status.success(), "sc-meta wallet test-wallet failed");
+    generate_test_wallet(sc_meta_bin, "alice", &alice_pem_path);
 
     // Connect to the chain simulator.
     let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
@@ -388,5 +447,23 @@ async fn test_egld_transfer_alice_to_bob() {
     assert!(
         alice_balance_before - alice_balance_after >= TRANSFER_AMOUNT,
         "Alice's balance did not decrease by at least the transfer amount"
+    );
+}
+
+fn generate_test_wallet(sc_meta_bin: &str, name: &str, path: &std::path::Path) {
+    let status = Command::new(sc_meta_bin)
+        .args([
+            "wallet",
+            "test-wallet",
+            "--name",
+            name,
+            "--path",
+            path.to_str().unwrap(),
+        ])
+        .status()
+        .unwrap_or_else(|_| panic!("failed to generate {name}.pem"));
+    assert!(
+        status.success(),
+        "sc-meta wallet test-wallet failed for {name}"
     );
 }
