@@ -29,6 +29,7 @@ impl InteractorConfig for Config {
 
     fn register_wallets(&self) -> Vec<Wallet> {
         let mut wallets = vec![self.owner.wallet().clone(), self.wallet.wallet().clone()];
+        #[cfg(feature = "ledger")]
         if let Some(ledger_wallet) = &self.ledger_wallet {
             wallets.push(ledger_wallet.wallet().clone());
         }
