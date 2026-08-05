@@ -102,6 +102,11 @@ where
     }
 
     pub(crate) fn sign_tx(&self, transaction: &mut Transaction) {
+        self.sign_tx_for_sender(transaction);
+        self.sign_tx_for_relayer(transaction);
+    }
+
+    fn sign_tx_for_sender(&self, transaction: &mut Transaction) {
         // read
         let sender = self
             .sender_map
@@ -116,32 +121,14 @@ where
         transaction.signature = Some(signature);
     }
 
-    /// Designates a registered wallet as the relayer for all transactions from this interactor.
-    ///
-    /// The wallet must already be registered via [`Self::register_wallet`].
-    /// Call with `None` to clear the relayer.
-    pub fn set_relayer(&mut self, address: impl Into<Option<Address>>) {
-        let address = address.into();
-        if let Some(ref addr) = address {
-            assert!(
-                self.sender_map.contains_key(addr),
-                "relayer wallet not registered; call register_wallet first"
-            );
-        }
-        self.relayer_address = address;
-    }
-
     /// Signs the transaction as the relayer (adds `relayer_signature`).
-    ///
-    /// No-op if no relayer is configured. Must be called **after** the sender has signed,
-    /// and after [`Self::apply_relayer_address`] has set the `relayer` field.
-    pub(crate) fn sign_tx_as_relayer(&self, transaction: &mut Transaction) {
-        let Some(relayer_address) = &self.relayer_address else {
+    fn sign_tx_for_relayer(&self, transaction: &mut Transaction) {
+        let Some(relayer_address) = &transaction.relayer else {
             return;
         };
         let relayer = self
             .sender_map
-            .get(relayer_address)
+            .get(relayer_address.as_address())
             .expect("relayer wallet not registered");
         let sig = relayer
             .wallet

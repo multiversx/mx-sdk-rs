@@ -34,7 +34,11 @@ where
             chain_id: self.network_config().chain_id.clone(),
             version: TransactionVersion::V2,
             options: Some(TransactionOptions::SIGN_WITH_HASH),
-            relayer: self.relayer_address.as_ref().map(|a| a.to_bech32(hrp)),
+            relayer: sc_deploy_step
+                .tx
+                .relayer
+                .as_ref()
+                .map(|a| a.to_address().to_bech32(hrp)),
             relayer_signature: None,
         }
     }
@@ -49,7 +53,6 @@ where
         self.set_tx_nonce_update_sender(sender_address, &mut transaction)
             .await;
         self.sign_tx(&mut transaction);
-        self.sign_tx_as_relayer(&mut transaction);
 
         transaction
     }

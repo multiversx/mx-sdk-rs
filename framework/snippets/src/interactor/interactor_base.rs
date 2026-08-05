@@ -85,12 +85,6 @@ where
     /// address.  Populated by [`Self::register_wallet`].
     pub sender_map: HashMap<Address, Sender>,
 
-    /// Optional relayer address. When set, every transaction signed by this
-    /// interactor is also signed by the relayer wallet (relayed v3).
-    /// The relayer wallet must already be registered in `sender_map` via
-    /// [`Self::register_wallet`] before calling [`Self::set_relayer`].
-    pub relayer_address: Option<Address>,
-
     /// Scenario runners executed **before** each step (e.g. pre-condition checks
     /// or state loading).
     pub pre_runners: ScenarioRunnerList,
@@ -119,7 +113,6 @@ where
             connection: None,
             use_chain_simulator: false,
             sender_map: HashMap::new(),
-            relayer_address: None,
             waiting_time_ms: 0,
             pre_runners: ScenarioRunnerList::empty(),
             post_runners: ScenarioRunnerList::empty(),
