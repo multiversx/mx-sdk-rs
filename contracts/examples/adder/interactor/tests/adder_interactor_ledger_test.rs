@@ -18,6 +18,7 @@ fn chain_simulator_ledger_config() -> Config {
         owner: WalletConfig::from_test_wallet("mike"),
         wallet: WalletConfig::from_test_wallet("ivan"),
         ledger_wallet: Some(WalletConfig::from_test_wallet("carol")),
+        relayer: None,
     }
 }
 
