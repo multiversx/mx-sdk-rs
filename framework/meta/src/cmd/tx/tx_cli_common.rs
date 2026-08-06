@@ -7,13 +7,10 @@ use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::{
     hex,
     imports::{
-        BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext, ManagedArgBuffer,
-        ManagedBuffer, StaticApi,
+        BytesValue, GatewayHttpProxy, Interactor, InterpretableFrom, InterpreterContext,
+        ManagedArgBuffer, ManagedBuffer, StaticApi,
     },
-    sdk::{
-        data::transaction::{ApiTransactionResult, Transaction},
-        wallet::Wallet,
-    },
+    sdk::data::transaction::{ApiTransactionResult, Transaction},
 };
 use serde::Serialize;
 
@@ -149,10 +146,9 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
 /// Apply nonce / gas-price / chain-id overrides, sign the transaction, then
 /// write / print / broadcast it according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
-/// `relayer_wallet` is `Some` when the relayer signs in the same step.
+/// All wallets (sender and optional relayer) must already be registered with `interactor`.
 pub async fn sign_and_dispatch(
-    wallet: Wallet,
-    relayer_wallet: Option<Wallet>,
+    interactor: &Interactor,
     mut tx: Transaction,
     nonce: u64,
     tx_args: &TxArgs,
@@ -167,15 +163,11 @@ pub async fn sign_and_dispatch(
         tx.chain_id = chain_id.clone();
     }
 
-    // Set relayer address before signing — it is included in the signing bytes.
-    // Priority: explicit --relayer flag > address derived from --relayer-pem.
+    // Explicit --relayer address override (takes priority over the address set in the tx builder).
     if let Some(relayer_str) = &tx_args.relayer {
         let relayer_addr = Bech32Address::try_from_bech32_string(relayer_str.clone())
             .map_err(|e| anyhow!("invalid --relayer address: {e}"))?;
         tx.relayer = Some(relayer_addr);
-    } else if let Some(ref rw) = relayer_wallet {
-        // Derive the relayer address automatically from the wallet.
-        tx.relayer = Some(rw.to_address().to_bech32_default());
     }
 
     let decoded_data = match &tx.data {
@@ -186,25 +178,7 @@ pub async fn sign_and_dispatch(
         }
     };
 
-    let sig = wallet.sign_tx(&tx)?;
-    tx.signature = Some(sig);
-
-    // Optionally sign as relayer.
-    if let Some(relayer_w) = relayer_wallet {
-        let relayer_addr = relayer_w.to_address().to_bech32_default();
-        // Validate only when --relayer was set explicitly (mismatch guard).
-        if let Some(tx_relayer) = &tx.relayer {
-            if relayer_addr != *tx_relayer {
-                return Err(anyhow!(
-                    "relayer wallet address {} does not match --relayer {}",
-                    relayer_addr.to_bech32_str(),
-                    tx_relayer.to_bech32_str(),
-                ));
-            }
-        }
-        let relayer_sig = relayer_w.sign_tx(&tx)?;
-        tx.relayer_signature = Some(relayer_sig);
-    }
+    interactor.sign_tx(&mut tx);
 
     let output = TxOutputFile {
         emitted_transaction: tx,

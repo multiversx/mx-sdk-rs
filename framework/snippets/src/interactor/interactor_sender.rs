@@ -101,7 +101,17 @@ where
         sender.current_nonce = Some(nonce + 1);
     }
 
-    pub(crate) fn sign_tx(&self, transaction: &mut Transaction) {
+    /// Signs the transaction with the sender's wallet and, if present, the relayer's wallet.
+    ///
+    /// Updates the transaction's `signature` field with the sender's signature and the
+    /// `relayer_signature` field if a relayer address is set. Both wallets must be
+    /// registered with this interactor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the sender's wallet is not registered or if a relayer is specified
+    /// but not registered.
+    pub fn sign_tx(&self, transaction: &mut Transaction) {
         self.sign_tx_for_sender(transaction);
         self.sign_tx_for_relayer(transaction);
     }

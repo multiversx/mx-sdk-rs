@@ -17,18 +17,21 @@ pub async fn tx_deploy(args: &DeployArgs) {
 }
 
 async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
-    let wallet = load_wallet(&args.sender)?;
+    let sender_wallet = load_wallet(&args.sender)?;
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet.clone()).await;
-    let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
+    let sender_address = interactor
+        .register_wallet_bech32(sender_wallet.clone())
+        .await;
+    let relayer_address_opt = interactor.register_wallet_bech32_opt(relayer_wallet).await;
 
     // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {
         n
     } else {
-        interactor.recall_nonce(&sender_address).await
+        interactor.recall_nonce(&sender_address.address).await
     };
 
     // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
@@ -43,13 +46,14 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     let arg_buffer = build_arg_buffer(&args.arguments)?;
     let tx_builder = interactor
         .tx()
-        .from(&sender_bech32)
+        .from(&sender_address)
         .gas(args.tx.gas_limit)
         .egld(args.payment.value)
         .raw_deploy()
         .code(code)
         .code_metadata(code_metadata)
-        .arguments_raw(arg_buffer);
+        .arguments_raw(arg_buffer)
+        .opt_relayer(relayer_address_opt);
 
     let tx = tx_builder.into_sdk_transaction();
 
@@ -64,10 +68,8 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         println!("new contract address: {contract_address}");
     }
 
-    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
     sign_and_dispatch(
-        wallet,
-        relayer_wallet,
+        &interactor,
         tx,
         nonce,
         &args.tx,

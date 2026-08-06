@@ -1016,4 +1016,19 @@ where
         self.env.set_relayer_address(relayer_addr);
         self
     }
+
+    /// Optionally sets the relayer address for a relayed v3 transaction.
+    ///
+    /// The relayer pays the gas fees. After the sender signs the transaction,
+    /// the relayer must also sign it (adding `relayerSignature`) before broadcasting.
+    pub fn opt_relayer<A>(self, relayer: Option<A>) -> Self
+    where
+        A: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        if let Some(relayer) = relayer {
+            self.relayer(relayer)
+        } else {
+            self
+        }
+    }
 }

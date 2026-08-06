@@ -19,11 +19,13 @@ pub async fn tx_upgrade(args: &UpgradeArgs) {
 
 async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
 
     // Create the interactor – this fetches the network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet.clone()).await;
+    let sender_address = interactor.register_wallet(wallet).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
+    let relayer_address_opt = interactor.register_wallet_bech32_opt(relayer_wallet).await;
 
     // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {
@@ -43,7 +45,7 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
 
     // Build upgrade transaction — same layout as deploy but sent to the existing contract address.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
-    let tx_builder = interactor
+    let tx = interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
@@ -52,19 +54,9 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
         .raw_upgrade()
         .code(code)
         .code_metadata(code_metadata)
-        .arguments_raw(arg_buffer);
+        .arguments_raw(arg_buffer)
+        .opt_relayer(relayer_address_opt)
+        .into_sdk_transaction();
 
-    let tx = tx_builder.into_sdk_transaction();
-
-    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
-    sign_and_dispatch(
-        wallet,
-        relayer_wallet,
-        tx,
-        nonce,
-        &args.tx,
-        &args.gateway,
-        None,
-    )
-    .await
+    sign_and_dispatch(&interactor, tx, nonce, &args.tx, &args.gateway, None).await
 }

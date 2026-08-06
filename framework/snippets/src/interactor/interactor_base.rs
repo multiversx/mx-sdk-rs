@@ -296,6 +296,31 @@ where
         address
     }
 
+    /// Registers a wallet as a transaction sender and funds it in simulator mode.
+    ///
+    /// Returns the wallet address encoded as bech32 using this interactor's
+    /// configured network HRP.
+    pub async fn register_wallet_bech32(&mut self, wallet: Wallet) -> Bech32Address {
+        self.register_wallet(wallet).await.to_bech32(self.get_hrp())
+    }
+
+    /// Registers an optional wallet as a transaction sender and funds it in
+    /// simulator mode.
+    ///
+    /// Returns `Some` containing the wallet address encoded as bech32 using
+    /// this interactor's configured network HRP. Returns `None` when no wallet
+    /// is provided.
+    pub async fn register_wallet_bech32_opt(
+        &mut self,
+        wallet: Option<Wallet>,
+    ) -> Option<Bech32Address> {
+        if let Some(w) = wallet {
+            Some(self.register_wallet_bech32(w).await)
+        } else {
+            None
+        }
+    }
+
     /// Sleeps for `duration` using the configured gateway and accumulates waited time.
     pub async fn sleep(&mut self, duration: Duration) {
         let millis = duration.as_millis() as u64;

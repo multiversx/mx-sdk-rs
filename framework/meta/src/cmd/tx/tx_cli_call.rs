@@ -13,12 +13,14 @@ pub async fn tx_call(args: &CallArgs) {
 }
 
 async fn tx_call_inner(args: &CallArgs) -> Result<()> {
-    let wallet = load_wallet(&args.sender)?;
+    let sender_wallet = load_wallet(&args.sender)?;
+    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
 
     // Create the interactor – fetches network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet.clone()).await;
+    let sender_address = interactor.register_wallet(sender_wallet).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
+    let relayer_address_opt = interactor.register_wallet_bech32_opt(relayer_wallet).await;
 
     // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {
@@ -41,17 +43,8 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         .payment(payments)
         .raw_call(args.function.as_str())
         .arguments_raw(arg_buffer)
+        .opt_relayer(relayer_address_opt)
         .into_sdk_transaction();
 
-    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
-    sign_and_dispatch(
-        wallet,
-        relayer_wallet,
-        tx,
-        nonce,
-        &args.tx,
-        &args.gateway,
-        None,
-    )
-    .await
+    sign_and_dispatch(&interactor, tx, nonce, &args.tx, &args.gateway, None).await
 }
