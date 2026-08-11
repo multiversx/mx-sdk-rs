@@ -104,13 +104,12 @@ where
     /// Signs the transaction with the sender's wallet and, if present, the relayer's wallet.
     ///
     /// Updates the transaction's `signature` field with the sender's signature and the
-    /// `relayer_signature` field if a relayer address is set. Both wallets must be
-    /// registered with this interactor.
+    /// `relayer_signature` field if its wallet is registered. If only a relayer
+    /// address is present, the transaction is left without a relayer signature.
     ///
     /// # Panics
     ///
-    /// Panics if the sender's wallet is not registered or if a relayer is specified
-    /// but not registered.
+    /// Panics if the sender's wallet is not registered.
     pub fn sign_tx(&self, transaction: &mut Transaction) {
         self.sign_tx_for_sender(transaction);
         self.sign_tx_for_relayer(transaction);
@@ -136,14 +135,46 @@ where
         let Some(relayer_address) = &transaction.relayer else {
             return;
         };
-        let relayer = self
-            .sender_map
-            .get(relayer_address.as_address())
-            .expect("relayer wallet not registered");
+        let Some(relayer) = self.sender_map.get(relayer_address.as_address()) else {
+            return;
+        };
         let sig = relayer
             .wallet
             .sign_tx(transaction)
             .expect("failed to sign as relayer");
         transaction.relayer_signature = Some(sig);
+    }
+}
+
+#[cfg(all(test, feature = "http"))]
+mod tests {
+    use multiversx_sc_scenario::imports::Bech32Address;
+    use multiversx_sdk::data::transaction::{Transaction, TransactionVersion};
+
+    use crate::Interactor;
+
+    #[test]
+    fn leaves_relayer_signature_empty_when_wallet_is_not_registered() {
+        let interactor = Interactor::empty();
+        let address = Bech32Address::zero_default_hrp();
+        let mut transaction = Transaction {
+            nonce: 0,
+            value: "0".to_owned(),
+            receiver: address.clone(),
+            sender: address.clone(),
+            gas_price: 1_000_000_000,
+            gas_limit: 100_000,
+            data: None,
+            signature: None,
+            chain_id: "D".to_owned(),
+            version: TransactionVersion::V2,
+            options: None,
+            relayer: Some(address),
+            relayer_signature: None,
+        };
+
+        interactor.sign_tx_for_relayer(&mut transaction);
+
+        assert!(transaction.relayer_signature.is_none());
     }
 }

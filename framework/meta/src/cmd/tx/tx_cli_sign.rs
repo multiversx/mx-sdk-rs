@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use multiversx_chain_core::std::base64_decode;
+use multiversx_chain_core::std::{Bech32Address, base64_decode};
 
 use super::{
     output::TxOutputFile,
@@ -33,6 +33,12 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
 
     if let Some(chain_id) = &args.gateway.chain {
         tx.chain_id = chain_id.clone();
+    }
+
+    if let Some(relayer_str) = &args.relayer.relayer {
+        let relayer_addr = Bech32Address::try_from_bech32_string(relayer_str.clone())
+            .map_err(|e| anyhow!("invalid --relayer address: {e}"))?;
+        tx.relayer = Some(relayer_addr);
     }
 
     let sig = wallet.sign_tx(&tx)?;

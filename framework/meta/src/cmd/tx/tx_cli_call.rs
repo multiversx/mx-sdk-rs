@@ -3,7 +3,7 @@ use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoS
 
 use super::parse_payments::parse_all_payment_args;
 use super::tx_cli_common::{
-    apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+    apply_gas_price, build_arg_buffer, load_relayer_for_interactor, load_wallet, sign_and_dispatch,
     validate_chain_id,
 };
 use crate::cli::cli_args_tx::CallArgs;
@@ -17,13 +17,12 @@ pub async fn tx_call(args: &CallArgs) {
 
 async fn tx_call_inner(args: &CallArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
-    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
 
     // Create the interactor – fetches network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
     let sender_address = interactor.register_wallet(sender_wallet).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
-    let relayer_address_opt = interactor.register_wallet_bech32_opt(relayer_wallet).await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
 
     // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {

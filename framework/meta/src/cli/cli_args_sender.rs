@@ -31,6 +31,13 @@ pub struct SenderArgs {
 /// Wallet arguments for the relayer. Mirrors [`SenderArgs`] with a `--relayer-*` prefix.
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct RelayerArgs {
+    /// Bech32 address of the relayer that will pay the gas fees (relayed v3).
+    /// The gas limit must include the extra base cost for the relayed operation.
+    /// Allows specifying a relayer address without a wallet,
+    /// in which case the transaction will remain unsigned by the relayer.
+    #[arg(long)]
+    pub relayer: Option<String>,
+
     /// Path to a PEM wallet file for the relayer.
     #[arg(long = "relayer-pem", group = "relayer_source")]
     pub relayer_pem: Option<PathBuf>,

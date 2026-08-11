@@ -8,7 +8,7 @@ use multiversx_sc_snippets::imports::{
 
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
-    apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+    apply_gas_price, build_arg_buffer, load_relayer_for_interactor, load_wallet, sign_and_dispatch,
     validate_chain_id,
 };
 use crate::cli::cli_args_tx::UpgradeArgs;
@@ -22,13 +22,12 @@ pub async fn tx_upgrade(args: &UpgradeArgs) {
 
 async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
-    let relayer_wallet = load_relayer_wallet(&args.relayer)?;
 
     // Create the interactor – this fetches the network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
     let sender_address = interactor.register_wallet(wallet).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
-    let relayer_address_opt = interactor.register_wallet_bech32_opt(relayer_wallet).await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
 
     // Determine nonce.
     let nonce = if let Some(n) = args.tx.nonce {

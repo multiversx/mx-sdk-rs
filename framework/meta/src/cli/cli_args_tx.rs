@@ -67,11 +67,6 @@ pub struct TxArgs {
     #[arg(long)]
     pub nonce: Option<u64>,
 
-    /// Bech32 address of the relayer that will pay the gas fees (relayed v3).
-    /// The gas limit must include the extra base cost for the relayed operation.
-    #[arg(long)]
-    pub relayer: Option<String>,
-
     /// If set, the transaction is broadcast to the network.
     /// Without this flag the signed tx JSON is written to --outfile or stdout.
     #[arg(long, default_value = "false")]

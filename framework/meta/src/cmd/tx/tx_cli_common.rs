@@ -20,7 +20,7 @@ use serde_json::Value;
 
 use super::output::TxOutputFile;
 pub use crate::cli::cli_args_sender::{load_relayer_wallet, load_wallet};
-use crate::cli::cli_args_tx::{GatewayArgs, TxArgs};
+use crate::cli::cli_args_tx::{GatewayArgs, RelayerArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
@@ -156,10 +156,43 @@ pub fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) ->
     Ok(())
 }
 
+pub async fn load_relayer_for_interactor(
+    interactor: &mut Interactor,
+    relayer_args: &RelayerArgs,
+) -> Result<Option<Bech32Address>> {
+    let explicit_address = relayer_args
+        .relayer
+        .as_ref()
+        .map(|address| {
+            Bech32Address::try_from_bech32_string(address.clone())
+                .map_err(|e| anyhow!("invalid --relayer address: {e}"))
+        })
+        .transpose()?;
+
+    let Some(wallet) = load_relayer_wallet(relayer_args)? else {
+        return Ok(explicit_address);
+    };
+
+    let wallet_address = interactor.register_wallet_bech32(wallet).await;
+    if let Some(explicit_address) = explicit_address {
+        if explicit_address != wallet_address {
+            return Err(anyhow!(
+                "relayer wallet address {} does not match --relayer address {}",
+                wallet_address.to_bech32_str(),
+                explicit_address.to_bech32_str(),
+            ));
+        }
+        Ok(Some(explicit_address))
+    } else {
+        Ok(Some(wallet_address))
+    }
+}
+
 /// Apply the nonce, sign the transaction, then
 /// write / print / broadcast it according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
-/// All wallets (sender and optional relayer) must already be registered with `interactor`.
+/// The sender wallet and any relayer wallet must already be registered with `interactor`.
+/// A relayer address without a registered wallet is preserved without a relayer signature.
 pub async fn sign_and_dispatch(
     interactor: &Interactor,
     mut tx: Transaction,
@@ -169,13 +202,6 @@ pub async fn sign_and_dispatch(
     contract_address: Option<String>,
 ) -> Result<()> {
     tx.nonce = nonce;
-
-    // Explicit --relayer address override (takes priority over the address set in the tx builder).
-    if let Some(relayer_str) = &tx_args.relayer {
-        let relayer_addr = Bech32Address::try_from_bech32_string(relayer_str.clone())
-            .map_err(|e| anyhow!("invalid --relayer address: {e}"))?;
-        tx.relayer = Some(relayer_addr);
-    }
 
     let decoded_data = match &tx.data {
         None => String::new(),
@@ -218,5 +244,29 @@ pub(super) fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_mo
     }
     for (i, result) in tx_response.out.iter().enumerate() {
         println!("Result[{i}]: 0x{}", hex::encode(result));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn explicit_relayer_address_does_not_register_wallet() {
+        let mut interactor = Interactor::empty();
+        let relayer = Bech32Address::zero_default_hrp();
+        let args = RelayerArgs {
+            relayer: Some(relayer.to_bech32_string()),
+            relayer_pem: None,
+            relayer_keyfile: None,
+            relayer_keystore_password: None,
+        };
+
+        let loaded_relayer = load_relayer_for_interactor(&mut interactor, &args)
+            .await
+            .unwrap();
+
+        assert_eq!(loaded_relayer, Some(relayer));
+        assert!(interactor.sender_map.is_empty());
     }
 }
