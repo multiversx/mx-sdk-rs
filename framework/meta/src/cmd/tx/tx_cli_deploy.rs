@@ -2,12 +2,12 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
-use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
     apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+    validate_chain_id,
 };
 use crate::cli::cli_args_tx::DeployArgs;
 
@@ -37,6 +37,7 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     };
 
     apply_gas_price(&mut interactor, &args.tx);
+    validate_chain_id(&interactor, &args.gateway)?;
 
     // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
     let bytecode = fs::read(&args.bytecode)
@@ -63,10 +64,7 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
 
     let contract_address = compute_new_address_bech32(&tx.sender, nonce);
 
-    // TODO: refactor, by working with an interactor object in the future,
-    // who keeps the effective network config/chain ID
-    let effective_chain_id = args.gateway.chain.as_deref().unwrap_or(&tx.chain_id);
-    if let Some(ex) = ExplorerUrl::from_chain_id(effective_chain_id) {
+    if let Some(ex) = &interactor.explorer_url {
         println!("new contract: {}", ex.address_url(&contract_address));
     } else {
         println!("new contract address: {contract_address}");

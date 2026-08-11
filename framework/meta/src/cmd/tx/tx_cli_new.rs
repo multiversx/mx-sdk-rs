@@ -5,7 +5,9 @@ use multiversx_chain_core::std::{base64_decode, base64_encode};
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
-use crate::cmd::tx::tx_cli_common::{apply_gas_price, load_relayer_wallet, load_wallet};
+use crate::cmd::tx::tx_cli_common::{
+    apply_gas_price, load_relayer_wallet, load_wallet, validate_chain_id,
+};
 
 use super::{
     output::TxOutputFile,
@@ -40,6 +42,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     };
 
     apply_gas_price(&mut interactor, &args.tx);
+    validate_chain_id(&interactor, &args.gateway)?;
 
     // Build Transaction via unified Tx syntax (resembles interactor code).
     let payments = parse_all_payment_args(&args.payment)?;
@@ -67,9 +70,6 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
         }
     };
     tx.nonce = nonce;
-    if let Some(chain_id) = &args.gateway.chain {
-        tx.chain_id = chain_id.clone();
-    }
 
     interactor.sign_tx(&mut tx);
 

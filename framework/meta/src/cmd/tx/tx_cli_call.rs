@@ -4,6 +4,7 @@ use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoS
 use super::parse_payments::parse_all_payment_args;
 use super::tx_cli_common::{
     apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+    validate_chain_id,
 };
 use crate::cli::cli_args_tx::CallArgs;
 
@@ -32,6 +33,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
     };
 
     apply_gas_price(&mut interactor, &args.tx);
+    validate_chain_id(&interactor, &args.gateway)?;
 
     let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 

@@ -268,6 +268,17 @@ where
             .network_config
     }
 
+    /// Validates that `chain_id` matches the chain ID reported by the gateway.
+    pub fn validate_chain_id(&self, chain_id: &str) -> anyhow::Result<()> {
+        let network_chain_id = &self.network_config().chain_id;
+        if chain_id != network_chain_id {
+            anyhow::bail!(
+                "chain ID mismatch: CLI specifies {chain_id}, but gateway reports {network_chain_id}"
+            );
+        }
+        Ok(())
+    }
+
     /// Enables or disables chain-simulator mode.
     pub fn use_chain_simulator(mut self, use_chain_simulator: bool) -> Self {
         self.use_chain_simulator = use_chain_simulator;

@@ -149,7 +149,14 @@ pub fn apply_gas_price(interactor: &mut Interactor, tx_args: &TxArgs) {
     }
 }
 
-/// Apply nonce / chain-id overrides, sign the transaction, then
+pub fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) -> Result<()> {
+    if let Some(chain_id) = &gateway_args.chain {
+        interactor.validate_chain_id(chain_id)?;
+    }
+    Ok(())
+}
+
+/// Apply the nonce, sign the transaction, then
 /// write / print / broadcast it according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
 /// All wallets (sender and optional relayer) must already be registered with `interactor`.
@@ -162,9 +169,6 @@ pub async fn sign_and_dispatch(
     contract_address: Option<String>,
 ) -> Result<()> {
     tx.nonce = nonce;
-    if let Some(chain_id) = &gateway_args.chain {
-        tx.chain_id = chain_id.clone();
-    }
 
     // Explicit --relayer address override (takes priority over the address set in the tx builder).
     if let Some(relayer_str) = &tx_args.relayer {
