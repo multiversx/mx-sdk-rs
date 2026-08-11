@@ -62,11 +62,9 @@ where
     }
 
     async fn tx_call_to_blockchain_signed_tx(&mut self, sc_call_step: &ScCallStep) -> Transaction {
-        let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         // Set relayer field before signing — it is included in the signing bytes.
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
+        self.set_tx_nonce_update_sender(&mut transaction).await;
         self.sign_tx(&mut transaction);
 
         transaction

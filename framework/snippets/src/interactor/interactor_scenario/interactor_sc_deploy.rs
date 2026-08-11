@@ -47,11 +47,9 @@ where
         &mut self,
         sc_deploy_step: &ScDeployStep,
     ) -> Transaction {
-        let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
         // Set relayer field before signing — it is included in the signing bytes.
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
+        self.set_tx_nonce_update_sender(&mut transaction).await;
         self.sign_tx(&mut transaction);
 
         transaction

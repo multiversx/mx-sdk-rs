@@ -74,19 +74,13 @@ where
     /// Updates:
     /// - the transaction with the nonce read from the network
     /// - the sender's current_nonce
-    pub(crate) async fn set_tx_nonce_update_sender(
-        &mut self,
-        sender_address: &Address,
-        transaction: &mut Transaction,
-    ) {
-        // read
-        let sender = self
-            .sender_map
-            .get(sender_address)
-            .expect("the wallet that was supposed to sign is not registered");
+    ///
+    /// Assumes that the transaction sender has already been set.
+    pub(crate) async fn set_tx_nonce_update_sender(&mut self, transaction: &mut Transaction) {
+        let sender_address = transaction.sender.as_address();
 
         // recall
-        let nonce = self.recall_nonce(&sender.address).await;
+        let nonce = self.recall_nonce(sender_address).await;
         println!("sender's recalled nonce: {nonce}");
 
         // set tx nonce
