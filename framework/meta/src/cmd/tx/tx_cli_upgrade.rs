@@ -7,7 +7,9 @@ use multiversx_sc_snippets::imports::{
 };
 
 use super::parse_code_metadata::parse_code_metadata;
-use super::tx_cli_common::{build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch};
+use super::tx_cli_common::{
+    apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+};
 use crate::cli::cli_args_tx::UpgradeArgs;
 
 pub async fn tx_upgrade(args: &UpgradeArgs) {
@@ -33,6 +35,8 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
     } else {
         interactor.recall_nonce(&sender_address).await
     };
+
+    apply_gas_price(&mut interactor, &args.tx);
 
     let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 

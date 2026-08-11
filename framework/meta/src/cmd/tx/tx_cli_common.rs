@@ -143,7 +143,13 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
     Ok(arg_buffer)
 }
 
-/// Apply nonce / gas-price / chain-id overrides, sign the transaction, then
+pub fn apply_gas_price(interactor: &mut Interactor, tx_args: &TxArgs) {
+    if let Some(gas_price) = tx_args.gas_price {
+        interactor.gas_price = gas_price;
+    }
+}
+
+/// Apply nonce / chain-id overrides, sign the transaction, then
 /// write / print / broadcast it according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
 /// All wallets (sender and optional relayer) must already be registered with `interactor`.
@@ -156,9 +162,6 @@ pub async fn sign_and_dispatch(
     contract_address: Option<String>,
 ) -> Result<()> {
     tx.nonce = nonce;
-    if let Some(gas_price) = tx_args.gas_price {
-        tx.gas_price = gas_price;
-    }
     if let Some(chain_id) = &gateway_args.chain {
         tx.chain_id = chain_id.clone();
     }

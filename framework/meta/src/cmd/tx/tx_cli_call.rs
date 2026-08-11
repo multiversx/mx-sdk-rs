@@ -2,7 +2,9 @@ use anyhow::Result;
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use super::parse_payments::parse_all_payment_args;
-use super::tx_cli_common::{build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch};
+use super::tx_cli_common::{
+    apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+};
 use crate::cli::cli_args_tx::CallArgs;
 
 pub async fn tx_call(args: &CallArgs) {
@@ -28,6 +30,8 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
     } else {
         interactor.recall_nonce(&sender_address).await
     };
+
+    apply_gas_price(&mut interactor, &args.tx);
 
     let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 

@@ -6,7 +6,9 @@ use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
 
 use super::parse_code_metadata::parse_code_metadata;
-use super::tx_cli_common::{build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch};
+use super::tx_cli_common::{
+    apply_gas_price, build_arg_buffer, load_relayer_wallet, load_wallet, sign_and_dispatch,
+};
 use crate::cli::cli_args_tx::DeployArgs;
 
 pub async fn tx_deploy(args: &DeployArgs) {
@@ -33,6 +35,8 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     } else {
         interactor.recall_nonce(&sender_address.address).await
     };
+
+    apply_gas_price(&mut interactor, &args.tx);
 
     // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
     let bytecode = fs::read(&args.bytecode)
