@@ -20,16 +20,10 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
 
     // Create the interactor – fetches network config.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
+    interactor.override_next_tx_nonce = args.tx.nonce;
     let sender_address = interactor.register_wallet(sender_wallet).await;
     let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
     let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
-
-    // Determine nonce.
-    let nonce = if let Some(n) = args.tx.nonce {
-        n
-    } else {
-        interactor.recall_nonce(&sender_address).await
-    };
 
     apply_gas_price(&mut interactor, &args.tx);
     validate_chain_id(&interactor, &args.gateway)?;
@@ -40,7 +34,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
     let arg_buffer = build_arg_buffer(&args.arguments)?;
     let payments = parse_all_payment_args(&args.payment)?;
 
-    let tx = interactor
+    let mut tx = interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
@@ -50,6 +44,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         .arguments_raw(arg_buffer)
         .opt_relayer(relayer_address_opt)
         .into_sdk_transaction();
+    interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    sign_and_dispatch(&interactor, tx, nonce, &args.tx, &args.gateway, None).await
+    sign_and_dispatch(&interactor, tx, &args.tx, &args.gateway, None).await
 }

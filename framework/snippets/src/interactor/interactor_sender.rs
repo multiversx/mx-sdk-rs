@@ -76,12 +76,10 @@ where
     /// - the sender's current_nonce
     ///
     /// Assumes that the transaction sender has already been set.
-    pub(crate) async fn set_tx_nonce_update_sender(&mut self, transaction: &mut Transaction) {
+    pub async fn set_tx_nonce_update_sender(&mut self, transaction: &mut Transaction) {
         let sender_address = transaction.sender.as_address();
 
-        // recall
-        let nonce = self.recall_nonce(sender_address).await;
-        println!("sender's recalled nonce: {nonce}");
+        let nonce = self.resolve_tx_nonce(sender_address).await;
 
         // set tx nonce
         transaction.nonce = nonce;
@@ -93,6 +91,17 @@ where
             .get_mut(sender_address)
             .expect("the wallet that was supposed to sign is not registered");
         sender.current_nonce = Some(nonce + 1);
+    }
+
+    pub(crate) async fn resolve_tx_nonce(&mut self, sender_address: &Address) -> u64 {
+        if let Some(nonce) = self.override_next_tx_nonce.take() {
+            println!("sender's overridden nonce: {nonce}");
+            nonce
+        } else {
+            let nonce = self.recall_nonce(sender_address).await;
+            println!("sender's recalled nonce: {nonce}");
+            nonce
+        }
     }
 
     /// Signs the transaction with the sender's wallet and, if present, the relayer's wallet.
@@ -142,10 +151,19 @@ where
 
 #[cfg(all(test, feature = "http"))]
 mod tests {
-    use multiversx_sc_scenario::imports::Bech32Address;
+    use multiversx_sc_scenario::{imports::Bech32Address, multiversx_sc::types::Address};
     use multiversx_sdk::data::transaction::{Transaction, TransactionVersion};
 
     use crate::Interactor;
+
+    #[tokio::test]
+    async fn nonce_override_does_not_require_a_gateway_connection() {
+        let mut interactor = Interactor::empty();
+        interactor.override_next_tx_nonce = Some(42);
+
+        assert_eq!(interactor.resolve_tx_nonce(&Address::zero()).await, 42);
+        assert_eq!(interactor.override_next_tx_nonce, None);
+    }
 
     #[test]
     fn leaves_relayer_signature_empty_when_wallet_is_not_registered() {

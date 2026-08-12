@@ -81,6 +81,15 @@ where
     /// `connection.network_config.min_gas_price` at connection time.
     pub gas_price: u64,
 
+    /// Explicit transaction nonce. When set, transaction preparation uses this
+    /// value instead of fetching the sender nonce from the gateway.
+    ///
+    /// Only applies for the next transaction; it is cleared after use.
+    ///
+    /// This is used to implement the `--nonce` CLI flag,
+    /// which overrides the nonce for a single transaction.
+    pub override_next_tx_nonce: Option<u64>,
+
     /// All wallets registered as transaction signers, keyed by their on-chain
     /// address.  Populated by [`Self::register_wallet`].
     pub sender_map: HashMap<Address, Sender>,
@@ -118,6 +127,7 @@ where
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
             gas_price: 0,
+            override_next_tx_nonce: None,
             explorer_url: None,
         }
     }

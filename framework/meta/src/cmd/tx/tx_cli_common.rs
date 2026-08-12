@@ -188,21 +188,18 @@ pub async fn load_relayer_for_interactor(
     }
 }
 
-/// Apply the nonce, sign the transaction, then
-/// write / print / broadcast it according to the `TxArgs` flags.
+/// Sign the nonce-prepared transaction, then write / print / broadcast it
+/// according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
 /// The sender wallet and any relayer wallet must already be registered with `interactor`.
 /// A relayer address without a registered wallet is preserved without a relayer signature.
 pub async fn sign_and_dispatch(
     interactor: &Interactor,
     mut tx: Transaction,
-    nonce: u64,
     tx_args: &TxArgs,
     gateway_args: &GatewayArgs,
     contract_address: Option<String>,
 ) -> Result<()> {
-    tx.nonce = nonce;
-
     let decoded_data = match &tx.data {
         None => String::new(),
         Some(d) => {
