@@ -68,7 +68,6 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         &interactor,
         tx,
         &args.tx,
-        &args.gateway,
         Some(contract_address.to_bech32_string()),
     )
     .await

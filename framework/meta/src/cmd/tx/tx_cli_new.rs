@@ -51,7 +51,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     }
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    sign_and_dispatch(&interactor, tx, &args.tx, &args.gateway, None).await
+    sign_and_dispatch(&interactor, tx, &args.tx, None).await
 }
 
 // ---------------------------------------------------------------------------

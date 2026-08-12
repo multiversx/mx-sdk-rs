@@ -46,5 +46,5 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         .into_sdk_transaction();
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    sign_and_dispatch(&interactor, tx, &args.tx, &args.gateway, None).await
+    sign_and_dispatch(&interactor, tx, &args.tx, None).await
 }

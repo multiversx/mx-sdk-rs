@@ -38,6 +38,8 @@ pub struct InteractorConnection<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Gateway URI used to construct `proxy`.
+    pub gateway_uri: String,
     /// The async gateway used to communicate with the blockchain network.
     pub proxy: GatewayProxy,
     /// Chain-level parameters (chain ID, gas price, HRP, …) fetched from the gateway.
@@ -159,6 +161,7 @@ where
         self.gas_price = network_config.min_gas_price;
         self.explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
         self.connection = Some(InteractorConnection {
+            gateway_uri: gateway_uri.to_owned(),
             proxy,
             network_config,
         });
@@ -248,19 +251,28 @@ where
         config
     }
 
+    fn connection(&self) -> &InteractorConnection<GatewayProxy> {
+        self.connection.as_ref().expect(
+            "interactor connection is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
+        )
+    }
+
     /// Returns the initialized gateway proxy reference.
     ///
     /// # Panics
     ///
     /// Panics if connection has not been initialized.
     pub fn proxy(&self) -> &GatewayProxy {
-        &self
-            .connection
-            .as_ref()
-            .expect(
-            "interactor proxy is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-            )
-            .proxy
+        &self.connection().proxy
+    }
+
+    /// Returns the gateway URI used to initialize the connection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn gateway_uri(&self) -> &str {
+        &self.connection().gateway_uri
     }
 
     /// Returns the initialized network configuration.
@@ -269,13 +281,7 @@ where
     ///
     /// Panics if connection has not been initialized.
     pub fn network_config(&self) -> &NetworkConfig {
-        &self
-            .connection
-            .as_ref()
-            .expect(
-            "interactor network_config is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-            )
-            .network_config
+        &self.connection().network_config
     }
 
     /// Validates that `chain_id` matches the chain ID reported by the gateway.

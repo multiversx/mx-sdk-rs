@@ -197,7 +197,6 @@ pub async fn sign_and_dispatch(
     interactor: &Interactor,
     mut tx: Transaction,
     tx_args: &TxArgs,
-    gateway_args: &GatewayArgs,
     contract_address: Option<String>,
 ) -> Result<()> {
     let decoded_data = match &tx.data {
@@ -221,7 +220,7 @@ pub async fn sign_and_dispatch(
     if tx_args.send {
         broadcast_and_save(
             output,
-            &gateway_args.proxy,
+            interactor.gateway_uri(),
             tx_args.outfile.as_deref(),
             tx_args.wait_result,
         )
