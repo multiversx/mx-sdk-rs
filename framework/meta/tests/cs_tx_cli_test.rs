@@ -14,6 +14,8 @@ const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
 /// Minimum gas for a plain EGLD transfer.
 const GAS_LIMIT: u64 = 50_000;
 
+const CLI_TX_PROCESSING_BLOCKS: u64 = 40;
+
 /// Deploys the adder contract, calls `add`, and verifies `getSum` returns the expected value.
 /// Mirrors the deploy / add / getSum flow from the adder snippets.sh.
 #[tokio::test]
@@ -76,7 +78,10 @@ async fn test_adder_deploy_add_get_sum() {
     );
     assert!(deploy_output.status.success(), "deploy failed");
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor
+        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
+        .await
+        .unwrap();
 
     // Read the deployed contract address from the interaction output file.
     let outfile_content =
@@ -140,7 +145,10 @@ async fn test_adder_deploy_add_get_sum() {
 
     assert!(status.success(), "add call failed");
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor
+        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
+        .await
+        .unwrap();
 
     // Read and verify deterministic call fields.
     let call_content = std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
@@ -223,7 +231,10 @@ async fn test_adder_deploy_add_get_sum() {
     );
     assert!(upgrade_output.status.success(), "upgrade failed");
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor
+        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
+        .await
+        .unwrap();
 
     // Verify the upgrade outfile references the same contract address.
     let upgrade_content =
@@ -307,7 +318,10 @@ async fn test_adder_deploy_add_get_sum() {
 
     assert!(status.success(), "relayed add call failed");
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor
+        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
+        .await
+        .unwrap();
 
     // getSum must return 5 + 3 = 8 after the relayed add.
     let query_after_relayed = Command::new(sc_meta_bin)
@@ -416,7 +430,10 @@ async fn test_egld_transfer_alice_to_bob() {
     assert!(status.success(), "sc-meta tx new command failed");
 
     // Allow the transfer transaction to settle.
-    interactor.generate_blocks(20).await.unwrap();
+    interactor
+        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
+        .await
+        .unwrap();
 
     // ── balances after transfer ───────────────────────────────────────────────
     let alice_balance_after: u128 = interactor
