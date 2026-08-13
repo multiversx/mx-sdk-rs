@@ -419,7 +419,10 @@ async fn test_egld_transfer_alice_to_bob() {
         "Bob's balance did not increase by the expected transfer amount"
     );
 
-    // Alice must have spent at least the transfer amount (gas fees are on top).
+    // Alice was funded automatically by the CLI,
+    // since the chain-simulator config was auto-detected,
+    // hence the additional FUND_AMOUNT.
+    // She must have spent at least the transfer amount (gas fees are on top).
     assert!(
         alice_balance_before + FUND_AMOUNT - alice_balance_after >= TRANSFER_AMOUNT,
         "Alice's balance did not decrease by at least the transfer amount"
