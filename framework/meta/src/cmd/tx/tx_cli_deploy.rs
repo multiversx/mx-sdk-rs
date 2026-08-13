@@ -7,7 +7,6 @@ use multiversx_sc_snippets::imports::{BytesValue, InteractorIntoSdkTransaction};
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
     build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
-    sign_and_dispatch,
 };
 use crate::cli::cli_args_tx::DeployArgs;
 
@@ -60,11 +59,13 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         println!("new contract address: {contract_address}");
     }
 
-    sign_and_dispatch(
-        &interactor,
-        tx,
-        &args.tx,
-        Some(contract_address.to_bech32_string()),
-    )
-    .await
+    interactor
+        .sign_and_dispatch(
+            tx,
+            Some(contract_address.to_bech32_string()),
+            args.tx.send,
+            args.tx.wait_result,
+            args.tx.outfile.as_deref(),
+        )
+        .await
 }

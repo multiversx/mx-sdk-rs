@@ -4,7 +4,6 @@ use multiversx_sc_snippets::imports::{Bech32Address, InteractorIntoSdkTransactio
 use super::parse_payments::parse_all_payment_args;
 use super::tx_cli_common::{
     build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
-    sign_and_dispatch,
 };
 use crate::cli::cli_args_tx::CallArgs;
 
@@ -42,5 +41,13 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         .into_sdk_transaction();
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    sign_and_dispatch(&interactor, tx, &args.tx, None).await
+    interactor
+        .sign_and_dispatch(
+            tx,
+            None,
+            args.tx.send,
+            args.tx.wait_result,
+            args.tx.outfile.as_deref(),
+        )
+        .await
 }

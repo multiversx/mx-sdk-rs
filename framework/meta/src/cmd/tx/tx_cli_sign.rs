@@ -1,13 +1,8 @@
 use anyhow::{Result, anyhow};
-use multiversx_chain_core::std::{Bech32Address, base64_decode};
+use multiversx_chain_core::std::Bech32Address;
+use multiversx_sc_snippets::{Interactor, TxOutputFile};
 
-use super::{
-    output::TxOutputFile,
-    tx_cli_common::{
-        broadcast_and_save, load_relayer_wallet, load_transaction_from_file, load_wallet,
-        save_output,
-    },
-};
+use super::tx_cli_common::{load_relayer_wallet, load_transaction_from_file, load_wallet};
 use crate::cli::cli_args_tx::SignArgs;
 
 pub async fn tx_sign(args: &SignArgs) {
@@ -63,32 +58,17 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         tx.relayer_signature = Some(relayer_sig);
     }
 
-    let decoded_data = match &tx.data {
-        None => String::new(),
-        Some(d) => {
-            let bytes = base64_decode(d)?;
-            String::from_utf8_lossy(&bytes).into_owned()
-        }
-    };
-
-    let output = TxOutputFile {
-        emitted_transaction: tx,
-        emitted_transaction_data: decoded_data,
-        emitted_transaction_hash: String::new(),
-        contract_address: None,
-        transaction_on_network: None,
-    };
+    let output = TxOutputFile::from_transaction(tx, None)?;
 
     if args.send {
-        broadcast_and_save(
-            output,
-            &args.gateway.proxy,
-            args.outfile.as_deref(),
-            args.wait_result,
-        )
-        .await?;
+        let interactor = Interactor::empty()
+            .with_connection(&args.gateway.proxy)
+            .await;
+        interactor
+            .broadcast_and_save(output, args.outfile.as_deref(), args.wait_result)
+            .await?;
     } else {
-        save_output(&output, args.outfile.as_deref())?;
+        output.save_output(args.outfile.as_deref())?;
     }
     Ok(())
 }

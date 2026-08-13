@@ -7,7 +7,6 @@ use multiversx_sc_snippets::imports::{Bech32Address, BytesValue, InteractorIntoS
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
     build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
-    sign_and_dispatch,
 };
 use crate::cli::cli_args_tx::UpgradeArgs;
 
@@ -52,5 +51,13 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
         .into_sdk_transaction();
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    sign_and_dispatch(&interactor, tx, &args.tx, None).await
+    interactor
+        .sign_and_dispatch(
+            tx,
+            None,
+            args.tx.send,
+            args.tx.wait_result,
+            args.tx.outfile.as_deref(),
+        )
+        .await
 }
