@@ -14,6 +14,7 @@ impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Send funds to a user account on the chain simulator. The amount is fixed to 100 EGLD.
     pub async fn send_user_funds(&self, receiver: &Bech32Address) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));

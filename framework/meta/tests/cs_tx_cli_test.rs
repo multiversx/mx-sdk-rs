@@ -36,15 +36,8 @@ async fn test_adder_deploy_add_get_sum() {
 
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
-    let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
-        .await
-        .use_chain_simulator(true);
-
     let wallet = Wallet::from_pem_file(&wallet_pem_path).unwrap();
     let wallet_address = wallet.to_address().to_bech32_default();
-    interactor.send_user_funds(&wallet_address).await.unwrap();
-
-    interactor.generate_blocks(20).await.unwrap();
 
     // ── deploy ────────────────────────────────────────────────────────────────
     let deploy_output = Command::new(sc_meta_bin)
@@ -273,12 +266,6 @@ async fn test_adder_deploy_add_get_sum() {
     let outfile_call_relayed = outfiles_dir.join("adder-call-relayed-cs.interaction.json");
 
     generate_test_wallet(sc_meta_bin, "s1mon", &relayer_pem_path);
-
-    let relayer_wallet = Wallet::from_pem_file(&relayer_pem_path).unwrap();
-    let relayer_address = relayer_wallet.to_address().to_bech32_default();
-    interactor.send_user_funds(&relayer_address).await.unwrap();
-
-    interactor.generate_blocks(20).await.unwrap();
 
     let status = Command::new(sc_meta_bin)
         .args([
