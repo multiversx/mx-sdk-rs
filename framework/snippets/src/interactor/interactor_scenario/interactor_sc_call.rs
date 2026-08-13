@@ -3,7 +3,6 @@ use std::process;
 use super::error_message::{sc_call_err_message, simulate_gas_sc_call_err_message};
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
-    imports::Bech32Address,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
@@ -29,8 +28,7 @@ where
             transaction.gas_limit = gas;
 
             // sign again, because gas changed
-            let sender_address = &sc_call_step.tx.from.value;
-            self.sign_tx(sender_address, &mut transaction);
+            self.sign_tx(&mut transaction);
         }
 
         self.pre_runners.run_sc_call_step(sc_call_step);
@@ -64,11 +62,10 @@ where
     }
 
     async fn tx_call_to_blockchain_signed_tx(&mut self, sc_call_step: &ScCallStep) -> Transaction {
-        let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
-        self.sign_tx(sender_address, &mut transaction);
+        // Set relayer field before signing — it is included in the signing bytes.
+        self.set_tx_nonce_update_sender(&mut transaction).await;
+        self.sign_tx(&mut transaction);
 
         transaction
     }
@@ -126,8 +123,8 @@ where
         Transaction {
             nonce: 0,
             value: normalized.egld_value.value.to_string(),
-            sender: Bech32Address::encode_address(hrp, normalized.from.to_address()),
-            receiver: Bech32Address::encode_address(hrp, normalized.to.to_address()),
+            sender: normalized.from.to_address().to_bech32(hrp),
+            receiver: normalized.to.to_address().to_bech32(hrp),
             gas_price: self.gas_price,
             gas_limit: normalized.gas_limit.value,
             data,
@@ -135,6 +132,11 @@ where
             chain_id: self.network_config().chain_id.clone(),
             version: TransactionVersion::V2,
             options: Some(TransactionOptions::SIGN_WITH_HASH),
+            relayer: normalized
+                .relayer
+                .as_ref()
+                .map(|a| a.to_address().to_bech32(hrp)),
+            relayer_signature: None,
         }
     }
 }

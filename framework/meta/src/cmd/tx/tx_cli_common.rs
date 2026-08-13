@@ -2,17 +2,15 @@ use std::fs;
 
 use anyhow::{Context, Result, anyhow};
 use multiversx_chain_core::std::base64_decode;
+use multiversx_sc::imports::Bech32Address;
 use multiversx_sc_snippets::ExplorerUrl;
 use multiversx_sc_snippets::{
     hex,
     imports::{
-        BytesValue, GatewayHttpProxy, InterpretableFrom, InterpreterContext, ManagedArgBuffer,
-        ManagedBuffer, StaticApi,
+        BytesValue, GatewayHttpProxy, Interactor, InterpretableFrom, InterpreterContext,
+        ManagedArgBuffer, ManagedBuffer, StaticApi,
     },
-    sdk::{
-        data::transaction::{ApiTransactionResult, Transaction},
-        wallet::Wallet,
-    },
+    sdk::data::transaction::{ApiTransactionResult, Transaction},
 };
 use serde::Serialize;
 
@@ -21,8 +19,8 @@ use multiversx_sc_snippets::network_response;
 use serde_json::Value;
 
 use super::output::TxOutputFile;
-pub use crate::cli::cli_args_sender::load_wallet;
-use crate::cli::cli_args_tx::{GatewayArgs, TxArgs};
+pub use crate::cli::cli_args_sender::{load_relayer_wallet, load_wallet};
+use crate::cli::cli_args_tx::{GatewayArgs, RelayerArgs, TxArgs};
 
 /// Load a transaction from an mxpy-compatible interaction JSON file.
 /// Accepts both `{"emittedTransaction": {...}}` and `{"tx": {...}}` wrappers.
@@ -78,6 +76,13 @@ pub(super) async fn broadcast_and_save(
     if output.emitted_transaction.signature.is_none() {
         return Err(anyhow!(
             "transaction is not signed; sign it before broadcasting"
+        ));
+    }
+    if output.emitted_transaction.relayer.is_some()
+        && output.emitted_transaction.relayer_signature.is_none()
+    {
+        return Err(anyhow!(
+            "relayed transaction is missing relayer signature; use `tx relay` to add it"
         ));
     }
 
@@ -138,25 +143,62 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
     Ok(arg_buffer)
 }
 
-/// Apply nonce / gas-price / chain-id overrides, sign the transaction, then
-/// write / print / broadcast it according to the `TxArgs` flags.
+pub fn apply_gas_price(interactor: &mut Interactor, tx_args: &TxArgs) {
+    if let Some(gas_price) = tx_args.gas_price {
+        interactor.gas_price = gas_price;
+    }
+}
+
+pub fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) -> Result<()> {
+    if let Some(chain_id) = &gateway_args.chain {
+        interactor.validate_chain_id(chain_id)?;
+    }
+    Ok(())
+}
+
+pub async fn load_relayer_for_interactor(
+    interactor: &mut Interactor,
+    relayer_args: &RelayerArgs,
+) -> Result<Option<Bech32Address>> {
+    let explicit_address = relayer_args
+        .relayer
+        .as_ref()
+        .map(|address| {
+            Bech32Address::try_from_bech32_string(address.clone())
+                .map_err(|e| anyhow!("invalid --relayer address: {e}"))
+        })
+        .transpose()?;
+
+    let Some(wallet) = load_relayer_wallet(relayer_args)? else {
+        return Ok(explicit_address);
+    };
+
+    let wallet_address = interactor.register_wallet_bech32(wallet).await;
+    if let Some(explicit_address) = explicit_address {
+        if explicit_address != wallet_address {
+            return Err(anyhow!(
+                "relayer wallet address {} does not match --relayer address {}",
+                wallet_address.to_bech32_str(),
+                explicit_address.to_bech32_str(),
+            ));
+        }
+        Ok(Some(explicit_address))
+    } else {
+        Ok(Some(wallet_address))
+    }
+}
+
+/// Sign the nonce-prepared transaction, then write / print / broadcast it
+/// according to the `TxArgs` flags.
 /// `contract_address` should be `Some(bech32)` for deploy transactions.
+/// The sender wallet and any relayer wallet must already be registered with `interactor`.
+/// A relayer address without a registered wallet is preserved without a relayer signature.
 pub async fn sign_and_dispatch(
-    wallet: Wallet,
+    interactor: &Interactor,
     mut tx: Transaction,
-    nonce: u64,
     tx_args: &TxArgs,
-    gateway_args: &GatewayArgs,
     contract_address: Option<String>,
 ) -> Result<()> {
-    tx.nonce = nonce;
-    if let Some(gas_price) = tx_args.gas_price {
-        tx.gas_price = gas_price;
-    }
-    if let Some(chain_id) = &gateway_args.chain {
-        tx.chain_id = chain_id.clone();
-    }
-
     let decoded_data = match &tx.data {
         None => String::new(),
         Some(d) => {
@@ -165,8 +207,7 @@ pub async fn sign_and_dispatch(
         }
     };
 
-    let sig = wallet.sign_tx(&tx)?;
-    tx.signature = Some(sig);
+    interactor.sign_tx(&mut tx);
 
     let output = TxOutputFile {
         emitted_transaction: tx,
@@ -179,7 +220,7 @@ pub async fn sign_and_dispatch(
     if tx_args.send {
         broadcast_and_save(
             output,
-            &gateway_args.proxy,
+            interactor.gateway_uri(),
             tx_args.outfile.as_deref(),
             tx_args.wait_result,
         )
@@ -199,5 +240,29 @@ pub(super) fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_mo
     }
     for (i, result) in tx_response.out.iter().enumerate() {
         println!("Result[{i}]: 0x{}", hex::encode(result));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn explicit_relayer_address_does_not_register_wallet() {
+        let mut interactor = Interactor::empty();
+        let relayer = Bech32Address::zero_default_hrp();
+        let args = RelayerArgs {
+            relayer: Some(relayer.to_bech32_string()),
+            relayer_pem: None,
+            relayer_keyfile: None,
+            relayer_keystore_password: None,
+        };
+
+        let loaded_relayer = load_relayer_for_interactor(&mut interactor, &args)
+            .await
+            .unwrap();
+
+        assert_eq!(loaded_relayer, Some(relayer));
+        assert!(interactor.sender_map.is_empty());
     }
 }

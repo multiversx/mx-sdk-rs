@@ -1,17 +1,15 @@
 use std::fs;
 
 use anyhow::{Context, Result};
-use multiversx_chain_core::std::{base64_decode, base64_encode};
+use multiversx_chain_core::std::base64_encode;
 use multiversx_sc_snippets::imports::{Bech32Address, Interactor, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
-use crate::cmd::tx::tx_cli_common::load_wallet;
-
-use super::{
-    output::TxOutputFile,
-    parse_payments::parse_all_payment_args,
-    tx_cli_common::{broadcast_and_save, save_output},
+use crate::cmd::tx::tx_cli_common::{
+    apply_gas_price, load_relayer_for_interactor, load_wallet, sign_and_dispatch, validate_chain_id,
 };
+
+use super::parse_payments::parse_all_payment_args;
 
 pub async fn tx_new(args: &NewArgs) {
     if let Err(e) = tx_new_inner(args).await {
@@ -21,29 +19,29 @@ pub async fn tx_new(args: &NewArgs) {
 }
 
 async fn tx_new_inner(args: &NewArgs) -> Result<()> {
-    let wallet = load_wallet(&args.sender)?;
+    let sender_wallet = load_wallet(&args.sender)?;
     let receiver = Bech32Address::try_from_bech32_string(args.receiver.clone())?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    let sender_address = interactor.register_wallet(wallet.clone()).await;
-    let sender = sender_address.to_bech32(interactor.get_hrp());
+    interactor.override_next_tx_nonce = args.tx.nonce;
+    let sender_address = interactor
+        .register_wallet_bech32(sender_wallet.clone())
+        .await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
 
-    // Determine nonce (explicit override or recalled from network).
-    let nonce = if let Some(n) = args.tx.nonce {
-        n
-    } else {
-        interactor.recall_nonce(&sender_address).await
-    };
+    apply_gas_price(&mut interactor, &args.tx);
+    validate_chain_id(&interactor, &args.gateway)?;
 
     // Build Transaction via unified Tx syntax (resembles interactor code).
     let payments = parse_all_payment_args(&args.payment)?;
     let mut tx = interactor
         .tx()
-        .from(&sender)
+        .from(&sender_address)
         .to(&receiver)
         .gas(args.tx.gas_limit)
         .payment(payments)
+        .opt_relayer(relayer_address_opt)
         .into_sdk_transaction();
 
     // Data field (mutually exclusive with --token-transfers; overrides only when provided).
@@ -51,46 +49,9 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     if !data_raw.is_empty() {
         tx.data = Some(base64_encode(&data_raw));
     }
+    interactor.set_tx_nonce_update_sender(&mut tx).await;
 
-    // Decode the data field for the human-readable output.
-    let decoded_data = match &tx.data {
-        None => String::new(),
-        Some(d) => {
-            let bytes = base64_decode(d)?;
-            String::from_utf8_lossy(&bytes).into_owned()
-        }
-    };
-    tx.nonce = nonce;
-    if let Some(gas_price) = args.tx.gas_price {
-        tx.gas_price = gas_price;
-    }
-    if let Some(chain_id) = &args.gateway.chain {
-        tx.chain_id = chain_id.clone();
-    }
-
-    let sig = wallet.sign_tx(&tx)?;
-    tx.signature = Some(sig);
-
-    let output = TxOutputFile {
-        emitted_transaction: tx,
-        emitted_transaction_data: decoded_data,
-        emitted_transaction_hash: String::new(),
-        contract_address: None,
-        transaction_on_network: None,
-    };
-
-    if args.tx.send {
-        broadcast_and_save(
-            output,
-            &args.gateway.proxy,
-            args.tx.outfile.as_deref(),
-            args.tx.wait_result,
-        )
-        .await?;
-    } else {
-        save_output(&output, args.tx.outfile.as_deref())?;
-    }
-    Ok(())
+    sign_and_dispatch(&interactor, tx, &args.tx, None).await
 }
 
 // ---------------------------------------------------------------------------

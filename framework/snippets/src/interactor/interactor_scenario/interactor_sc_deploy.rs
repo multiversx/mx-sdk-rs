@@ -34,6 +34,12 @@ where
             chain_id: self.network_config().chain_id.clone(),
             version: TransactionVersion::V2,
             options: Some(TransactionOptions::SIGN_WITH_HASH),
+            relayer: sc_deploy_step
+                .tx
+                .relayer
+                .as_ref()
+                .map(|a| a.to_address().to_bech32(hrp)),
+            relayer_signature: None,
         }
     }
 
@@ -41,11 +47,10 @@ where
         &mut self,
         sc_deploy_step: &ScDeployStep,
     ) -> Transaction {
-        let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
-        self.sign_tx(sender_address, &mut transaction);
+        // Set relayer field before signing — it is included in the signing bytes.
+        self.set_tx_nonce_update_sender(&mut transaction).await;
+        self.sign_tx(&mut transaction);
 
         transaction
     }
@@ -82,8 +87,7 @@ where
             transaction.gas_limit = gas;
 
             // sign again, because gas changed
-            let sender_address = &sc_deploy_step.tx.from.value;
-            self.sign_tx(sender_address, &mut transaction);
+            self.sign_tx(&mut transaction);
         }
 
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);

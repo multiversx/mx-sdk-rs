@@ -15,14 +15,13 @@ where
 {
     pub(crate) async fn recall_senders_nonce(&mut self, senders: HashSet<Address>) {
         for sender_address in &senders {
-            let nonce = self.recall_nonce(sender_address).await;
+            let nonce = self.resolve_tx_nonce(sender_address).await;
             let sender = self
                 .sender_map
                 .get_mut(sender_address)
                 .expect("sender not registered");
 
             sender.current_nonce = Some(nonce);
-            println!("sender's recalled nonce: {nonce}");
         }
     }
 

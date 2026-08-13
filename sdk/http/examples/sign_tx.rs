@@ -30,6 +30,8 @@ async fn main() -> anyhow::Result<()> {
         chain_id: arg.chain_id,
         version: arg.version,
         options: arg.options,
+        relayer: None,
+        relayer_signature: None,
     };
 
     let signature = wallet.sign_tx(&unsign_tx)?;

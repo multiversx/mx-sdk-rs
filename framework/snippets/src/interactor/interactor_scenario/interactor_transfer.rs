@@ -62,12 +62,9 @@ where
 
     async fn launch_transfer(&mut self, transfer_step: &TransferStep) -> Transaction {
         self.pre_runners.run_transfer_step(transfer_step);
-
-        let sender_address = &transfer_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
-        self.sign_tx(sender_address, &mut transaction);
+        self.set_tx_nonce_update_sender(&mut transaction).await;
+        self.sign_tx(&mut transaction);
 
         transaction
     }

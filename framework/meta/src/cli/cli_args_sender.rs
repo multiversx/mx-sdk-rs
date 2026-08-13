@@ -28,6 +28,30 @@ pub struct SenderArgs {
 }
 
 /// Load a wallet from a PEM file, JSON keystore, or Ledger device.
+/// Wallet arguments for the relayer. Mirrors [`SenderArgs`] with a `--relayer-*` prefix.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct RelayerArgs {
+    /// Bech32 address of the relayer that will pay the gas fees (relayed v3).
+    /// The gas limit must include the extra base cost for the relayed operation.
+    /// Allows specifying a relayer address without a wallet,
+    /// in which case the transaction will remain unsigned by the relayer.
+    #[arg(long)]
+    pub relayer: Option<String>,
+
+    /// Path to a PEM wallet file for the relayer.
+    #[arg(long = "relayer-pem", group = "relayer_source")]
+    pub relayer_pem: Option<PathBuf>,
+
+    /// Path to a JSON keystore wallet file for the relayer.
+    #[arg(long = "relayer-keyfile", group = "relayer_source")]
+    pub relayer_keyfile: Option<PathBuf>,
+
+    /// Relayer keystore password (plain text). If omitted, will prompt interactively.
+    #[arg(long = "relayer-keystore-password")]
+    pub relayer_keystore_password: Option<String>,
+}
+
+/// Load a wallet from a PEM file or JSON keystore.
 pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
         Wallet::from_pem_file(pem).context("failed to load PEM wallet")
@@ -68,6 +92,26 @@ fn load_ledger_wallet(address_index: u32) -> Result<Wallet> {
     Err(anyhow!(
         "Ledger support is not available; recompile with the `ledger` feature enabled"
     ))
+}
+
+/// Load a relayer wallet from [`RelayerArgs`], returning `None` if no relayer args are set.
+pub fn load_relayer_wallet(args: &RelayerArgs) -> Result<Option<Wallet>> {
+    if let Some(pem) = &args.relayer_pem {
+        let wallet = Wallet::from_pem_file(pem).context("failed to load relayer PEM wallet")?;
+        Ok(Some(wallet))
+    } else if let Some(keyfile) = &args.relayer_keyfile {
+        let password = match &args.relayer_keystore_password {
+            Some(pw) => pw.clone(),
+            None => get_keystore_password(),
+        };
+        let keystore = Keystore::from_file(keyfile)?;
+        let wallet = keystore
+            .decrypt_wallet(&password)
+            .context("failed to load relayer keystore wallet")?;
+        Ok(Some(wallet))
+    } else {
+        Ok(None)
+    }
 }
 
 pub fn get_keystore_password() -> String {

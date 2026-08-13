@@ -149,6 +149,7 @@ impl Wallet {
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> Result<WalletSignature> {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
+        unsign_tx.relayer_signature = None;
 
         match &self.signer {
             Signer::PrivateKey(pk) => {

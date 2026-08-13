@@ -38,6 +38,8 @@ pub struct InteractorConnection<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Gateway URI used to construct `proxy`.
+    pub gateway_uri: String,
     /// The async gateway used to communicate with the blockchain network.
     pub proxy: GatewayProxy,
     /// Chain-level parameters (chain ID, gas price, HRP, …) fetched from the gateway.
@@ -81,6 +83,15 @@ where
     /// `connection.network_config.min_gas_price` at connection time.
     pub gas_price: u64,
 
+    /// Explicit transaction nonce. When set, transaction preparation uses this
+    /// value instead of fetching the sender nonce from the gateway.
+    ///
+    /// Only applies for the next transaction; it is cleared after use.
+    ///
+    /// This is used to implement the `--nonce` CLI flag,
+    /// which overrides the nonce for a single transaction.
+    pub override_next_tx_nonce: Option<u64>,
+
     /// All wallets registered as transaction signers, keyed by their on-chain
     /// address.  Populated by [`Self::register_wallet`].
     pub sender_map: HashMap<Address, Sender>,
@@ -118,6 +129,7 @@ where
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
             gas_price: 0,
+            override_next_tx_nonce: None,
             explorer_url: None,
         }
     }
@@ -149,6 +161,7 @@ where
         self.gas_price = network_config.min_gas_price;
         self.explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
         self.connection = Some(InteractorConnection {
+            gateway_uri: gateway_uri.to_owned(),
             proxy,
             network_config,
         });
@@ -238,19 +251,28 @@ where
         config
     }
 
+    fn connection(&self) -> &InteractorConnection<GatewayProxy> {
+        self.connection.as_ref().expect(
+            "interactor connection is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
+        )
+    }
+
     /// Returns the initialized gateway proxy reference.
     ///
     /// # Panics
     ///
     /// Panics if connection has not been initialized.
     pub fn proxy(&self) -> &GatewayProxy {
-        &self
-            .connection
-            .as_ref()
-            .expect(
-            "interactor proxy is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-            )
-            .proxy
+        &self.connection().proxy
+    }
+
+    /// Returns the gateway URI used to initialize the connection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn gateway_uri(&self) -> &str {
+        &self.connection().gateway_uri
     }
 
     /// Returns the initialized network configuration.
@@ -259,13 +281,18 @@ where
     ///
     /// Panics if connection has not been initialized.
     pub fn network_config(&self) -> &NetworkConfig {
-        &self
-            .connection
-            .as_ref()
-            .expect(
-            "interactor network_config is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
-            )
-            .network_config
+        &self.connection().network_config
+    }
+
+    /// Validates that `chain_id` matches the chain ID reported by the gateway.
+    pub fn validate_chain_id(&self, chain_id: &str) -> anyhow::Result<()> {
+        let network_chain_id = &self.network_config().chain_id;
+        if chain_id != network_chain_id {
+            anyhow::bail!(
+                "chain ID mismatch: CLI specifies {chain_id}, but gateway reports {network_chain_id}"
+            );
+        }
+        Ok(())
     }
 
     /// Enables or disables chain-simulator mode.
@@ -294,6 +321,31 @@ where
             },
         );
         address
+    }
+
+    /// Registers a wallet as a transaction sender and funds it in simulator mode.
+    ///
+    /// Returns the wallet address encoded as bech32 using this interactor's
+    /// configured network HRP.
+    pub async fn register_wallet_bech32(&mut self, wallet: Wallet) -> Bech32Address {
+        self.register_wallet(wallet).await.to_bech32(self.get_hrp())
+    }
+
+    /// Registers an optional wallet as a transaction sender and funds it in
+    /// simulator mode.
+    ///
+    /// Returns `Some` containing the wallet address encoded as bech32 using
+    /// this interactor's configured network HRP. Returns `None` when no wallet
+    /// is provided.
+    pub async fn register_wallet_bech32_opt(
+        &mut self,
+        wallet: Option<Wallet>,
+    ) -> Option<Bech32Address> {
+        if let Some(w) = wallet {
+            Some(self.register_wallet_bech32(w).await)
+        } else {
+            None
+        }
     }
 
     /// Sleeps for `duration` using the configured gateway and accumulates waited time.

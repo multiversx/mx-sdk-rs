@@ -27,3 +27,10 @@ test_wallet = 'ivan'
 
 [ledger-wallet]
 ledger = true
+
+# Optional relayer wallet, used in `add-relayed`.
+[relayer]
+test_wallet = 's1mon' # ivan is in shard 1
+# pem = 'path/to/relayer.pem'
+# keyfile = 'path/to/relayer.json'
+# keystore_password = 'password'

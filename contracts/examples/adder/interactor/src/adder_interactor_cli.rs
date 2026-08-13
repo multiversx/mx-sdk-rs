@@ -22,6 +22,11 @@ pub enum InteractCliCommand {
     Add(AddArgs),
     #[command(name = "add-ledger", about = "Add value via ledger device")]
     AddLedger(AddArgs),
+    #[command(
+        name = "add-relayed",
+        about = "Add value via a relayed transaction (relayer pays gas)"
+    )]
+    AddRelayed(AddArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
