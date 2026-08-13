@@ -11,10 +11,12 @@ const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
 /// 0.1 EGLD in the smallest denomination (10^17).
 const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
 
+/// 100 EGLD, the amount senders get funded automatically
+/// on interactor/sc-meta CLI + chain simulator.
+const FUND_AMOUNT: u128 = 100_00_000_000_000_000_000;
+
 /// Minimum gas for a plain EGLD transfer.
 const GAS_LIMIT: u64 = 50_000;
-
-const CLI_TX_PROCESSING_BLOCKS: u64 = 40;
 
 /// Deploys the adder contract, calls `add`, and verifies `getSum` returns the expected value.
 /// Mirrors the deploy / add / getSum flow from the adder snippets.sh.
@@ -42,7 +44,7 @@ async fn test_adder_deploy_add_get_sum() {
     let wallet_address = wallet.to_address().to_bech32_default();
     interactor.send_user_funds(&wallet_address).await.unwrap();
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor.generate_blocks(20).await.unwrap();
 
     // ── deploy ────────────────────────────────────────────────────────────────
     let deploy_output = Command::new(sc_meta_bin)
@@ -78,11 +80,6 @@ async fn test_adder_deploy_add_get_sum() {
         String::from_utf8_lossy(&deploy_output.stderr)
     );
     assert!(deploy_output.status.success(), "deploy failed");
-
-    interactor
-        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
-        .await
-        .unwrap();
 
     // Read the deployed contract address from the interaction output file.
     let outfile_content =
@@ -146,11 +143,6 @@ async fn test_adder_deploy_add_get_sum() {
         .expect("failed to execute sc-meta tx call");
 
     assert!(status.success(), "add call failed");
-
-    interactor
-        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
-        .await
-        .unwrap();
 
     // Read and verify deterministic call fields.
     let call_content = std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
@@ -234,11 +226,6 @@ async fn test_adder_deploy_add_get_sum() {
     );
     assert!(upgrade_output.status.success(), "upgrade failed");
 
-    interactor
-        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
-        .await
-        .unwrap();
-
     // Verify the upgrade outfile references the same contract address.
     let upgrade_content =
         std::fs::read_to_string(&outfile_upgrade).expect("failed to read upgrade outfile");
@@ -291,7 +278,7 @@ async fn test_adder_deploy_add_get_sum() {
     let relayer_address = relayer_wallet.to_address().to_bech32_default();
     interactor.send_user_funds(&relayer_address).await.unwrap();
 
-    interactor.generate_blocks(10).await.unwrap();
+    interactor.generate_blocks(20).await.unwrap();
 
     let status = Command::new(sc_meta_bin)
         .args([
@@ -321,11 +308,6 @@ async fn test_adder_deploy_add_get_sum() {
         .expect("failed to execute sc-meta tx call (relayed)");
 
     assert!(status.success(), "relayed add call failed");
-
-    interactor
-        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
-        .await
-        .unwrap();
 
     // getSum must return 5 + 3 = 8 after the relayed add.
     let query_after_relayed = Command::new(sc_meta_bin)
@@ -381,15 +363,6 @@ async fn test_egld_transfer_alice_to_bob() {
     let alice_address = test_wallets::alice().to_address();
     let bob_address = test_wallets::bob().to_address();
 
-    // fund alice
-    interactor
-        .send_user_funds(&alice_address.to_bech32_default())
-        .await
-        .unwrap();
-
-    // Allow the funding transactions to settle.
-    interactor.generate_blocks(10).await.unwrap();
-
     // ── balances before transfer ──────────────────────────────────────────────
     let alice_balance_before: u128 = interactor
         .get_account(&alice_address)
@@ -434,12 +407,6 @@ async fn test_egld_transfer_alice_to_bob() {
 
     assert!(status.success(), "sc-meta tx new command failed");
 
-    // Allow the transfer transaction to settle.
-    interactor
-        .generate_blocks(CLI_TX_PROCESSING_BLOCKS)
-        .await
-        .unwrap();
-
     // ── balances after transfer ───────────────────────────────────────────────
     let alice_balance_after: u128 = interactor
         .get_account(&alice_address)
@@ -467,7 +434,7 @@ async fn test_egld_transfer_alice_to_bob() {
 
     // Alice must have spent at least the transfer amount (gas fees are on top).
     assert!(
-        alice_balance_before - alice_balance_after >= TRANSFER_AMOUNT,
+        alice_balance_before + FUND_AMOUNT - alice_balance_after >= TRANSFER_AMOUNT,
         "Alice's balance did not decrease by at least the transfer amount"
     );
 }
