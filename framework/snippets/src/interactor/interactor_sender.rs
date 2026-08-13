@@ -149,7 +149,7 @@ where
     }
 }
 
-#[cfg(all(test, feature = "http"))]
+#[cfg(test)]
 mod tests {
     use multiversx_sc_scenario::{imports::Bech32Address, multiversx_sc::types::Address};
     use multiversx_sdk::data::transaction::{Transaction, TransactionVersion};
