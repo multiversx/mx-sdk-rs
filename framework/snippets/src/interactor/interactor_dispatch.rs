@@ -15,6 +15,35 @@ where
         to_json_pretty(value)
     }
 
+    pub async fn broadcast_transaction(
+        &self,
+        transaction: &Transaction,
+        info: &str,
+    ) -> anyhow::Result<String> {
+        let result = self
+            .proxy()
+            .request(multiversx_sdk::gateway::SendTxRequest(transaction))
+            .await;
+        let Ok(tx_hash) = result else {
+            let Err(err) = result else {
+                unreachable!();
+            };
+            let error = anyhow::anyhow!("{info} error: {err}");
+            eprintln!("{error}");
+            log::error!("{error}");
+            return Err(error);
+        };
+
+        log::info!("{info} tx hash: {tx_hash}");
+        if let Some(explorer_url) = ExplorerUrl::from_chain_id(&transaction.chain_id) {
+            println!("{info}: {}", explorer_url.tx_url(&tx_hash));
+        } else {
+            println!("{info} tx hash: {tx_hash}");
+        }
+
+        Ok(tx_hash)
+    }
+
     /// Broadcast the transaction inside `output`, update the hash (and optionally
     /// the on-network result), then write/print the updated output.
     pub async fn broadcast_and_save(
@@ -35,18 +64,8 @@ where
         }
 
         let tx_hash = self
-            .proxy()
-            .request(multiversx_sdk::gateway::SendTxRequest(
-                &output.emitted_transaction,
-            ))
-            .await
-            .context("failed to broadcast transaction")?;
-        if let Some(explorer_url) = ExplorerUrl::from_chain_id(&output.emitted_transaction.chain_id)
-        {
-            println!("transaction: {}", explorer_url.tx_url(&tx_hash));
-        } else {
-            println!("transaction hash: {tx_hash}");
-        }
+            .broadcast_transaction(&output.emitted_transaction, "transaction")
+            .await?;
 
         let mut output_with_hash = TxOutputFile {
             emitted_transaction_hash: tx_hash.clone(),

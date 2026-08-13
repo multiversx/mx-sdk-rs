@@ -1,6 +1,6 @@
 use std::process;
 
-use super::error_message::{sc_call_err_message, simulate_gas_sc_call_err_message};
+use super::error_message::simulate_gas_sc_call_err_message;
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
@@ -9,10 +9,7 @@ use multiversx_sc_scenario::{
 use multiversx_sdk::chain_core::std::base64_encode;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
 use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
-use multiversx_sdk::{
-    gateway::{GatewayAsyncService, SendTxRequest},
-    retrieve_tx_on_network,
-};
+use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -33,7 +30,9 @@ where
 
         self.pre_runners.run_sc_call_step(sc_call_step);
 
-        let tx_hash = self.launch_sc_call(&transaction).await;
+        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "sc call").await else {
+            process::exit(1)
+        };
 
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
@@ -68,28 +67,6 @@ where
         self.sign_tx(&mut transaction);
 
         transaction
-    }
-
-    async fn launch_sc_call(&mut self, transaction: &Transaction) -> String {
-        let tx_hash = self.proxy().request(SendTxRequest(transaction)).await;
-
-        match tx_hash {
-            Ok(tx_hash) => {
-                log::info!("sc call tx hash: {tx_hash}");
-                if let Some(ex) = &self.explorer_url {
-                    println!("sc call: {}", ex.tx_url(&tx_hash));
-                } else {
-                    println!("sc call tx hash: {tx_hash}");
-                }
-                tx_hash
-            }
-            Err(err) => {
-                println!("sc call error: {err}");
-                log::error!("sc call error: {err}");
-                sc_call_err_message(&err);
-                process::exit(1)
-            }
-        }
     }
 
     async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
