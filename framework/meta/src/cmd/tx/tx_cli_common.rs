@@ -143,13 +143,27 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
     Ok(arg_buffer)
 }
 
-pub fn apply_gas_price(interactor: &mut Interactor, tx_args: &TxArgs) {
+/// Create an interactor connected to `gateway`, with chain-simulator mode auto-detected,
+/// the explicit nonce override from `tx` applied, the gas price override applied, and
+/// the chain ID validated against `gateway.chain` (if given).
+pub(super) async fn create_interactor(gateway: &GatewayArgs, tx: &TxArgs) -> Result<Interactor> {
+    let mut interactor = Interactor::empty()
+        .with_connection(&gateway.proxy)
+        .await
+        .use_chain_simulator_auto();
+    interactor.override_next_tx_nonce = tx.nonce;
+    apply_gas_price(&mut interactor, tx);
+    validate_chain_id(&interactor, gateway)?;
+    Ok(interactor)
+}
+
+fn apply_gas_price(interactor: &mut Interactor, tx_args: &TxArgs) {
     if let Some(gas_price) = tx_args.gas_price {
         interactor.gas_price = gas_price;
     }
 }
 
-pub fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) -> Result<()> {
+fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) -> Result<()> {
     if let Some(chain_id) = &gateway_args.chain {
         interactor.validate_chain_id(chain_id)?;
     }

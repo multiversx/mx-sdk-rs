@@ -2,12 +2,12 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc::chain_core::std::new_address::compute_new_address_bech32;
-use multiversx_sc_snippets::imports::{BytesValue, Interactor, InteractorIntoSdkTransaction};
+use multiversx_sc_snippets::imports::{BytesValue, InteractorIntoSdkTransaction};
 
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
-    apply_gas_price, build_arg_buffer, load_relayer_for_interactor, load_wallet, sign_and_dispatch,
-    validate_chain_id,
+    build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
+    sign_and_dispatch,
 };
 use crate::cli::cli_args_tx::DeployArgs;
 
@@ -22,15 +22,11 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config in the process.
-    let mut interactor = Interactor::new(&args.gateway.proxy).await;
-    interactor.override_next_tx_nonce = args.tx.nonce;
+    let mut interactor = create_interactor(&args.gateway, &args.tx).await?;
     let sender_address = interactor
         .register_wallet_bech32(sender_wallet.clone())
         .await;
     let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
-
-    apply_gas_price(&mut interactor, &args.tx);
-    validate_chain_id(&interactor, &args.gateway)?;
 
     // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
     let bytecode = fs::read(&args.bytecode)
