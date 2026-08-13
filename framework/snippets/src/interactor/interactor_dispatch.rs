@@ -74,6 +74,9 @@ where
 
         if wait_result {
             println!("Waiting for transaction result...");
+
+            self.generate_blocks_until_tx_processed(&tx_hash).await?;
+
             let (tx_on_network, return_code) =
                 multiversx_sdk::retrieve_tx_on_network(self.proxy(), tx_hash).await?;
             let tx_response =

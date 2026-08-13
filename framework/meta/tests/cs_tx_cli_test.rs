@@ -62,6 +62,7 @@ async fn test_adder_deploy_add_get_sum() {
             "--arguments",
             "0",
             "--send",
+            "--wait-result",
             "--outfile",
             outfile_deploy.to_str().unwrap(),
         ])
@@ -137,6 +138,7 @@ async fn test_adder_deploy_add_get_sum() {
             "--arguments",
             "5",
             "--send",
+            "--wait-result",
             "--outfile",
             outfile_call.to_str().unwrap(),
         ])
@@ -215,6 +217,7 @@ async fn test_adder_deploy_add_get_sum() {
             "--gas-limit",
             "50000000",
             "--send",
+            "--wait-result",
             "--outfile",
             outfile_upgrade.to_str().unwrap(),
         ])
@@ -310,6 +313,7 @@ async fn test_adder_deploy_add_get_sum() {
             "--arguments",
             "3",
             "--send",
+            "--wait-result",
             "--outfile",
             outfile_call_relayed.to_str().unwrap(),
         ])
@@ -423,6 +427,7 @@ async fn test_egld_transfer_alice_to_bob() {
             "--value",
             &TRANSFER_AMOUNT.to_string(),
             "--send",
+            "--wait-result",
         ])
         .status()
         .expect("failed to execute sc-meta tx new");
