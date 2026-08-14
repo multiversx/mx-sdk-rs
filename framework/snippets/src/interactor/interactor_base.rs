@@ -322,7 +322,7 @@ where
         self.send_user_funds(&address.to_bech32(self.get_hrp()))
             .await
             .unwrap();
-        self.generate_blocks(1).await.unwrap();
+        self.generate_blocks(10).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {
