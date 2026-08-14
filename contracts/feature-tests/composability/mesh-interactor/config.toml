@@ -1,9 +1,12 @@
-call_tree_path = "layouts/async_v1_c1_smin_pay.toml"
+call_tree_path = "layouts/sync_a1_sync.toml"
+# call_tree_path = "layouts/direct.toml"
 
 [gateway]
-uri = "https://testnet-gateway.multiversx.com/"
-chain_type = "real"
+uri = "http://localhost:8085"
+chain_type = "simulator"
 
 # [gateway]
-# uri = "https://gateway.battleofnodes.com"
+# uri = "https://testnet-gateway.multiversx.com/"
 # chain_type = "real"
+
+
