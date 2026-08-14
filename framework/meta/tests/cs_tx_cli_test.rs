@@ -39,6 +39,12 @@ async fn test_adder_deploy_add_get_sum() {
     let wallet = Wallet::from_pem_file(&wallet_pem_path).unwrap();
     let wallet_address = wallet.to_address().to_bech32_default();
 
+    // Connect to the chain simulator, generate some initial blocks.
+    let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
+        .await
+        .use_chain_simulator(true);
+    interactor.generate_blocks(10).await.unwrap();
+
     // ── deploy ────────────────────────────────────────────────────────────────
     let deploy_output = Command::new(sc_meta_bin)
         .args([
@@ -344,6 +350,7 @@ async fn test_egld_transfer_alice_to_bob() {
     let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
         .await
         .use_chain_simulator(true);
+    interactor.generate_blocks(10).await.unwrap();
 
     // Register wallets – `register_wallet` automatically funds each account via
     // the chain simulator's `send_user_funds` endpoint.
