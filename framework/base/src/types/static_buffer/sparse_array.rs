@@ -307,8 +307,7 @@ impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = crate::abi::ListAbi<usize>;
 
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {

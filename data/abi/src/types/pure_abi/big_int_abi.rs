@@ -1,4 +1,6 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 /// Pure ABI counterpart of `BigInt<M>`.
 ///
@@ -7,17 +9,26 @@ use crate::{TypeAbi, TypeAbiFrom, TypeName};
 /// or across different framework implementations entirely.
 pub struct BigIntAbi;
 
-impl TypeAbiFrom<Self> for BigIntAbi {}
+impl AbiTypeFrom<Self> for BigIntAbi {}
 
-impl TypeAbi for BigIntAbi {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for BigIntAbi {
     fn type_name() -> TypeName {
         TypeName::from("BigInt")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbiFrom<Self> for BigIntAbi {}
+
+impl TypeAbi for BigIntAbi {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         TypeName::from("BigIntAbi")
     }
+}
+
+impl HasUnmanaged for BigIntAbi {
+    type Unmanaged = Self;
 }

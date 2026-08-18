@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::{
-    abi::TypeAbiFrom,
+    abi::{AbiTypeFrom, TypeAbi},
     contract_base::SyncCallRawResult,
     types::{RHListItem, RHListItemExec, TxEnv, interaction::decode_result},
 };
@@ -32,7 +32,9 @@ impl<T> ReturnsResultAs<T> {
 impl<Env, Original, T> RHListItem<Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    T: TopDecodeMulti + TypeAbiFrom<Original>,
+    Original: TypeAbi,
+    T: TopDecodeMulti + TypeAbi,
+    T::Abi: AbiTypeFrom<Original::Abi>,
 {
     type Returns = T;
 }
@@ -41,7 +43,9 @@ impl<Env, Original, T> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original
     for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    T: TopDecodeMulti + TypeAbiFrom<Original>,
+    Original: TypeAbi,
+    T: TopDecodeMulti + TypeAbi,
+    T::Abi: AbiTypeFrom<Original::Abi>,
 {
     fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Self::Returns {
         decode_result::<Env::Api, T>(raw_result.0.clone())

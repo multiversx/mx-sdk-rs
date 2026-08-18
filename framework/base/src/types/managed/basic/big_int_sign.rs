@@ -82,7 +82,6 @@ impl TopDecode for Sign {
 impl TypeAbiFrom<Self> for Sign {}
 
 impl TypeAbi for Sign {
-    type Unmanaged = Self;
     type Abi = crate::abi::SignAbi;
 
     fn type_name() -> TypeName {

@@ -361,8 +361,7 @@ impl<M> TypeAbi for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = ArgBuffer;
-    type Abi = ArgBuffer;
+    type Abi = Vec<Vec<u8>>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {

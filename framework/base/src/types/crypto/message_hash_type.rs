@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     codec::{
         self,
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
@@ -41,12 +41,16 @@ impl From<u8> for MessageHashType {
 }
 
 impl TypeAbiFrom<Self> for MessageHashType {}
+impl AbiTypeFrom<Self> for MessageHashType {}
 
-impl TypeAbi for MessageHashType {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for MessageHashType {
     fn type_name() -> TypeName {
         "MessageHashType".into()
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for MessageHashType {
+    type Abi = Self;
 }

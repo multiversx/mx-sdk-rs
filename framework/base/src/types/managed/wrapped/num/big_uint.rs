@@ -219,12 +219,6 @@ impl<M> TypeAbiFrom<Self> for BigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for BigUint<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
-    #[cfg(feature = "num-bigint")]
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-
-    #[cfg(not(feature = "num-bigint"))]
-    type Unmanaged = Self;
-
     type Abi = BigUintAbi;
 
     fn type_name() -> TypeName {

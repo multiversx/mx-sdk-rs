@@ -1,4 +1,6 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 use alloc::format;
 
 /// Pure ABI counterpart of `ManagedDecimalSigned<M, NumDecimals>` (variable number of decimals).
@@ -9,19 +11,29 @@ use alloc::format;
 /// or across different framework implementations entirely.
 pub struct DecimalSignedAbi;
 
-impl TypeAbiFrom<Self> for DecimalSignedAbi {}
+impl AbiTypeFrom<Self> for DecimalSignedAbi {}
 
-impl TypeAbi for DecimalSignedAbi {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for DecimalSignedAbi {
     fn type_name() -> TypeName {
         TypeName::from("ManagedDecimalSigned<usize>")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbiFrom<Self> for DecimalSignedAbi {}
+
+impl TypeAbi for DecimalSignedAbi {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         TypeName::from("ManagedDecimalSignedAbi")
     }
+}
+
+#[cfg(feature = "num-bigint")]
+impl HasUnmanaged for DecimalSignedAbi {
+    type Unmanaged = crate::codec::num_bigint::BigInt;
 }
 
 /// Pure ABI counterpart of `ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>` (compile-time fixed number of decimals).
@@ -34,17 +46,27 @@ impl TypeAbi for DecimalSignedAbi {
 /// or across different framework implementations entirely.
 pub struct DecimalSignedConstAbi<const DECIMALS: usize>;
 
-impl<const DECIMALS: usize> TypeAbiFrom<Self> for DecimalSignedConstAbi<DECIMALS> {}
+impl<const DECIMALS: usize> AbiTypeFrom<Self> for DecimalSignedConstAbi<DECIMALS> {}
 
-impl<const DECIMALS: usize> TypeAbi for DecimalSignedConstAbi<DECIMALS> {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl<const DECIMALS: usize> AbiType for DecimalSignedConstAbi<DECIMALS> {
     fn type_name() -> TypeName {
         format!("ManagedDecimalSigned<{DECIMALS}>")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl<const DECIMALS: usize> TypeAbiFrom<Self> for DecimalSignedConstAbi<DECIMALS> {}
+
+impl<const DECIMALS: usize> TypeAbi for DecimalSignedConstAbi<DECIMALS> {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         format!("ManagedDecimalSignedConstAbi<{DECIMALS}>")
     }
+}
+
+#[cfg(feature = "num-bigint")]
+impl<const DECIMALS: usize> HasUnmanaged for DecimalSignedConstAbi<DECIMALS> {
+    type Unmanaged = crate::codec::num_bigint::BigInt;
 }

@@ -166,8 +166,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = crate::abi::CountedVariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");

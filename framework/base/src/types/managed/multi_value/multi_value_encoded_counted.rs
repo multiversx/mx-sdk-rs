@@ -216,7 +216,6 @@ where
     M: ManagedTypeApi,
     T: TypeAbi + MultiValueConstLength,
 {
-    type Unmanaged = MultiValueVec<T::Unmanaged>;
     type Abi = MultiValueVec<T::Abi>;
 
     fn type_name() -> TypeName {

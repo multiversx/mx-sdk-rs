@@ -109,8 +109,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = crate::types::heap::AsyncCallResult<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("AsyncCallResult<");

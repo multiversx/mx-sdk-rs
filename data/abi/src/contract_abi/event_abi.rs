@@ -33,7 +33,7 @@ impl EventAbi {
     pub fn add_input<T: TypeAbi>(&mut self, arg_name: &str, indexed: bool) {
         self.inputs.push(EventInputAbi {
             arg_name: arg_name.to_string(),
-            type_name: T::type_name(),
+            type_name: T::type_names().abi,
             indexed,
         });
     }

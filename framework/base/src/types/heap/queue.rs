@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     codec::*,
 };
 use alloc::vec::Vec;
@@ -138,9 +138,23 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
 
 impl<T: TypeAbi> TypeAbiFrom<Self> for Queue<T> {}
 
+impl<T: AbiType> AbiTypeFrom<Self> for Queue<T> {}
+
+impl<T: AbiType> AbiType for Queue<T> {
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("Queue<");
+        repr.push_str(T::type_name().as_str());
+        repr.push('>');
+        repr
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
+}
+
 impl<T: TypeAbi> TypeAbi for Queue<T> {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = Queue<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("Queue<");

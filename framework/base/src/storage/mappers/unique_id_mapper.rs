@@ -281,8 +281,7 @@ impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = crate::codec::multi_types::MultiValueVec<usize>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<usize>()

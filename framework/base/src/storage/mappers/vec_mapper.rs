@@ -419,11 +419,10 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        crate::abi::type_name_variadic::<T::Abi>()
     }
 
     fn type_name_rust() -> TypeName {

@@ -1,7 +1,8 @@
 use alloc::format;
 
 use crate::{
-    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+    AbiType, AbiTypeFrom, HasUnmanaged, OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer,
+    TypeName,
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
@@ -12,16 +13,11 @@ where
 {
 }
 
-impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
-    type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
-    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
+impl<T: AbiType> AbiTypeFrom<Self> for crate::codec::multi_types::MultiValueVec<T> {}
 
+impl<T: AbiType> AbiType for crate::codec::multi_types::MultiValueVec<T> {
     fn type_name() -> TypeName {
         super::type_name_variadic::<T>()
-    }
-
-    fn type_name_rust() -> TypeName {
-        format!("MultiValueVec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -33,15 +29,39 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     }
 }
 
+impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
+    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
+
+    fn type_name_rust() -> TypeName {
+        format!("MultiValueVec<{}>", T::type_name_rust())
+    }
+
+    fn is_variadic() -> bool {
+        true
+    }
+}
+
+impl<T: HasUnmanaged> HasUnmanaged for crate::codec::multi_types::MultiValueVec<T> {
+    type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
+}
+
 impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
+impl AbiTypeFrom<Self> for IgnoreValue {}
 
-impl TypeAbi for IgnoreValue {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for IgnoreValue {
     fn type_name() -> TypeName {
         TypeName::from("ignore")
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+
+    fn is_variadic() -> bool {
+        true
+    }
+}
+
+impl TypeAbi for IgnoreValue {
+    type Abi = Self;
 
     fn type_name_rust() -> TypeName {
         "IgnoreValue".into()
@@ -52,22 +72,20 @@ impl TypeAbi for IgnoreValue {
     }
 }
 
+impl HasUnmanaged for IgnoreValue {
+    type Unmanaged = Self;
+}
+
 impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFrom<U> {}
 
 // IgnoreValue -> OptionalValue::None
 // It makes it easier with
 impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
+impl<T: AbiType> AbiTypeFrom<Self> for OptionalValue<T> {}
 
-impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
-    type Unmanaged = OptionalValue<T::Unmanaged>;
-    type Abi = OptionalValue<T::Abi>;
-
+impl<T: AbiType> AbiType for OptionalValue<T> {
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()
-    }
-
-    fn type_name_rust() -> TypeName {
-        format!("OptionalValue<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -79,6 +97,22 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     }
 }
 
+impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
+    type Abi = OptionalValue<T::Abi>;
+
+    fn type_name_rust() -> TypeName {
+        format!("OptionalValue<{}>", T::type_name_rust())
+    }
+
+    fn is_variadic() -> bool {
+        true
+    }
+}
+
+impl<T: HasUnmanaged> HasUnmanaged for OptionalValue<T> {
+    type Unmanaged = OptionalValue<T::Unmanaged>;
+}
+
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $($n:tt $t:ident $u:ident)+) )+) => {
         $(
@@ -87,13 +121,15 @@ macro_rules! multi_arg_impls {
                 $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
+            impl<$($t),+> AbiTypeFrom<Self> for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
-                $($t: TypeAbi,)+
-            {
-                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
-                type Abi = crate::codec::multi_types::$mval_struct<$($t::Abi,)+>;
+                $($t: AbiType,)+
+            {}
 
+            impl<$($t),+> AbiType for crate::codec::multi_types::$mval_struct<$($t,)+>
+            where
+                $($t: AbiType,)+
+            {
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");
                     repr.push('<');
@@ -107,6 +143,23 @@ macro_rules! multi_arg_impls {
                     repr
                 }
 
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+                    $(
+                        $t::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn is_variadic() -> bool {
+                    true
+                }
+            }
+
+            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
+            where
+                $($t: TypeAbi,)+
+            {
+                type Abi = crate::codec::multi_types::$mval_struct<$($t::Abi,)+>;
+
                 fn type_name_rust() -> TypeName {
                     let mut repr = TypeName::from(stringify!($mval_struct));
                     repr.push('<');
@@ -118,12 +171,6 @@ macro_rules! multi_arg_impls {
                     )+
                     repr.push('>');
                     repr
-                }
-
-                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    $(
-                        $t::provide_type_descriptions(accumulator);
-                    )+
                 }
 
                 fn is_variadic() -> bool {
@@ -143,6 +190,14 @@ macro_rules! multi_arg_impls {
                     )+
                     result
                 }
+            }
+
+
+            impl<$($t),+> HasUnmanaged for crate::codec::multi_types::$mval_struct<$($t,)+>
+            where
+                $($t: HasUnmanaged,)+
+            {
+                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
             }
         )+
     }

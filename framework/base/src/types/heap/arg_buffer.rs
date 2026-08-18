@@ -116,8 +116,7 @@ impl Clone for ArgBuffer {
 impl TypeAbiFrom<Self> for ArgBuffer {}
 
 impl TypeAbi for ArgBuffer {
-    type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = Vec<Vec<u8>>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {

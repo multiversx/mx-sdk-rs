@@ -271,7 +271,6 @@ impl<M> TypeAbi for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = crate::types::heap::Address;
     type Abi = crate::abi::AddressAbi;
 
     /// `"Address"` instead of `"array32<u8>"`.

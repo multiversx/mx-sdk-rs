@@ -1,4 +1,6 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 /// Pure ABI counterpart of `EgldOrEsdtTokenIdentifier<M>`.
 ///
@@ -8,17 +10,26 @@ use crate::{TypeAbi, TypeAbiFrom, TypeName};
 /// or across different framework implementations entirely.
 pub struct EgldOrEsdtTokenIdentifierAbi;
 
-impl TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifierAbi {}
+impl AbiTypeFrom<Self> for EgldOrEsdtTokenIdentifierAbi {}
 
-impl TypeAbi for EgldOrEsdtTokenIdentifierAbi {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for EgldOrEsdtTokenIdentifierAbi {
     fn type_name() -> TypeName {
         TypeName::from("EgldOrEsdtTokenIdentifier")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifierAbi {}
+
+impl TypeAbi for EgldOrEsdtTokenIdentifierAbi {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         TypeName::from("EgldOrEsdtTokenIdentifierAbi")
     }
+}
+
+impl HasUnmanaged for EgldOrEsdtTokenIdentifierAbi {
+    type Unmanaged = multiversx_chain_core::types::BoxedBytes;
 }

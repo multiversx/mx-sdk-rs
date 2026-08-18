@@ -936,12 +936,11 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
-    type Unmanaged = Vec<T::Unmanaged>;
     type Abi = ListAbi<T::Abi>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
-        <ListAbi<T> as TypeAbi>::type_name()
+        <ListAbi<T::Abi> as TypeAbi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

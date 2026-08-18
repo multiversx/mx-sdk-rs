@@ -39,9 +39,9 @@ fn field_snippet(
         field_descriptions.push(#imports::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
-            <#field_ty>::type_names(),
+            <#field_ty as #imports::TypeAbi>::type_names(),
         ));
-        <#field_ty>::provide_type_descriptions(accumulator);
+        <#field_ty as #imports::TypeAbi>::provide_type_descriptions(accumulator);
     }
 }
 
@@ -106,7 +106,7 @@ pub fn type_abi_derive(
             let struct_field_snippets = fields_snippets(&data_struct.fields, context);
             quote! {
                 fn provide_type_descriptions<TDC: #imports::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_names = Self::type_names();
+                    let type_names = <Self as #imports::TypeAbi>::type_names();
                     if !accumulator.contains_type(&type_names.abi) {
                         accumulator.reserve_type_name(type_names.clone());
                         let mut field_descriptions = #imports::Vec::new();
@@ -150,7 +150,7 @@ pub fn type_abi_derive(
                 .collect();
             quote! {
                 fn provide_type_descriptions<TDC: #imports::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_names = Self::type_names();
+                    let type_names = <Self as #imports::TypeAbi>::type_names();
                     if !accumulator.contains_type(&type_names.abi) {
                         accumulator.reserve_type_name(type_names.clone());
                         let mut variant_descriptions = #imports::Vec::new();
@@ -175,15 +175,21 @@ pub fn type_abi_derive(
     quote! {
         impl #impl_generics #imports::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
         impl #impl_generics #imports::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
+        impl #impl_generics #imports::AbiTypeFrom<Self> for #name #ty_generics #where_clause {}
 
-        impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
-            type Unmanaged = Self;
-            type Abi = Self;
-
+        impl #impl_generics #imports::AbiType for #name #ty_generics #where_clause {
             fn type_name() -> #imports::TypeName {
                 #name_str.into()
             }
             #type_description_impl
+        }
+
+        impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
+            type Abi = Self;
+        }
+
+        impl #impl_generics #imports::HasUnmanaged for #name #ty_generics #where_clause {
+            type Unmanaged = Self;
         }
     }
 }

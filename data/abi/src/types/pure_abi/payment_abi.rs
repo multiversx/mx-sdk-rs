@@ -1,4 +1,6 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 /// Pure ABI counterpart of `Payment<M>`.
 ///
@@ -8,17 +10,31 @@ use crate::{TypeAbi, TypeAbiFrom, TypeName};
 /// or across different framework implementations entirely.
 pub struct PaymentAbi;
 
-impl TypeAbiFrom<Self> for PaymentAbi {}
+impl AbiTypeFrom<Self> for PaymentAbi {}
 
-impl TypeAbi for PaymentAbi {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for PaymentAbi {
     fn type_name() -> TypeName {
         TypeName::from("Payment")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbiFrom<Self> for PaymentAbi {}
+
+impl TypeAbi for PaymentAbi {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         TypeName::from("PaymentAbi")
     }
+}
+
+#[cfg(feature = "num-bigint")]
+impl HasUnmanaged for PaymentAbi {
+    type Unmanaged = (
+        multiversx_chain_core::types::BoxedBytes,
+        u64,
+        crate::codec::num_bigint::BigUint,
+    );
 }

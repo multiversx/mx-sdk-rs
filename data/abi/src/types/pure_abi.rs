@@ -12,6 +12,7 @@ mod list_abi;
 mod non_zero_big_uint_abi;
 mod payment_abi;
 mod sign_abi;
+mod special_encoding_abi;
 mod token_id_abi;
 
 pub use address_abi::AddressAbi;
@@ -28,4 +29,5 @@ pub use list_abi::ListAbi;
 pub use non_zero_big_uint_abi::NonZeroBigUintAbi;
 pub use payment_abi::PaymentAbi;
 pub use sign_abi::SignAbi;
+pub use special_encoding_abi::{BytesReadToEndAbi, CountedVariadicAbi};
 pub use token_id_abi::TokenIdAbi;

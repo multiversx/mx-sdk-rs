@@ -312,7 +312,6 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + TypeAbi,
 {
-    type Unmanaged = Option<T::Unmanaged>;
     type Abi = Option<T::Abi>;
 
     /// It is semantically equivalent to any list of `T`.

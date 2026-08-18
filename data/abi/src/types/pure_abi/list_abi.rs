@@ -1,21 +1,41 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 pub struct ListAbi<T>
 where
-    T: TypeAbi,
+    T: AbiType,
 {
     _phantom: core::marker::PhantomData<T>,
 }
 
-impl<T> TypeAbiFrom<Self> for ListAbi<T> where T: TypeAbi {}
+impl<T> AbiTypeFrom<Self> for ListAbi<T> where T: AbiType {}
 
-impl<T> TypeAbi for ListAbi<T>
+impl<T, U> AbiTypeFrom<alloc::vec::Vec<U>> for ListAbi<T>
 where
-    T: TypeAbi,
+    T: AbiTypeFrom<U>,
+    U: AbiType,
 {
-    type Unmanaged = Self;
-    type Abi = Self;
+}
 
+impl<T, U> AbiTypeFrom<alloc::boxed::Box<[U]>> for ListAbi<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
+
+impl<T, U, const N: usize> AbiTypeFrom<[U; N]> for ListAbi<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
+
+impl<T> AbiType for ListAbi<T>
+where
+    T: AbiType,
+{
     fn type_name() -> TypeName {
         let t_name = T::type_name();
         if t_name == "u8" {
@@ -27,14 +47,30 @@ where
         repr
     }
 
-    fn type_name_rust() -> TypeName {
-        let mut repr = TypeName::from("ListAbi<");
-        repr.push_str(T::type_name_rust().as_str());
-        repr.push('>');
-        repr
-    }
-
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
+}
+
+impl<T> TypeAbiFrom<Self> for ListAbi<T> where T: AbiType {}
+
+impl<T> TypeAbi for ListAbi<T>
+where
+    T: AbiType,
+{
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        let mut repr = TypeName::from("ListAbi<");
+        repr.push_str(T::type_name().as_str());
+        repr.push('>');
+        repr
+    }
+}
+
+impl<T> HasUnmanaged for ListAbi<T>
+where
+    T: HasUnmanaged,
+{
+    type Unmanaged = alloc::vec::Vec<T::Unmanaged>;
 }

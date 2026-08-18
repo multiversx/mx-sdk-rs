@@ -421,7 +421,6 @@ impl<M: ManagedTypeApi> TopDecode for ManagedDecimalSigned<M, NumDecimals> {
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for ManagedDecimalSigned<M, NumDecimals> {}
 
 impl<M: ManagedTypeApi> TypeAbi for ManagedDecimalSigned<M, NumDecimals> {
-    type Unmanaged = Self;
     type Abi = crate::abi::DecimalSignedAbi;
 
     fn type_name() -> TypeName {
@@ -441,7 +440,6 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbiFrom<Self>
 impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
-    type Unmanaged = Self;
     type Abi = crate::abi::DecimalSignedAbi;
 
     fn type_name() -> TypeName {

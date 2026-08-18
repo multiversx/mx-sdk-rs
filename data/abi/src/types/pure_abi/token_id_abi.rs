@@ -1,4 +1,6 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 /// Pure ABI counterpart of `TokenId<M>`.
 ///
@@ -8,17 +10,26 @@ use crate::{TypeAbi, TypeAbiFrom, TypeName};
 /// or across different framework implementations entirely.
 pub struct TokenIdAbi;
 
-impl TypeAbiFrom<Self> for TokenIdAbi {}
+impl AbiTypeFrom<Self> for TokenIdAbi {}
 
-impl TypeAbi for TokenIdAbi {
-    type Unmanaged = Self;
-    type Abi = Self;
-
+impl AbiType for TokenIdAbi {
     fn type_name() -> TypeName {
         TypeName::from("TokenId")
     }
 
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbiFrom<Self> for TokenIdAbi {}
+
+impl TypeAbi for TokenIdAbi {
+    type Abi = Self;
+
     fn type_name_rust() -> TypeName {
         TypeName::from("TokenIdAbi")
     }
+}
+
+impl HasUnmanaged for TokenIdAbi {
+    type Unmanaged = multiversx_chain_core::types::BoxedBytes;
 }

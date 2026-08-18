@@ -188,8 +188,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
-    type Unmanaged = T::Unmanaged;
-    type Abi = Self;
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
         T::type_name()
