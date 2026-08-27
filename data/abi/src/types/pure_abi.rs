@@ -20,7 +20,7 @@ pub use address_abi::AddressAbi;
 pub use big_float_abi::BigFloatAbi;
 pub use big_int_abi::BigIntAbi;
 pub use big_uint_abi::BigUintAbi;
-pub use decimal_abi::{DecimalAbi, DecimalConstAbi};
+pub use decimal_abi::{DecimalAbi, DecimalAbiSpec, DecimalConstAbi};
 pub use decimal_signed_abi::{DecimalSignedAbi, DecimalSignedConstAbi};
 pub use egld_or_esdt_token_identifier_abi::EgldOrEsdtTokenIdentifierAbi;
 pub use elliptic_curve_abi::EllipticCurveAbi;

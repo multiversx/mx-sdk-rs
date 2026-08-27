@@ -63,6 +63,12 @@ impl<DECIMALS: Unsigned> Decimals for ConstDecimals<DECIMALS> {
     }
 }
 
+impl<DECIMALS: Unsigned> crate::abi::DecimalAbiSpec for ConstDecimals<DECIMALS> {
+    fn decimal_abi_name() -> crate::abi::TypeName {
+        alloc::format!("{}", DECIMALS::to_usize()).into()
+    }
+}
+
 impl<DEC1, DEC2> Add<ConstDecimals<DEC2>> for ConstDecimals<DEC1>
 where
     DEC1: Unsigned,

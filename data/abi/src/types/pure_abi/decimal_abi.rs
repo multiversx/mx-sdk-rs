@@ -1,27 +1,39 @@
 use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 use alloc::format;
+use core::marker::PhantomData;
 
-/// Pure ABI counterpart of `ManagedDecimal<M, NumDecimals>` (variable number of decimals).
+/// Provides the ABI name fragment for a decimal precision specification.
+pub trait DecimalAbiSpec {
+    fn decimal_abi_name() -> TypeName;
+}
+
+impl DecimalAbiSpec for usize {
+    fn decimal_abi_name() -> TypeName {
+        TypeName::from("usize")
+    }
+}
+
+/// Pure ABI counterpart of `ManagedDecimal<M, D>`.
 ///
 /// Provides a stable, framework-agnostic type representation for fixed-point decimals
-/// with a runtime-determined number of decimal places.
+/// with a decimal precision determined by `D`.
 /// Using this type ensures ABI compatibility across multiple versions of the framework
 /// or across different framework implementations entirely.
-pub struct DecimalAbi;
+pub struct DecimalAbi<D>(PhantomData<D>);
 
-impl AbiTypeFrom<Self> for DecimalAbi {}
+impl<D: DecimalAbiSpec> AbiTypeFrom<Self> for DecimalAbi<D> {}
 
-impl AbiType for DecimalAbi {
+impl<D: DecimalAbiSpec> AbiType for DecimalAbi<D> {
     fn type_name() -> TypeName {
-        TypeName::from("ManagedDecimal<usize>")
+        format!("ManagedDecimal<{}>", D::decimal_abi_name())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
 }
 
-impl TypeAbiFrom<Self> for DecimalAbi {}
+impl<D: DecimalAbiSpec> TypeAbiFrom<Self> for DecimalAbi<D> {}
 
-impl TypeAbi for DecimalAbi {
+impl<D: DecimalAbiSpec> TypeAbi for DecimalAbi<D> {
     type Abi = Self;
 
     fn type_name_rust() -> TypeName {

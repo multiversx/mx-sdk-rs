@@ -59,8 +59,6 @@ unmanaged_self!(
     crate::abi::AddressAbi,
     crate::abi::BigFloatAbi,
     crate::abi::BigIntAbi,
-    crate::abi::DecimalAbi,
-    crate::abi::DecimalSignedAbi,
     crate::abi::EgldOrEsdtTokenIdentifierAbi,
     crate::abi::EllipticCurveAbi,
     crate::abi::EsdtTokenIdentifierAbi,
@@ -72,6 +70,14 @@ unmanaged_self!(
     crate::abi::TokenIdAbi,
     crate::abi::BytesReadToEndAbi,
 );
+
+impl<D: crate::abi::DecimalAbiSpec> HasUnmanaged for crate::abi::DecimalAbi<D> {
+    type Unmanaged = Self;
+}
+
+impl<D: crate::abi::DecimalAbiSpec> HasUnmanaged for crate::abi::DecimalSignedAbi<D> {
+    type Unmanaged = Self;
+}
 
 impl<const DECIMALS: usize> HasUnmanaged for crate::abi::DecimalConstAbi<DECIMALS> {
     type Unmanaged = Self;
