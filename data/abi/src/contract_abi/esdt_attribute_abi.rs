@@ -16,7 +16,7 @@ impl EsdtAttributeAbi {
         T::provide_type_descriptions(&mut type_descriptions);
         EsdtAttributeAbi {
             ticker: arg_name.to_string(),
-            ty: T::type_name(),
+            ty: T::type_names().abi,
             type_descriptions,
         }
     }

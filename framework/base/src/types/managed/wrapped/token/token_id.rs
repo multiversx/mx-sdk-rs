@@ -329,7 +329,7 @@ impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenId<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenId<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for TokenId<M> {
-    type Unmanaged = Self;
+    type Abi = crate::abi::TokenIdAbi;
 
     fn type_name() -> TypeName {
         "TokenId".into()

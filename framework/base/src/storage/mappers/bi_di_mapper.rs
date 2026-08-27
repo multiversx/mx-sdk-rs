@@ -423,7 +423,7 @@ where
 {
 }
 
-impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V, CurrentStorage>
+impl<SA, K, V> crate::types::HasUnmanaged for BiDiMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode
@@ -444,6 +444,29 @@ where
         + TypeAbi,
 {
     type Unmanaged = Self;
+}
+
+impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
+{
+    type Abi = crate::abi::MultiValueListAbi<MultiValue2<K::Abi, V::Abi>>;
 
     fn type_name() -> TypeName {
         MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()

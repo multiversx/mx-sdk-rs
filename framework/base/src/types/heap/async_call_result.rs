@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
@@ -84,8 +84,23 @@ where
 
 impl<T: TypeAbi> TypeAbiFrom<Self> for AsyncCallResult<T> {}
 
+impl<T: AbiType> AbiTypeFrom<Self> for AsyncCallResult<T> {}
+
+impl<T: AbiType> AbiType for AsyncCallResult<T> {
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("AsyncCallResult<");
+        repr.push_str(T::type_name().as_str());
+        repr.push('>');
+        repr
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T::provide_type_descriptions(accumulator);
+    }
+}
+
 impl<T: TypeAbi> TypeAbi for AsyncCallResult<T> {
-    type Unmanaged = Self;
+    type Abi = AsyncCallResult<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("AsyncCallResult<");

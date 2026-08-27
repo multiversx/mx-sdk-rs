@@ -569,11 +569,18 @@ impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> whe
 
 impl<SA> TypeAbiFrom<Self> for NonFungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
-impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
+impl<SA> crate::types::HasUnmanaged for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
     type Unmanaged = Self;
+}
+
+impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    type Abi = crate::abi::EsdtTokenIdentifierAbi;
 
     fn type_name() -> TypeName {
         EsdtTokenIdentifier::<SA>::type_name()

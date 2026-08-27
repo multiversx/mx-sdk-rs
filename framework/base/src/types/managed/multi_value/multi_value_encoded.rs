@@ -368,10 +368,10 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = crate::abi::MultiValueListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        crate::abi::type_name_variadic::<T::Abi>()
     }
 
     fn type_name_rust() -> TypeName {
@@ -391,7 +391,7 @@ impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: TypeAbiFrom<T>,
+    U: TypeAbi + TypeAbiFrom<T>,
 {
 }
 
@@ -399,7 +399,7 @@ impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: TypeAbiFrom<T>,
+    U: TypeAbi + TypeAbiFrom<T>,
 {
 }
 

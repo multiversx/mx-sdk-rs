@@ -361,15 +361,23 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
+impl<SA, T> crate::types::HasUnmanaged for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     type Unmanaged = Self;
+}
+
+impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+{
+    type Abi = crate::abi::MultiValueListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        crate::abi::type_name_variadic::<T::Abi>()
     }
 
     fn type_name_rust() -> TypeName {

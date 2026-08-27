@@ -705,15 +705,23 @@ where
 {
 }
 
-impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
+impl<SA, T> crate::types::HasUnmanaged for LinkedListMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     type Unmanaged = Self;
+}
+
+impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
+{
+    type Abi = crate::abi::MultiValueListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        crate::abi::type_name_variadic::<T::Abi>()
     }
 
     fn type_name_rust() -> TypeName {

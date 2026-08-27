@@ -7,13 +7,19 @@ use multiversx_chain_core::types::{
 };
 
 impl TypeAbiFrom<Self> for H256 {}
+impl AbiTypeFrom<Self> for H256 {}
+impl AbiTypeFrom<H256> for [u8; 32] {}
 
-impl TypeAbi for H256 {
-    type Unmanaged = Self;
-
+impl AbiType for H256 {
     fn type_name() -> TypeName {
         "H256".into()
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for H256 {
+    type Abi = Self;
 
     fn type_name_rust() -> TypeName {
         "H256".into()
@@ -23,11 +29,7 @@ impl TypeAbi for H256 {
 impl TypeAbiFrom<Self> for Address {}
 
 impl TypeAbi for Address {
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        "Address".into()
-    }
+    type Abi = AddressAbi;
 
     fn type_name_rust() -> TypeName {
         "Address".into()
@@ -37,11 +39,7 @@ impl TypeAbi for Address {
 impl TypeAbiFrom<Self> for BoxedBytes {}
 
 impl TypeAbi for BoxedBytes {
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        "bytes".into()
-    }
+    type Abi = BytesAbi;
 
     fn type_name_rust() -> TypeName {
         "BoxedBytes".into()
@@ -49,12 +47,18 @@ impl TypeAbi for BoxedBytes {
 }
 
 impl TypeAbiFrom<Self> for CodeMetadata {}
-impl TypeAbi for CodeMetadata {
-    type Unmanaged = Self;
+impl AbiTypeFrom<Self> for CodeMetadata {}
 
+impl AbiType for CodeMetadata {
     fn type_name() -> TypeName {
         "CodeMetadata".into()
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for CodeMetadata {
+    type Abi = Self;
 
     fn type_name_rust() -> TypeName {
         "CodeMetadata".into()
@@ -62,12 +66,9 @@ impl TypeAbi for CodeMetadata {
 }
 
 impl TypeAbiFrom<Self> for BLSKey {}
-impl TypeAbi for BLSKey {
-    type Unmanaged = Self;
 
-    fn type_name() -> TypeName {
-        <[u8; BLSKey::len()]>::type_name()
-    }
+impl TypeAbi for BLSKey {
+    type Abi = [u8; BLSKey::len()];
 
     fn type_name_rust() -> TypeName {
         "BLSKey".into()
@@ -77,12 +78,9 @@ impl TypeAbi for BLSKey {
 impl TypeAbiFrom<Self> for BLSSignature {}
 impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
 impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
-impl TypeAbi for BLSSignature {
-    type Unmanaged = Self;
 
-    fn type_name() -> TypeName {
-        <[u8; BLSSignature::len()]>::type_name()
-    }
+impl TypeAbi for BLSSignature {
+    type Abi = [u8; BLSSignature::len()];
 
     fn type_name_rust() -> TypeName {
         "BLSSignature".into()
@@ -91,17 +89,21 @@ impl TypeAbi for BLSSignature {
 
 impl TypeAbiFrom<Self> for EsdtTokenType {}
 impl TypeAbiFrom<&Self> for EsdtTokenType {}
+impl AbiTypeFrom<Self> for EsdtTokenType {}
 
 // implementation originally generated via #[type_abi] attribute
-impl TypeAbi for EsdtTokenType {
-    type Unmanaged = Self;
+impl AbiType for EsdtTokenType {
     fn type_name() -> TypeName {
         "EsdtTokenType".into()
     }
 
     #[allow(clippy::vec_init_then_push)]
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        let type_names = Self::type_names();
+        let type_names = TypeNames {
+            abi: <Self as AbiType>::type_name(),
+            rust: "EsdtTokenType".into(),
+            specific: None,
+        };
         if !accumulator.contains_type(&type_names.abi) {
             accumulator.reserve_type_name(type_names.clone());
             let mut variant_descriptions = Vec::new();
@@ -153,20 +155,27 @@ impl TypeAbi for EsdtTokenType {
     }
 }
 
+impl TypeAbi for EsdtTokenType {
+    type Abi = Self;
+}
+
 impl TypeAbiFrom<Self> for EsdtLocalRole {}
 impl TypeAbiFrom<&Self> for EsdtLocalRole {}
+impl AbiTypeFrom<Self> for EsdtLocalRole {}
 
 // implementation originally generated via #[type_abi] attribute
-impl TypeAbi for EsdtLocalRole {
-    type Unmanaged = Self;
-
+impl AbiType for EsdtLocalRole {
     fn type_name() -> TypeName {
         "EsdtLocalRole".into()
     }
 
     #[allow(clippy::vec_init_then_push)]
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        let type_names = Self::type_names();
+        let type_names = TypeNames {
+            abi: <Self as AbiType>::type_name(),
+            rust: "EsdtLocalRole".into(),
+            specific: None,
+        };
         if !accumulator.contains_type(&type_names.abi) {
             accumulator.reserve_type_name(type_names.clone());
             let mut variant_descriptions = Vec::new();
@@ -232,74 +241,98 @@ impl TypeAbi for EsdtLocalRole {
     }
 }
 
+impl TypeAbi for EsdtLocalRole {
+    type Abi = Self;
+}
+
 impl TypeAbiFrom<Self> for DurationMillis {}
+impl AbiTypeFrom<Self> for DurationMillis {}
 
-impl TypeAbi for DurationMillis {
-    type Unmanaged = Self;
-
+impl AbiType for DurationMillis {
     fn type_name() -> TypeName {
         "u64".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "DurationMillis".into()
     }
 
     fn type_name_specific() -> Option<TypeName> {
         Some("DurationMillis".into())
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for DurationMillis {
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        "DurationMillis".into()
+    }
 }
 
 impl TypeAbiFrom<Self> for DurationSeconds {}
+impl AbiTypeFrom<Self> for DurationSeconds {}
 
-impl TypeAbi for DurationSeconds {
-    type Unmanaged = Self;
-
+impl AbiType for DurationSeconds {
     fn type_name() -> TypeName {
         "u64".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "DurationSeconds".into()
     }
 
     fn type_name_specific() -> Option<TypeName> {
         Some("DurationSeconds".into())
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for DurationSeconds {
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        "DurationSeconds".into()
+    }
 }
 
 impl TypeAbiFrom<Self> for TimestampMillis {}
+impl AbiTypeFrom<Self> for TimestampMillis {}
 
-impl TypeAbi for TimestampMillis {
-    type Unmanaged = Self;
-
+impl AbiType for TimestampMillis {
     fn type_name() -> TypeName {
         "u64".into()
-    }
-
-    fn type_name_rust() -> TypeName {
-        "TimestampMillis".into()
     }
 
     fn type_name_specific() -> Option<TypeName> {
         Some("TimestampMillis".into())
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for TimestampMillis {
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        "TimestampMillis".into()
+    }
 }
 
 impl TypeAbiFrom<Self> for TimestampSeconds {}
+impl AbiTypeFrom<Self> for TimestampSeconds {}
 
-impl TypeAbi for TimestampSeconds {
-    type Unmanaged = Self;
-
+impl AbiType for TimestampSeconds {
     fn type_name() -> TypeName {
         "u64".into()
     }
 
-    fn type_name_rust() -> TypeName {
-        "TimestampSeconds".into()
-    }
-
     fn type_name_specific() -> Option<TypeName> {
         Some("TimestampSeconds".into())
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+}
+
+impl TypeAbi for TimestampSeconds {
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        "TimestampSeconds".into()
     }
 }

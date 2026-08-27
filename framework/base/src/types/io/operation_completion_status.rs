@@ -4,8 +4,8 @@ use multiversx_sc_codec::{
 
 use crate::{
     abi::{
-        ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents, TypeDescription,
-        TypeDescriptionContainer, TypeName,
+        AbiType, AbiTypeFrom, ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents,
+        TypeDescription, TypeDescriptionContainer, TypeName,
     },
     api::ManagedTypeApi,
     codec::EncodeErrorHandler,
@@ -76,22 +76,18 @@ impl TopDecode for OperationCompletionStatus {
 impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
 impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
 impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+impl AbiTypeFrom<OperationCompletionStatus> for crate::abi::BytesAbi {}
 
 impl TypeAbiFrom<Self> for OperationCompletionStatus {}
+impl AbiTypeFrom<Self> for OperationCompletionStatus {}
 
-impl TypeAbi for OperationCompletionStatus {
-    type Unmanaged = Self;
-
+impl AbiType for OperationCompletionStatus {
     fn type_name() -> TypeName {
         TypeName::from("OperationCompletionStatus")
     }
 
-    fn type_name_rust() -> TypeName {
-        TypeName::from("OperationCompletionStatus")
-    }
-
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        let type_names = Self::type_names();
+        let type_names = <Self as TypeAbi>::type_names();
 
         accumulator.insert(
             type_names,
@@ -111,6 +107,14 @@ impl TypeAbi for OperationCompletionStatus {
                 macro_attributes: Vec::new()
             },
         );
+    }
+}
+
+impl TypeAbi for OperationCompletionStatus {
+    type Abi = Self;
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("OperationCompletionStatus")
     }
 }
 

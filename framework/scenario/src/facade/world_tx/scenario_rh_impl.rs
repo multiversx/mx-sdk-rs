@@ -1,9 +1,9 @@
 use multiversx_sc::{
-    abi::{TypeAbi, TypeAbiFrom},
+    abi::{AbiTypeFrom, TypeAbi},
     codec::TopDecodeMulti,
     tuple_util::NestedTupleFlatten,
     types::{
-        ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
+        HasUnmanaged, ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
         ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
         ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
         WithNewAddress, WithResultAs,
@@ -31,7 +31,9 @@ where
 impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    T: TopDecodeMulti + TypeAbiFrom<Original>,
+    Original: TypeAbi,
+    T: TopDecodeMulti + TypeAbi,
+    T::Abi: AbiTypeFrom<Original::Abi>,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<T>::from_raw(tx_response);
@@ -44,7 +46,7 @@ where
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResultUnmanaged
 where
     Env: TxEnv,
-    Original: TypeAbi,
+    Original: HasUnmanaged,
     Original::Unmanaged: TopDecodeMulti,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
@@ -58,7 +60,9 @@ where
 impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultAs<T, F>
 where
     Env: TxEnv,
-    T: TopDecodeMulti + TypeAbiFrom<Original>,
+    Original: TypeAbi,
+    T: TopDecodeMulti + TypeAbi,
+    T::Abi: AbiTypeFrom<Original::Abi>,
     F: FnOnce(T),
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {

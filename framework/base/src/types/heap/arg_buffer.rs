@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbiFrom, TypeName},
+    abi::{ListAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::TopEncodeOutput,
     proxy_imports::TypeAbi,
@@ -116,7 +116,7 @@ impl Clone for ArgBuffer {
 impl TypeAbiFrom<Self> for ArgBuffer {}
 
 impl TypeAbi for ArgBuffer {
-    type Unmanaged = Self;
+    type Abi = ListAbi<ListAbi<u8>>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {

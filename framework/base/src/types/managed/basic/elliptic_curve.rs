@@ -471,7 +471,7 @@ impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
 impl<M> TypeAbiFrom<Self> for EllipticCurve<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
-    type Unmanaged = Self;
+    type Abi = crate::abi::EllipticCurveAbi;
 
     fn type_name() -> TypeName {
         TypeName::from("EllipticCurve")

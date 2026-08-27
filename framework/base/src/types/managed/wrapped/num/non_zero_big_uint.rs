@@ -225,7 +225,7 @@ impl<M> TypeAbiFrom<Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for NonZeroBigUint<M> {
-    type Unmanaged = Self;
+    type Abi = crate::abi::NonZeroBigUintAbi;
 
     fn type_name() -> TypeName {
         TypeName::from("NonZeroBigUint")

@@ -216,7 +216,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi + MultiValueConstLength,
 {
-    type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = crate::abi::CountedVariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");
@@ -242,7 +242,7 @@ impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncodedCounted<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: TypeAbiFrom<T> + MultiValueConstLength,
+    U: TypeAbi + TypeAbiFrom<T> + MultiValueConstLength,
 {
 }
 
@@ -250,7 +250,7 @@ impl<M, T, U> TypeAbiFrom<MultiValueEncodedCounted<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti + MultiValueConstLength,
-    U: TypeAbiFrom<T>,
+    U: TypeAbi + TypeAbiFrom<T>,
 {
 }
 

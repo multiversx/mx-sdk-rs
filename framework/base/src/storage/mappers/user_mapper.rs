@@ -328,14 +328,21 @@ impl<SA> TypeAbiFrom<UserMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, M
 impl<SA> TypeAbiFrom<Self> for UserMapper<SA, CurrentStorage> where SA: StorageMapperApi {}
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
+impl<SA> crate::types::HasUnmanaged for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
     type Unmanaged = Self;
+}
+
+impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
+where
+    SA: StorageMapperApi,
+{
+    type Abi = crate::abi::MultiValueListAbi<crate::abi::AddressAbi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
+        crate::abi::type_name_variadic::<crate::abi::AddressAbi>()
     }
 
     fn type_name_rust() -> TypeName {

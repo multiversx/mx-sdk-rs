@@ -97,7 +97,7 @@ where
 impl<T: TypeAbi, E> TypeAbiFrom<Self> for SCResult<T, E> {}
 
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
-    type Unmanaged = Self;
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
         T::type_name()

@@ -183,12 +183,20 @@ where
 {
 }
 
+impl<SA, T> crate::types::HasUnmanaged for TimelockMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + TypeAbi + crate::types::HasUnmanaged,
+{
+    type Unmanaged = T::Unmanaged;
+}
+
 impl<SA, T> TypeAbi for TimelockMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
-    type Unmanaged = T::Unmanaged;
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
         T::type_name()

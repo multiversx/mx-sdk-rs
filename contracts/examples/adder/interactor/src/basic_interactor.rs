@@ -2,7 +2,7 @@ mod basic_interactor_cli;
 mod basic_interactor_config;
 mod basic_interactor_state;
 
-use adder::adder_proxy;
+use adder::adder_abi;
 pub use basic_interactor_config::Config;
 use basic_interactor_state::State;
 use clap::Parser;
@@ -81,7 +81,7 @@ impl BasicInteractor {
             .id("interactor deploy")
             .from(&self.adder_owner_address.clone())
             .gas(100_000_000)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(adder_abi::AdderAbiProxy)
             .init(0u64)
             .code(ADDER_CODE_PATH)
             .returns(ReturnsNewBech32Address)
@@ -99,7 +99,7 @@ impl BasicInteractor {
             .from(sender)
             .to(self.state.current_adder_address())
             .gas(6_000_000)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(adder_abi::AdderAbiProxy)
             .upgrade(new_value)
             .code(ADDER_CODE_PATH)
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -125,7 +125,7 @@ impl BasicInteractor {
             .from(&self.wallet_address)
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(adder_abi::AdderAbiProxy)
             .add(value)
             .run()
             .await;
@@ -137,7 +137,7 @@ impl BasicInteractor {
         self.interactor
             .query()
             .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(adder_abi::AdderAbiProxy)
             .sum()
             .returns(ReturnsResultUnmanaged)
             .run()

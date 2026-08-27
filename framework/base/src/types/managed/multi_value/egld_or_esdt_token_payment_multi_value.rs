@@ -102,7 +102,7 @@ impl<M> TypeAbi for EgldOrEsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = Self;
+    type Abi = MultiValue3<crate::abi::EgldOrEsdtTokenIdentifierAbi, u64, crate::abi::BigUintAbi>;
 
     fn type_name() -> TypeName {
         MultiValue3::<EsdtTokenIdentifier<M>, u64, BigUint<M>>::type_name()

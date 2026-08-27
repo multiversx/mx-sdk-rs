@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+    AbiType, AbiTypeFrom, OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
@@ -13,18 +13,10 @@ where
 }
 
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
-    type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
-
-    fn type_name() -> TypeName {
-        super::type_name_variadic::<T>()
-    }
+    type Abi = crate::MultiValueListAbi<T::Abi>;
 
     fn type_name_rust() -> TypeName {
         format!("MultiValueVec<{}>", T::type_name_rust())
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        T::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {
@@ -33,13 +25,22 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
 }
 
 impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
+impl AbiTypeFrom<Self> for IgnoreValue {}
 
-impl TypeAbi for IgnoreValue {
-    type Unmanaged = Self;
-
+impl AbiType for IgnoreValue {
     fn type_name() -> TypeName {
         TypeName::from("ignore")
     }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
+
+    fn is_variadic() -> bool {
+        true
+    }
+}
+
+impl TypeAbi for IgnoreValue {
+    type Abi = Self;
 
     fn type_name_rust() -> TypeName {
         "IgnoreValue".into()
@@ -55,20 +56,33 @@ impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFr
 // IgnoreValue -> OptionalValue::None
 // It makes it easier with
 impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
+impl<T, U> AbiTypeFrom<OptionalValue<U>> for OptionalValue<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
+impl<T: AbiType> AbiTypeFrom<IgnoreValue> for OptionalValue<T> {}
 
-impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
-    type Unmanaged = OptionalValue<T::Unmanaged>;
-
+impl<T: AbiType> AbiType for OptionalValue<T> {
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()
     }
 
-    fn type_name_rust() -> TypeName {
-        format!("OptionalValue<{}>", T::type_name_rust())
-    }
-
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
+    }
+
+    fn is_variadic() -> bool {
+        true
+    }
+}
+
+impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
+    type Abi = OptionalValue<T::Abi>;
+
+    fn type_name_rust() -> TypeName {
+        format!("OptionalValue<{}>", T::type_name_rust())
     }
 
     fn is_variadic() -> bool {
@@ -84,12 +98,16 @@ macro_rules! multi_arg_impls {
                 $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
+            impl<$($t, $u),+> AbiTypeFrom<crate::codec::multi_types::$mval_struct<$($u,)+>> for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
-                $($t: TypeAbi,)+
-            {
-                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
+                $($t: AbiTypeFrom<$u>,)+
+                $($u: AbiType,)+
+            {}
 
+            impl<$($t),+> AbiType for crate::codec::multi_types::$mval_struct<$($t,)+>
+            where
+                $($t: AbiType,)+
+            {
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");
                     repr.push('<');
@@ -103,6 +121,23 @@ macro_rules! multi_arg_impls {
                     repr
                 }
 
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+                    $(
+                        $t::provide_type_descriptions(accumulator);
+                    )+
+                }
+
+                fn is_variadic() -> bool {
+                    true
+                }
+            }
+
+            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
+            where
+                $($t: TypeAbi,)+
+            {
+                type Abi = crate::codec::multi_types::$mval_struct<$($t::Abi,)+>;
+
                 fn type_name_rust() -> TypeName {
                     let mut repr = TypeName::from(stringify!($mval_struct));
                     repr.push('<');
@@ -114,12 +149,6 @@ macro_rules! multi_arg_impls {
                     )+
                     repr.push('>');
                     repr
-                }
-
-                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    $(
-                        $t::provide_type_descriptions(accumulator);
-                    )+
                 }
 
                 fn is_variadic() -> bool {
@@ -140,6 +169,8 @@ macro_rules! multi_arg_impls {
                     result
                 }
             }
+
+
         )+
     }
 }
