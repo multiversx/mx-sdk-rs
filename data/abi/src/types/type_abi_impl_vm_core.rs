@@ -66,18 +66,9 @@ impl TypeAbi for CodeMetadata {
 }
 
 impl TypeAbiFrom<Self> for BLSKey {}
-impl AbiTypeFrom<Self> for BLSKey {}
-
-impl AbiType for BLSKey {
-    fn type_name() -> TypeName {
-        <[u8; BLSKey::len()] as AbiType>::type_name()
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
-}
 
 impl TypeAbi for BLSKey {
-    type Abi = Self;
+    type Abi = [u8; BLSKey::len()];
 
     fn type_name_rust() -> TypeName {
         "BLSKey".into()
@@ -87,20 +78,9 @@ impl TypeAbi for BLSKey {
 impl TypeAbiFrom<Self> for BLSSignature {}
 impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
 impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
-impl AbiTypeFrom<Self> for BLSSignature {}
-impl AbiTypeFrom<[u8; BLSSignature::len()]> for BLSSignature {}
-impl AbiTypeFrom<BLSSignature> for [u8; BLSSignature::len()] {}
-
-impl AbiType for BLSSignature {
-    fn type_name() -> TypeName {
-        <[u8; BLSSignature::len()] as AbiType>::type_name()
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
-}
 
 impl TypeAbi for BLSSignature {
-    type Abi = Self;
+    type Abi = [u8; BLSSignature::len()];
 
     fn type_name_rust() -> TypeName {
         "BLSSignature".into()

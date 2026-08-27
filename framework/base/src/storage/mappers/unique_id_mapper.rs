@@ -288,10 +288,10 @@ impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Abi = crate::codec::multi_types::MultiValueVec<usize>;
+    type Abi = crate::abi::MultiValueListAbi<<usize as TypeAbi>::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<usize>()
+        crate::abi::type_name_variadic::<<usize as TypeAbi>::Abi>()
     }
 
     fn type_name_rust() -> TypeName {

@@ -625,7 +625,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
-    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
+    type Abi = crate::abi::MultiValueListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T::Abi>()

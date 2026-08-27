@@ -279,7 +279,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Abi = MultiValueVec<T::Abi>;
+    type Abi = crate::abi::MultiValueListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T::Abi>()

@@ -11,7 +11,6 @@ impl AbiTypeFrom<Self> for BigIntAbi {}
 impl AbiTypeFrom<i8> for BigIntAbi {}
 impl AbiTypeFrom<i16> for BigIntAbi {}
 impl AbiTypeFrom<i32> for BigIntAbi {}
-impl AbiTypeFrom<isize> for BigIntAbi {}
 impl AbiTypeFrom<i64> for BigIntAbi {}
 
 impl AbiType for BigIntAbi {

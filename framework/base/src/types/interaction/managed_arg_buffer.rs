@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{ListAbi, TypeAbi, TypeAbiFrom, TypeName},
     api::{ErrorApi, ManagedTypeApi, ManagedTypeApiImpl, use_raw_handle},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -361,7 +361,7 @@ impl<M> TypeAbi for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type Abi = Vec<Vec<u8>>;
+    type Abi = ListAbi<ListAbi<u8>>;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {

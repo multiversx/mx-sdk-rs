@@ -107,15 +107,20 @@ impl<T: AbiType> AbiType for ListAbi<T> {
     fn type_name() -> TypeName { /* "List<T>" or "bytes" */ }
     // ...
 }
-impl<T: TypeAbi> TypeAbi for ListAbi<T> {
-    type Abi = ListAbi<T::Abi>; // propagates ABI type through the container
-    fn type_name_rust() -> TypeName { /* */ }
+impl<T: AbiType> TypeAbi for ListAbi<T> {
+    type Abi = Self;
 }
 ```
 
+`Vec<T>`, `&[T]`, `Box<[T]>`, and `ArrayVec<T, CAP>` all use `ListAbi<T::Abi>`.
+`String`, `&'static str`, and `Box<str>` all use `StringAbi`. Ordinary variadic
+containers use `VariadicAbi<T::Abi>`.
+
 ### B. Primitives and standard types (`type_abi_impl_basic.rs`)
 
-`u8`…`i128`, `bool`, `()`, `String`, `&'static str`, `Box<str>`, arrays, tuples, `Vec<T>`, `Option<T>`.
+Primitive ABI owners, `()`, arrays, tuples, and `Option<T>` implement `AbiType`.
+Concrete representation types use their shared descriptors instead: strings use `StringAbi`,
+lists use `ListAbi<T>`, `usize` uses `u32`, and `isize` uses `i32`.
 
 ```rust
 impl AbiType for u32 { fn type_name() -> TypeName { "u32".into() } }
@@ -132,7 +137,8 @@ impl<T: TypeAbi> TypeAbi for &T {
 
 ### C. VM-core types (`type_abi_impl_vm_core.rs`)
 
-`H256`, `BoxedBytes`, `CodeMetadata`, etc. are framework-agnostic and implement `AbiType` themselves.  
+Self-describing VM-core types such as `H256` and `CodeMetadata` implement `AbiType` themselves.
+`BoxedBytes` uses `BytesAbi`; `BLSKey` and `BLSSignature` use their fixed byte-array ABI types.
 `Address` keeps `type Abi = AddressAbi` (separate ABI marker already exists).
 
 ### D. Managed framework types (`framework/base/src/**`)
@@ -159,8 +165,8 @@ impl<M: ManagedTypeApi> HasUnmanaged for BigUint<M> {
 | `types/type_abi.rs` | Add `AbiType` trait; modify `TypeAbi` (remove `Unmanaged`, `type_name`, update `type_names`) |
 | `types/type_abi_from.rs` | Add `AbiTypeFrom<Source: AbiType>`; keep `TypeAbiFrom` for compat |
 | `framework/base/src/types/has_unmanaged.rs` | Define `HasUnmanaged` and compatibility mappings |
-| `types/pure_abi/*.rs` (15 files) | Add `AbiType` impl; update `TypeAbi` |
-| `types/type_abi_impl_basic.rs` | Add `AbiType` impls; update `TypeAbi`; fix `&T` to use `Abi = T::Abi` |
+| `types/pure_abi/*.rs` | Define canonical ABI descriptors, including lists, strings, and variadics |
+| `types/type_abi_impl_basic.rs` | Map concrete standard representations to shared ABI descriptors |
 | `types/type_abi_impl_vm_core.rs` | Add `AbiType` for self-describing types; update `TypeAbi` |
 | `types/type_abi_impl_codec_multi.rs` | Update `TypeAbi` |
 | `types/type_abi_impl_big_int.rs` | Update `TypeAbi` |
@@ -173,6 +179,5 @@ impl<M: ManagedTypeApi> HasUnmanaged for BigUint<M> {
 
 ## Open Questions
 
-- **`Box<T>` ABI type**: currently `type Abi = Box<T::Abi>`. Since `Box` is transparent at ABI level, consider simplifying to `type Abi = T::Abi`. Same question for all transparent container wrappers.
 - **Cross-type `TypeAbiFrom` migration**: managed→ABI edges like `impl TypeAbiFrom<u64> for BigUint<M>` become `impl AbiTypeFrom<u64> for BigUintAbi`. Audit all cross-type edges during migration.
 - **`ProxyArg<O>` update**: once `AbiTypeFrom` is stable, `O: TypeAbiFrom<T>` becomes `O: AbiTypeFrom<T::Abi>`.

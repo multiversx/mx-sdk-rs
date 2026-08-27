@@ -1,4 +1,4 @@
-use multiversx_sc_abi::{BytesAbi, ListAbi};
+use multiversx_sc_abi::BytesAbi;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},

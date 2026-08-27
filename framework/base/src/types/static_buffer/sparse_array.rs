@@ -307,7 +307,7 @@ impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
-    type Abi = crate::abi::ListAbi<usize>;
+    type Abi = crate::abi::ListAbi<u32>;
 
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {

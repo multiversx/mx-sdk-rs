@@ -633,7 +633,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,
     V: TopEncode + TopDecode + TypeAbi + 'static,
 {
-    type Abi = crate::codec::multi_types::MultiValueVec<MultiValue2<K::Abi, V::Abi>>;
+    type Abi = crate::abi::MultiValueListAbi<MultiValue2<K::Abi, V::Abi>>;
 
     fn type_name() -> TypeName {
         MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()

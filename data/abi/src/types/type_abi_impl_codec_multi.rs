@@ -12,30 +12,8 @@ where
 {
 }
 
-impl<T, U> AbiTypeFrom<crate::codec::multi_types::MultiValueVec<U>>
-    for crate::codec::multi_types::MultiValueVec<T>
-where
-    T: AbiTypeFrom<U>,
-    U: AbiType,
-{
-}
-
-impl<T: AbiType> AbiType for crate::codec::multi_types::MultiValueVec<T> {
-    fn type_name() -> TypeName {
-        super::type_name_variadic::<T>()
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        T::provide_type_descriptions(accumulator);
-    }
-
-    fn is_variadic() -> bool {
-        true
-    }
-}
-
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
-    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
+    type Abi = crate::MultiValueListAbi<T::Abi>;
 
     fn type_name_rust() -> TypeName {
         format!("MultiValueVec<{}>", T::type_name_rust())

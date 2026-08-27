@@ -339,7 +339,7 @@ impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Abi = crate::codec::multi_types::MultiValueVec<crate::abi::AddressAbi>;
+    type Abi = crate::abi::MultiValueListAbi<crate::abi::AddressAbi>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<crate::abi::AddressAbi>()

@@ -1,4 +1,6 @@
-use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
+use crate::{
+    AbiType, AbiTypeFrom, BytesAbi, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+};
 
 /// Pure ABI counterpart of `EsdtTokenIdentifier<M>` (a.k.a. `TokenIdentifier<M>`).
 ///
@@ -8,7 +10,7 @@ use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer
 pub struct EsdtTokenIdentifierAbi;
 
 impl AbiTypeFrom<Self> for EsdtTokenIdentifierAbi {}
-impl AbiTypeFrom<alloc::vec::Vec<u8>> for EsdtTokenIdentifierAbi {}
+impl AbiTypeFrom<BytesAbi> for EsdtTokenIdentifierAbi {}
 
 impl AbiType for EsdtTokenIdentifierAbi {
     fn type_name() -> TypeName {

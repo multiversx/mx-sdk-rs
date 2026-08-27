@@ -68,6 +68,7 @@ unmanaged_self!(
     crate::abi::NonZeroBigUintAbi,
     crate::abi::PaymentAbi,
     crate::abi::SignAbi,
+    crate::abi::StringAbi,
     crate::abi::TokenIdAbi,
     crate::abi::BytesReadToEndAbi,
 );
@@ -81,6 +82,10 @@ impl<const DECIMALS: usize> HasUnmanaged for crate::abi::DecimalSignedConstAbi<D
 }
 
 impl<T: crate::abi::AbiType> HasUnmanaged for crate::abi::ListAbi<T> {
+    type Unmanaged = Self;
+}
+
+impl<T: crate::abi::AbiType> HasUnmanaged for crate::abi::MultiValueListAbi<T> {
     type Unmanaged = Self;
 }
 

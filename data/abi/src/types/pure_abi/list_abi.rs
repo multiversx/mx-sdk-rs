@@ -9,16 +9,7 @@ where
 
 pub type BytesAbi = ListAbi<u8>;
 
-impl<T> AbiTypeFrom<Self> for ListAbi<T> where T: AbiType {}
-
-impl<T, U> AbiTypeFrom<alloc::vec::Vec<U>> for ListAbi<T>
-where
-    T: AbiTypeFrom<U>,
-    U: AbiType,
-{
-}
-
-impl<T, U> AbiTypeFrom<alloc::boxed::Box<[U]>> for ListAbi<T>
+impl<T, U> AbiTypeFrom<ListAbi<U>> for ListAbi<T>
 where
     T: AbiTypeFrom<U>,
     U: AbiType,
@@ -31,9 +22,6 @@ where
     U: AbiType,
 {
 }
-
-impl AbiTypeFrom<alloc::string::String> for BytesAbi {}
-impl AbiTypeFrom<BytesAbi> for alloc::string::String {}
 
 impl<T> AbiType for ListAbi<T>
 where
