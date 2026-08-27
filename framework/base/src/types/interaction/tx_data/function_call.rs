@@ -136,10 +136,10 @@ impl<Api> TypeAbi for FunctionCall<Api>
 where
     Api: ManagedTypeApi,
 {
-    type Abi = crate::codec::multi_types::MultiValueVec<crate::abi::ListAbi<u8>>;
+    type Abi = crate::codec::multi_types::MultiValueVec<crate::abi::BytesAbi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<crate::abi::ListAbi<u8>>()
+        crate::abi::type_name_variadic::<crate::abi::BytesAbi>()
     }
 
     fn type_name_rust() -> TypeName {

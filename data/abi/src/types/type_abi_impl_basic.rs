@@ -12,7 +12,7 @@ impl AbiTypeFrom<Self> for () {}
 
 impl AbiType for () {
     fn type_name() -> TypeName {
-        TypeName::from("void")
+        TypeName::from("()")
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
@@ -39,7 +39,12 @@ impl<T: TypeAbi> TypeAbi for &T {
 }
 
 impl<T, U> TypeAbiFrom<Box<U>> for Box<T> where T: TypeAbiFrom<U> {}
-impl<T: AbiType> AbiTypeFrom<Self> for Box<T> {}
+impl<T, U> AbiTypeFrom<Box<U>> for Box<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
 
 impl<T: AbiType> AbiType for Box<T> {
     fn type_name() -> TypeName {
@@ -91,8 +96,20 @@ impl<T: TypeAbi> TypeAbi for &[T] {
     }
 }
 
-impl<T, U> TypeAbiFrom<Vec<T>> for Vec<U> where T: TypeAbiFrom<U> {}
-impl<T: AbiType> AbiTypeFrom<Self> for Vec<T> {}
+impl<T, U> TypeAbiFrom<Vec<U>> for Vec<T> where T: TypeAbiFrom<U> {}
+impl<T, U> AbiTypeFrom<Vec<U>> for Vec<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
+
+impl<T, U> AbiTypeFrom<ListAbi<U>> for Vec<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     type Abi = Vec<T::Abi>;
@@ -163,6 +180,8 @@ impl TypeAbiFrom<&String> for String {}
 impl TypeAbiFrom<&str> for String {}
 impl TypeAbiFrom<Box<str>> for String {}
 impl AbiTypeFrom<Self> for String {}
+impl AbiTypeFrom<&'static str> for String {}
+impl AbiTypeFrom<Box<str>> for String {}
 
 impl AbiType for String {
     fn type_name() -> TypeName {
@@ -199,6 +218,7 @@ impl TypeAbiFrom<Box<str>> for Box<str> {}
 impl TypeAbiFrom<&str> for Box<str> {}
 impl TypeAbiFrom<String> for Box<str> {}
 impl AbiTypeFrom<Self> for Box<str> {}
+impl AbiTypeFrom<String> for Box<str> {}
 
 impl AbiType for Box<str> {
     fn type_name() -> TypeName {
@@ -321,7 +341,12 @@ impl TypeAbiFrom<i8> for i16 {}
 impl AbiTypeFrom<i8> for i16 {}
 
 impl<T, U> TypeAbiFrom<Option<U>> for Option<T> where T: TypeAbiFrom<U> {}
-impl<T: AbiType> AbiTypeFrom<Self> for Option<T> {}
+impl<T, U> AbiTypeFrom<Option<U>> for Option<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
 
 impl<T: AbiType> AbiType for Option<T> {
     fn type_name() -> TypeName {
@@ -454,7 +479,12 @@ tuple_impls! {
 }
 
 impl<T, U, const N: usize> TypeAbiFrom<[U; N]> for [T; N] where T: TypeAbiFrom<U> {}
-impl<T: AbiType, const N: usize> AbiTypeFrom<Self> for [T; N] {}
+impl<T, U, const N: usize> AbiTypeFrom<[U; N]> for [T; N]
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
 
 impl<T: AbiType, const N: usize> AbiType for [T; N] {
     fn type_name() -> TypeName {

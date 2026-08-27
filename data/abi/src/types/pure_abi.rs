@@ -25,7 +25,7 @@ pub use egld_or_esdt_token_identifier_abi::EgldOrEsdtTokenIdentifierAbi;
 pub use elliptic_curve_abi::EllipticCurveAbi;
 pub use esdt_token_identifier_abi::EsdtTokenIdentifierAbi;
 pub use fungible_payment_abi::FungiblePaymentAbi;
-pub use list_abi::ListAbi;
+pub use list_abi::{ListAbi, BytesAbi};
 pub use non_zero_big_uint_abi::NonZeroBigUintAbi;
 pub use payment_abi::PaymentAbi;
 pub use sign_abi::SignAbi;

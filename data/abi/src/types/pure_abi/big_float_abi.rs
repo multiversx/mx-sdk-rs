@@ -8,6 +8,7 @@ use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer
 pub struct BigFloatAbi;
 
 impl AbiTypeFrom<Self> for BigFloatAbi {}
+impl AbiTypeFrom<BigFloatAbi> for f64 {}
 
 impl AbiType for BigFloatAbi {
     fn type_name() -> TypeName {

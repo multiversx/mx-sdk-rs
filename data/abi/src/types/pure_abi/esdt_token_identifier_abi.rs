@@ -8,6 +8,7 @@ use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer
 pub struct EsdtTokenIdentifierAbi;
 
 impl AbiTypeFrom<Self> for EsdtTokenIdentifierAbi {}
+impl AbiTypeFrom<alloc::vec::Vec<u8>> for EsdtTokenIdentifierAbi {}
 
 impl AbiType for EsdtTokenIdentifierAbi {
     fn type_name() -> TypeName {

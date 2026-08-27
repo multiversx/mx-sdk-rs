@@ -8,6 +8,7 @@ use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer
 pub struct AddressAbi;
 
 impl AbiTypeFrom<Self> for AddressAbi {}
+impl AbiTypeFrom<[u8; 32]> for AddressAbi {}
 
 impl AbiType for AddressAbi {
     fn type_name() -> TypeName {

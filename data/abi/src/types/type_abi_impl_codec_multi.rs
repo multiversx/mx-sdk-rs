@@ -12,7 +12,13 @@ where
 {
 }
 
-impl<T: AbiType> AbiTypeFrom<Self> for crate::codec::multi_types::MultiValueVec<T> {}
+impl<T, U> AbiTypeFrom<crate::codec::multi_types::MultiValueVec<U>>
+    for crate::codec::multi_types::MultiValueVec<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
 
 impl<T: AbiType> AbiType for crate::codec::multi_types::MultiValueVec<T> {
     fn type_name() -> TypeName {
@@ -72,7 +78,13 @@ impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFr
 // IgnoreValue -> OptionalValue::None
 // It makes it easier with
 impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
-impl<T: AbiType> AbiTypeFrom<Self> for OptionalValue<T> {}
+impl<T, U> AbiTypeFrom<OptionalValue<U>> for OptionalValue<T>
+where
+    T: AbiTypeFrom<U>,
+    U: AbiType,
+{
+}
+impl<T: AbiType> AbiTypeFrom<IgnoreValue> for OptionalValue<T> {}
 
 impl<T: AbiType> AbiType for OptionalValue<T> {
     fn type_name() -> TypeName {
@@ -108,9 +120,10 @@ macro_rules! multi_arg_impls {
                 $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($t),+> AbiTypeFrom<Self> for crate::codec::multi_types::$mval_struct<$($t,)+>
+            impl<$($t, $u),+> AbiTypeFrom<crate::codec::multi_types::$mval_struct<$($u,)+>> for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
-                $($t: AbiType,)+
+                $($t: AbiTypeFrom<$u>,)+
+                $($u: AbiType,)+
             {}
 
             impl<$($t),+> AbiType for crate::codec::multi_types::$mval_struct<$($t,)+>

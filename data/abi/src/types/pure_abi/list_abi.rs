@@ -7,6 +7,8 @@ where
     _phantom: core::marker::PhantomData<T>,
 }
 
+pub type BytesAbi = ListAbi<u8>;
+
 impl<T> AbiTypeFrom<Self> for ListAbi<T> where T: AbiType {}
 
 impl<T, U> AbiTypeFrom<alloc::vec::Vec<U>> for ListAbi<T>
@@ -29,6 +31,9 @@ where
     U: AbiType,
 {
 }
+
+impl AbiTypeFrom<alloc::string::String> for BytesAbi {}
+impl AbiTypeFrom<BytesAbi> for alloc::string::String {}
 
 impl<T> AbiType for ListAbi<T>
 where

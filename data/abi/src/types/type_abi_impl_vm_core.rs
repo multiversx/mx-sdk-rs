@@ -8,6 +8,7 @@ use multiversx_chain_core::types::{
 
 impl TypeAbiFrom<Self> for H256 {}
 impl AbiTypeFrom<Self> for H256 {}
+impl AbiTypeFrom<H256> for [u8; 32] {}
 
 impl AbiType for H256 {
     fn type_name() -> TypeName {
@@ -36,18 +37,9 @@ impl TypeAbi for Address {
 }
 
 impl TypeAbiFrom<Self> for BoxedBytes {}
-impl AbiTypeFrom<Self> for BoxedBytes {}
-
-impl AbiType for BoxedBytes {
-    fn type_name() -> TypeName {
-        "bytes".into()
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(_: &mut TDC) {}
-}
 
 impl TypeAbi for BoxedBytes {
-    type Abi = Self;
+    type Abi = BytesAbi;
 
     fn type_name_rust() -> TypeName {
         "BoxedBytes".into()
@@ -96,6 +88,8 @@ impl TypeAbiFrom<Self> for BLSSignature {}
 impl TypeAbiFrom<[u8; BLSSignature::len()]> for BLSSignature {}
 impl TypeAbiFrom<BLSSignature> for [u8; BLSSignature::len()] {}
 impl AbiTypeFrom<Self> for BLSSignature {}
+impl AbiTypeFrom<[u8; BLSSignature::len()]> for BLSSignature {}
+impl AbiTypeFrom<BLSSignature> for [u8; BLSSignature::len()] {}
 
 impl AbiType for BLSSignature {
     fn type_name() -> TypeName {

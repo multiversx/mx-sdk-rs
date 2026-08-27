@@ -9,6 +9,7 @@ use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer
 pub struct EgldOrEsdtTokenIdentifierAbi;
 
 impl AbiTypeFrom<Self> for EgldOrEsdtTokenIdentifierAbi {}
+impl AbiTypeFrom<crate::EsdtTokenIdentifierAbi> for EgldOrEsdtTokenIdentifierAbi {}
 
 impl AbiType for EgldOrEsdtTokenIdentifierAbi {
     fn type_name() -> TypeName {

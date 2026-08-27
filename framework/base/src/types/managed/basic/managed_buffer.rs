@@ -1,4 +1,4 @@
-use multiversx_sc_abi::ListAbi;
+use multiversx_sc_abi::{BytesAbi, ListAbi};
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
@@ -548,7 +548,7 @@ impl<M> TypeAbiFrom<Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for ManagedBuffer<M> {
-    type Abi = ListAbi<u8>;
+    type Abi = BytesAbi;
 
     fn type_name() -> TypeName {
         "bytes".into()

@@ -300,6 +300,19 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
+impl<T> TypeAbiFrom<Self> for SingleValue<T> where T: TopDecode + TypeAbi {}
+
+impl<T> TypeAbi for SingleValue<T>
+where
+    T: TopDecode + TypeAbi,
+{
+    type Abi = T::Abi;
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+}
+
 impl<SA, T, R> TypeAbiFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
 where
     SA: StorageMapperApi,

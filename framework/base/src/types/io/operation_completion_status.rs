@@ -76,6 +76,9 @@ impl TopDecode for OperationCompletionStatus {
 impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
 impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
 impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+impl AbiTypeFrom<OperationCompletionStatus> for crate::abi::BytesAbi {}
+impl AbiTypeFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
+impl AbiTypeFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 
 impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 impl AbiTypeFrom<Self> for OperationCompletionStatus {}

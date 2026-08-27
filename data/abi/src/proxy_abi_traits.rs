@@ -1,6 +1,6 @@
 use multiversx_sc_codec::TopEncodeMulti;
 
-use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom};
+use crate::{AbiTypeFrom, TypeAbi, TypeAbiFrom};
 
 /// Trait that is automatically implemented for all types that are allowed as proxy inputs.
 ///
