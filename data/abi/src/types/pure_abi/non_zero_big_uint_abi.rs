@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `NonZeroBigUint<M>`.
 ///
@@ -27,9 +25,4 @@ impl TypeAbi for NonZeroBigUintAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("NonZeroBigUintAbi")
     }
-}
-
-#[cfg(feature = "num-bigint")]
-impl HasUnmanaged for NonZeroBigUintAbi {
-    type Unmanaged = crate::codec::num_bigint::BigUint;
 }

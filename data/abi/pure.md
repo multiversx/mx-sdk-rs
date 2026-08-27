@@ -43,17 +43,18 @@ impl AbiTypeFrom<u16> for BigUintAbi {}
 
 The old `TypeAbiFrom<T>` is kept for backward compatibility; its cross-type impls migrate here.
 
-### 3. `HasUnmanaged` — optional default concrete type
+### 3. `HasUnmanaged` — framework result compatibility
 
 ```rust
-/// A pure ABI type that has a known default concrete Rust implementation.
-/// Not implemented when the concrete type is feature-gated or unavailable.
-pub trait HasUnmanaged: AbiType {
-    type Unmanaged: TypeAbi;
+/// The historical concrete result type used by `ReturnsResultUnmanaged`.
+pub trait HasUnmanaged: TypeAbi {
+    type Unmanaged;
 }
 ```
 
-`ReturnsResultUnmanaged` is updated to bound `Original: AbiType + HasUnmanaged`.
+This trait lives in `framework/base`, next to its only consumer. It is implemented on concrete
+`TypeAbi` types so that old mappings remain intact. Despite the name, `Unmanaged` can be a managed
+type when that was the historical behavior. `ReturnsResultUnmanaged` bounds `Original: HasUnmanaged`.
 
 ### 4. Modified `TypeAbi` — concrete type with ABI link
 
@@ -98,18 +99,6 @@ impl TypeAbi for BigIntAbi {
     type Abi = Self;
     fn type_name_rust() -> TypeName { "BigIntAbi".into() }
 }
-impl HasUnmanaged for BigIntAbi { type Unmanaged = Self; }
-```
-
-`BigUintAbi` — feature-gated `HasUnmanaged`:
-```rust
-#[cfg(not(feature = "num-bigint"))]
-impl HasUnmanaged for BigUintAbi { type Unmanaged = Self; }
-
-#[cfg(feature = "num-bigint")]
-impl HasUnmanaged for BigUintAbi {
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-}
 ```
 
 `ListAbi<T>` — generic:
@@ -131,7 +120,6 @@ impl<T: TypeAbi> TypeAbi for ListAbi<T> {
 ```rust
 impl AbiType for u32 { fn type_name() -> TypeName { "u32".into() } }
 impl TypeAbi for u32 { type Abi = Self; fn type_name_rust() -> TypeName { "u32".into() } }
-impl HasUnmanaged for u32 { type Unmanaged = Self; }
 ```
 
 `&T` — transparent wrapper, does NOT implement `AbiType`:
@@ -156,7 +144,10 @@ impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
     type Abi = BigUintAbi; // BigUintAbi implements AbiType
     fn type_name_rust() -> TypeName { "BigUintAbi".into() }
 }
-// HasUnmanaged is on BigUintAbi, not BigUint<M>
+impl<M: ManagedTypeApi> HasUnmanaged for BigUint<M> {
+    // Feature-gated exactly as the historical TypeAbi::Unmanaged mapping was.
+    type Unmanaged = /* Rust BigUint or Self */;
+}
 ```
 
 ---
@@ -167,15 +158,15 @@ impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
 |---|---|
 | `types/type_abi.rs` | Add `AbiType` trait; modify `TypeAbi` (remove `Unmanaged`, `type_name`, update `type_names`) |
 | `types/type_abi_from.rs` | Add `AbiTypeFrom<Source: AbiType>`; keep `TypeAbiFrom` for compat |
-| NEW `types/has_unmanaged.rs` | Define `HasUnmanaged` trait |
-| `types/pure_abi/*.rs` (15 files) | Add `AbiType` impl; update `TypeAbi`; add `HasUnmanaged` where appropriate |
-| `types/type_abi_impl_basic.rs` | Add `AbiType` impls; update `TypeAbi`; fix `&T` to use `Abi = T::Abi`; add `HasUnmanaged` |
-| `types/type_abi_impl_vm_core.rs` | Add `AbiType` for self-describing types; update `TypeAbi`; add `HasUnmanaged` |
+| `framework/base/src/types/has_unmanaged.rs` | Define `HasUnmanaged` and compatibility mappings |
+| `types/pure_abi/*.rs` (15 files) | Add `AbiType` impl; update `TypeAbi` |
+| `types/type_abi_impl_basic.rs` | Add `AbiType` impls; update `TypeAbi`; fix `&T` to use `Abi = T::Abi` |
+| `types/type_abi_impl_vm_core.rs` | Add `AbiType` for self-describing types; update `TypeAbi` |
 | `types/type_abi_impl_codec_multi.rs` | Update `TypeAbi` |
-| `types/type_abi_impl_big_int.rs` | Update `TypeAbi`; feature-gated `HasUnmanaged` |
-| `lib.rs` | Export `AbiType`, `AbiTypeFrom`, `HasUnmanaged` |
-| `framework/base/src/**` | All managed types: remove `type_name` overrides, remove `Unmanaged` |
-| `result_handlers/returns_result_unmanaged.rs` | Bound: `Original: AbiType + HasUnmanaged` |
+| `types/type_abi_impl_big_int.rs` | Update `TypeAbi` |
+| `lib.rs` | Export `AbiType`, `AbiTypeFrom` |
+| `framework/base/src/**` | Move historical `Unmanaged` mappings to framework-owned implementations |
+| `result_handlers/returns_result_unmanaged.rs` | Bound: `Original: HasUnmanaged` |
 | `result_handlers/returns_result_as.rs` | Bound: `T::Abi: AbiTypeFrom<Original>` instead of `T: TypeAbiFrom<Original>` |
 
 ---

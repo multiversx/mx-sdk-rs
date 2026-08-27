@@ -434,6 +434,13 @@ impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for EsdtTokenIdentifier<SA> where
 
 impl<SA> TypeAbiFrom<Self> for FungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
+impl<SA> crate::types::HasUnmanaged for FungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    type Unmanaged = Self;
+}
+
 impl<SA> TypeAbi for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,

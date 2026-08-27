@@ -705,6 +705,14 @@ where
 {
 }
 
+impl<SA, T> crate::types::HasUnmanaged for LinkedListMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
+{
+    type Unmanaged = Self;
+}
+
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
     SA: StorageMapperApi,

@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `Payment<M>`.
 ///
@@ -28,13 +26,4 @@ impl TypeAbi for PaymentAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("PaymentAbi")
     }
-}
-
-#[cfg(feature = "num-bigint")]
-impl HasUnmanaged for PaymentAbi {
-    type Unmanaged = (
-        multiversx_chain_core::types::BoxedBytes,
-        u64,
-        crate::codec::num_bigint::BigUint,
-    );
 }

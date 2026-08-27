@@ -361,6 +361,14 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
+impl<SA, T> crate::types::HasUnmanaged for SetMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+{
+    type Unmanaged = Self;
+}
+
 impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,

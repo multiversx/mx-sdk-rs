@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `EgldOrEsdtTokenIdentifier<M>`.
 ///
@@ -28,8 +26,4 @@ impl TypeAbi for EgldOrEsdtTokenIdentifierAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("EgldOrEsdtTokenIdentifierAbi")
     }
-}
-
-impl HasUnmanaged for EgldOrEsdtTokenIdentifierAbi {
-    type Unmanaged = multiversx_chain_core::types::BoxedBytes;
 }

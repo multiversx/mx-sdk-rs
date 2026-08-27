@@ -1,9 +1,9 @@
 use multiversx_sc::{
-    abi::{AbiTypeFrom, HasUnmanaged, TypeAbi},
+    abi::{AbiTypeFrom, TypeAbi},
     codec::TopDecodeMulti,
     tuple_util::NestedTupleFlatten,
     types::{
-        ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
+        HasUnmanaged, ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
         ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
         ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
         WithNewAddress, WithResultAs,
@@ -46,13 +46,11 @@ where
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResultUnmanaged
 where
     Env: TxEnv,
-    Original: TypeAbi,
-    Original::Abi: HasUnmanaged,
-    <Original::Abi as HasUnmanaged>::Unmanaged: TopDecodeMulti,
+    Original: HasUnmanaged,
+    Original::Unmanaged: TopDecodeMulti,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
-        let response =
-            TypedResponse::<<Original::Abi as HasUnmanaged>::Unmanaged>::from_raw(tx_response);
+        let response = TypedResponse::<Original::Unmanaged>::from_raw(tx_response);
         response
             .result
             .expect("ReturnsResultUnmanaged expects that transaction is successful")

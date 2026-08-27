@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 pub struct ListAbi<T>
 where
@@ -66,11 +64,4 @@ where
         repr.push('>');
         repr
     }
-}
-
-impl<T> HasUnmanaged for ListAbi<T>
-where
-    T: HasUnmanaged,
-{
-    type Unmanaged = alloc::vec::Vec<T::Unmanaged>;
 }

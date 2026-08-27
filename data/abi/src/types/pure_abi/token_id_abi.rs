@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `TokenId<M>`.
 ///
@@ -28,8 +26,4 @@ impl TypeAbi for TokenIdAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("TokenIdAbi")
     }
-}
-
-impl HasUnmanaged for TokenIdAbi {
-    type Unmanaged = multiversx_chain_core::types::BoxedBytes;
 }

@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `BigFloat<M>`.
 ///
@@ -27,8 +25,4 @@ impl TypeAbi for BigFloatAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("BigFloatAbi")
     }
-}
-
-impl HasUnmanaged for BigFloatAbi {
-    type Unmanaged = Self;
 }

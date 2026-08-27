@@ -423,6 +423,29 @@ where
 {
 }
 
+impl<SA, K, V> crate::types::HasUnmanaged for BiDiMapper<SA, K, V, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    K: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
+    V: TopEncode
+        + TopDecode
+        + NestedEncode
+        + NestedDecode
+        + 'static
+        + Default
+        + PartialEq
+        + TypeAbi,
+{
+    type Unmanaged = Self;
+}
+
 impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,

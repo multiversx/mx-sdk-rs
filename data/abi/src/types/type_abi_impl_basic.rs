@@ -28,10 +28,6 @@ impl TypeAbi for () {
     }
 }
 
-impl HasUnmanaged for () {
-    type Unmanaged = Self;
-}
-
 impl<T, U> TypeAbiFrom<&U> for &T where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &T {
@@ -65,10 +61,6 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
     fn type_name_rust() -> TypeName {
         format!("Box<{}>", T::type_name_rust())
     }
-}
-
-impl<T: HasUnmanaged> HasUnmanaged for Box<T> {
-    type Unmanaged = Box<T::Unmanaged>;
 }
 
 impl<T, U> TypeAbiFrom<&[T]> for &[U] where T: TypeAbiFrom<U> {}
@@ -108,10 +100,6 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
     fn type_name_rust() -> TypeName {
         format!("Vec<{}>", T::type_name_rust())
     }
-}
-
-impl<T: HasUnmanaged> HasUnmanaged for Vec<T> {
-    type Unmanaged = Vec<T::Unmanaged>;
 }
 
 impl<T: TypeAbi, const CAP: usize> TypeAbiFrom<ArrayVec<T, CAP>> for ArrayVec<T, CAP> {}
@@ -188,10 +176,6 @@ impl TypeAbi for String {
     type Abi = Self;
 }
 
-impl HasUnmanaged for String {
-    type Unmanaged = Self;
-}
-
 impl TypeAbiFrom<&'static str> for &'static str {}
 impl AbiTypeFrom<Self> for &'static str {}
 
@@ -248,10 +232,6 @@ macro_rules! type_abi_name_only {
 
         impl TypeAbi for $ty {
             type Abi = Self;
-        }
-
-        impl HasUnmanaged for $ty {
-            type Unmanaged = Self;
         }
     };
 }
@@ -364,10 +344,6 @@ where
     }
 }
 
-impl<T: HasUnmanaged> HasUnmanaged for Option<T> {
-    type Unmanaged = Option<T::Unmanaged>;
-}
-
 impl<T: TypeAbi, E> TypeAbiFrom<Self> for Result<T, E> {}
 impl<T: AbiType, E> AbiTypeFrom<Self> for Result<T, E> {}
 
@@ -454,12 +430,6 @@ macro_rules! tuple_impls {
             }
 
 
-            impl<$($name),+> HasUnmanaged for ($($name,)+)
-            where
-                $($name: HasUnmanaged,)+
-            {
-                type Unmanaged = ($($name::Unmanaged,)+);
-            }
         )+
     }
 }
@@ -512,8 +482,4 @@ impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
         repr.push(']');
         repr
     }
-}
-
-impl<T: HasUnmanaged, const N: usize> HasUnmanaged for [T; N] {
-    type Unmanaged = [T::Unmanaged; N];
 }

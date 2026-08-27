@@ -1,6 +1,6 @@
 use multiversx_sc_codec::TopEncodeMulti;
 
-use crate::TypeAbiFrom;
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom};
 
 /// Trait that is automatically implemented for all types that are allowed as proxy inputs.
 ///
@@ -11,6 +11,15 @@ impl<O, T> ProxyArg<O> for T
 where
     O: TypeAbiFrom<T>,
     T: TopEncodeMulti,
+{
+}
+
+pub trait ProxyArg2<O>: TopEncodeMulti {}
+
+impl<O, T> ProxyArg2<O> for T
+where
+    T: TopEncodeMulti + TypeAbi,
+    O: AbiTypeFrom<T::Abi>,
 {
 }
 

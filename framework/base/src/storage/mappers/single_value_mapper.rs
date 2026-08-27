@@ -322,6 +322,14 @@ where
 {
 }
 
+impl<SA, T> crate::types::HasUnmanaged for SingleValueMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + TypeAbi + crate::types::HasUnmanaged,
+{
+    type Unmanaged = T::Unmanaged;
+}
+
 impl<SA, T> TypeAbi for SingleValueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,

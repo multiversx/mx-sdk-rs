@@ -172,6 +172,14 @@ pub fn type_abi_derive(
     };
 
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let has_unmanaged_impl = match context {
+        TypeAbiImportCrate::MultiversxSc => quote! {
+            impl #impl_generics multiversx_sc::types::HasUnmanaged for #name #ty_generics #where_clause {
+                type Unmanaged = Self;
+            }
+        },
+        TypeAbiImportCrate::MultiversxScAbi => quote! {},
+    };
     quote! {
         impl #impl_generics #imports::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
         impl #impl_generics #imports::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
@@ -188,9 +196,7 @@ pub fn type_abi_derive(
             type Abi = Self;
         }
 
-        impl #impl_generics #imports::HasUnmanaged for #name #ty_generics #where_clause {
-            type Unmanaged = Self;
-        }
+        #has_unmanaged_impl
     }
 }
 

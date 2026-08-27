@@ -1,8 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 pub struct CountedVariadicAbi<T: AbiType>(PhantomData<T>);
 
@@ -31,10 +29,6 @@ impl<T: AbiType> TypeAbi for CountedVariadicAbi<T> {
     type Abi = Self;
 }
 
-impl<T: AbiType> HasUnmanaged for CountedVariadicAbi<T> {
-    type Unmanaged = Self;
-}
-
 pub struct BytesReadToEndAbi;
 
 impl AbiTypeFrom<Self> for BytesReadToEndAbi {}
@@ -51,8 +45,4 @@ impl TypeAbiFrom<Self> for BytesReadToEndAbi {}
 
 impl TypeAbi for BytesReadToEndAbi {
     type Abi = Self;
-}
-
-impl HasUnmanaged for BytesReadToEndAbi {
-    type Unmanaged = Self;
 }

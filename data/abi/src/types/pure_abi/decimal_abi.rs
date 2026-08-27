@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 use alloc::format;
 
 /// Pure ABI counterpart of `ManagedDecimal<M, NumDecimals>` (variable number of decimals).
@@ -31,11 +29,6 @@ impl TypeAbi for DecimalAbi {
     }
 }
 
-#[cfg(feature = "num-bigint")]
-impl HasUnmanaged for DecimalAbi {
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-}
-
 /// Pure ABI counterpart of `ManagedDecimal<M, ConstDecimals<DECIMALS>>` (compile-time fixed number of decimals).
 ///
 /// The const parameter `DECIMALS` encodes the number of decimal places at the type level.
@@ -64,9 +57,4 @@ impl<const DECIMALS: usize> TypeAbi for DecimalConstAbi<DECIMALS> {
     fn type_name_rust() -> TypeName {
         format!("ManagedDecimalConstAbi<{DECIMALS}>")
     }
-}
-
-#[cfg(feature = "num-bigint")]
-impl<const DECIMALS: usize> HasUnmanaged for DecimalConstAbi<DECIMALS> {
-    type Unmanaged = crate::codec::num_bigint::BigUint;
 }

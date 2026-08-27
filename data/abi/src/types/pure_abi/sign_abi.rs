@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 /// Pure ABI counterpart of `Sign` (the sign of a `BigInt`).
 ///
@@ -27,8 +25,4 @@ impl TypeAbi for SignAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("SignAbi")
     }
-}
-
-impl HasUnmanaged for SignAbi {
-    type Unmanaged = Self;
 }

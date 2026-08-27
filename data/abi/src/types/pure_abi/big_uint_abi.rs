@@ -1,6 +1,4 @@
-use crate::{
-    AbiType, AbiTypeFrom, HasUnmanaged, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
-};
+use crate::{AbiType, AbiTypeFrom, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName};
 
 pub struct BigUintAbi;
 
@@ -33,14 +31,4 @@ impl TypeAbi for BigUintAbi {
     fn type_name_rust() -> TypeName {
         TypeName::from("BigUintAbi")
     }
-}
-
-#[cfg(feature = "num-bigint")]
-impl HasUnmanaged for BigUintAbi {
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-}
-
-#[cfg(not(feature = "num-bigint"))]
-impl HasUnmanaged for BigUintAbi {
-    type Unmanaged = Self;
 }
