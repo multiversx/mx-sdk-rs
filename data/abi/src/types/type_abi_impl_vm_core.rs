@@ -97,6 +97,7 @@ impl AbiType for EsdtTokenType {
         "EsdtTokenType".into()
     }
 
+    #[allow(clippy::vec_init_then_push)]
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         let type_names = TypeNames {
             abi: <Self as AbiType>::type_name(),
@@ -168,6 +169,7 @@ impl AbiType for EsdtLocalRole {
         "EsdtLocalRole".into()
     }
 
+    #[allow(clippy::vec_init_then_push)]
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         let type_names = TypeNames {
             abi: <Self as AbiType>::type_name(),
