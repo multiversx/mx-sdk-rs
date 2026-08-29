@@ -49,5 +49,8 @@ pub struct NetworkConfigResponse {
 }
 
 fn default_hrp() -> String {
-    "erd".to_string()
+    // "erd".to_string()
+
+    // TEMP: either wait for network config to be fixed, or override some place else 
+    "one".to_string() 
 }
