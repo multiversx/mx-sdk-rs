@@ -63,7 +63,8 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
     if args.send {
         let interactor = Interactor::empty()
             .with_connection(&args.gateway.proxy)
-            .await;
+            .await
+            .use_chain_simulator_auto();
         interactor
             .broadcast_and_save(output, args.outfile.as_deref(), args.wait_result)
             .await?;

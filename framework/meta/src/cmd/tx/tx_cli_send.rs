@@ -15,7 +15,10 @@ async fn tx_send_inner(args: &SendArgs) -> Result<()> {
     let tx = load_transaction_from_file(&args.infile)?;
 
     let output = TxOutputFile::from_transaction(tx, None)?;
-    let interactor = Interactor::empty().with_connection(&args.proxy).await;
+    let interactor = Interactor::empty()
+        .with_connection(&args.proxy)
+        .await
+        .use_chain_simulator_auto();
     interactor
         .broadcast_and_save(output, args.outfile.as_deref(), args.wait_result)
         .await
