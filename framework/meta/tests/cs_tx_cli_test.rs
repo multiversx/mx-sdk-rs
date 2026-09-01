@@ -13,7 +13,7 @@ const TRANSFER_AMOUNT: u128 = 100_000_000_000_000_000;
 
 /// 100 EGLD, the amount senders get funded automatically
 /// on interactor/sc-meta CLI + chain simulator.
-const FUND_AMOUNT: u128 = 100_00_000_000_000_000_000;
+const FUND_AMOUNT: u128 = 100_000_000_000_000_000_000;
 
 /// Minimum gas for a plain EGLD transfer.
 const GAS_LIMIT: u64 = 50_000;
@@ -207,6 +207,8 @@ async fn test_adder_deploy_add_get_sum() {
             CHAIN_SIMULATOR_CHAIN_ID,
             "--gas-limit",
             "50000000",
+            "--arguments",
+            "10",
             "--send",
             "--wait-result",
             "--outfile",
@@ -239,7 +241,7 @@ async fn test_adder_deploy_add_get_sum() {
         "upgrade receiver mismatch"
     );
 
-    // getSum must still return 5 after the upgrade.
+    // getSum must return 10 (0a) after the upgrade.
     let query_after_upgrade = Command::new(sc_meta_bin)
         .args([
             "tx",
@@ -263,7 +265,7 @@ async fn test_adder_deploy_add_get_sum() {
         serde_json::from_str(stdout_after.trim()).expect("failed to parse query output as JSON");
     assert_eq!(
         result_after,
-        vec!["05"],
+        vec!["0a"],
         "getSum returned unexpected value after upgrade"
     );
 
@@ -302,7 +304,7 @@ async fn test_adder_deploy_add_get_sum() {
 
     assert!(status.success(), "relayed add call failed");
 
-    // getSum must return 5 + 3 = 8 after the relayed add.
+    // getSum must return 0a + 3 = 0d after the relayed add.
     let query_after_relayed = Command::new(sc_meta_bin)
         .args([
             "tx",
@@ -326,7 +328,7 @@ async fn test_adder_deploy_add_get_sum() {
         serde_json::from_str(stdout_relayed.trim()).expect("failed to parse query output as JSON");
     assert_eq!(
         result_relayed,
-        vec!["08"],
+        vec!["0d"],
         "getSum returned unexpected value after relayed add"
     );
 }
