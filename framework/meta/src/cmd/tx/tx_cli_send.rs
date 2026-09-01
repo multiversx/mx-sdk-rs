@@ -14,7 +14,7 @@ pub async fn tx_send(args: &SendArgs) {
 async fn tx_send_inner(args: &SendArgs) -> Result<()> {
     let tx = load_transaction_from_file(&args.infile)?;
 
-    let output = TxOutputFile::from_transaction(tx, None)?;
+    let output = TxOutputFile::from_transaction(tx)?;
     let interactor = Interactor::empty()
         .with_connection(&args.proxy)
         .await

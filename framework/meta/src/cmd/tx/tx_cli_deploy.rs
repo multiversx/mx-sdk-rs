@@ -62,7 +62,6 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     interactor
         .sign_and_dispatch(
             tx,
-            Some(contract_address.to_bech32_string()),
             args.tx.send,
             args.tx.wait_result,
             args.tx.outfile.as_deref(),

@@ -48,7 +48,7 @@ async fn tx_relay_inner(args: &RelayArgs) -> Result<()> {
     let relayer_sig = relayer_wallet.sign_tx(&tx)?;
     tx.relayer_signature = Some(relayer_sig);
 
-    let output = TxOutputFile::from_transaction(tx, None)?;
+    let output = TxOutputFile::from_transaction(tx)?;
 
     if args.send {
         let interactor = Interactor::empty()

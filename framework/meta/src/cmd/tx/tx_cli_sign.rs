@@ -58,7 +58,7 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
         tx.relayer_signature = Some(relayer_sig);
     }
 
-    let output = TxOutputFile::from_transaction(tx, None)?;
+    let output = TxOutputFile::from_transaction(tx)?;
 
     if args.send {
         let interactor = Interactor::empty()

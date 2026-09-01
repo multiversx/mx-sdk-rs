@@ -48,7 +48,6 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     interactor
         .sign_and_dispatch(
             tx,
-            None,
             args.tx.send,
             args.tx.wait_result,
             args.tx.outfile.as_deref(),

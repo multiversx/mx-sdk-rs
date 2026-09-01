@@ -44,7 +44,6 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
     interactor
         .sign_and_dispatch(
             tx,
-            None,
             args.tx.send,
             args.tx.wait_result,
             args.tx.outfile.as_deref(),

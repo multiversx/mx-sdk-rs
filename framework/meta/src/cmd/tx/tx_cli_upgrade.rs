@@ -54,7 +54,6 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
     interactor
         .sign_and_dispatch(
             tx,
-            None,
             args.tx.send,
             args.tx.wait_result,
             args.tx.outfile.as_deref(),

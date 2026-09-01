@@ -101,13 +101,12 @@ where
     pub async fn sign_and_dispatch(
         &self,
         mut transaction: Transaction,
-        contract_address: Option<String>,
         send: bool,
         wait_result: bool,
         outfile: Option<&Path>,
     ) -> anyhow::Result<()> {
         self.sign_tx(&mut transaction);
-        let output = TxOutputFile::from_transaction(transaction, contract_address)?;
+        let output = TxOutputFile::from_transaction(transaction)?;
 
         if send {
             self.broadcast_and_save(output, outfile, wait_result).await
