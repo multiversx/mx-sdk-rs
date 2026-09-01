@@ -23,6 +23,12 @@ where
         }
     }
 
+    /// Broadcast `transaction` through the configured gateway.
+    ///
+    /// Returns the transaction hash reported by the gateway. On success, logs the hash and
+    /// prints its explorer URL when `transaction.chain_id` is supported; otherwise prints the
+    /// hash. On failure, logs and prints the gateway error before returning it with `info` as
+    /// context.
     pub async fn broadcast_transaction(
         &self,
         transaction: &Transaction,
