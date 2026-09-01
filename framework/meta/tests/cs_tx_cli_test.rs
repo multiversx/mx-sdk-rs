@@ -63,7 +63,7 @@ async fn test_adder_deploy_add_get_sum() {
     interactor.generate_blocks(10).await.unwrap();
 
     let contract_address = deploy_adder(&context, &outfile_deploy);
-    call_adder(&context, &contract_address, &outfile_call, "5");
+    call_adder(&context, &contract_address, &outfile_call, 5);
     assert_eq!(query_sum(&context, &contract_address), vec!["05"]);
 
     upgrade_adder(&context, &contract_address, &outfile_upgrade);
@@ -111,7 +111,11 @@ fn deploy_adder(context: &AdderTestContext<'_>, outfile: &std::path::Path) -> St
         "deploy stdout:\n{}",
         String::from_utf8_lossy(&output.stdout)
     );
-    assert!(output.status.success(), "deploy failed");
+    assert!(
+        output.status.success(),
+        "deploy failed:\n{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
 
     let content = std::fs::read_to_string(outfile).expect("failed to read deploy outfile");
     let json: serde_json::Value =
@@ -146,7 +150,7 @@ fn call_adder(
     context: &AdderTestContext<'_>,
     contract_address: &str,
     outfile: &std::path::Path,
-    argument: &str,
+    argument: usize,
 ) {
     let output = Command::new(context.sc_meta_bin)
         .args([
@@ -164,7 +168,7 @@ fn call_adder(
             "--function",
             "add",
             "--arguments",
-            argument,
+            argument.to_string().as_str(),
             "--send",
             "--wait-result",
             "--outfile",
@@ -188,9 +192,10 @@ fn call_adder(
         contract_address,
         "call receiver mismatch"
     );
+    let expected_transaction_data = format!("add@{:02x}", argument);
     assert_eq!(
         json["emittedTransactionData"].as_str().unwrap(),
-        "add@05",
+        expected_transaction_data,
         "call emittedTransactionData mismatch"
     );
 }
