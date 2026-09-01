@@ -15,6 +15,14 @@ where
         to_json_pretty(value)
     }
 
+    fn print_tx_url(tx_hash: &str, chain_id: &str, info: &str) {
+        if let Some(explorer_url) = ExplorerUrl::from_chain_id(chain_id) {
+            println!("{info}: {}", explorer_url.tx_url(tx_hash));
+        } else {
+            println!("{info} tx hash: {tx_hash}");
+        }
+    }
+
     pub async fn broadcast_transaction(
         &self,
         transaction: &Transaction,
@@ -24,24 +32,19 @@ where
             .proxy()
             .request(multiversx_sdk::gateway::SendTxRequest(transaction))
             .await;
-        let Ok(tx_hash) = result else {
-            let Err(err) = result else {
-                unreachable!();
-            };
-            let error = anyhow::anyhow!("{info} error: {err}");
-            eprintln!("{error}");
-            log::error!("{error}");
-            return Err(error);
-        };
-
-        log::info!("{info} tx hash: {tx_hash}");
-        if let Some(explorer_url) = ExplorerUrl::from_chain_id(&transaction.chain_id) {
-            println!("{info}: {}", explorer_url.tx_url(&tx_hash));
-        } else {
-            println!("{info} tx hash: {tx_hash}");
+        match result {
+            Ok(tx_hash) => {
+                log::info!("{info} tx hash: {tx_hash}");
+                Self::print_tx_url(&tx_hash, &transaction.chain_id, info);
+                Ok(tx_hash)
+            }
+            Err(err) => {
+                let error = anyhow::anyhow!("{info} error: {err}");
+                eprintln!("{error}");
+                log::error!("{error}");
+                Err(error)
+            }
         }
-
-        Ok(tx_hash)
     }
 
     /// Broadcast the transaction inside `output`, update the hash (and optionally
