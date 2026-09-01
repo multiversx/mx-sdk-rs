@@ -1,12 +1,11 @@
 use std::process;
 
-use super::error_message::{simulate_gas_transfer_err_message, transfer_err_message};
+use super::error_message::simulate_gas_transfer_err_message;
 use crate::InteractorBase;
-use log::info;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
 use multiversx_sdk::{
     data::transaction::Transaction,
-    gateway::{GatewayAsyncService, SendTxRequest, SimulateTxRequest},
+    gateway::{GatewayAsyncService, SimulateTxRequest},
     retrieve_tx_on_network,
 };
 
@@ -17,23 +16,12 @@ where
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
         let transaction = self.launch_transfer(&transfer_step).await;
 
-        let tx_hash = match self.proxy().request(SendTxRequest(&transaction)).await {
-            Ok(hash) => hash,
-            Err(err) => {
-                transfer_err_message(&err);
-                process::exit(1);
-            }
+        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "transfer").await else {
+            process::exit(1)
         };
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-
-        if let Some(ex) = &self.explorer_url {
-            println!("transfer: {}", ex.tx_url(&tx_hash));
-        } else {
-            println!("transfer tx hash: {tx_hash}");
-        }
-        info!("transfer tx hash: {}", tx_hash);
 
         retrieve_tx_on_network(self.proxy(), tx_hash.clone())
             .await

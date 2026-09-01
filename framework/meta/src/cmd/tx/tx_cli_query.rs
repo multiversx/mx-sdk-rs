@@ -1,11 +1,11 @@
 use anyhow::{Context, Result, anyhow};
 use multiversx_sc_snippets::{
     hex,
-    imports::{Bech32Address, GatewayHttpProxy},
+    imports::{Bech32Address, GatewayHttpProxy, Interactor},
     sdk::data::vm::VMQueryInput,
 };
 
-use super::tx_cli_common::{build_arg_buffer, to_json_pretty};
+use super::tx_cli_common::build_arg_buffer;
 use crate::cli::cli_args_tx::QueryArgs;
 
 pub async fn tx_query(args: &QueryArgs) {
@@ -53,7 +53,7 @@ async fn tx_query_inner(args: &QueryArgs) -> Result<()> {
         .map(|bytes| hex::encode(&bytes))
         .collect();
 
-    let json = to_json_pretty(&return_data)?;
+    let json = Interactor::to_json_pretty(&return_data)?;
     println!("{json}");
     Ok(())
 }

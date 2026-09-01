@@ -28,6 +28,7 @@ use crate::{
 const DEFAULT_CONFIG_FILE_NAME: &str = "config.toml";
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
+pub const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
 
 /// Holds the gateway connection and chain network configuration together.
 ///
@@ -301,6 +302,17 @@ where
         self
     }
 
+    /// Enables or disables chain-simulator mode automatically, based on the chain ID
+    /// reported by the gateway: the chain simulator reports chain ID [`CHAIN_SIMULATOR_CHAIN_ID`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn use_chain_simulator_auto(mut self) -> Self {
+        self.use_chain_simulator = self.network_config().chain_id == CHAIN_SIMULATOR_CHAIN_ID;
+        self
+    }
+
     /// Registers a wallet as a transaction sender and funds it in simulator mode.
     ///
     /// Returns the wallet address.
@@ -310,7 +322,7 @@ where
         self.send_user_funds(&address.to_bech32(self.get_hrp()))
             .await
             .unwrap();
-        self.generate_blocks(1).await.unwrap();
+        self.generate_blocks(10).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {

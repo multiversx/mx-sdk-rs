@@ -1,6 +1,6 @@
 use std::process;
 
-use super::error_message::{deploy_err_message, simulate_gas_deploy_err_message};
+use super::error_message::simulate_gas_deploy_err_message;
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     imports::Bech32Address,
@@ -10,10 +10,7 @@ use multiversx_sc_scenario::{
 use multiversx_sdk::chain_core::std::base64_encode;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
 use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
-use multiversx_sdk::{
-    gateway::{GatewayAsyncService, SendTxRequest},
-    retrieve_tx_on_network,
-};
+use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -55,28 +52,6 @@ where
         transaction
     }
 
-    async fn launch_sc_deploy(&mut self, transaction: &Transaction) -> String {
-        let tx_hash_result = self.proxy().request(SendTxRequest(transaction)).await;
-
-        match tx_hash_result {
-            Ok(tx_hash) => {
-                log::info!("sc deploy tx hash: {tx_hash}");
-                if let Some(ex) = &self.explorer_url {
-                    println!("sc deploy: {}", ex.tx_url(&tx_hash));
-                } else {
-                    println!("sc deploy tx hash: {tx_hash}");
-                }
-                tx_hash
-            }
-            Err(err) => {
-                println!("sc deploy error: {err}");
-                log::error!("sc deploy error: {err}");
-                deploy_err_message(&err);
-                process::exit(1)
-            }
-        }
-    }
-
     pub async fn sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) {
         let mut transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
 
@@ -92,7 +67,9 @@ where
 
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
 
-        let tx_hash = self.launch_sc_deploy(&transaction).await;
+        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "sc deploy").await else {
+            process::exit(1)
+        };
 
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
