@@ -1,5 +1,5 @@
 use super::ManagedVecItem;
-use core::{cmp::Ordering, marker::PhantomData};
+use core::{borrow::Borrow, cmp::Ordering, marker::PhantomData};
 
 pub struct EncodedManagedVecItem<T: ManagedVecItem>
 where
@@ -13,8 +13,8 @@ impl<T> EncodedManagedVecItem<T>
 where
     T: ManagedVecItem,
 {
-    pub(crate) fn decode(&self) -> T {
-        T::read_from_payload(&self.encoded)
+    pub(crate) fn decode(&self) -> T::Ref<'_> {
+        unsafe { T::borrow_from_payload(&self.encoded) }
     }
 }
 
@@ -24,7 +24,9 @@ where
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        self.decode().eq(&other.decode())
+        let self_ref = self.decode();
+        let other_ref = other.decode();
+        self_ref.borrow().eq(other_ref.borrow())
     }
 }
 
@@ -36,7 +38,7 @@ where
 {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.decode().partial_cmp(&other.decode())
+        self.decode().borrow().partial_cmp(other.decode().borrow())
     }
 }
 
@@ -45,6 +47,6 @@ where
     T: Ord + ManagedVecItem,
 {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.decode().cmp(&other.decode())
+        self.decode().borrow().cmp(other.decode().borrow())
     }
 }

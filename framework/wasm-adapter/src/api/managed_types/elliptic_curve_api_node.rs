@@ -1,5 +1,6 @@
 use multiversx_sc::{api::EllipticCurveApiImpl, types::heap::BoxedBytes};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
 

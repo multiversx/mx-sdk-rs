@@ -1,3 +1,4 @@
+use super::ManagedVecItemPayload;
 use crate::types::ManagedVecItem;
 use core::{borrow::Borrow, fmt::Debug, marker::PhantomData, mem::ManuallyDrop, ops::Deref};
 
@@ -39,9 +40,15 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        // TODO: improve
+        // the payload is a dummy
+        // it is used because save_to_payload does a great job doing the soft deallocation needed here
+        //
+        // TODO: the saving as payload is not necessary, figure out if it is worth optimizing
+        // by adding a special soft drop method to ManagedVecItem
+        let mut dummy_payload = T::PAYLOAD::new_buffer();
         unsafe {
-            ManuallyDrop::drop(&mut self.item);
+            let inner = ManuallyDrop::take(&mut self.item);
+            inner.save_to_payload(&mut dummy_payload);
         }
     }
 }

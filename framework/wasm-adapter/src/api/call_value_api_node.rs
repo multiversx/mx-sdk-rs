@@ -1,6 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{CallValueApi, CallValueApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn checkNoPayment();
 

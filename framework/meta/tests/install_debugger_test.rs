@@ -4,6 +4,7 @@ use multiversx_sc_meta_lib::tools::find_current_workspace;
 const INSTALL_DEBUGGER_TEMP_DIR_NAME: &str = "install-debugger-test";
 
 #[tokio::test]
+#[cfg_attr(not(feature = "install-debugger-test"), ignore)]
 async fn test_install_debugger() {
     let workspace_path = find_current_workspace().unwrap();
     let target_path = workspace_path.join(INSTALL_DEBUGGER_TEMP_DIR_NAME);

@@ -56,7 +56,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for FungiblePayment<M> {
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
         let mut index = 0;
         unsafe {
             FungiblePayment {
@@ -77,5 +77,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for FungiblePayment<M> {
             managed_vec_item_save_to_payload_index(self.token_identifier, payload, &mut index);
             managed_vec_item_save_to_payload_index(self.amount, payload, &mut index);
         }
+    }
+
+    fn requires_drop() -> bool {
+        true
     }
 }

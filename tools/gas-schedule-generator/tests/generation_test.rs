@@ -1,21 +1,13 @@
-use std::path::Path;
-
-use gas_schedule_generator::generate_file_content;
-use multiversx_chain_vm::schedule::GasScheduleVersion;
-
-const VALID_FILE_CONTENT_NAME: &str = "valid_generated.txt";
-const NEWLY_GENERATED_CONTENT_NAME: &str = "sections.rs";
+const GENERATED_SECTIONS_FILE: &str = "generated_sections.rs";
 
 #[test]
-
 fn generation_test() {
-    let gas_schedule_v8_content = GasScheduleVersion::V8;
-    let valid_generated =
-        std::fs::read_to_string(Path::new("tests").join(VALID_FILE_CONTENT_NAME)).unwrap();
+    let generated = gas_schedule_generator::generate_to_string();
+    std::fs::write(GENERATED_SECTIONS_FILE, &generated).unwrap();
 
-    generate_file_content(gas_schedule_v8_content as u16);
-    let newly_generated =
-        std::fs::read_to_string(Path::new("output").join(NEWLY_GENERATED_CONTENT_NAME)).unwrap();
-
-    assert_eq!(newly_generated, valid_generated);
+    let on_disk = std::fs::read_to_string(gas_schedule_generator::SECTIONS_FILE_PATH).unwrap();
+    assert_eq!(
+        generated, on_disk,
+        "Generated content does not match the content on disk. Please run `cargo run` in `tools/gas-schedule-generator` to regenerate the file."
+    );
 }

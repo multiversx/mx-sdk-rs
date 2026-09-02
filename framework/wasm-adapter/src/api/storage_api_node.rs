@@ -3,6 +3,7 @@ use multiversx_sc::api::{
     StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     // managed buffer API
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;

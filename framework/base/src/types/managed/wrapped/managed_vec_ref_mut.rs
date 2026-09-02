@@ -53,13 +53,17 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
+        // This drop saves the item back into the parent ManagedVec.
+        //
+        // Using `set_unchecked_no_drop` ensures the item's data is written back
+        // without running Drop on the item itself, so the handle is transferred
+        // to the buffer rather than freed.
         let item = unsafe { ManuallyDrop::take(&mut self.item) };
         unsafe {
-            let _ =
-                ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone())
-                    .set(self.item_index, item);
+            let mut parent_ref =
+                ManagedRefMut::<M, ManagedVec<M, T>>::wrap_handle(self.managed_vec_handle.clone());
+            let _ = parent_ref.set_unchecked_no_drop(self.item_index, item);
         }
-        // core::mem::forget(item);
     }
 }
 

@@ -4,6 +4,7 @@ use multiversx_sc::{
     types::heap::BoxedBytes,
 };
 
+#[link(wasm_import_module = "env")]
 #[allow(dead_code)]
 unsafe extern "C" {
     fn mBufferNew() -> i32;

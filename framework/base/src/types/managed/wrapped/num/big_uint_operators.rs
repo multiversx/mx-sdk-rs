@@ -1,6 +1,6 @@
 use crate::{
     api::{BigIntApiImpl, ManagedTypeApi, const_handles},
-    types::{BigUint, ManagedType},
+    types::{BigUint, ManagedType, SaturatingSub, SaturatingSubAssign},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -52,13 +52,13 @@ macro_rules! binary_operator {
             fn $method(self, other: &BigUint<M>) -> BigUint<M> {
                 // both arguments are references, so a new BigUint needs to be created
                 unsafe {
-                    let result = BigUint::new_uninit();
-                    M::managed_type_impl().$api_func(
-                        result.get_handle(),
-                        self.get_handle(),
-                        other.get_handle(),
-                    );
-                    result
+                    BigUint::new_init_handle(|result_handle| {
+                        M::managed_type_impl().$api_func(
+                            result_handle,
+                            self.get_handle(),
+                            other.get_handle(),
+                        );
+                    })
                 }
             }
         }
@@ -84,13 +84,13 @@ macro_rules! binary_operator {
                 let big_int_temp_1 =
                     BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 unsafe {
-                    let result = BigUint::new_uninit();
-                    M::managed_type_impl().$api_func(
-                        result.get_handle(),
-                        self.get_handle(),
-                        big_int_temp_1,
-                    );
-                    result
+                    BigUint::new_init_handle(|result_handle| {
+                        M::managed_type_impl().$api_func(
+                            result_handle,
+                            self.get_handle(),
+                            big_int_temp_1,
+                        );
+                    })
                 }
             }
         }
@@ -116,13 +116,13 @@ macro_rules! binary_operator {
                 let big_int_temp_1 =
                     BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 unsafe {
-                    let result = BigUint::new_uninit();
-                    M::managed_type_impl().$api_func(
-                        result.get_handle(),
-                        self.get_handle(),
-                        big_int_temp_1,
-                    );
-                    result
+                    BigUint::new_init_handle(|result_handle| {
+                        M::managed_type_impl().$api_func(
+                            result_handle,
+                            self.get_handle(),
+                            big_int_temp_1,
+                        );
+                    })
                 }
             }
         }
@@ -131,6 +131,7 @@ macro_rules! binary_operator {
 
 binary_operator! {Add, add, bi_add}
 binary_operator! {Sub, sub, bi_sub_unsigned}
+binary_operator! {SaturatingSub, saturating_sub, bi_sub_unsigned_saturated}
 binary_operator! {Mul, mul, bi_mul}
 binary_operator! {Div, div, bi_t_div}
 binary_operator! {Rem, rem, bi_t_mod}
@@ -188,6 +189,7 @@ macro_rules! binary_assign_operator {
 
 binary_assign_operator! {AddAssign, add_assign, bi_add}
 binary_assign_operator! {SubAssign, sub_assign, bi_sub_unsigned}
+binary_assign_operator! {SaturatingSubAssign, saturating_sub_assign, bi_sub_unsigned_saturated}
 binary_assign_operator! {MulAssign, mul_assign, bi_mul}
 binary_assign_operator! {DivAssign, div_assign, bi_t_div}
 binary_assign_operator! {RemAssign, rem_assign, bi_t_mod}

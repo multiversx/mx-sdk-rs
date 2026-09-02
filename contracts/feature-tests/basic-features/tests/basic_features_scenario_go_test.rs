@@ -10,6 +10,11 @@ fn big_int_from_i_64_go() {
 }
 
 #[test]
+fn big_int_neg_go() {
+    world().run("scenarios/big_int_neg.scen.json");
+}
+
+#[test]
 fn big_int_to_i_64_go() {
     world().run("scenarios/big_int_to_i64.scen.json");
 }
@@ -32,6 +37,11 @@ fn big_num_ops_bitwise_go() {
 #[test]
 fn big_num_ops_cmp_go() {
     world().run("scenarios/big_num_ops_cmp.scen.json");
+}
+
+#[test]
+fn big_num_ops_saturating_sub_go() {
+    world().run("scenarios/big_num_ops_saturating_sub.scen.json");
 }
 
 #[test]
@@ -329,6 +339,11 @@ fn managed_vec_address_push_go() {
 #[test]
 fn managed_vec_biguint_push_go() {
     world().run("scenarios/managed_vec_biguint_push.scen.json");
+}
+
+#[test]
+fn math_features_go() {
+    world().run("scenarios/math_features.scen.json");
 }
 
 #[test]

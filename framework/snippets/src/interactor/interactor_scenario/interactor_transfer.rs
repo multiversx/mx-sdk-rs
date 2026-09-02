@@ -31,7 +31,9 @@ where
         println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
 
-        retrieve_tx_on_network(&self.proxy, tx_hash.clone()).await;
+        retrieve_tx_on_network(&self.proxy, tx_hash.clone())
+            .await
+            .expect("failed to fetch transfer tx result");
 
         self.post_runners.run_transfer_step(&transfer_step);
 

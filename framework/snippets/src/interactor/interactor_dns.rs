@@ -1,27 +1,10 @@
 use multiversx_sc_scenario::{
-    multiversx_sc::types::Address, scenario_format::value_interpreter::keccak256,
+    multiversx_sc::{chain_core::std::new_address::compute_new_address, types::Address},
+    scenario_format::value_interpreter::keccak256,
 };
 
 fn get_initial_dns_address() -> Address {
     Address::from_slice(&[1u8; 32])
-}
-
-fn compute_smart_contract_address(owner_address: Address, owner_nonce: u64) -> Address {
-    // 8 bytes of zero + 2 bytes for VM type + 20 bytes of hash(owner) + 2 bytes of shard(owner)
-    let owner_bytes = owner_address.as_bytes();
-    let nonce_bytes = owner_nonce.to_le_bytes();
-    let bytes_to_hash = [owner_bytes, &nonce_bytes].concat();
-    let initial_padding = [0u8; 8];
-    let vm_type: [u8; 2] = [5, 0];
-    let address = keccak256(&bytes_to_hash);
-    let address = [
-        initial_padding.as_slice(),
-        vm_type.as_slice(),
-        &address[10..30],
-        &owner_bytes[30..],
-    ]
-    .concat();
-    Address::from_slice(&address)
 }
 
 fn compute_dns_address_for_shard_id(shard_id: u8) -> Address {
@@ -33,8 +16,7 @@ fn compute_dns_address_for_shard_id(shard_id: u8) -> Address {
 
     let deployer_pubkey = [deployer_pubkey_prefix, shard_identifier].concat();
     let deployer_address = Address::from_slice(&deployer_pubkey);
-    let deployer_nonce = 0;
-    compute_smart_contract_address(deployer_address, deployer_nonce)
+    compute_new_address(&deployer_address, 0)
 }
 
 fn shard_id_from_name(name: &str) -> u8 {

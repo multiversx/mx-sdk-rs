@@ -10,13 +10,13 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::{ScDeployStep, TxResponse},
 };
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
 
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync,
-    interactor_prepare_async::InteractorRunAsync,
+    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
+    InteractorRunAsync,
 };
 
 #[allow(clippy::type_complexity)]
@@ -100,6 +100,34 @@ where
 
     fn run(self) -> impl std::future::Future<Output = Self::Result> {
         run_async_deploy(self)
+    }
+}
+
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorIntoSdkTransaction
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    fn into_sdk_transaction(self) -> Transaction {
+        let step_wrapper = self.tx_to_step();
+        step_wrapper
+            .env
+            .world
+            .sc_deploy_to_blockchain_tx(&step_wrapper.step)
     }
 }
 

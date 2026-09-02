@@ -9,6 +9,7 @@ use multiversx_sc::{
     types::heap::{Address, Box, H256},
 };
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     // address utils
     fn getSCAddress(resultOffset: *mut u8);

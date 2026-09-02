@@ -27,6 +27,7 @@ pub mod hex_call_data;
 pub mod io;
 pub mod log_util;
 mod macros;
+pub mod math;
 pub mod non_zero_util;
 pub mod storage;
 pub mod tuple_util;

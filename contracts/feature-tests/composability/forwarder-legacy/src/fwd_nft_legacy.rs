@@ -243,7 +243,7 @@ pub trait ForwarderNftModule: fwd_storage_legacy::ForwarderStorageModule {
             &amount,
             self.blockchain().get_gas_left(),
             &function,
-            &arguments.to_arg_buffer(),
+            &arguments.into_arg_buffer(),
         );
     }
 

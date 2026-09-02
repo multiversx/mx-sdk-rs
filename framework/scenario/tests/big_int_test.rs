@@ -1,6 +1,10 @@
 use multiversx_sc::types::BigInt;
 use multiversx_sc_scenario::api::StaticApi;
 
+// BigInt intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(BigInt::<StaticApi>: Send, Sync);
+
 #[test]
 fn test_big_int_add() {
     let x = BigInt::<StaticApi>::from(2);

@@ -1,0 +1,49 @@
+# sc-reproducible-build.toml
+#
+# Configuration for `sc-meta reproducible-build` commands.
+# Place this file at the workspace root (to configure all contracts)
+# or inside a single contract crate (to configure that contract only).
+#
+# CLI flags always take precedence over values here.
+
+# ─── General ─────────────────────────────────────────────────────────────────
+[general]
+
+# Pinned Docker image used for `sc-meta rb build` and `sc-meta rb publish`.
+# Bump this tag when upgrading the toolchain.
+docker-image = "multiversx/sdk-rust-contract-builder:v12.0.0-alpha"
+
+# ─── Build ───────────────────────────────────────────────────────────────────
+[build]
+
+# Output directory on the host where build artifacts are written.
+# Defaults to <project>/output-rb/ if omitted.
+output = "output-rb"
+
+# Wipe the output folder before building if it is not empty (default: false).
+overwrite = true
+
+# Uncomment to build only a specific contract in a multi-contract workspace.
+# contract = "my-contract"
+
+# Uncomment to skip wasm-opt post-processing.
+# no-wasm-opt = false
+
+# Folder where the project is copied before building.
+# For `build` (Docker): path inside the container. For `local-build`: path on the host.
+# Defaults to /tmp/sc-build if omitted.
+# build-root = "/tmp/sc-build"
+
+# ─── Publish ─────────────────────────────────────────────────────────────────
+# One entry per deployed instance (network / environment).
+# The `address` field is the on-chain bech32 address of the deployed contract.
+# Wallet: use either `pem` or `keystore`, not both.
+
+# [[publish]]
+# name         = "devnet"
+# address      = "erd1qqqqqqqqqqqqqpgq..."
+# source       = "output-rb/devnet/my-contract.source.json"
+# verifier-url = "https://devnet-play-api.multiversx.com"
+# pem          = "~/multiversx-wallets/devnet.pem"
+# keystore          = "~/multiversx-wallets/devnet.json"
+# keystore-password = ""   # omit to be prompted interactively
