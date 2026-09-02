@@ -18,6 +18,13 @@ const FUND_AMOUNT: u128 = 100_000_000_000_000_000_000;
 /// Minimum gas for a plain EGLD transfer.
 const GAS_LIMIT: u64 = 50_000;
 
+struct AdderTestContext<'a> {
+    sc_meta_bin: &'a str,
+    wasm_path: &'a std::path::Path,
+    wallet_pem_path: &'a std::path::Path,
+    wallet_address: &'a str,
+}
+
 /// Deploys the adder contract, calls `add`, and verifies `getSum` returns the expected value.
 /// Mirrors the deploy / add / getSum flow from the adder snippets.sh.
 #[tokio::test]
@@ -37,7 +44,17 @@ async fn test_adder_deploy_add_get_sum() {
     let sc_meta_bin = env!("CARGO_BIN_EXE_sc-meta");
 
     let wallet = Wallet::from_pem_file(&wallet_pem_path).unwrap();
-    let wallet_address = wallet.to_address().to_bech32_default();
+    let wallet_address = wallet
+        .to_address()
+        .to_bech32_default()
+        .to_bech32_str()
+        .to_owned();
+    let context = AdderTestContext {
+        sc_meta_bin,
+        wasm_path: &wasm_path,
+        wallet_pem_path: &wallet_pem_path,
+        wallet_address: &wallet_address,
+    };
 
     // Connect to the chain simulator, generate some initial blocks.
     let interactor = Interactor::new(CHAIN_SIMULATOR_URL)
@@ -45,15 +62,36 @@ async fn test_adder_deploy_add_get_sum() {
         .use_chain_simulator(true);
     interactor.generate_blocks(10).await.unwrap();
 
-    // ── deploy ────────────────────────────────────────────────────────────────
-    let deploy_output = Command::new(sc_meta_bin)
+    let contract_address = deploy_adder(&context, &outfile_deploy);
+    call_adder(&context, &contract_address, &outfile_call, 5);
+    assert_eq!(query_sum(&context, &contract_address), vec!["05"]);
+
+    upgrade_adder(&context, &contract_address, &outfile_upgrade);
+    assert_eq!(query_sum(&context, &contract_address), vec!["0a"]);
+
+    let relayer_pem_path = test_artefacts_dir.join("s1mon.pem");
+    let outfile_call_relayed = outfiles_dir.join("adder-call-relayed-cs.interaction.json");
+
+    generate_test_wallet(context.sc_meta_bin, "s1mon", &relayer_pem_path);
+    call_adder_relayed(
+        &context,
+        &contract_address,
+        &relayer_pem_path,
+        &outfile_call_relayed,
+        "3",
+    );
+    assert_eq!(query_sum(&context, &contract_address), vec!["0d"]);
+}
+
+fn deploy_adder(context: &AdderTestContext<'_>, outfile: &std::path::Path) -> String {
+    let output = Command::new(context.sc_meta_bin)
         .args([
             "tx",
             "deploy",
             "--bytecode",
-            wasm_path.to_str().unwrap(),
+            context.wasm_path.to_str().unwrap(),
             "--pem",
-            wallet_pem_path.to_str().unwrap(),
+            context.wallet_pem_path.to_str().unwrap(),
             "--proxy",
             CHAIN_SIMULATOR_URL,
             "--chain",
@@ -65,64 +103,62 @@ async fn test_adder_deploy_add_get_sum() {
             "--send",
             "--wait-result",
             "--outfile",
-            outfile_deploy.to_str().unwrap(),
+            outfile.to_str().unwrap(),
         ])
         .output()
         .expect("failed to execute sc-meta tx deploy");
-
     println!(
         "deploy stdout:\n{}",
-        String::from_utf8_lossy(&deploy_output.stdout)
+        String::from_utf8_lossy(&output.stdout)
     );
-    println!(
-        "deploy stderr:\n{}",
-        String::from_utf8_lossy(&deploy_output.stderr)
+    assert!(
+        output.status.success(),
+        "deploy failed:\n{}",
+        String::from_utf8_lossy(&output.stderr)
     );
-    assert!(deploy_output.status.success(), "deploy failed");
 
-    // Read the deployed contract address from the interaction output file.
-    let outfile_content =
-        std::fs::read_to_string(&outfile_deploy).expect("failed to read deploy outfile");
-    let deploy_json: serde_json::Value =
-        serde_json::from_str(&outfile_content).expect("failed to parse deploy outfile JSON");
-
-    // Verify deterministic deploy fields.
+    let content = std::fs::read_to_string(outfile).expect("failed to read deploy outfile");
+    let json: serde_json::Value =
+        serde_json::from_str(&content).expect("failed to parse deploy outfile JSON");
     assert_eq!(
-        deploy_json["emittedTransaction"]["sender"]
-            .as_str()
-            .unwrap(),
-        wallet_address.to_bech32_str(),
+        json["emittedTransaction"]["sender"].as_str().unwrap(),
+        context.wallet_address,
         "deploy sender mismatch"
     );
     assert_eq!(
-        deploy_json["emittedTransaction"]["receiver"]
-            .as_str()
-            .unwrap(),
+        json["emittedTransaction"]["receiver"].as_str().unwrap(),
         Bech32Address::zero_default_hrp().to_bech32_str(),
         "deploy receiver mismatch"
     );
     assert!(
-        deploy_json["emittedTransactionData"]
+        json["emittedTransactionData"]
             .as_str()
             .unwrap()
             .ends_with("@0500@0500@"),
         "deploy emittedTransactionData does not end with @0500@0500@"
     );
 
-    let contract_address = deploy_json["contractAddress"]
+    let contract_address = json["contractAddress"]
         .as_str()
-        .expect("contractAddress not found in deploy outfile");
-
+        .expect("contractAddress not found in deploy outfile")
+        .to_owned();
     println!("Deployed adder at: {contract_address}");
+    contract_address
+}
 
-    // ── add(5) ────────────────────────────────────────────────────────────────
-    let status = Command::new(sc_meta_bin)
+fn call_adder(
+    context: &AdderTestContext<'_>,
+    contract_address: &str,
+    outfile: &std::path::Path,
+    argument: usize,
+) {
+    let output = Command::new(context.sc_meta_bin)
         .args([
             "tx",
             "call",
             contract_address,
             "--pem",
-            wallet_pem_path.to_str().unwrap(),
+            context.wallet_pem_path.to_str().unwrap(),
             "--proxy",
             CHAIN_SIMULATOR_URL,
             "--chain",
@@ -132,42 +168,40 @@ async fn test_adder_deploy_add_get_sum() {
             "--function",
             "add",
             "--arguments",
-            "5",
+            argument.to_string().as_str(),
             "--send",
             "--wait-result",
             "--outfile",
-            outfile_call.to_str().unwrap(),
+            outfile.to_str().unwrap(),
         ])
-        .status()
+        .output()
         .expect("failed to execute sc-meta tx call");
+    println!("add stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+    assert!(output.status.success(), "add call failed");
 
-    assert!(status.success(), "add call failed");
-
-    // Read and verify deterministic call fields.
-    let call_content = std::fs::read_to_string(&outfile_call).expect("failed to read call outfile");
-    let call_json: serde_json::Value =
-        serde_json::from_str(&call_content).expect("failed to parse call outfile JSON");
-
+    let content = std::fs::read_to_string(outfile).expect("failed to read call outfile");
+    let json: serde_json::Value =
+        serde_json::from_str(&content).expect("failed to parse call outfile JSON");
     assert_eq!(
-        call_json["emittedTransaction"]["sender"].as_str().unwrap(),
-        wallet_address.to_bech32_str(),
+        json["emittedTransaction"]["sender"].as_str().unwrap(),
+        context.wallet_address,
         "call sender mismatch"
     );
     assert_eq!(
-        call_json["emittedTransaction"]["receiver"]
-            .as_str()
-            .unwrap(),
+        json["emittedTransaction"]["receiver"].as_str().unwrap(),
         contract_address,
         "call receiver mismatch"
     );
+    let expected_transaction_data = format!("add@{:02x}", argument);
     assert_eq!(
-        call_json["emittedTransactionData"].as_str().unwrap(),
-        "add@05",
+        json["emittedTransactionData"].as_str().unwrap(),
+        expected_transaction_data,
         "call emittedTransactionData mismatch"
     );
+}
 
-    // ── getSum ────────────────────────────────────────────────────────────────
-    let query_output = Command::new(sc_meta_bin)
+fn query_sum(context: &AdderTestContext<'_>, contract_address: &str) -> Vec<String> {
+    let output = Command::new(context.sc_meta_bin)
         .args([
             "tx",
             "query",
@@ -179,28 +213,27 @@ async fn test_adder_deploy_add_get_sum() {
         ])
         .output()
         .expect("failed to execute sc-meta tx query");
+    assert!(output.status.success(), "getSum query failed");
 
-    assert!(query_output.status.success(), "getSum query failed");
-
-    let stdout = String::from_utf8_lossy(&query_output.stdout);
+    let stdout = String::from_utf8_lossy(&output.stdout);
     println!("getSum result: {stdout}");
+    serde_json::from_str(stdout.trim()).expect("failed to parse query output as JSON")
+}
 
-    // The result is a JSON array of hex-encoded values, e.g. ["05"].
-    // 5 decimal = 0x05.
-    let result: Vec<String> =
-        serde_json::from_str(stdout.trim()).expect("failed to parse query output as JSON");
-    assert_eq!(result, vec!["05"], "getSum returned unexpected value");
-
-    // ── upgrade ───────────────────────────────────────────────────────────────
-    let upgrade_output = Command::new(sc_meta_bin)
+fn upgrade_adder(
+    context: &AdderTestContext<'_>,
+    contract_address: &str,
+    outfile: &std::path::Path,
+) {
+    let output = Command::new(context.sc_meta_bin)
         .args([
             "tx",
             "upgrade",
             contract_address,
             "--bytecode",
-            wasm_path.to_str().unwrap(),
+            context.wasm_path.to_str().unwrap(),
             "--pem",
-            wallet_pem_path.to_str().unwrap(),
+            context.wallet_pem_path.to_str().unwrap(),
             "--proxy",
             CHAIN_SIMULATOR_URL,
             "--chain",
@@ -212,76 +245,40 @@ async fn test_adder_deploy_add_get_sum() {
             "--send",
             "--wait-result",
             "--outfile",
-            outfile_upgrade.to_str().unwrap(),
+            outfile.to_str().unwrap(),
         ])
         .output()
         .expect("failed to execute sc-meta tx upgrade");
-
     println!(
         "upgrade stdout:\n{}",
-        String::from_utf8_lossy(&upgrade_output.stdout)
+        String::from_utf8_lossy(&output.stdout)
     );
-    println!(
-        "upgrade stderr:\n{}",
-        String::from_utf8_lossy(&upgrade_output.stderr)
-    );
-    assert!(upgrade_output.status.success(), "upgrade failed");
+    assert!(output.status.success(), "upgrade failed");
 
-    // Verify the upgrade outfile references the same contract address.
-    let upgrade_content =
-        std::fs::read_to_string(&outfile_upgrade).expect("failed to read upgrade outfile");
-    let upgrade_json: serde_json::Value =
-        serde_json::from_str(&upgrade_content).expect("failed to parse upgrade outfile JSON");
-
+    let content = std::fs::read_to_string(outfile).expect("failed to read upgrade outfile");
+    let json: serde_json::Value =
+        serde_json::from_str(&content).expect("failed to parse upgrade outfile JSON");
     assert_eq!(
-        upgrade_json["emittedTransaction"]["receiver"]
-            .as_str()
-            .unwrap(),
+        json["emittedTransaction"]["receiver"].as_str().unwrap(),
         contract_address,
         "upgrade receiver mismatch"
     );
+}
 
-    // getSum must return 10 (0a) after the upgrade.
-    let query_after_upgrade = Command::new(sc_meta_bin)
-        .args([
-            "tx",
-            "query",
-            contract_address,
-            "--proxy",
-            CHAIN_SIMULATOR_URL,
-            "--function",
-            "getSum",
-        ])
-        .output()
-        .expect("failed to execute sc-meta tx query after upgrade");
-
-    assert!(
-        query_after_upgrade.status.success(),
-        "getSum query after upgrade failed"
-    );
-
-    let stdout_after = String::from_utf8_lossy(&query_after_upgrade.stdout);
-    let result_after: Vec<String> =
-        serde_json::from_str(stdout_after.trim()).expect("failed to parse query output as JSON");
-    assert_eq!(
-        result_after,
-        vec!["0a"],
-        "getSum returned unexpected value after upgrade"
-    );
-
-    // ── add(3) via relayed transaction (one-step) ─────────────────────────────
-    let relayer_pem_path = test_artefacts_dir.join("s1mon.pem");
-    let outfile_call_relayed = outfiles_dir.join("adder-call-relayed-cs.interaction.json");
-
-    generate_test_wallet(sc_meta_bin, "s1mon", &relayer_pem_path);
-
-    let status = Command::new(sc_meta_bin)
+fn call_adder_relayed(
+    context: &AdderTestContext<'_>,
+    contract_address: &str,
+    relayer_pem_path: &std::path::Path,
+    outfile: &std::path::Path,
+    argument: &str,
+) {
+    let output = Command::new(context.sc_meta_bin)
         .args([
             "tx",
             "call",
             contract_address,
             "--pem",
-            wallet_pem_path.to_str().unwrap(),
+            context.wallet_pem_path.to_str().unwrap(),
             "--relayer-pem",
             relayer_pem_path.to_str().unwrap(),
             "--proxy",
@@ -293,44 +290,19 @@ async fn test_adder_deploy_add_get_sum() {
             "--function",
             "add",
             "--arguments",
-            "3",
+            argument,
             "--send",
             "--wait-result",
             "--outfile",
-            outfile_call_relayed.to_str().unwrap(),
-        ])
-        .status()
-        .expect("failed to execute sc-meta tx call (relayed)");
-
-    assert!(status.success(), "relayed add call failed");
-
-    // getSum must return 0a + 3 = 0d after the relayed add.
-    let query_after_relayed = Command::new(sc_meta_bin)
-        .args([
-            "tx",
-            "query",
-            contract_address,
-            "--proxy",
-            CHAIN_SIMULATOR_URL,
-            "--function",
-            "getSum",
+            outfile.to_str().unwrap(),
         ])
         .output()
-        .expect("failed to execute sc-meta tx query after relayed add");
-
-    assert!(
-        query_after_relayed.status.success(),
-        "getSum query after relayed add failed"
+        .expect("failed to execute sc-meta tx call (relayed)");
+    println!(
+        "relayed add stdout:\n{}",
+        String::from_utf8_lossy(&output.stdout)
     );
-
-    let stdout_relayed = String::from_utf8_lossy(&query_after_relayed.stdout);
-    let result_relayed: Vec<String> =
-        serde_json::from_str(stdout_relayed.trim()).expect("failed to parse query output as JSON");
-    assert_eq!(
-        result_relayed,
-        vec!["0d"],
-        "getSum returned unexpected value after relayed add"
-    );
+    assert!(output.status.success(), "relayed add call failed");
 }
 
 /// Sends a small amount of EGLD from Alice to Bob via the `sc-meta tx new` CLI command
