@@ -31,4 +31,8 @@ impl ManagedTypeContainer {
         let mmap = self.managed_map_map.get_mut(map_handle);
         mmap.remove(key).unwrap_or_default()
     }
+
+    pub fn mm_remove(&mut self, handle: RawHandle) {
+        self.managed_map_map.remove_handle(handle);
+    }
 }

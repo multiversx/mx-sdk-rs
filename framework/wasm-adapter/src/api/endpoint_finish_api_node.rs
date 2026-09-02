@@ -1,6 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn finish(dataOffset: *const u8, length: i32);
 

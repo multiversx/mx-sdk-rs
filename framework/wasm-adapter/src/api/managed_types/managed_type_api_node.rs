@@ -1,6 +1,7 @@
 use crate::api::VmApiImpl;
 use multiversx_sc::api::{ManagedTypeApi, ManagedTypeApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;
     fn mBufferToBigIntSigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;

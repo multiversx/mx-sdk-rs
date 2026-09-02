@@ -1,5 +1,10 @@
-use multiversx_sc::types::BigUint;
+use core::str::FromStr;
+use multiversx_sc::types::{BigUint, ParseBigUintError, SaturatingSub, SaturatingSubAssign};
 use multiversx_sc_scenario::api::StaticApi;
+
+// BigUint intentionally does not implement Send or Sync,
+// since it holds a managed handle that is only valid on the thread of the original context.
+static_assertions::assert_not_impl_any!(BigUint::<StaticApi>: Send, Sync);
 
 fn assert_big_uint_ln(x: u32, ln_str: &str) {
     let x = BigUint::<StaticApi>::from(x);
@@ -73,7 +78,160 @@ fn test_big_uint_proportion_all() {
 }
 
 #[test]
+fn test_big_uint_saturating_sub() {
+    let sub = |a: u64, b: u64| -> u64 {
+        let result = BigUint::<StaticApi>::from(a).saturating_sub(&BigUint::<StaticApi>::from(b));
+        result.to_u64().unwrap()
+    };
+
+    assert_eq!(sub(10, 3), 7);
+    assert_eq!(sub(10, 10), 0);
+    assert_eq!(sub(10, 11), 0);
+    assert_eq!(sub(0, 0), 0);
+    assert_eq!(sub(0, 1), 0);
+    assert_eq!(sub(1000, 999), 1);
+    assert_eq!(sub(i64::MAX as u64, i64::MAX as u64), 0);
+    assert_eq!(sub(i64::MAX as u64, 1), i64::MAX as u64 - 1);
+}
+
+#[test]
+fn test_big_uint_saturating_sub_assign() {
+    let sub_assign = |a: u64, b: u64| -> u64 {
+        let mut result = BigUint::<StaticApi>::from(a);
+        result.saturating_sub_assign(&BigUint::<StaticApi>::from(b));
+        result.to_u64().unwrap()
+    };
+
+    assert_eq!(sub_assign(10, 3), 7);
+    assert_eq!(sub_assign(10, 10), 0);
+    assert_eq!(sub_assign(10, 11), 0);
+    assert_eq!(sub_assign(0, 0), 0);
+    assert_eq!(sub_assign(0, 1), 0);
+    assert_eq!(sub_assign(1000, 999), 1);
+    assert_eq!(sub_assign(i64::MAX as u64, i64::MAX as u64), 0);
+    assert_eq!(sub_assign(i64::MAX as u64, 1), i64::MAX as u64 - 1);
+}
+
+#[test]
 #[should_panic = "StaticApi signal error: proportion overflow"]
 fn test_big_uint_proportion_overflow() {
     let _ = BigUint::<StaticApi>::from(100u64).proportion(100, i64::MAX as u64 + 1);
+}
+
+fn assert_nth_root(x: u64, k: u32, expected: u64) {
+    let big = BigUint::<StaticApi>::from(x);
+    let result = big.nth_root(k);
+    let expected_big = BigUint::<StaticApi>::from(expected);
+    assert_eq!(
+        result, expected_big,
+        "nth_root({x}, {k}) expected {expected}"
+    );
+}
+
+#[test]
+fn test_big_uint_nth_root() {
+    // k = 1: identity
+    assert_nth_root(0, 1, 0);
+    assert_nth_root(1, 1, 1);
+    assert_nth_root(42, 1, 42);
+
+    // zero base: always 0
+    assert_nth_root(0, 2, 0);
+    assert_nth_root(0, 3, 0);
+    assert_nth_root(0, 100, 0);
+
+    // perfect squares (agreeing with sqrt)
+    assert_nth_root(1, 2, 1);
+    assert_nth_root(4, 2, 2);
+    assert_nth_root(9, 2, 3);
+    assert_nth_root(100, 2, 10);
+    assert_nth_root(10000, 2, 100);
+
+    // perfect cubes
+    assert_nth_root(1, 3, 1);
+    assert_nth_root(8, 3, 2);
+    assert_nth_root(27, 3, 3);
+    assert_nth_root(125, 3, 5);
+    assert_nth_root(1000, 3, 10);
+
+    // floor (not an exact power)
+    assert_nth_root(2, 2, 1); // sqrt(2) ~ 1.41
+    assert_nth_root(10, 3, 2); // cbrt(10) ~ 2.154
+    assert_nth_root(100, 3, 4); // cbrt(100) ~ 4.641
+    assert_nth_root(255, 2, 15); // sqrt(255) ~ 15.96
+    assert_nth_root(1023, 10, 1); // 1023^(1/10) ~ 1.995
+
+    // higher roots
+    assert_nth_root(16, 4, 2); // 2^4 = 16
+    assert_nth_root(32, 5, 2); // 2^5 = 32
+    assert_nth_root(1024, 10, 2); // 2^10 = 1024
+    assert_nth_root(2_u64.pow(20), 20, 2); // 2^20
+
+    // large number
+    assert_nth_root(1_000_000_000, 3, 1000); // 1000^3 = 10^9
+}
+
+#[test]
+#[should_panic = "StaticApi signal error: cannot compute 0th root"]
+fn test_big_uint_nth_root_zero_k() {
+    let _ = BigUint::<StaticApi>::from(10u64).nth_root(0);
+}
+
+#[test]
+fn test_big_uint_parse() {
+    let parse = |s: &str| -> u64 { BigUint::<StaticApi>::from_str(s).unwrap().to_u64().unwrap() };
+
+    // smaller values
+    assert_eq!(parse("0"), 0);
+    assert_eq!(parse("1"), 1);
+    assert_eq!(parse("42"), 42);
+    assert_eq!(parse("1000000"), 1_000_000);
+    assert_eq!(parse("9223372036854775807"), i64::MAX as u64); // largest i64
+
+    // larger values
+    let ten = BigUint::<StaticApi>::from(10u64);
+    assert_eq!(
+        "10000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(19)
+    ); // 10^19 > i64::MAX
+    assert_eq!(
+        "100000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(20)
+    ); // 10^20 > u64::MAX
+    assert_eq!(
+        "1000000000000000000000000000000"
+            .parse::<BigUint<StaticApi>>()
+            .unwrap(),
+        ten.pow(30)
+    );
+
+    // str::parse uses FromStr, so .parse() should also work
+    let big: BigUint<StaticApi> = "12345".parse().unwrap();
+    assert_eq!(big, BigUint::<StaticApi>::from(12345u64));
+}
+
+#[test]
+fn test_big_uint_parse_errors() {
+    assert_eq!(BigUint::<StaticApi>::from_str(""), Err(ParseBigUintError));
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("abc"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("12x4"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(BigUint::<StaticApi>::from_str("-1"), Err(ParseBigUintError));
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("1.0"),
+        Err(ParseBigUintError)
+    );
+    assert_eq!(
+        BigUint::<StaticApi>::from_str("123e4"),
+        Err(ParseBigUintError)
+    );
 }

@@ -43,8 +43,9 @@ const NULL_ENTRY: usize = 0;
 ///
 /// # Trade-offs
 ///
-/// - **Pros**: O(1) insert, remove, and contains operations; efficient for membership testing.
-/// - **Cons**: No ordering guarantees; removal changes element positions; uses more storage than `SetMapper`.
+/// - **Pros**: O(1) insert, remove, and contains operations; efficient for membership testing;
+///   more compact storage than `SetMapper` (2N + 1 entries vs 3N + 1).
+/// - **Cons**: No ordering guarantees; `swap_remove` changes the positions of other elements.
 ///
 /// # Example
 ///

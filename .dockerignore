@@ -1,0 +1,10 @@
+# Exclude all Rust build output directories.
+# This prevents Docker from sending gigabytes of compiled artifacts
+# as part of the build context when building Dockerfile.local.
+**/target/
+
+# Not needed to build sc-meta from source.
+.github/
+.vscode/
+template-test/
+install-debugger-test/

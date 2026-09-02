@@ -54,6 +54,22 @@ pub fn generate_big_int_operators_trait() -> String {
     section_comment(&mut out, "Equality/comparison operators");
     write_filtered_endpoints(&endpoints, OperatorGroup::Cmp, false, &mut out);
 
+    section_comment(&mut out, "Saturating sub methods");
+    write_filtered_endpoints(
+        &endpoints,
+        OperatorGroup::SaturatingSubMethods,
+        false,
+        &mut out,
+    );
+
+    section_comment(&mut out, "Saturating sub assign methods");
+    write_filtered_endpoints(
+        &endpoints,
+        OperatorGroup::SaturatingSubMethods,
+        true,
+        &mut out,
+    );
+
     writeln!(&mut out, "\n}}").unwrap();
 
     out

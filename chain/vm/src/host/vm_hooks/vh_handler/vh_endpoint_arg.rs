@@ -14,10 +14,14 @@ use super::VMHooksHandler;
 /// The smart contract code doesn't have access to these methods directly.
 impl<C: VMHooksContext> VMHooksHandler<C> {
     pub fn get_num_arguments(&mut self) -> Result<i32, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_num_arguments)?;
+
         Ok(self.context.input_ref().args.len() as i32)
     }
 
     pub fn get_argument_len(&mut self, arg_index: i32) -> Result<usize, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_argument)?;
+
         let arg = self.context.input_ref().get_argument_vec_u8(arg_index);
         Ok(arg.len())
     }
@@ -78,6 +82,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn get_argument_i64(&mut self, arg_index: i32) -> Result<i64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.int_64_get_argument)?;
+
         // specific implementation provided, in order to simulate the VM error (status 10 instead of 4)
         let bytes = self.context.input_ref().get_argument_vec_u8(arg_index);
         let bi = BigInt::from_signed_bytes_be(&bytes);
@@ -89,6 +95,8 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn get_argument_u64(&mut self, arg_index: i32) -> Result<u64, VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.int_64_get_argument)?;
+
         // specific implementation provided, in order to simulate the VM error (status 10 instead of 4)
         let bytes = self.context.input_ref().get_argument_vec_u8(arg_index);
         let bu = BigUint::from_bytes_be(&bytes);

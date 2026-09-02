@@ -46,4 +46,6 @@ fn struct_3_static() {
         74
     );
     assert!(!<Auction<StaticApi> as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert!(<Auction<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
+    assert!(!<AuctionType as multiversx_sc::types::ManagedVecItem>::requires_drop());
 }

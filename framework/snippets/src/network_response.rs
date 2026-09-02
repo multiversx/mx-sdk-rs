@@ -1,18 +1,19 @@
 use crate::sdk::{
-    data::transaction::{ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork},
+    data::transaction::{ApiLogs, ApiSmartContractResult, ApiTransactionResult, Events},
     utils::base64_decode,
 };
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress, ReturnCode},
-    multiversx_chain_vm::{crypto_functions::keccak256, types::H256},
+    multiversx_chain_vm::types::H256,
+    multiversx_sc::chain_core::std::new_address::compute_new_address,
     scenario_model::{Log, TxResponse, TxResponseStatus},
 };
 
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
-/// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
-pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> TxResponse {
+/// Creates a [`TxResponse`] from an [`ApiTransactionResult`].
+pub fn parse_tx_response(tx: ApiTransactionResult, return_code: ReturnCode) -> TxResponse {
     let tx_error = process_signal_error(&tx, return_code);
     if !tx_error.is_success() {
         return TxResponse {
@@ -25,7 +26,7 @@ pub fn parse_tx_response(tx: TransactionOnNetwork, return_code: ReturnCode) -> T
     process_success(&tx)
 }
 
-fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> TxResponseStatus {
+fn process_signal_error(tx: &ApiTransactionResult, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         if event.topics.len() >= 2 {
             let error_message = String::from_utf8(base64_decode(&event.topics[1])).expect(
@@ -38,7 +39,7 @@ fn process_signal_error(tx: &TransactionOnNetwork, return_code: ReturnCode) -> T
     TxResponseStatus::default()
 }
 
-fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
+fn process_success(tx: &ApiTransactionResult) -> TxResponse {
     TxResponse {
         out: process_out(tx),
         new_deployed_address: process_new_deployed_address(tx),
@@ -50,7 +51,7 @@ fn process_success(tx: &TransactionOnNetwork) -> TxResponse {
     }
 }
 
-fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
+fn process_tx_hash(tx: &ApiTransactionResult) -> Option<H256> {
     tx.hash.as_ref().map(|encoded_hash| {
         let decoded = hex::decode(encoded_hash).expect("error decoding tx hash from hex");
         assert_eq!(decoded.len(), 32);
@@ -58,7 +59,7 @@ fn process_tx_hash(tx: &TransactionOnNetwork) -> Option<H256> {
     })
 }
 
-fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
+fn process_out(tx: &ApiTransactionResult) -> Vec<Vec<u8>> {
     let out_multi_transfer = tx.smart_contract_results.iter().find(is_multi_transfer);
     let out_scr = tx.smart_contract_results.iter().find(is_out_scr);
 
@@ -78,7 +79,7 @@ fn process_out(tx: &TransactionOnNetwork) -> Vec<Vec<u8>> {
     process_out_from_log(tx).unwrap_or_default()
 }
 
-fn process_logs(tx: &TransactionOnNetwork) -> Vec<Log> {
+fn process_logs(tx: &ApiTransactionResult) -> Vec<Log> {
     if let Some(api_logs) = &tx.logs {
         return api_logs
             .events
@@ -99,7 +100,7 @@ fn extract_data(event: &Events) -> Vec<Vec<u8>> {
     let mut out: Vec<Vec<u8>> = Vec::new();
     event
         .data
-        .for_each(|data_field| out.push(data_field.clone().into_bytes()));
+        .for_each(|data_field| out.push(data_field.to_string().into_bytes()));
     out
 }
 
@@ -112,7 +113,7 @@ fn extract_topics(event: &Events) -> Vec<Vec<u8>> {
         .collect()
 }
 
-fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
+fn process_out_from_log(tx: &ApiTransactionResult) -> Option<Vec<Vec<u8>>> {
     if let Some(logs) = &tx.logs {
         logs.events.iter().rev().find_map(|event| {
             if event.identifier == "writeLog" {
@@ -127,31 +128,19 @@ fn process_out_from_log(tx: &TransactionOnNetwork) -> Option<Vec<Vec<u8>>> {
     }
 }
 
-fn process_new_deployed_address(tx: &TransactionOnNetwork) -> Option<Address> {
+fn process_new_deployed_address(tx: &ApiTransactionResult) -> Option<Address> {
     if tx.processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
         return None;
     }
 
-    let sender_address_bytes = tx.sender.address.as_bytes();
-    let sender_nonce_bytes = tx.nonce.to_le_bytes();
-    let mut bytes_to_hash: Vec<u8> = Vec::new();
-    bytes_to_hash.extend_from_slice(sender_address_bytes);
-    bytes_to_hash.extend_from_slice(&sender_nonce_bytes);
-
-    let address_keccak = keccak256(&bytes_to_hash);
-
-    let mut address = [0u8; 32];
-
-    address[0..8].copy_from_slice(&[0u8; 8]);
-    address[8..10].copy_from_slice(&[5, 0]);
-    address[10..30].copy_from_slice(&address_keccak[10..30]);
-    address[30..32].copy_from_slice(&sender_address_bytes[30..32]);
-
-    Some(Address::from(address))
+    Some(compute_new_address(&tx.sender.address, tx.nonce))
 }
 
-fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<String> {
-    let original_tx_data = String::from_utf8(base64_decode(tx.data.as_ref().unwrap())).unwrap();
+fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<String> {
+    let Some(data) = &tx.data else {
+        return None;
+    };
+    let original_tx_data = String::from_utf8(base64_decode(data)).unwrap_or_default();
 
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.address != ESDTSystemSCAddress.to_address() {
@@ -164,7 +153,7 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
             .find(|e| e.hash == scr.prev_tx_hash)
         {
             prev_tx.data.as_ref()
-        } else if &scr.prev_tx_hash == tx.hash.as_ref().unwrap() {
+        } else if tx.hash.as_deref() == Some(scr.prev_tx_hash.as_str()) {
             &original_tx_data
         } else {
             continue;
@@ -192,17 +181,17 @@ fn process_new_issued_token_identifier(tx: &TransactionOnNetwork) -> Option<Stri
         }
 
         if scr.data.starts_with("ESDTTransfer@") {
-            let encoded_tid = scr.data.split('@').nth(1);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(1)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         } else if scr.data.starts_with("@00@") || scr.data.starts_with("@6f6b@") {
-            let encoded_tid = scr.data.split('@').nth(2);
-            return Some(String::from_utf8(hex::decode(encoded_tid?).unwrap()).unwrap());
+            let encoded_tid = scr.data.split('@').nth(2)?;
+            return String::from_utf8(hex::decode(encoded_tid).ok()?).ok();
         }
     }
     None
 }
 
-fn find_log<'a>(tx: &'a TransactionOnNetwork, log_identifier: &str) -> Option<&'a Events> {
+fn find_log<'a>(tx: &'a ApiTransactionResult, log_identifier: &str) -> Option<&'a Events> {
     if let Some(logs) = &tx.logs {
         logs.events
             .iter()

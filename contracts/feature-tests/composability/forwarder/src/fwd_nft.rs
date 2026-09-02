@@ -249,7 +249,7 @@ pub trait ForwarderNftModule: fwd_storage::ForwarderStorageModule {
             .to(&to)
             .gas(gas_left)
             .raw_call(function)
-            .arguments_raw(arguments.to_arg_buffer())
+            .arguments_raw(arguments.into_arg_buffer())
             .single_esdt(&token_identifier, nonce, &amount)
             .transfer_execute();
     }

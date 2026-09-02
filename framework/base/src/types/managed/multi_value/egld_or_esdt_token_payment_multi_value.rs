@@ -39,8 +39,8 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPaymentMultiValue<M> {
     const SKIPS_RESERIALIZATION: bool = EgldOrEsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Ref<'a, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        EgldOrEsdtTokenPayment::read_from_payload(payload).into()
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe { EgldOrEsdtTokenPayment::read_from_payload(payload).into() }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
@@ -49,6 +49,10 @@ impl<M: ManagedTypeApi> ManagedVecItem for EgldOrEsdtTokenPaymentMultiValue<M> {
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.obj.save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        true
     }
 }
 

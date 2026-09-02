@@ -1,5 +1,6 @@
 use multiversx_sc::api::ManagedMapApiImpl;
 
+#[link(wasm_import_module = "env")]
 #[allow(dead_code)]
 unsafe extern "C" {
     fn managedMapNew() -> i32;

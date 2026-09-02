@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
-use multiversx_sc::types::{BigUint, ManagedRef, ManagedVec};
-use multiversx_sc_scenario::api::StaticApi;
+use multiversx_sc::types::{BigUint, ManagedBuffer, ManagedRef, ManagedVec};
+use multiversx_sc_scenario::api::{DebugApi, StaticApi};
 
 #[test]
 fn test_managed_vec_iter_rev() {
@@ -556,6 +556,48 @@ fn test_append_vec() {
 }
 
 #[test]
+fn test_clone_u32_non_drop_path() {
+    assert!(!<u32 as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, u32>::new();
+    original.push(10u32);
+    original.push(20u32);
+    original.push(30u32);
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    let old = cloned.set(1, 99u32).unwrap();
+    assert_eq!(old, 20u32);
+
+    // Mutating the clone must not affect the source.
+    assert_eq!(cloned.get(1), 99u32);
+    assert_eq!(original.get(1), 20u32);
+}
+
+#[test]
+fn test_clone_biguint_drop_path() {
+    assert!(<BigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::requires_drop());
+
+    let mut original = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    original.push(BigUint::from(10u64));
+    original.push(BigUint::from(20u64));
+    original.push(BigUint::from(30u64));
+
+    let mut cloned = original.clone();
+    assert_eq!(cloned, original);
+
+    {
+        let mut first = cloned.get_mut(0);
+        *first += 100u64;
+    }
+
+    // Clone changes are independent from source for managed, drop-requiring types too.
+    assert_eq!(*cloned.get(0), BigUint::from(110u64));
+    assert_eq!(*original.get(0), BigUint::from(10u64));
+}
+
+#[test]
 fn test_overwrite_with_single_item() {
     let mut vec = Vec::new();
     for i in 20u64..=30u64 {
@@ -597,6 +639,52 @@ fn test_managed_vec_get_mut() {
 }
 
 #[test]
+fn test_eq_managed_buffer() {
+    let make_vec = |items: &[&[u8]]| -> ManagedVec<StaticApi, ManagedBuffer<StaticApi>> {
+        let mut v = ManagedVec::new();
+        for &item in items {
+            v.push(ManagedBuffer::new_from_bytes(item));
+        }
+        v
+    };
+
+    // equal vecs
+    assert_eq!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo", b"bar"]));
+
+    // different content
+    assert_ne!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo", b"baz"]));
+
+    // different length
+    assert_ne!(make_vec(&[b"foo", b"bar"]), make_vec(&[b"foo"]));
+
+    // both empty
+    assert_eq!(make_vec(&[]), make_vec(&[]));
+}
+
+#[test]
+fn test_eq_u32() {
+    let make_vec = |items: &[u32]| -> ManagedVec<StaticApi, u32> {
+        let mut v = ManagedVec::new();
+        for &item in items {
+            v.push(item);
+        }
+        v
+    };
+
+    // equal vecs
+    assert_eq!(make_vec(&[1, 2, 3]), make_vec(&[1, 2, 3]));
+
+    // different content
+    assert_ne!(make_vec(&[1, 2, 3]), make_vec(&[1, 2, 4]));
+
+    // different length
+    assert_ne!(make_vec(&[1, 2, 3]), make_vec(&[1, 2]));
+
+    // both empty
+    assert_eq!(make_vec(&[]), make_vec(&[]));
+}
+
+#[test]
 fn test_is_single_item() {
     let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     assert!(managed_vec.is_single_item().is_none());
@@ -609,4 +697,331 @@ fn test_is_single_item() {
 
     managed_vec.push(BigUint::<StaticApi>::from(2u32));
     assert!(managed_vec.is_single_item().is_none());
+}
+
+#[test]
+fn test_byte_len() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    assert_eq!(vec.byte_len(), 0);
+    vec.push(1u32);
+    assert_eq!(vec.byte_len(), 4); // u32 is 4 bytes
+    vec.push(2u32);
+    assert_eq!(vec.byte_len(), 8);
+    vec.push(3u32);
+    assert_eq!(vec.byte_len(), 12);
+}
+
+#[test]
+fn test_is_empty() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    assert!(vec.is_empty());
+    vec.push(42u32);
+    assert!(!vec.is_empty());
+}
+
+#[test]
+fn test_is_empty_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    assert!(vec.is_empty());
+    vec.push(BigUint::from(42u64));
+    assert!(!vec.is_empty());
+}
+
+#[test]
+fn test_try_get() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    assert!(vec.try_get(0).is_none());
+    vec.push(10u32);
+    vec.push(20u32);
+    assert_eq!(vec.try_get(0).unwrap(), 10u32);
+    assert_eq!(vec.try_get(1).unwrap(), 20u32);
+    assert!(vec.try_get(2).is_none());
+}
+
+#[test]
+fn test_try_get_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    assert!(vec.try_get(0).is_none());
+    vec.push(BigUint::from(10u64));
+    vec.push(BigUint::from(20u64));
+    assert_eq!(*vec.try_get(0).unwrap(), BigUint::from(10u64));
+    assert_eq!(*vec.try_get(1).unwrap(), BigUint::from(20u64));
+    assert!(vec.try_get(2).is_none());
+}
+
+#[test]
+fn test_set_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    vec.push(10u32);
+    vec.push(20u32);
+    vec.push(30u32);
+
+    let old = vec.set(1, 99u32).unwrap();
+    assert_eq!(old, 20u32);
+    assert_eq!(vec.get(0), 10u32);
+    assert_eq!(vec.get(1), 99u32);
+    assert_eq!(vec.get(2), 30u32);
+}
+
+#[test]
+fn test_set_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    vec.push(BigUint::from(10u64));
+    vec.push(BigUint::from(20u64));
+    vec.push(BigUint::from(30u64));
+
+    let old = vec.set(1, BigUint::from(99u64)).unwrap();
+    assert_eq!(old, BigUint::from(20u64));
+    assert_eq!(*vec.get(0), BigUint::from(10u64));
+    assert_eq!(*vec.get(1), BigUint::from(99u64));
+    assert_eq!(*vec.get(2), BigUint::from(30u64));
+}
+
+#[test]
+fn test_slice_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    for i in 1u32..=5u32 {
+        vec.push(i);
+    }
+
+    let sliced = vec.clone_range(1, 4).unwrap();
+    assert_eq!(sliced.len(), 3);
+    assert_eq!(sliced.get(0), 2u32);
+    assert_eq!(sliced.get(1), 3u32);
+    assert_eq!(sliced.get(2), 4u32);
+
+    // original is intact
+    assert_eq!(vec.len(), 5);
+
+    // empty slice (start == end)
+    let empty = vec.clone_range(2, 2).unwrap();
+    assert!(empty.is_empty());
+
+    // out of range
+    assert!(vec.clone_range(3, 10).is_none());
+
+    // full slice
+    let full = vec.clone_range(0, 5).unwrap();
+    assert_eq!(full.len(), 5);
+}
+
+#[test]
+fn test_slice_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    let sliced = vec.clone_range(1, 4).unwrap();
+    assert_eq!(sliced.len(), 3);
+    assert_eq!(*sliced.get(0), BigUint::from(2u64));
+    assert_eq!(*sliced.get(1), BigUint::from(3u64));
+    assert_eq!(*sliced.get(2), BigUint::from(4u64));
+
+    // original is intact after slicing (items were deep-copied)
+    assert_eq!(vec.len(), 5);
+    assert_eq!(*vec.get(0), BigUint::from(1u64));
+
+    // out of range
+    assert!(vec.clone_range(3, 10).is_none());
+}
+
+#[test]
+fn test_slice_biguint_debug_api() {
+    // Keep this test on the DebugApi stack, where managed-type dropping semantics
+    // differ from StaticApi and previously exposed slice aliasing issues.
+    DebugApi::dummy();
+
+    let mut vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    let mut sliced = vec.clone_range(1, 4).unwrap();
+    assert_eq!(sliced.len(), 3);
+    assert_eq!(*sliced.get(0), BigUint::from(2u64));
+    assert_eq!(*sliced.get(1), BigUint::from(3u64));
+    assert_eq!(*sliced.get(2), BigUint::from(4u64));
+
+    // Mutating the slice must not mutate the source collection.
+    {
+        let mut first_sliced = sliced.get_mut(0);
+        *first_sliced += &BigUint::from(100u64);
+    }
+    assert_eq!(*sliced.get(0), BigUint::from(102u64));
+
+    // Original is intact after slicing and after mutating the slice.
+    assert_eq!(vec.len(), 5);
+    assert_eq!(*vec.get(0), BigUint::from(1u64));
+    assert_eq!(*vec.get(1), BigUint::from(2u64));
+}
+
+#[test]
+fn test_slice_out_of_bounds_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    for i in 1u32..=5u32 {
+        vec.push(i);
+    }
+
+    // end > len
+    assert!(vec.clone_range(0, 6).is_none());
+    assert!(vec.clone_range(3, 6).is_none());
+
+    // start > end
+    assert!(vec.clone_range(3, 2).is_none());
+    assert!(vec.clone_range(5, 1).is_none());
+
+    // start == end == len is a valid empty slice, not out of bounds
+    assert!(vec.clone_range(5, 5).is_some());
+    assert!(vec.clone_range(5, 5).unwrap().is_empty());
+
+    // start > len
+    assert!(vec.clone_range(6, 6).is_none());
+
+    // empty vec
+    let empty = ManagedVec::<StaticApi, u32>::new();
+    assert!(empty.clone_range(0, 1).is_none());
+    assert!(empty.clone_range(1, 0).is_none());
+    // empty slice from empty vec is valid
+    assert!(empty.clone_range(0, 0).is_some());
+    assert!(empty.clone_range(0, 0).unwrap().is_empty());
+}
+
+#[test]
+fn test_slice_out_of_bounds_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+
+    // end > len
+    assert!(vec.clone_range(0, 6).is_none());
+    assert!(vec.clone_range(3, 6).is_none());
+
+    // start > end
+    assert!(vec.clone_range(3, 2).is_none());
+    assert!(vec.clone_range(5, 1).is_none());
+
+    // start == end == len is a valid empty slice, not out of bounds
+    assert!(vec.clone_range(5, 5).is_some());
+    assert!(vec.clone_range(5, 5).unwrap().is_empty());
+
+    // start > len
+    assert!(vec.clone_range(6, 6).is_none());
+
+    // empty vec
+    let empty = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    assert!(empty.clone_range(0, 1).is_none());
+    assert!(empty.clone_range(1, 0).is_none());
+    // empty slice from empty vec is valid
+    assert!(empty.clone_range(0, 0).is_some());
+    assert!(empty.clone_range(0, 0).unwrap().is_empty());
+}
+
+#[test]
+fn test_remove_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    vec.push(10u32);
+    vec.push(20u32);
+    vec.push(30u32);
+
+    vec.remove(1);
+    assert_eq!(vec.len(), 2);
+    assert_eq!(vec.get(0), 10u32);
+    assert_eq!(vec.get(1), 30u32);
+
+    vec.remove(0);
+    assert_eq!(vec.len(), 1);
+    assert_eq!(vec.get(0), 30u32);
+
+    vec.remove(0);
+    assert!(vec.is_empty());
+}
+
+#[test]
+fn test_remove_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    vec.push(BigUint::from(10u64));
+    vec.push(BigUint::from(20u64));
+    vec.push(BigUint::from(30u64));
+
+    vec.remove(1);
+    assert_eq!(vec.len(), 2);
+    assert_eq!(*vec.get(0), BigUint::from(10u64));
+    assert_eq!(*vec.get(1), BigUint::from(30u64));
+}
+
+#[test]
+fn test_from_single_item_u32() {
+    let vec = ManagedVec::<StaticApi, u32>::from_single_item(42u32);
+    assert_eq!(vec.len(), 1);
+    assert_eq!(vec.get(0), 42u32);
+}
+
+#[test]
+fn test_from_single_item_biguint() {
+    let vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::from_single_item(BigUint::from(42u64));
+    assert_eq!(vec.len(), 1);
+    assert_eq!(*vec.get(0), BigUint::from(42u64));
+}
+
+#[test]
+fn test_clear_u32() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    for i in 1u32..=5u32 {
+        vec.push(i);
+    }
+    assert_eq!(vec.len(), 5);
+    vec.clear();
+    assert!(vec.is_empty());
+    // can still push after clear
+    vec.push(1u32);
+    assert_eq!(vec.len(), 1);
+}
+
+#[test]
+fn test_clear_biguint() {
+    let mut vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    for i in 1u64..=5u64 {
+        vec.push(BigUint::from(i));
+    }
+    assert_eq!(vec.len(), 5);
+    vec.clear();
+    assert!(vec.is_empty());
+    // can still push after clear
+    vec.push(BigUint::from(1u64));
+    assert_eq!(vec.len(), 1);
+}
+
+#[test]
+fn test_find() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    vec.push(10u32);
+    vec.push(20u32);
+    vec.push(30u32);
+    vec.push(20u32); // duplicate
+
+    assert_eq!(vec.find(&10u32), Some(0));
+    assert_eq!(vec.find(&20u32), Some(1)); // first occurrence
+    assert_eq!(vec.find(&30u32), Some(2));
+    assert_eq!(vec.find(&99u32), None);
+
+    let empty = ManagedVec::<StaticApi, u32>::new();
+    assert_eq!(empty.find(&10u32), None);
+}
+
+#[test]
+fn test_contains() {
+    let mut vec = ManagedVec::<StaticApi, u32>::new();
+    vec.push(10u32);
+    vec.push(20u32);
+    vec.push(30u32);
+
+    assert!(vec.contains(&10u32));
+    assert!(vec.contains(&20u32));
+    assert!(vec.contains(&30u32));
+    assert!(!vec.contains(&99u32));
+
+    let empty = ManagedVec::<StaticApi, u32>::new();
+    assert!(!empty.contains(&10u32));
 }

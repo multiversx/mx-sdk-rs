@@ -9,3 +9,8 @@
 # Mandos test trace
 adder_trace*.scen.json
 trace*.scen.json
+
+# Script artifacts
+snippets/*.pem
+snippets/*.data-storage.json
+snippets/*.interaction.json

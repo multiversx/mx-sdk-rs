@@ -3,5 +3,5 @@
 **/output/**
 **/testnet/**
 **/wallets/**
-**/mxpy.data-storage.json
+**/*.data-storage.json
 **/*.interaction.json

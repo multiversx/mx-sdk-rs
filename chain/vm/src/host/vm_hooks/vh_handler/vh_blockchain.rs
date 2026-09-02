@@ -41,11 +41,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn managed_caller(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_caller)?;
 
         self.context
             .m_types_lock()
@@ -54,11 +50,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
     }
 
     pub fn managed_sc_address(&mut self, dest_handle: RawHandle) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_sc_address)?;
 
         self.context
             .m_types_lock()
@@ -70,11 +62,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         &mut self,
         dest_handle: RawHandle,
     ) -> Result<(), VMHooksEarlyExit> {
-        self.use_gas(
-            self.gas_schedule()
-                .managed_buffer_api_cost
-                .m_buffer_set_bytes,
-        )?;
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_owner_address)?;
 
         self.context.m_types_lock().mb_set(
             dest_handle,
@@ -375,6 +363,31 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
             .m_types_lock()
             .mb_set(response_handle, code_metadata_bytes.to_vec());
 
+        Ok(())
+    }
+
+    fn get_code_hash(&mut self, address: &Address) -> Vec<u8> {
+        let Some(data) = self.context.account_data(address) else {
+            return vec![];
+        };
+        let Some(code) = &data.contract_path else {
+            return vec![];
+        };
+        multiversx_chain_core::std::code_hash(code).to_vec()
+    }
+
+    pub fn managed_get_code_hash(
+        &mut self,
+        address_handle: i32,
+        code_hash_handle: i32,
+    ) -> Result<(), VMHooksEarlyExit> {
+        self.use_gas(self.gas_schedule().base_ops_api_cost.get_code_hash)?;
+
+        let address = Address::from_slice(self.context.m_types_lock().mb_get(address_handle));
+        let code_hash = self.get_code_hash(&address);
+        self.context
+            .m_types_lock()
+            .mb_set(code_hash_handle, code_hash);
         Ok(())
     }
 

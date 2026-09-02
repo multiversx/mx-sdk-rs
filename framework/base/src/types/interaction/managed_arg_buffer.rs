@@ -322,10 +322,12 @@ where
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
-    fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
-        Self::from(ManagedVec::<M, ManagedBuffer<M>>::read_from_payload(
-            payload,
-        ))
+    unsafe fn read_from_payload(payload: &Self::PAYLOAD) -> Self {
+        unsafe {
+            Self::from(ManagedVec::<M, ManagedBuffer<M>>::read_from_payload(
+                payload,
+            ))
+        }
     }
 
     unsafe fn borrow_from_payload<'a>(payload: &Self::PAYLOAD) -> Self::Ref<'a> {
@@ -337,6 +339,10 @@ where
 
     fn save_to_payload(self, payload: &mut Self::PAYLOAD) {
         self.data.save_to_payload(payload);
+    }
+
+    fn requires_drop() -> bool {
+        true
     }
 }
 

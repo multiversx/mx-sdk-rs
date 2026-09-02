@@ -1,6 +1,7 @@
 use super::VmApiImpl;
 use multiversx_sc::api::{TestApi, TestApiImpl};
 
+#[link(wasm_import_module = "env")]
 unsafe extern "C" {
 
     fn createAccount(addressHandle: i32, nonce: i64, balanceHandle: i32);

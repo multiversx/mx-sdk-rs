@@ -1,9 +1,12 @@
-use multiversx_chain_vm::{executor::VMHooks, host::vm_hooks::VMHooksDispatcher};
+use multiversx_chain_vm::host::vm_hooks::VMHooksDispatcher;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
-use multiversx_sc::{api::RawHandle, types::Address};
+use multiversx_sc::types::Address;
 use std::sync::Mutex;
 
-use crate::executor::debug::StaticVarData;
+use crate::{
+    api::StaticApiHandle,
+    executor::debug::{StaticVarData, VMHooksDebugger},
+};
 
 use super::{StaticApiVMHooksContext, VMHooksApi, VMHooksApiBackend};
 
@@ -21,11 +24,11 @@ thread_local! {
 pub struct StaticApiBackend;
 
 impl VMHooksApiBackend for StaticApiBackend {
-    type HandleType = RawHandle;
+    type HandleType = StaticApiHandle;
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&mut dyn VMHooks) -> Result<R, VMHooksEarlyExit>,
+        F: FnOnce(&mut dyn VMHooksDebugger) -> Result<R, VMHooksEarlyExit>,
     {
         let result = STATIC_API_VH_CELL.with(|vh_mutex| {
             let mut vh = vh_mutex.lock().unwrap();
@@ -43,6 +46,10 @@ impl VMHooksApiBackend for StaticApiBackend {
             let data = data_mutex.lock().unwrap();
             f(&data)
         })
+    }
+
+    fn backend_requires_managed_type_drop() -> bool {
+        true
     }
 }
 

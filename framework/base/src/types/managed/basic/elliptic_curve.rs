@@ -132,10 +132,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             x_result_handle.clone(),
             y_result_handle.clone(),
             self.handle.clone(),
-            x_first_point.value.handle,
-            y_first_point.value.handle,
-            x_second_point.value.handle,
-            y_second_point.value.handle,
+            x_first_point.value.handle.clone(),
+            y_first_point.value.handle.clone(),
+            x_second_point.value.handle.clone(),
+            y_second_point.value.handle.clone(),
         );
         unsafe {
             (
@@ -153,8 +153,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             x_result_handle.clone(),
             y_result_handle.clone(),
             self.handle.clone(),
-            x_point.value.handle,
-            y_point.value.handle,
+            x_point.value.handle.clone(),
+            y_point.value.handle.clone(),
         );
         unsafe {
             (
@@ -168,8 +168,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         let api = M::managed_type_impl();
         api.ec_is_on_curve(
             self.handle.clone(),
-            x_point.value.handle,
-            y_point.value.handle,
+            x_point.value.handle.clone(),
+            y_point.value.handle.clone(),
         )
     }
 
@@ -187,8 +187,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             x_result_handle.clone(),
             y_result_handle.clone(),
             self.handle.clone(),
-            x_point.value.handle,
-            y_point.value.handle,
+            x_point.value.handle.clone(),
+            y_point.value.handle.clone(),
             data,
         );
         unsafe {
@@ -212,8 +212,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             x_result_handle.clone(),
             y_result_handle.clone(),
             self.handle.clone(),
-            x_point.value.handle,
-            y_point.value.handle,
+            x_point.value.handle.clone(),
+            y_point.value.handle.clone(),
             data.get_handle(),
         );
         unsafe {
@@ -274,8 +274,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         let api = M::managed_type_impl();
         api.ec_marshal_legacy(
             self.handle.clone(),
-            x_pair.value.handle,
-            y_pair.value.handle,
+            x_pair.value.handle.clone(),
+            y_pair.value.handle.clone(),
         )
     }
 
@@ -284,8 +284,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal(
             self.handle.clone(),
-            x_pair.value.handle,
-            y_pair.value.handle,
+            x_pair.value.handle.clone(),
+            y_pair.value.handle.clone(),
             result_handle.clone(),
         );
         unsafe { ManagedBuffer::from_handle(result_handle) }
@@ -304,8 +304,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         let api = M::managed_type_impl();
         api.ec_marshal_compressed_legacy(
             self.handle.clone(),
-            x_pair.value.handle,
-            y_pair.value.handle,
+            x_pair.value.handle.clone(),
+            y_pair.value.handle.clone(),
         )
     }
 
@@ -314,8 +314,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal_compressed(
             self.handle.clone(),
-            x_pair.value.handle,
-            y_pair.value.handle,
+            x_pair.value.handle.clone(),
+            y_pair.value.handle.clone(),
             result_handle.clone(),
         );
         unsafe { ManagedBuffer::from_handle(result_handle) }

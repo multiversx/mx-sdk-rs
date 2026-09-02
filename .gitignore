@@ -20,6 +20,11 @@ chain/wasmer-prod/Cargo.lock
 !contracts/feature-tests/gas-tests/Cargo.lock
 !chain/wasmer-prod/Cargo.lock
 
+# Test artefacts
+template-test
+contracts/test*
+install-debugger-test
+
 # Coverage outputs
 *.profraw
 *.profdata
@@ -38,8 +43,6 @@ tools/coverage
 # Others
 my-vm-tests.sh
 quick.sh
-template-test
-install-debugger-test
 .DS_Store
 
 # Zip output with example wasm binaries
@@ -51,7 +54,7 @@ tags
 **/node_modules
 **/output/**
 **/testnet/**
-**/mxpy.data-storage.json
+**/*.data-storage.json
 **/*.interaction.json
 
 # Python scripts
