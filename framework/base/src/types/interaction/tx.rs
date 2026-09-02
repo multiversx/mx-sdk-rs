@@ -1,5 +1,5 @@
 use crate::types::{
-    BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+    BigUint, CodeMetadata, CodePath, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
     EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenIdentifier, EsdtTokenPayment,
     EsdtTokenPaymentRefs, EsdtTokenPaymentVec, ManagedAddress, ManagedBuffer, ManagedVec,
     TxPaymentCompose, heap::H256,
@@ -11,7 +11,7 @@ use multiversx_sc_codec::TopEncodeMulti;
 use super::{
     AnnotatedValue, Code, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
     ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
-    TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
+    TxCodePathValue, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
     TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
     TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxTo, TxToSpecified,
     UpgradeCall,
@@ -837,6 +837,25 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data.code_source(FromSource(source_address)),
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Sets the path to the code file. Only works in parametric tests.
+    pub fn code_path<CodePathValue>(
+        self,
+        code: CodePathValue,
+    ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodePath<CodePathValue>>, RH>
+    where
+        CodePathValue: TxCodePathValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data.code_source(CodePath(code)),
             result_handler: self.result_handler,
         }
     }

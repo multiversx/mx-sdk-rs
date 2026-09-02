@@ -1,0 +1,96 @@
+{
+    "name": "caller",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "steps/init.steps.json"
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_init.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "out of funds",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "1000000000",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "3",
+                    "0"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "7",
+                "message": ""
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_init.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "out of funds - indirect",
+            "comment": "SC attempts to send too many tokens",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "1000",
+                "arguments": [
+                    "sc:callee",
+                    "str:fail_if_neg",
+                    "3",
+                    "2000"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:failed transfer (insufficient funds)"
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_init.steps.json"
+        },
+        {
+            "step": "scCall",
+            "id": "nonexistent account",
+            "comment": "indirect call to nonexistent account",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:caller",
+                "function": "call_other",
+                "value": "1000",
+                "arguments": [
+                    "sc:invalidaddress",
+                    "str:fail_if_neg",
+                    "3",
+                    "10"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "*"
+            }
+        },
+        {
+            "step": "externalSteps",
+            "path": "steps/check_init.steps.json"
+        }
+    ]
+}

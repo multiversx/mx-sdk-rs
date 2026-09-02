@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use wasmparser::ValType;
 
-use super::VM_HOOK_SIGNATURES;
+use super::{TEST_API_HOOK_SIGNATURES, VM_HOOK_SIGNATURES};
 
 #[derive(Debug, Clone)]
 pub struct VmHookSignature {
@@ -58,6 +58,9 @@ fn val_type_to_wat(val_type: ValType) -> &'static str {
 pub fn vm_hook_signature_map() -> HashMap<&'static str, VmHookSignature> {
     let mut map = HashMap::new();
     for vm_hook in VM_HOOK_SIGNATURES {
+        map.insert(vm_hook.name, vm_hook.clone());
+    }
+    for vm_hook in TEST_API_HOOK_SIGNATURES {
         map.insert(vm_hook.name, vm_hook.clone());
     }
     map

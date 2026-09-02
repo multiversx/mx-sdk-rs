@@ -1,0 +1,178 @@
+{
+    "name": "addercaller",
+    "comment": "add then check",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "100000",
+                    "esdt": {
+                        "str:MYESDT": "200"
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:adder"
+                },
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "2",
+                    "newAddress": "sc:addercaller"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy adder",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../myadder/output/adder.wasm",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy addercaller",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/addercaller.wasm",
+                "arguments": [
+                    "sc:adder"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call adder",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:adder",
+                "function": "add",
+                "value": "1000",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["8"],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call addercaller egld",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:addercaller",
+                "function": "call_adder",
+                "value": "1000",
+                "arguments": [
+                    "4"
+                ],
+                "gasLimit": "15,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["12", "str:added"],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call addercaller esdt",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:addercaller",
+                "function": "call_adder_esdt",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:MYESDT",
+                        "value": "30"
+                    }
+                ],
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "15,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["17", "str:added-esdt"],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "98000",
+                    "storage": {},
+                    "code": "",
+                    "esdt": {
+                        "str:MYESDT": "170"
+                    }
+                },
+                "sc:adder": {
+                    "nonce": "0",
+                    "balance": "1030",
+                    "storage": {
+                        "str:sum": "17"
+                    },
+                    "code": "file:../../myadder/output/adder.wasm",
+                    "esdt": {
+                        "str:MYESDT": "20"
+                    }
+                },
+                "sc:addercaller": {
+                    "nonce": "0",
+                    "balance": "970",
+                    "storage": {
+                        "str:dest": "sc:adder"
+                    },
+                    "code": "file:../output/addercaller.wasm",
+                    "esdt": {
+                        "str:MYESDT": "10"
+                    }
+                }
+            }
+        }
+    ]
+}

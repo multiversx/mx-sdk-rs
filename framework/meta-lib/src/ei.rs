@@ -7,6 +7,7 @@ mod ei_1_3;
 mod ei_1_4;
 mod ei_1_5;
 mod ei_version;
+mod test_api_hook_signature_list;
 mod vm_hook_signature;
 mod vm_hook_signature_list;
 
@@ -18,5 +19,6 @@ pub use ei_1_3::EI_1_3_NAMES;
 pub use ei_1_4::EI_1_4_NAMES;
 pub use ei_1_5::EI_1_5_NAMES;
 pub use ei_version::{EIVersion, parse_check_ei};
+pub use test_api_hook_signature_list::TEST_API_HOOK_SIGNATURES;
 pub use vm_hook_signature::{VmHookSignature, check_vm_hook_signatures, vm_hook_signature_map};
 pub use vm_hook_signature_list::VM_HOOK_SIGNATURES;
