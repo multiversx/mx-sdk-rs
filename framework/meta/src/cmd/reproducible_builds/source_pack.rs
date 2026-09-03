@@ -1,4 +1,4 @@
-use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
+use multiversx_chain_core::std::base64_encode;
 use serde::Serialize;
 use std::{
     collections::HashSet,
@@ -165,7 +165,7 @@ fn make_entry(
 ) -> SourceFileEntry {
     let rel = pathdiff::diff_paths(file, project_folder).unwrap();
     let path_str = rel.to_string_lossy().replace('\\', "/");
-    let content = BASE64.encode(fs::read(file).unwrap());
+    let content = base64_encode(fs::read(file).unwrap());
     SourceFileEntry {
         path: path_str.clone(),
         content,

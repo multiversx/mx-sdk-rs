@@ -25,8 +25,7 @@ serial_test = "3.2"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.66.2"
-path = "../../../../framework/snippets"
+workspace = true
 
 [features]
 chain-simulator-tests = []

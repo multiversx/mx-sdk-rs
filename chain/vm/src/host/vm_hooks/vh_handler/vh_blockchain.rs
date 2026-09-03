@@ -554,7 +554,10 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
 
         let m_types = self.context.m_types_lock();
         let token_id = m_types.mb_get(token_id_handle);
-        Ok(multiversx_chain_core::token_identifier_util::validate_token_identifier(token_id))
+        Ok(
+            multiversx_chain_core::token_identifier_util::validate_token_identifier(token_id)
+                .is_ok(),
+        )
     }
 
     #[allow(clippy::too_many_arguments)]

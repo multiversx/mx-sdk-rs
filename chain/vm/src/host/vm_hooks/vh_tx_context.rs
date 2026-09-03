@@ -16,7 +16,7 @@ use crate::{
         TxContextRef, TxFunctionName, TxInput, TxResult, async_call_tx_input,
     },
     host::execution,
-    types::{Address, VMCodeMetadata},
+    types::{Address, CodeMetadata},
     vm_err_msg,
 };
 
@@ -99,9 +99,8 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
     }
 
     fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
-        self.tx_context_ref.with_account_mut(address, |account| {
-            account.storage.get(key).cloned().unwrap_or_default()
-        })
+        self.tx_context_ref
+            .with_account_mut(address, |account| account.storage_get(key))
     }
 
     fn storage_write(&mut self, key: &[u8], value: &[u8]) -> Result<(), VMHooksEarlyExit> {
@@ -109,7 +108,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         self.check_not_readonly()?;
 
         self.tx_context_ref.with_contract_account_mut(|account| {
-            account.storage.insert(key.to_vec(), value.to_vec());
+            account.storage_set(key, value);
         });
         Ok(())
     }
@@ -209,7 +208,7 @@ impl<S: InstanceState> VMHooksContext for TxVMHooksContext<S> {
         &mut self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> Result<(Address, Vec<Vec<u8>>), VMHooksEarlyExit> {
         let contract_address = self.current_address();

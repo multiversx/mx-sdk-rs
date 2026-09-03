@@ -4,7 +4,7 @@ use super::{FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex, hex_util};
 
 impl SCDisplay for CodeMetadata {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        self.for_each_string_token(|token| f.append_bytes(token.as_bytes()))
+        self.write_display_tokens(|token| f.append_bytes(token.as_bytes()))
     }
 }
 

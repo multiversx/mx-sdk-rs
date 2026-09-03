@@ -17,5 +17,4 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 alloc = ["multiversx-sc/alloc"]
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../framework/base"
+workspace = true

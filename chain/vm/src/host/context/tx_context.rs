@@ -4,7 +4,7 @@ use crate::{
         state::{AccountData, AccountEsdt, BlockchainState},
     },
     host::runtime::RuntimeRef,
-    types::{Address, VMCodeMetadata},
+    types::{Address, CodeMetadata},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -53,7 +53,7 @@ impl TxContext {
             esdt: AccountEsdt::default(),
             username: Vec::new(),
             contract_path: None,
-            code_metadata: VMCodeMetadata::empty(),
+            code_metadata: CodeMetadata::empty(),
             contract_owner: None,
             developer_rewards: BigUint::zero(),
         });
@@ -154,7 +154,7 @@ impl TxContext {
         &self,
         new_address: &Address,
         contract_path: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        code_metadata: CodeMetadata,
         contract_owner: Address,
     ) {
         assert!(

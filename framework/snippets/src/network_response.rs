@@ -1,6 +1,6 @@
 use crate::sdk::{
+    chain_core::std::base64_decode,
     data::transaction::{ApiLogs, ApiSmartContractResult, ApiTransactionResult, Events},
-    utils::base64_decode,
 };
 use multiversx_sc_scenario::{
     imports::{Address, ESDTSystemSCAddress, ReturnCode},
@@ -29,9 +29,11 @@ pub fn parse_tx_response(tx: ApiTransactionResult, return_code: ReturnCode) -> T
 fn process_signal_error(tx: &ApiTransactionResult, return_code: ReturnCode) -> TxResponseStatus {
     if let Some(event) = find_log(tx, LOG_IDENTIFIER_SIGNAL_ERROR) {
         if event.topics.len() >= 2 {
-            let error_message = String::from_utf8(base64_decode(&event.topics[1])).expect(
-                "Failed to decode base64-encoded error message from transaction event topic",
-            );
+            let error_message = String::from_utf8(
+                base64_decode(&event.topics[1])
+                    .expect("Failed to base64-decode error message topic"),
+            )
+            .expect("Failed to decode base64-encoded error message from transaction event topic");
             return TxResponseStatus::new(return_code, &error_message);
         }
     }
@@ -140,7 +142,9 @@ fn process_new_issued_token_identifier(tx: &ApiTransactionResult) -> Option<Stri
     let Some(data) = &tx.data else {
         return None;
     };
-    let original_tx_data = String::from_utf8(base64_decode(data)).unwrap_or_default();
+    let original_tx_data =
+        String::from_utf8(base64_decode(data).expect("Failed to base64-decode tx.data"))
+            .unwrap_or_default();
 
     for scr in tx.smart_contract_results.iter() {
         if scr.sender.address != ESDTSystemSCAddress.to_address() {
@@ -249,7 +253,7 @@ pub fn decode_multi_transfer_data_or_panic(logs: Option<ApiLogs>) -> Option<Vec<
 fn extract_write_log_data(event: &Events) -> Vec<Vec<u8>> {
     let mut out = Vec::new();
     event.data.for_each(|data_member| {
-        let decoded_data = String::from_utf8(base64_decode(data_member)).unwrap();
+        let decoded_data = String::from_utf8(base64_decode(data_member).unwrap()).unwrap();
 
         if decoded_data.starts_with('@') {
             let out_content = decode_scr_data_or_panic(decoded_data.as_str());

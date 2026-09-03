@@ -2,13 +2,10 @@ use crate::{
     multiversx_sc::types::heap::Address, scenario::model::ScDeployStep, scenario_model::TxResponse,
 };
 
-use multiversx_chain_vm::{
-    host::{
-        context::{TxFunctionName, TxInput, TxResult},
-        execution,
-        runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
-    },
-    types::VMCodeMetadata,
+use multiversx_chain_vm::host::{
+    context::{TxFunctionName, TxInput, TxResult},
+    execution,
+    runtime::{RuntimeInstanceCallLambda, RuntimeInstanceCallLambdaDefault},
 };
 
 use super::{ScenarioVMRunner, check_tx_output, tx_input_util::generate_tx_hash};
@@ -42,7 +39,7 @@ impl ScenarioVMRunner {
         let (new_address, tx_result) = execution::commit_deploy(
             tx_input,
             contract_code,
-            VMCodeMetadata::from(sc_deploy_step.tx.code_metadata.bits()),
+            sc_deploy_step.tx.code_metadata,
             &mut self.blockchain_mock.state,
             &runtime,
             f,

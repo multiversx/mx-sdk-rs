@@ -5,7 +5,10 @@ use multiversx_sc_scenario::{
     meta::tools::find_current_workspace,
     multiversx_sc::types::Address,
 };
-use multiversx_sdk::gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount};
+use multiversx_sdk::{
+    chain_core::std::Bech32Hrp,
+    gateway::{GatewayAsyncService, NetworkConfigRequest, SetStateAccount},
+};
 
 use super::ExplorerUrl;
 use std::{
@@ -16,73 +19,315 @@ use std::{
     time::Duration,
 };
 
-use crate::{Sender, account_tool::retrieve_account_as_scenario_set_state};
+use crate::{
+    Sender,
+    account_tool::retrieve_account_as_scenario_set_state,
+    config::{InteractorConfig, load_toml_config},
+};
 
+const DEFAULT_CONFIG_FILE_NAME: &str = "config.toml";
 pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 pub const INTERACTOR_SET_STATE_PATH: &str = "set_state.json";
+pub const CHAIN_SIMULATOR_CHAIN_ID: &str = "chain";
 
+/// Holds the gateway connection and chain network configuration together.
+///
+/// `proxy` and `network_config` are always obtained from the same gateway call, so
+/// they are stored as a unit in [`InteractorBase::connection`] and are either both
+/// present or both absent.
+pub struct InteractorConnection<GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    /// Gateway URI used to construct `proxy`.
+    pub gateway_uri: String,
+    /// The async gateway used to communicate with the blockchain network.
+    pub proxy: GatewayProxy,
+    /// Chain-level parameters (chain ID, gas price, HRP, …) fetched from the gateway.
+    pub network_config: NetworkConfig,
+}
+
+/// Core interactor state shared across all contract-specific interactors.
+///
+/// An `InteractorBase` is created in two phases:
+///
+/// 1. **Construction** – call [`Self::empty`] (or [`Self::new`] for the
+///    backwards-compatible path) to obtain an instance whose gateway fields are
+///    still uninitialised.
+/// 2. **Initialisation** – connect to a gateway via [`Self::with_connection`] or
+///    load a full typed config via [`Self::load_config`] /
+///    [`Self::load_config_toml`] / [`Self::load_config_from_file`].
+///
+/// Once initialised the interactor exposes helpers for sending transactions,
+/// querying state, registering wallets, managing chain-simulator blocks, and
+/// persisting/restoring account state to/from disk.
 pub struct InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    pub proxy: GatewayProxy,
+    /// Working directory used to resolve file paths such as `config.toml`,
+    /// `state.toml`, and the set-state snapshot file.
+    ///
+    /// Set at construction time via [`Self::with_current_dir`] or
+    /// [`Self::set_current_dir_from_workspace`].
+    pub current_dir: PathBuf,
+
+    /// When `true` the interactor is connected to the MultiversX Chain Simulator
+    /// and will issue simulator-specific requests (fund accounts, generate blocks,
+    /// set state, …).  When `false` those requests are silently skipped.
     pub use_chain_simulator: bool,
-    pub network_config: NetworkConfig,
-    pub sender_map: HashMap<Address, Sender>,
+
+    /// Gateway proxy and network config, initialised together by [`Self::with_connection`].
+    connection: Option<InteractorConnection<GatewayProxy>>,
+
+    /// Gas price used when building transactions, derived from
+    /// `connection.network_config.min_gas_price` at connection time.
     pub gas_price: u64,
 
-    pub waiting_time_ms: u64,
+    /// Explicit transaction nonce. When set, transaction preparation uses this
+    /// value instead of fetching the sender nonce from the gateway.
+    ///
+    /// Only applies for the next transaction; it is cleared after use.
+    ///
+    /// This is used to implement the `--nonce` CLI flag,
+    /// which overrides the nonce for a single transaction.
+    pub override_next_tx_nonce: Option<u64>,
+
+    /// All wallets registered as transaction signers, keyed by their on-chain
+    /// address.  Populated by [`Self::register_wallet`].
+    pub sender_map: HashMap<Address, Sender>,
+
+    /// Scenario runners executed **before** each step (e.g. pre-condition checks
+    /// or state loading).
     pub pre_runners: ScenarioRunnerList,
+
+    /// Scenario runners executed **after** each step (e.g. trace file writers).
     pub post_runners: ScenarioRunnerList,
 
-    pub current_dir: PathBuf,
+    /// Optional block-explorer base URL derived from the network chain ID.  Used
+    /// to pretty-print transaction and address links in log output.
     pub explorer_url: Option<ExplorerUrl>,
+
+    /// Cumulative wall-clock time (in milliseconds) spent waiting inside
+    /// [`Self::sleep`] calls.
+    pub waiting_time_ms: u64,
 }
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
-    /// Not yet changed for backwards compatibility.
-    pub async fn new(gateway_uri: &str) -> Self {
-        let proxy = GatewayProxy::from_uri(gateway_uri);
-        let network_config = proxy
-            .request(NetworkConfigRequest)
-            .await
-            .expect("could not get network config");
-        let gas_price = network_config.min_gas_price;
-        let explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
+    /// Creates an uninitialized interactor instance.
+    ///
+    /// Use [`Self::with_connection`] to initialize gateway-dependent fields.
+    pub fn empty() -> Self {
         Self {
-            proxy,
+            connection: None,
             use_chain_simulator: false,
-            network_config,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
             pre_runners: ScenarioRunnerList::empty(),
             post_runners: ScenarioRunnerList::empty(),
             current_dir: PathBuf::default(),
-            gas_price,
-            explorer_url,
+            gas_price: 0,
+            override_next_tx_nonce: None,
+            explorer_url: None,
         }
     }
 
+    /// Backwards-compatible constructor that initializes the interactor connection.
+    pub async fn new(gateway_uri: &str) -> Self {
+        Self::empty().with_connection(gateway_uri).await
+    }
+
+    /// Initializes the interactor current directory.
+    pub fn with_current_dir<P: Into<PathBuf>>(mut self, current_dir: P) -> Self {
+        self.current_dir = current_dir.into();
+        self
+    }
+
+    /// Initializes gateway-specific fields from a gateway URI.
+    ///
+    /// This sets:
+    /// - `connection.proxy`
+    /// - `connection.network_config`
+    /// - `gas_price`
+    /// - `explorer_url`
+    async fn init_connection(&mut self, gateway_uri: &str) {
+        let proxy = GatewayProxy::from_uri(gateway_uri);
+        let network_config = proxy
+            .request(NetworkConfigRequest)
+            .await
+            .expect("could not get network config");
+        self.gas_price = network_config.min_gas_price;
+        self.explorer_url = ExplorerUrl::from_chain_id(&network_config.chain_id);
+        self.connection = Some(InteractorConnection {
+            gateway_uri: gateway_uri.to_owned(),
+            proxy,
+            network_config,
+        });
+    }
+
+    /// Ensures config-loading initialization runs only once.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection is already initialized.
+    fn assert_uninitialized_for_config_loading(&self) {
+        if self.connection.is_some() {
+            panic!(
+                "interactor connection already initialized; config loading must be called only on an uninitialized interactor"
+            );
+        }
+    }
+
+    /// Applies connection settings from a typed config.
+    ///
+    /// This initializes the gateway connection and chain-simulator toggle.
+    async fn apply_config_connection<C>(&mut self, config: &C)
+    where
+        C: InteractorConfig,
+    {
+        let conn = config.connection();
+        let gateway_uri = conn.gateway_uri().to_owned();
+        self.init_connection(&gateway_uri).await;
+        self.use_chain_simulator = conn.use_chain_simulator();
+    }
+
+    /// Initializes connection-dependent fields on an interactor.
+    pub async fn with_connection(mut self, gateway_uri: &str) -> Self {
+        self.init_connection(gateway_uri).await;
+        self
+    }
+
+    /// Loads an already-constructed config into this interactor.
+    ///
+    /// This initializes connection details, registers wallets from
+    /// [`InteractorConfig::register_wallets`], and advances chain-simulator blocks
+    /// until activation epoch is reached.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the interactor is already initialized.
+    pub async fn load_config<C>(&mut self, config: &C)
+    where
+        C: InteractorConfig,
+    {
+        self.assert_uninitialized_for_config_loading();
+        self.apply_config_connection(config).await;
+        for wallet in config.register_wallets() {
+            self.register_wallet(wallet).await;
+        }
+        self.generate_blocks_until_all_activations().await;
+    }
+
+    /// Builder-style variant of [`Self::load_config`].
+    pub async fn with_config<C>(mut self, config: &C) -> Self
+    where
+        C: InteractorConfig,
+    {
+        self.load_config(config).await;
+        self
+    }
+
+    /// Loads `config.toml` from [`InteractorBase::current_dir`] and initializes the interactor.
+    pub async fn load_config_toml<C>(&mut self) -> C
+    where
+        C: InteractorConfig + serde::de::DeserializeOwned,
+    {
+        self.load_config_from_file(DEFAULT_CONFIG_FILE_NAME).await
+    }
+
+    /// Loads a config file relative to [`InteractorBase::current_dir`] and initializes the interactor.
+    ///
+    /// Returns the parsed config value so callers can keep their typed config.
+    pub async fn load_config_from_file<C, P>(&mut self, config_file: P) -> C
+    where
+        C: InteractorConfig + serde::de::DeserializeOwned,
+        P: AsRef<Path>,
+    {
+        let config_path = self.current_dir.join(config_file.as_ref());
+        let config: C = load_toml_config(&config_path);
+        self.load_config(&config).await;
+        config
+    }
+
+    fn connection(&self) -> &InteractorConnection<GatewayProxy> {
+        self.connection.as_ref().expect(
+            "interactor connection is uninitialized; call InteractorBase::with_connection(...) or InteractorBase::new(...) first",
+        )
+    }
+
+    /// Returns the initialized gateway proxy reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn proxy(&self) -> &GatewayProxy {
+        &self.connection().proxy
+    }
+
+    /// Returns the gateway URI used to initialize the connection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn gateway_uri(&self) -> &str {
+        &self.connection().gateway_uri
+    }
+
+    /// Returns the initialized network configuration.
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn network_config(&self) -> &NetworkConfig {
+        &self.connection().network_config
+    }
+
+    /// Validates that `chain_id` matches the chain ID reported by the gateway.
+    pub fn validate_chain_id(&self, chain_id: &str) -> anyhow::Result<()> {
+        let network_chain_id = &self.network_config().chain_id;
+        if chain_id != network_chain_id {
+            anyhow::bail!(
+                "chain ID mismatch: CLI specifies {chain_id}, but gateway reports {network_chain_id}"
+            );
+        }
+        Ok(())
+    }
+
+    /// Enables or disables chain-simulator mode.
     pub fn use_chain_simulator(mut self, use_chain_simulator: bool) -> Self {
         self.use_chain_simulator = use_chain_simulator;
         self
     }
 
+    /// Enables or disables chain-simulator mode automatically, based on the chain ID
+    /// reported by the gateway: the chain simulator reports chain ID [`CHAIN_SIMULATOR_CHAIN_ID`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if connection has not been initialized.
+    pub fn use_chain_simulator_auto(mut self) -> Self {
+        self.use_chain_simulator = self.network_config().chain_id == CHAIN_SIMULATOR_CHAIN_ID;
+        self
+    }
+
+    /// Registers a wallet as a transaction sender and funds it in simulator mode.
+    ///
+    /// Returns the wallet address.
     pub async fn register_wallet(&mut self, wallet: Wallet) -> Address {
         let address = wallet.to_address();
 
         self.send_user_funds(&address.to_bech32(self.get_hrp()))
             .await
             .unwrap();
-        self.generate_blocks(1).await.unwrap();
+        self.generate_blocks(10).await.unwrap();
         self.sender_map.insert(
             address.clone(),
             Sender {
                 address: address.clone(),
-                hrp: self.network_config.address_hrp.clone(),
+                hrp: self.get_hrp(),
                 wallet,
                 current_nonce: None,
             },
@@ -90,20 +335,48 @@ where
         address
     }
 
+    /// Registers a wallet as a transaction sender and funds it in simulator mode.
+    ///
+    /// Returns the wallet address encoded as bech32 using this interactor's
+    /// configured network HRP.
+    pub async fn register_wallet_bech32(&mut self, wallet: Wallet) -> Bech32Address {
+        self.register_wallet(wallet).await.to_bech32(self.get_hrp())
+    }
+
+    /// Registers an optional wallet as a transaction sender and funds it in
+    /// simulator mode.
+    ///
+    /// Returns `Some` containing the wallet address encoded as bech32 using
+    /// this interactor's configured network HRP. Returns `None` when no wallet
+    /// is provided.
+    pub async fn register_wallet_bech32_opt(
+        &mut self,
+        wallet: Option<Wallet>,
+    ) -> Option<Bech32Address> {
+        if let Some(w) = wallet {
+            Some(self.register_wallet_bech32(w).await)
+        } else {
+            None
+        }
+    }
+
+    /// Sleeps for `duration` using the configured gateway and accumulates waited time.
     pub async fn sleep(&mut self, duration: Duration) {
         let millis = duration.as_millis() as u64;
         self.waiting_time_ms += millis;
-        self.proxy.sleep(millis).await;
+        self.proxy().sleep(millis).await;
     }
 
+    /// Adds a scenario trace output runner to this interactor.
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {
         self.post_runners.push(ScenarioTraceFile::new(path));
         self
     }
 
+    /// Fetches on-chain account state and appends it to the local set-state file.
     pub async fn retrieve_account(&mut self, wallet_address: &Bech32Address) {
         let (set_state_account, set_state_step) =
-            retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
+            retrieve_account_as_scenario_set_state(self.proxy(), wallet_address).await;
         self.pre_runners.run_set_state_step(&set_state_step);
         self.post_runners.run_set_state_step(&set_state_step);
 
@@ -111,18 +384,24 @@ where
         set_state_account.add_to_state_file(path.as_path());
     }
 
+    /// Returns the absolute path to the persisted set-state file.
     pub fn get_state_file_path(&self) -> PathBuf {
         self.current_dir.join(INTERACTOR_SET_STATE_PATH)
     }
 
-    pub fn get_hrp(&self) -> &str {
-        &self.network_config.address_hrp
+    /// Returns the configured Bech32 HRP for this network.
+    pub fn get_hrp(&self) -> Bech32Hrp {
+        self.network_config().address_hrp
     }
 
+    /// Returns `true` if `address` belongs to a registered sender wallet.
     pub fn is_registered_wallet(&self, address: &Address) -> bool {
         self.sender_map.contains_key(address)
     }
 
+    /// Reads and parses all saved set-state accounts from disk.
+    ///
+    /// Returns an empty list if the file does not exist or cannot be parsed.
     pub fn get_accounts_from_file(&self) -> Vec<SetStateAccount> {
         let file_path = self.get_state_file_path();
 
@@ -146,5 +425,26 @@ where
         path.push(relative_path);
         self.current_dir = path;
         self
+    }
+
+    /// Loads `State` from `state.toml` in `current_dir` (or returns the default)
+    /// and wraps it in an [`AutoSave`] that persists changes on drop.
+    ///
+    /// Call [`AutoSave::disable`] or use [`AutoSave::no_save`] directly when you
+    /// do not want side-effects (e.g. in tests).
+    pub fn load_state<State>(&self) -> crate::AutoSave<State>
+    where
+        State: serde::Serialize + serde::de::DeserializeOwned + Default,
+    {
+        let path = self.current_dir.join("state.toml");
+        let value = if path.exists() {
+            let content = std::fs::read_to_string(&path)
+                .unwrap_or_else(|e| panic!("cannot read {}: {e}", path.display()));
+            toml::from_str(&content)
+                .unwrap_or_else(|e| panic!("cannot parse {}: {e}", path.display()))
+        } else {
+            State::default()
+        };
+        crate::AutoSave::new(value, path)
     }
 }

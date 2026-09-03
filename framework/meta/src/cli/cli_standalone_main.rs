@@ -1,10 +1,11 @@
 use crate::cli::{ReproducibleBuildCliAction, StandaloneCliAction, StandaloneCliArgs};
 use crate::cmd::chain_simulator::chain_simulator;
 use crate::cmd::data::data_cli;
+use crate::cmd::ledger_cmd::ledger_cmd;
 use crate::cmd::retrieve_address::retrieve_address;
 use crate::cmd::scen_blackbox::scen_blackbox_tool;
-use crate::cmd::tx::tx_cli;
-use crate::cmd::wallet::wallet;
+use crate::cmd::tx_cli::tx_cli;
+use crate::cmd::wallet_cmd::wallet;
 use clap::Parser;
 
 use crate::cmd::all::call_all_meta;
@@ -89,6 +90,9 @@ pub async fn cli_main_standalone() {
         }
         Some(StandaloneCliAction::Tx(args)) => {
             tx_cli(args).await;
+        }
+        Some(StandaloneCliAction::Ledger(args)) => {
+            ledger_cmd(args);
         }
         Some(StandaloneCliAction::Data(args)) => {
             data_cli(args);

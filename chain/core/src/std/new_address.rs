@@ -58,7 +58,7 @@ pub fn compute_new_address_bech32(
     deployment_nonce: u64,
 ) -> Bech32Address {
     let address = compute_new_address(&deployer.address, deployment_nonce);
-    Bech32Address::encode_address(&deployer.hrp, address)
+    Bech32Address::encode_address(deployer.hrp, address)
 }
 
 /// Generates a mock smart contract address deterministically from a creator address and nonce.

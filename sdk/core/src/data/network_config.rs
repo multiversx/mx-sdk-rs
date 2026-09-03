@@ -1,3 +1,4 @@
+use multiversx_chain_core::std::Bech32Hrp;
 use serde::{Deserialize, Serialize};
 
 // NetworkConfig holds the network configuration parameters
@@ -6,7 +7,7 @@ pub struct NetworkConfig {
     #[serde(rename = "erd_chain_id")]
     pub chain_id: String,
     #[serde(rename = "erd_address_hrp", default = "default_hrp")]
-    pub address_hrp: String,
+    pub address_hrp: Bech32Hrp,
     #[serde(rename = "erd_denomination")]
     pub denomination: i32,
     #[serde(rename = "erd_gas_per_data_byte")]
@@ -48,6 +49,6 @@ pub struct NetworkConfigResponse {
     pub data: Option<NetworkConfigData>,
 }
 
-fn default_hrp() -> String {
-    "erd".to_string()
+fn default_hrp() -> Bech32Hrp {
+    Bech32Hrp::default()
 }

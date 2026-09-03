@@ -9,14 +9,11 @@ publish = false
 path = "src/multisig.rs"
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
-path = "../../../framework/base"
+workspace = true
 
 [dependencies.multiversx-sc-modules]
-version = "0.66.2"
-path = "../../../contracts/modules"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
+workspace = true
 features = ["wasmer-experimental"]
-path = "../../../framework/scenario"

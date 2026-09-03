@@ -1,0 +1,15 @@
+name = "greeter"
+contract_trait = "Greeter"
+src_file = "greeter.rs"
+rename_pairs = []
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "wasm/Cargo.lock",
+    "Cargo.toml",
+    "multiversx.json",
+    "README.md",
+    "sc-config.toml",
+]

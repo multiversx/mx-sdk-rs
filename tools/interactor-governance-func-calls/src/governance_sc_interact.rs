@@ -8,7 +8,7 @@ use governance_sc_interact_state::State;
 
 use multiversx_sc_snippets::{
     imports::*,
-    sdk::{gateway::SetStateAccount, utils::base64_decode},
+    sdk::{chain_core::std::base64_decode, gateway::SetStateAccount},
 };
 
 pub async fn governance_sc_interact_cli() {
@@ -89,9 +89,8 @@ impl GovernanceCallsInteract {
     pub async fn new(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
-            .use_chain_simulator(config.is_chain_simulator());
-
-        interactor.set_current_dir_from_workspace("tools/interactor-governance-func-calls");
+            .use_chain_simulator(config.is_chain_simulator())
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let owner = interactor.register_wallet(test_wallets::eve()).await;
         let user1 = interactor.register_wallet(test_wallets::mike()).await;
         let user2 = interactor.register_wallet(test_wallets::judy()).await;

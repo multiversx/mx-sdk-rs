@@ -7,7 +7,7 @@ use crate::{
         context::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
         vm_hooks::{VMHooksContext, vh_early_exit::early_exit_vm_error},
     },
-    types::{Address, RawHandle, VMCodeMetadata, top_encode_big_uint, top_encode_u64},
+    types::{Address, CodeMetadata, RawHandle, top_encode_big_uint, top_encode_u64},
     vm_err_msg,
 };
 use multiversx_chain_core::types::ReturnCode;
@@ -114,7 +114,7 @@ impl<C: VMHooksContext> VMHooksHandler<C> {
         to: Address,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> Result<(), VMHooksEarlyExit> {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];

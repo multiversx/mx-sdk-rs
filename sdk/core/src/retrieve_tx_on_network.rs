@@ -1,11 +1,13 @@
 use crate::{
     data::transaction::{ApiLogs, ApiTransactionResult, Events, LogData},
     gateway::{GetTxInfo, GetTxProcessStatus},
-    utils::base64_encode,
 };
 use anyhow::{Context, Result};
 use log::info;
-use multiversx_chain_core::{std::Bech32Address, types::ReturnCode};
+use multiversx_chain_core::{
+    std::{Bech32Address, base64_encode},
+    types::ReturnCode,
+};
 
 use crate::gateway::GatewayAsyncService;
 

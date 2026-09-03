@@ -23,7 +23,7 @@ where
     fn default() -> UpgradeCall<Env, ()> {
         UpgradeCall {
             code_source: (),
-            code_metadata: CodeMetadata::DEFAULT,
+            code_metadata: CodeMetadata::EMPTY,
             arg_buffer: ManagedArgBuffer::new(),
         }
     }

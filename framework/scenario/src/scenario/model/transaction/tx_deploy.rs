@@ -18,6 +18,7 @@ pub struct TxDeploy {
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+    pub relayer: Option<AddressValue>,
 }
 
 impl Default for TxDeploy {
@@ -25,11 +26,12 @@ impl Default for TxDeploy {
         Self {
             from: Default::default(),
             egld_value: Default::default(),
-            code_metadata: CodeMetadata::all(),
+            code_metadata: CodeMetadata::default(),
             contract_code: Default::default(),
             arguments: Default::default(),
             gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
             gas_price: Default::default(),
+            relayer: None,
         }
     }
 }
@@ -48,6 +50,7 @@ impl InterpretableFrom<TxDeployRaw> for TxDeploy {
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit, context),
             gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
+            relayer: None,
         }
     }
 }

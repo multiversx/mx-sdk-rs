@@ -19,17 +19,13 @@ tokio = { version = "1.24" }
 path = ".."
 
 [dependencies.multiversx-sc-modules]
-version = "0.66.2"
-path = "../../../../contracts/modules"
+workspace = true
 
 [dependencies.multiversx-sc-snippets]
-version = "0.66.2"
-path = "../../../../framework/snippets"
+workspace = true
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.66.2"
-path = "../../../../framework/scenario"
+workspace = true
 
 [dependencies.multiversx-sc]
-version = "=0.66.2"
-path = "../../../../framework/base"
+workspace = true

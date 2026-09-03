@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, bail};
-use base64::{Engine, engine::general_purpose::STANDARD as BASE64};
+use multiversx_chain_core::std::base64_decode;
 use std::{
     fs,
     path::{Component, Path, PathBuf},
@@ -67,8 +67,7 @@ pub fn unpack_packed_source(
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create {}", parent.display()))?;
         }
-        let content = BASE64
-            .decode(&entry.content)
+        let content = base64_decode(&entry.content)
             .with_context(|| format!("Failed to decode entry '{}'", entry.path))?;
         fs::write(&file_path, content)
             .with_context(|| format!("Failed to write {}", file_path.display()))?;

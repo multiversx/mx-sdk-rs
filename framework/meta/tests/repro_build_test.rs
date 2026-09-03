@@ -20,6 +20,7 @@ use multiversx_sc_meta::{
     folder_structure::{setup_workspace, strip_path},
 };
 use multiversx_sc_meta_lib::{
+    cargo_toml::WorkspaceDependencies,
     cli::{BuildArgs, ContractCliAction},
     tools::find_current_workspace,
 };
@@ -267,7 +268,11 @@ fn setup_build_dir(workspace: &Path, build_dir: &Path, contracts: &[&str]) {
         fs::remove_dir_all(&adder_interactor).unwrap();
     }
 
-    strip_path(build_dir, &["target".to_string()]);
+    strip_path(
+        build_dir,
+        &["target".to_string()],
+        &WorkspaceDependencies::load_from_dir(workspace),
+    );
 
     for contract in contracts {
         setup_workspace(
