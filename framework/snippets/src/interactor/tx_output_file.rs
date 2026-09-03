@@ -51,7 +51,7 @@ impl TxOutputFile {
             emitted_transaction,
             emitted_transaction_data,
             emitted_transaction_hash: String::new(),
-            contract_address: contract_address,
+            contract_address,
             transaction_on_network: None,
         })
     }
