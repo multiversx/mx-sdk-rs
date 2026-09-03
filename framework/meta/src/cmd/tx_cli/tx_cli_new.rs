@@ -5,7 +5,9 @@ use multiversx_chain_core::std::base64_encode;
 use multiversx_sc_snippets::imports::{Bech32Address, InteractorIntoSdkTransaction};
 
 use crate::cli::cli_args_tx::NewArgs;
-use crate::cmd::tx::tx_cli_common::{create_interactor, load_relayer_for_interactor, load_wallet};
+use crate::cmd::tx_cli::tx_cli_common::{
+    create_interactor, load_relayer_for_interactor, load_wallet,
+};
 
 use super::parse_payments::parse_all_payment_args;
 
