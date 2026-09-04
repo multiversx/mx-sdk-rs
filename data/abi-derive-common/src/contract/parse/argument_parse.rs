@@ -1,5 +1,5 @@
 use super::attributes::*;
-use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
+use crate::contract::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
 
 pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
     if m.sig.inputs.is_empty() {

@@ -1,4 +1,4 @@
-use crate::model::{AutoImpl, Method, MethodImpl};
+use crate::contract::model::{AutoImpl, Method, MethodImpl};
 
 use super::attributes::*;
 

@@ -1,4 +1,4 @@
-use crate::model::{
+use crate::contract::model::{
     CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method,
     PublicRole,
 };

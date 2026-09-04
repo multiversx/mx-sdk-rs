@@ -1,5 +1,5 @@
 use super::reserved;
-use crate::model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole};
+use crate::contract::model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole};
 
 const INIT_ENDPOINT_NAME: &str = "init";
 const UPGRADE_ENDPOINT_NAME: &str = "upgrade";

@@ -1,4 +1,4 @@
-use crate::model::EsdtAttribute;
+use crate::contract::model::EsdtAttribute;
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
     if let Some(first_seg) = attr.path().segments.first() {

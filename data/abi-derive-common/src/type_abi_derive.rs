@@ -15,7 +15,7 @@ pub enum TypeAbiImportCrate {
     MultiversxScAbi,
 }
 
-fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
+pub(crate) fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
     match context {
         TypeAbiImportCrate::MultiversxSc => quote! { multiversx_sc::abi },
         TypeAbiImportCrate::MultiversxScAbi => quote! { multiversx_sc_abi },

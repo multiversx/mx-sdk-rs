@@ -1,5 +1,5 @@
 use super::{MethodAttributesPass1, attributes::PayableAttribute};
-use crate::model::MethodPayableMetadata;
+use crate::contract::model::MethodPayableMetadata;
 
 pub fn process_payable_attribute(
     attr: &syn::Attribute,

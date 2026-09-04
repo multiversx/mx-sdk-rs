@@ -1,4 +1,4 @@
-use crate::{model::Supertrait, parse::split_path_last};
+use crate::contract::{model::Supertrait, parse::split_path_last};
 
 pub fn is_contract_base(supertrait: &syn::TypeParamBound) -> bool {
     match supertrait {

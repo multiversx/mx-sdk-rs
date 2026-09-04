@@ -18,10 +18,9 @@ mod macro_contract;
 mod macro_module;
 mod macro_proxy;
 mod managed_vec_item_derive;
-mod model;
-mod parse;
 mod preprocessing;
-mod validate;
+
+use multiversx_sc_abi_derive_common::contract::{model, parse, validate};
 
 #[proc_macro_attribute]
 pub fn contract(

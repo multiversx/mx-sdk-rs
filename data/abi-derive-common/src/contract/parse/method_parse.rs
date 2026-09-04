@@ -1,6 +1,6 @@
-use multiversx_sc_abi_derive_common::parse::attributes::extract_doc;
+use crate::parse::attributes::extract_doc;
 
-use crate::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
+use crate::contract::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
 
 use super::{
     auto_impl_parse::{

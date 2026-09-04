@@ -1,16 +1,16 @@
-use multiversx_sc_abi_derive_common::parse::attributes::extract_doc;
+use crate::parse::attributes::extract_doc;
 
 use super::{
     method_parse::process_method, parse_util::validate_attribute_args,
     supertrait_parse::parse_supertrait,
 };
-use crate::{
+use crate::contract::{
     model::{ContractTrait, Method, Supertrait, TraitProperties},
     parse::{is_contract_base, process_trait_arguments},
 };
 
 pub fn parse_contract_trait(
-    args: proc_macro::TokenStream,
+    args: proc_macro2::TokenStream,
     contract_trait: &syn::ItemTrait,
 ) -> ContractTrait {
     validate_attribute_args(args);

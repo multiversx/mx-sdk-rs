@@ -1,4 +1,4 @@
-use crate::model::EsdtAttribute;
+use crate::contract::model::EsdtAttribute;
 
 use super::{trait_prop_names::*, util::*};
 

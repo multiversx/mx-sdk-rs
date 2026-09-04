@@ -10,3 +10,4 @@ output
 abi_tester_generated_esdt_attr.esdt-abi.json
 abi_tester_generated_main.abi.json
 abi_tester_generated_view.abi.json
+contract_abi_generated.abi.json

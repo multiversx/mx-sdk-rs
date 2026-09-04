@@ -1,4 +1,4 @@
-use crate::parse::attributes::util::{clean_string, is_first_char_numeric};
+use crate::contract::parse::attributes::util::{clean_string, is_first_char_numeric};
 
 use super::attr_names::*;
 

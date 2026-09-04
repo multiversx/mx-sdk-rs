@@ -8,19 +8,19 @@ pub enum EndpointTypeMetadata {
 }
 
 impl EndpointTypeMetadata {
-    pub fn to_tokens(&self) -> proc_macro2::TokenStream {
+    pub fn to_tokens(&self, import: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
         match self {
             EndpointTypeMetadata::Init => {
-                quote! { multiversx_sc::abi::EndpointTypeAbi::Init }
+                quote! { #import::EndpointTypeAbi::Init }
             }
             EndpointTypeMetadata::Upgrade => {
-                quote! { multiversx_sc::abi::EndpointTypeAbi::Upgrade }
+                quote! { #import::EndpointTypeAbi::Upgrade }
             }
             EndpointTypeMetadata::Endpoint => {
-                quote! { multiversx_sc::abi::EndpointTypeAbi::Endpoint }
+                quote! { #import::EndpointTypeAbi::Endpoint }
             }
             EndpointTypeMetadata::PromisesCallback => {
-                quote! { multiversx_sc::abi::EndpointTypeAbi::PromisesCallback }
+                quote! { #import::EndpointTypeAbi::PromisesCallback }
             }
         }
     }

@@ -1,5 +1,5 @@
 use super::attributes::*;
-use crate::model::TraitProperties;
+use crate::contract::model::TraitProperties;
 
 pub fn process_trait_arguments(
     attrs: &[syn::Attribute],

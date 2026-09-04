@@ -4,10 +4,12 @@
 extern crate alloc;
 
 mod contract_abi;
+mod contract_abi_provider;
 mod proxy_abi_traits;
 mod types;
 
 pub use contract_abi::*;
+pub use contract_abi_provider::*;
 pub use proxy_abi_traits::*;
 pub use types::*;
 
