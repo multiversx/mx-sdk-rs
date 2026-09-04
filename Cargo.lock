@@ -2679,6 +2679,8 @@ name = "kitty"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
+ "multiversx-sc-abi",
+ "multiversx-sc-abi-derive",
  "random",
 ]
 

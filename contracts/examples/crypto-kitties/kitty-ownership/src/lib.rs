@@ -339,7 +339,7 @@ pub trait KittyOwnership {
             let caller = self.blockchain().get_caller();
             self.tx()
                 .to(&gene_science_contract_address)
-                .typed(kitty_genetic_alg_proxy::KittyGeneticAlgProxy)
+                .abi_typed(kitty::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
                 .generate_kitty_genes(matron, sire)
                 .callback(
                     self.callbacks()
