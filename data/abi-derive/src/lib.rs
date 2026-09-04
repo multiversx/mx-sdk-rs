@@ -1,35 +1,6 @@
 // ensure we don't run out of macro stack
 #![recursion_limit = "1024"]
 
-/// Arguments to `#[contract_abi(...)]`. `call = ProxyName` is the only supported argument: it
-/// names the generated call-proxy struct explicitly, so there is no magic naming derived from
-/// the trait name. Omitting it skips proxy generation entirely (only `AbiProvider` is emitted).
-struct ContractAbiArgs {
-    call: Option<syn::Ident>,
-}
-
-impl syn::parse::Parse for ContractAbiArgs {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        if input.is_empty() {
-            return Ok(ContractAbiArgs { call: None });
-        }
-
-        let key: syn::Ident = input.parse()?;
-        if key != "call" {
-            return Err(syn::Error::new(
-                key.span(),
-                "expected `call = <ProxyStructName>`",
-            ));
-        }
-        input.parse::<syn::Token![=]>()?;
-        let proxy_name: syn::Ident = input.parse()?;
-
-        Ok(ContractAbiArgs {
-            call: Some(proxy_name),
-        })
-    }
-}
-
 /// Generates the `AbiProvider` (`fn abi() -> ContractAbi`) for a contract-like trait, with no
 /// dependency on `multiversx-sc`/`VMApi`. Meant for traits written directly against pure ABI
 /// types (e.g. `BigUintAbi`, `AddressAbi`, ...), so unlike `#[multiversx_sc::contract]` there is
@@ -48,7 +19,9 @@ pub fn contract_abi(
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     let proc_input = syn::parse_macro_input!(input as syn::ItemTrait);
-    let contract_abi_args = syn::parse_macro_input!(args as ContractAbiArgs);
+    let call_arg = syn::parse_macro_input!(
+        args as multiversx_sc_abi_derive_common::contract::proxy_gen::ProxyCallArg
+    );
 
     let contract = multiversx_sc_abi_derive_common::contract::parse::parse_contract_trait(
         proc_macro2::TokenStream::new(),
@@ -63,12 +36,16 @@ pub fn contract_abi(
         &quote::quote! { multiversx_sc_abi::ContractAbiProvider },
         quote::quote! {},
     );
-    let abi_proxy = match &contract_abi_args.call {
+    // `Self::Api` never appears in a framework-agnostic trait's argument/return types (there is
+    // no managed-type substitution step here), so this placeholder is never actually spliced in.
+    let unused_self_api_replacement: syn::Path = syn::parse_quote! { ::core::convert::Infallible };
+    let abi_proxy = match &call_arg.proxy_name {
         Some(proxy_name) => {
             multiversx_sc_abi_derive_common::contract::proxy_gen::generate_abi_proxy(
                 &contract,
                 multiversx_sc_abi_derive_common::TypeAbiImportCrate::MultiversxScAbi,
                 proxy_name,
+                &unused_self_api_replacement,
             )
         }
         None => quote::quote! {},

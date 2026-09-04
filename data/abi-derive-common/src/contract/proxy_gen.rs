@@ -2,8 +2,38 @@ use quote::format_ident;
 
 use crate::TypeAbiImportCrate;
 use crate::contract::model::{ContractTrait, Method, PublicRole};
-use crate::contract::util::clear_all_type_lifetimes;
+use crate::contract::util::{clear_all_type_lifetimes, replace_self_api};
 use crate::type_abi_derive::import_tokens;
+
+/// Arguments to the `call = ProxyName` macro argument, shared between `data/abi-derive`'s
+/// `#[contract_abi(...)]` and `framework/derive`'s `#[multiversx_sc::contract(...)]`. `call`
+/// names the generated call-proxy struct explicitly, so there is no magic naming derived from
+/// the trait name. Omitting it skips proxy generation entirely.
+pub struct ProxyCallArg {
+    pub proxy_name: Option<syn::Ident>,
+}
+
+impl syn::parse::Parse for ProxyCallArg {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        if input.is_empty() {
+            return Ok(ProxyCallArg { proxy_name: None });
+        }
+
+        let key: syn::Ident = input.parse()?;
+        if key != "call" {
+            return Err(syn::Error::new(
+                key.span(),
+                "expected `call = <ProxyStructName>`",
+            ));
+        }
+        input.parse::<syn::Token![=]>()?;
+        let proxy_name: syn::Ident = input.parse()?;
+
+        Ok(ProxyCallArg {
+            proxy_name: Some(proxy_name),
+        })
+    }
+}
 
 /// The three proxy-generating roles: a constructor (`IntoDeploy`), the upgrade constructor
 /// (`IntoUpgrade`), or a regular endpoint call (`IntoCall`), identified by its wire name.
@@ -15,6 +45,21 @@ enum ProxyMethodKind {
     Call(String),
 }
 
+/// Rewrites a method's argument/return type into the `ProxyArg`/`IntoXxx` output type: any
+/// `Self::Api` is replaced with `self_api_replacement` (see `replace_self_api`), then the whole
+/// type is projected through `TypeAbi::Abi` to land on its pure ABI counterpart (a no-op for
+/// types that are already pure, e.g. everything the framework-agnostic `#[contract_abi]` sees).
+fn abi_projected_type(
+    ty: &syn::Type,
+    import: &proc_macro2::TokenStream,
+    self_api_replacement: &syn::Path,
+) -> proc_macro2::TokenStream {
+    let mut ty = ty.clone();
+    clear_all_type_lifetimes(&mut ty);
+    replace_self_api(&mut ty, self_api_replacement);
+    quote! { <#ty as #import::TypeAbi>::Abi }
+}
+
 /// Builds one dedicated `impl<T, ..> #methods_name<T> where T: IntoXxx<Payment, Output> { .. }`
 /// block for a single method, mirroring `contracts/examples/adder/src/adder_abi.rs`'s
 /// hand-written pattern: every method gets its own impl block, since `Output` (and, for payable
@@ -24,6 +69,7 @@ fn generate_proxy_method(
     kind: &ProxyMethodKind,
     methods_name: &syn::Ident,
     import: &proc_macro2::TokenStream,
+    self_api_replacement: &syn::Path,
 ) -> proc_macro2::TokenStream {
     let rust_name = &m.name;
 
@@ -35,23 +81,15 @@ fn generate_proxy_method(
     let arg_generics: Vec<syn::Ident> = (0..args.len())
         .map(|i| format_ident!("Arg{}", i))
         .collect();
-    let arg_types: Vec<syn::Type> = args
+    let arg_types: Vec<proc_macro2::TokenStream> = args
         .iter()
-        .map(|arg| {
-            let mut ty = arg.ty.clone();
-            clear_all_type_lifetimes(&mut ty);
-            ty
-        })
+        .map(|arg| abi_projected_type(&arg.ty, import, self_api_replacement))
         .collect();
     let arg_pats: Vec<&syn::Pat> = args.iter().map(|arg| &arg.pat).collect();
 
     let output_ty = match &m.return_type {
         syn::ReturnType::Default => quote! { () },
-        syn::ReturnType::Type(_, ty) => {
-            let mut ty = (**ty).clone();
-            clear_all_type_lifetimes(&mut ty);
-            quote! { #ty }
-        }
+        syn::ReturnType::Type(_, ty) => abi_projected_type(ty, import, self_api_replacement),
     };
 
     // A `NotPayable` endpoint hardcodes the marker, exactly like `adder_abi.rs`. A payable
@@ -127,12 +165,18 @@ fn generate_proxy_method(
 /// `.abi_typed(proxy_name)`). The methods struct is always `proxy_name` suffixed with
 /// `Methods`, matching every other proxy-methods struct in the codebase.
 ///
+/// `self_api_replacement` is spliced in wherever a method's argument/return type contains
+/// `Self::Api` (see `replace_self_api`); pass any concrete API type when generating from the
+/// framework macro (its choice is inconsequential, see `abi_projected_type`), it is unused
+/// (never matched) when generating from the framework-agnostic macro.
+///
 /// Only `Init`, `Upgrade` and `Endpoint` methods have an external call surface; everything else
 /// (callbacks, private methods) is skipped, same as `abi_gen`'s ABI-only counterpart.
 pub fn generate_abi_proxy(
     contract: &ContractTrait,
     import_crate: TypeAbiImportCrate,
     proxy_name: &syn::Ident,
+    self_api_replacement: &syn::Path,
 ) -> proc_macro2::TokenStream {
     let import = import_tokens(import_crate);
     let methods_name = format_ident!("{}Methods", proxy_name);
@@ -149,7 +193,13 @@ pub fn generate_abi_proxy(
                 }
                 _ => return None,
             };
-            Some(generate_proxy_method(m, &kind, &methods_name, &import))
+            Some(generate_proxy_method(
+                m,
+                &kind,
+                &methods_name,
+                &import,
+                self_api_replacement,
+            ))
         })
         .collect();
 
