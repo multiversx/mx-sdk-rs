@@ -1,7 +1,8 @@
+use multiversx_sc_abi_derive_common::parse::attributes::extract_doc;
+
 use crate::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
 
 use super::{
-    attributes::extract_doc,
     auto_impl_parse::{
         process_event_attribute, process_proxy_attribute, process_storage_clear_attribute,
         process_storage_get_attribute, process_storage_is_empty_attribute,

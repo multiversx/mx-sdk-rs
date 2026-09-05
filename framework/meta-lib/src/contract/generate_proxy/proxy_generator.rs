@@ -763,7 +763,7 @@ where
 
 #[cfg(test)]
 pub mod tests {
-    use multiversx_sc::abi::{BuildInfoAbi, ContractAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
+    use multiversx_sc::abi::{BuildInfoAbi, ContractAbi};
 
     use crate::contract::{meta_config::MetaConfig, sc_config::proxy_config::ProxyConfig};
 
@@ -771,16 +771,7 @@ pub mod tests {
 
     #[test]
     fn clean_paths_unsanitized_test() {
-        let build_info = BuildInfoAbi {
-            rustc: None,
-            contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate".to_owned(),
-                version: "0.0.0".to_owned(),
-                git_version: "0.0.0".to_owned(),
-            },
-            framework: FrameworkBuildAbi::create(),
-        };
-
+        let build_info = BuildInfoAbi::dummy();
         let original_contract_abi = ContractAbi::new(build_info, &[""], "contract-crate", false);
         let meta_config = MetaConfig::create(original_contract_abi.clone(), false);
         let mut proxy_generator = ProxyGenerator {
@@ -804,16 +795,7 @@ pub mod tests {
 
     #[test]
     fn clean_paths_sanitized_test() {
-        let build_info = BuildInfoAbi {
-            rustc: None,
-            contract_crate: ContractCrateBuildAbi {
-                name: "contract-crate".to_owned(),
-                version: "0.0.0".to_owned(),
-                git_version: "0.0.0".to_owned(),
-            },
-            framework: FrameworkBuildAbi::create(),
-        };
-
+        let build_info = BuildInfoAbi::dummy();
         let original_contract_abi = ContractAbi::new(build_info, &[""], "contract-crate", false);
         let meta_config = MetaConfig::create(original_contract_abi.clone(), false);
         let mut proxy_generator = ProxyGenerator {

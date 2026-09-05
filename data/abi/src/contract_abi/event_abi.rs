@@ -1,4 +1,5 @@
-use super::*;
+use crate::{TypeAbi, TypeName};
+
 use alloc::{
     string::{String, ToString},
     vec::Vec,

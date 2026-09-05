@@ -1,4 +1,5 @@
 use super::*;
+use crate::contract_abi::{OutputAbi, OutputAbis};
 use alloc::{format, string::ToString, vec::Vec};
 
 /// Implemented for all types that can end up in the ABI:

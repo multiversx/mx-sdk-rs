@@ -1,6 +1,6 @@
 use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
-use crate::abi::TypeAbiFrom;
+use crate::TypeAbiFrom;
 
 /// Type that ignores TypeAbiFrom restrictions.
 ///

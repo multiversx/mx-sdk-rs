@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    abi::{OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
