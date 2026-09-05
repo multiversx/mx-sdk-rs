@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.66.1"
+version = "0.66.2"
 edition = "2024"
 rust-version = "1.85"
 
@@ -27,13 +27,13 @@ contract-call-legacy = []
 small-int-bug = [] # can be used for testing the buggy mBufferFromSmallIntSigned VM hook
 
 [dependencies]
-bitflags = "2.9"
+bitflags = "2.13"
 num-traits = { version = "0.2", default-features = false }
 unwrap-infallible = "1.0"
 generic-array = "1.2"
 
 [dependencies.multiversx-sc-derive]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../derive"
 
 [dependencies.multiversx-sc-abi]
@@ -46,5 +46,5 @@ path = "../../data/codec"
 features = ["derive"]
 
 [dependencies.multiversx-chain-core]
-version = "=0.23.0"
+version = "=0.23.1"
 path = "../../chain/core"

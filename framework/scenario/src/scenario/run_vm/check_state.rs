@@ -78,19 +78,15 @@ fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
             );
 
             if let CheckStorage::Equal(eq) = &expected_account.storage {
-                let default_value = &Vec::new();
                 for (expected_key, expected_value) in eq.storages.iter() {
-                    let actual_value = account
-                        .storage
-                        .get(&expected_key.value)
-                        .unwrap_or(default_value);
+                    let actual_value = account.storage_get(&expected_key.value);
                     assert!(
-                        expected_value.check(actual_value),
+                        expected_value.check(&actual_value),
                         "bad storage value. Address: {}. Key: {}. Want: {}. Have: {}",
                         expected_address,
                         expected_key,
                         expected_value,
-                        verbose_hex(actual_value)
+                        verbose_hex(&actual_value)
                     );
                 }
 

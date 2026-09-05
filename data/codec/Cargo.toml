@@ -35,7 +35,7 @@ arrayvec = { version = "0.7", default-features = false }
 num-bigint = { version = "0.4", optional = true }           # can only be used in std contexts
 num-traits = { version = "0.2", default-features = false }
 unwrap-infallible = "1.0"
-bitflags = "2.9"
+bitflags = "2.13"
 
 [dev-dependencies.multiversx-sc-codec-derive]
 path = "../codec-derive"

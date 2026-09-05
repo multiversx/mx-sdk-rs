@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.66.1"
+version = "0.66.2"
 edition = "2024"
 
 authors = [
@@ -26,6 +26,7 @@ template-test-released = []
 chain-simulator-tests = []
 repro-build-test = []
 install-debugger-test = []
+ledger = ["multiversx-sdk/ledger"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
@@ -39,8 +40,8 @@ semver = "1.0.20"
 ruplacer = { version = "0.10", default-features = false }
 regex = "1.11"
 reqwest = { version = "0.13", features = ["rustls", "blocking", "json"] }
-copy_dir = "0.1.2"
-pathdiff = "0.2.1"
+copy_dir = "0.1"
+pathdiff = "0.2"
 common-path = "1.0"
 bip39 = { version = "2.0", features = ["rand"] }
 rand = { version = "0.10", default-features = false }
@@ -54,29 +55,29 @@ zip = { version = "7.2", features = ["deflate"], default-features = false }
 rpassword = "~7.3"
 
 [dependencies.multiversx-sc-meta-lib]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../meta-lib"
 
 [dependencies.multiversx-sc]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../base"
 features = ["alloc", "num-bigint"]
 
 [dependencies.multiversx-sc-snippets]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../scenario"
 
 [dependencies.multiversx-chain-core]
-version = "=0.23.0"
+version = "=0.23.1"
 path = "../../chain/core"
 features = ["std"]
 
 [dependencies.multiversx-sdk]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../../sdk/core"
 
 [dev-dependencies]

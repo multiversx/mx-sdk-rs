@@ -37,7 +37,7 @@ pub async fn unpublish_contract(args: &ReproducibleBuildUnpublishArgs) {
 
     // Sign using the same MultiversX message signing protocol as verify.
     let bytes_to_sign = compute_bytes_for_signing(&contract, &payload);
-    let signature = wallet.sign_bytes(bytes_to_sign);
+    let signature = wallet.sign_bytes(bytes_to_sign).expect("failed to sign");
 
     let request_body = serde_json::json!({
         "signature": signature,

@@ -1,4 +1,8 @@
-use multiversx_sdk::{data::transaction::Transaction, wallet::PrivateKey, wallet::Wallet};
+use multiversx_sdk::{
+    data::transaction::Transaction,
+    wallet::{PrivateKey, Wallet},
+};
+
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
 #[tokio::main]
@@ -26,9 +30,11 @@ async fn main() -> anyhow::Result<()> {
         chain_id: arg.chain_id,
         version: arg.version,
         options: arg.options,
+        relayer: None,
+        relayer_signature: None,
     };
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     let tx_hash = blockchain.send_transaction(&unsign_tx).await?;
 
