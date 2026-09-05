@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ErrorApi, ManagedTypeApi, ManagedTypeApiImpl, use_raw_handle},
+    api::{ErrorApi, ManagedTypeApi, use_raw_handle},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeMultiOutput,
@@ -342,7 +342,7 @@ where
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

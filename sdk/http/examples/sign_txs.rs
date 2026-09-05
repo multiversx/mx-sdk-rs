@@ -1,5 +1,5 @@
 use multiversx_sdk::{
-    data::transaction::Transaction,
+    data::transaction::{Transaction, TransactionOptions, TransactionVersion},
     wallet::{PrivateKey, Wallet},
 };
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
@@ -27,21 +27,23 @@ async fn main() -> anyhow::Result<()> {
         data: arg.data,
         signature: None,
         chain_id: arg.chain_id,
-        version: arg.version,
-        options: arg.options,
+        version: TransactionVersion::V1,
+        options: None,
+        relayer: None,
+        relayer_signature: None,
     };
 
     let mut txs: Vec<Transaction> = vec![];
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 
-    unsign_tx.version = 2;
-    unsign_tx.options = 1;
+    unsign_tx.version = TransactionVersion::V2;
+    unsign_tx.options = Some(TransactionOptions::SIGN_WITH_HASH);
     unsign_tx.nonce += 1;
 
-    let signature = wallet.sign_tx(&unsign_tx);
+    let signature = wallet.sign_tx(&unsign_tx)?;
     unsign_tx.signature = Some(signature);
     txs.push(unsign_tx.clone());
 

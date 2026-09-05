@@ -1,6 +1,5 @@
 use crate::{
     abi::TypeAbiFrom,
-    api::ManagedTypeApiImpl,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecodeMulti,
         TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput, multi_types::MultiValue3,
@@ -53,7 +52,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for PaymentMultiValue<M> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

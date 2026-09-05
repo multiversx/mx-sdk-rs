@@ -51,7 +51,7 @@ fn convert(convert_args: &WalletConvertArgs) {
             Some(file) => {
                 mnemonic_str = fs::read_to_string(file).unwrap();
                 let wallet = Wallet::try_from(Mnemonic::parse(&mnemonic_str).unwrap()).unwrap();
-                write_resulted_pem(wallet.to_pem(hrp), outfile);
+                write_resulted_pem(wallet.to_pem(hrp).unwrap(), outfile);
             }
             None => {
                 println!(
@@ -59,7 +59,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 );
                 _ = io::stdin().read_to_string(&mut mnemonic_str).unwrap();
                 let wallet = Wallet::try_from(Mnemonic::parse(&mnemonic_str).unwrap()).unwrap();
-                write_resulted_pem(wallet.to_pem(hrp), outfile);
+                write_resulted_pem(wallet.to_pem(hrp).unwrap(), outfile);
             }
         },
         ("keystore-secret", "pem") => match infile {
@@ -68,7 +68,7 @@ fn convert(convert_args: &WalletConvertArgs) {
                 match keystore.decrypt_wallet(&get_keystore_password()) {
                     Ok(wallet) => {
                         println!("Password is correct");
-                        write_resulted_pem(wallet.to_pem(hrp), outfile);
+                        write_resulted_pem(wallet.to_pem(hrp).unwrap(), outfile);
                     }
                     Err(KeystoreError::InvalidPassword) => {
                         panic!("Password is incorrect");
@@ -220,7 +220,7 @@ fn new(new_args: &WalletNewArgs) {
 
     match format {
         Some("pem") => {
-            write_resulted_pem(new_wallet_info.wallet.to_pem(hrp), outfile);
+            write_resulted_pem(new_wallet_info.wallet.to_pem(hrp).unwrap(), outfile);
             if let Some(outfile) = outfile {
                 println!("Wallet saved to '{outfile}'");
             }
@@ -228,7 +228,7 @@ fn new(new_args: &WalletNewArgs) {
         Some("keystore-secret") => {
             let randomness = new_keystore_randomness();
             let json_result = Keystore::encrypt(
-                &new_wallet_info.wallet.private_key,
+                new_wallet_info.wallet.private_key().unwrap(),
                 hrp,
                 &get_keystore_password(),
                 randomness,

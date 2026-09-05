@@ -39,6 +39,18 @@ impl AccountData {
             developer_rewards: BigUint::zero(),
         }
     }
+
+    pub fn storage_get(&self, key: &[u8]) -> Vec<u8> {
+        self.storage.get(key).cloned().unwrap_or_default()
+    }
+
+    pub fn storage_set(&mut self, key: &[u8], value: &[u8]) {
+        if value.is_empty() {
+            self.storage.remove(key);
+        } else {
+            self.storage.insert(key.to_vec(), value.to_vec());
+        }
+    }
 }
 
 impl fmt::Display for AccountData {

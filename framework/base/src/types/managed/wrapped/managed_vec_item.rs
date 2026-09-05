@@ -11,7 +11,7 @@ use multiversx_chain_core::types::{
 use multiversx_sc_codec::multi_types::{MultiValue2, MultiValue3};
 
 use crate::{
-    api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl, use_raw_handle},
+    api::{HandleConstraints, ManagedTypeApi, use_raw_handle},
     types::{
         BigInt, BigUint, EllipticCurve, EsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
         ManagedByteArray, ManagedRef, ManagedType, ManagedVec, NonZeroBigUint, TokenId,
@@ -304,7 +304,7 @@ macro_rules! impl_managed_type {
             }
 
             fn requires_drop() -> bool {
-                M::managed_type_impl().requires_managed_type_drop()
+                true
             }
         }
     };
@@ -346,7 +346,7 @@ where
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 
@@ -377,7 +377,7 @@ where
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

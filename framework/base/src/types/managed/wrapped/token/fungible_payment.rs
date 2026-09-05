@@ -2,7 +2,7 @@ use generic_array::typenum::U8;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::ManagedTypeApi,
     codec::{
         self,
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
@@ -81,6 +81,6 @@ impl<M: ManagedTypeApi> ManagedVecItem for FungiblePayment<M> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }

@@ -1,0 +1,22 @@
+[package]
+name = "wallet-miner"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+description = "Mines wallets with selected hex address suffixes"
+
+[[bin]]
+name = "wallet-miner"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+
+[dependencies.multiversx-sc-meta]
+version = "=0.66.2"
+path = "../../framework/meta"
+
+[dependencies.multiversx-sdk]
+version = "=0.16.1"
+path = "../../sdk/core"

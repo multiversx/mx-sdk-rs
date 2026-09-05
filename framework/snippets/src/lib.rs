@@ -4,9 +4,12 @@
 #![allow(clippy::manual_is_multiple_of)]
 
 pub mod account_tool;
+pub mod config;
 mod interactor;
 mod multi;
 pub mod network_response;
+
+pub use config::*;
 
 pub use env_logger;
 pub use hex;

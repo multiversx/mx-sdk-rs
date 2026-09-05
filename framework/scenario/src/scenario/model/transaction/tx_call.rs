@@ -25,6 +25,7 @@ pub struct TxCall {
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+    pub relayer: Option<AddressValue>,
 }
 
 impl Default for TxCall {
@@ -38,6 +39,7 @@ impl Default for TxCall {
             arguments: Default::default(),
             gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
             gas_price: Default::default(),
+            relayer: None,
         }
     }
 }
@@ -61,6 +63,7 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit, context),
             gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
+            relayer: None,
         }
     }
 }
@@ -154,6 +157,7 @@ impl TxCall {
             arguments,
             gas_limit: self.gas_limit.clone(),
             gas_price: self.gas_price.clone(),
+            relayer: self.relayer.clone(),
         }
     }
 

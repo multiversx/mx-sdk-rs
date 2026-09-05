@@ -2,7 +2,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         BigFloatApiImpl, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
-        ManagedTypeApiImpl, const_handles, use_raw_handle,
+        const_handles, use_raw_handle,
     },
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
@@ -273,7 +273,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimalSigned<M, NumDecimals> 
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 
@@ -299,7 +299,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

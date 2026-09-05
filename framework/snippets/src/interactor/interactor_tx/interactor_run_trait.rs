@@ -15,6 +15,7 @@ where
             interpreter_context: InterpreterContext::new().with_dir(self.current_dir.clone()),
             tx_id: None,
             tx_hash: None,
+            relayer: None,
         }
     }
 }

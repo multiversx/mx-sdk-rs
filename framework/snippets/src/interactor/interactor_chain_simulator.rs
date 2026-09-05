@@ -14,12 +14,13 @@ impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Send funds to a user account on the chain simulator. The amount is fixed to 100 EGLD.
     pub async fn send_user_funds(&self, receiver: &Bech32Address) -> Result<String, Error> {
         if !self.use_chain_simulator {
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorSendFundsRequest::to_address(receiver))
             .await
     }
@@ -29,7 +30,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorGenerateBlocksRequest::num_blocks(num_blocks))
             .await
     }
@@ -39,7 +40,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorAddKeysRequest::with_keys(vec![key]))
             .await
     }
@@ -49,7 +50,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorGenerateBlocksRequest::until_epoch(
                 epoch_number,
             ))
@@ -69,7 +70,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorGenerateBlocksRequest::until_tx_processed(
                 tx_hash,
             ))
@@ -81,7 +82,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
             .await
     }
@@ -94,7 +95,7 @@ where
             return Ok(String::from("no-simulator"));
         }
 
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorSetStateOverwriteRequest::for_accounts(
                 accounts,
             ))
@@ -107,7 +108,7 @@ where
         }
 
         let accounts = self.get_accounts_from_file();
-        self.proxy
+        self.proxy()
             .request(ChainSimulatorSetStateRequest::for_accounts(accounts))
             .await
     }

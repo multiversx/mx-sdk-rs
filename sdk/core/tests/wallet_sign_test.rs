@@ -6,8 +6,8 @@ fn test_sign_bytes_snapshot() {
     let bob = test_wallets::bob();
 
     // Signatures are deterministic: same key + same message always produces the same bytes.
-    let sig_alice = alice.sign_bytes(b"hello multiversx");
-    let sig_bob = bob.sign_bytes(b"hello multiversx");
+    let sig_alice = alice.sign_bytes(b"hello multiversx").unwrap();
+    let sig_bob = bob.sign_bytes(b"hello multiversx").unwrap();
 
     assert_eq!(sig_alice.to_hex(), SIG_ALICE_HELLO);
     assert_eq!(sig_bob.to_hex(), SIG_BOB_HELLO);
@@ -17,8 +17,8 @@ fn test_sign_bytes_snapshot() {
 fn test_sign_bytes_deterministic() {
     let alice = test_wallets::alice();
     assert_eq!(
-        alice.sign_bytes(b"deterministic"),
-        alice.sign_bytes(b"deterministic"),
+        alice.sign_bytes(b"deterministic").unwrap(),
+        alice.sign_bytes(b"deterministic").unwrap(),
     );
 }
 
@@ -26,16 +26,16 @@ fn test_sign_bytes_deterministic() {
 fn test_sign_bytes_different_messages_differ() {
     let alice = test_wallets::alice();
     assert_ne!(
-        alice.sign_bytes(b"message one"),
-        alice.sign_bytes(b"message two"),
+        alice.sign_bytes(b"message one").unwrap(),
+        alice.sign_bytes(b"message two").unwrap(),
     );
 }
 
 #[test]
 fn test_sign_bytes_different_keys_differ() {
     assert_ne!(
-        test_wallets::alice().sign_bytes(b"same message"),
-        test_wallets::bob().sign_bytes(b"same message"),
+        test_wallets::alice().sign_bytes(b"same message").unwrap(),
+        test_wallets::bob().sign_bytes(b"same message").unwrap(),
     );
 }
 
@@ -43,23 +43,28 @@ fn test_sign_bytes_different_keys_differ() {
 fn test_verify_valid_signature() {
     let alice = test_wallets::alice();
     let message = b"hello multiversx";
-    let sig = alice.sign_bytes(message);
-    assert!(alice.public_key().verify(message, &sig));
+    let sig = alice.sign_bytes(message).unwrap();
+    assert!(alice.public_key().unwrap().verify(message, &sig));
 }
 
 #[test]
 fn test_verify_wrong_message_fails() {
     let alice = test_wallets::alice();
-    let sig = alice.sign_bytes(b"hello multiversx");
-    assert!(!alice.public_key().verify(b"different message", &sig));
+    let sig = alice.sign_bytes(b"hello multiversx").unwrap();
+    assert!(
+        !alice
+            .public_key()
+            .unwrap()
+            .verify(b"different message", &sig)
+    );
 }
 
 #[test]
 fn test_verify_wrong_key_fails() {
     let alice = test_wallets::alice();
     let bob = test_wallets::bob();
-    let sig = alice.sign_bytes(b"hello multiversx");
-    assert!(!bob.public_key().verify(b"hello multiversx", &sig));
+    let sig = alice.sign_bytes(b"hello multiversx").unwrap();
+    assert!(!bob.public_key().unwrap().verify(b"hello multiversx", &sig));
 }
 
 #[test]
@@ -68,8 +73,17 @@ fn test_verify_snapshot_signatures() {
     let bob = test_wallets::bob();
     let alice_sig = WalletSignature::from_hex_str(SIG_ALICE_HELLO).unwrap();
     let bob_sig = WalletSignature::from_hex_str(SIG_BOB_HELLO).unwrap();
-    assert!(alice.public_key().verify(b"hello multiversx", &alice_sig));
-    assert!(bob.public_key().verify(b"hello multiversx", &bob_sig));
+    assert!(
+        alice
+            .public_key()
+            .unwrap()
+            .verify(b"hello multiversx", &alice_sig)
+    );
+    assert!(
+        bob.public_key()
+            .unwrap()
+            .verify(b"hello multiversx", &bob_sig)
+    );
 }
 
 // Snapshots captured with fixed test-wallet keys.

@@ -58,6 +58,14 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.66.2, chain 0.23.1, sdk 0.16.1] - 2026-06-18
+- Fixed an issue in `ManagedVec` `slice` when running on the `DebugApi` environment;
+	- `ManagedVecItem` `requires_drop()` no longer depends on environment, only on the type;
+	- Renamed `ManagedVec` `slice` to the more suggestive `clone_range`, and deprecated `slice`;
+	- `ManagedVec` clone optimization for Copy types.
+- `BoxedBytes` `from_concat` edge case allocation fix.
+
+
 ### [sc 0.66.1] - 2026-06-01
 - Build fix for Rust 1.96.
 - `ManagedVecItem` implementation for time types (`TimestampMillis`, `TimestampSeconds`, `DurationMillis`, `DurationSeconds`).

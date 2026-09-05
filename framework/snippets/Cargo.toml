@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.66.1"
+version = "0.66.2"
 edition = "2024"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -17,6 +17,8 @@ categories = ["cryptography::cryptocurrencies"]
 default = ["http"]
 http = ["multiversx-sdk-http", "tokio"]
 dapp = ["multiversx-sdk-dapp"]
+chain-simulator-tests = []
+ledger = ["multiversx-sdk/ledger"]
 
 [dependencies]
 hex = "0.4"
@@ -24,13 +26,16 @@ log = "0.4"
 env_logger = "0.11"
 futures = "0.3"
 anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+toml = "1.0"
 colored = "3.0"
+pathdiff = "0.2"
 
 tokio = { version = "1.24", features = ["full"], optional = true }
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.66.1"
+version = "=0.66.2"
 path = "../scenario"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -38,16 +43,19 @@ version = "0.26.1"
 path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-sdk]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../../sdk/core"
 
 [dependencies.multiversx-sdk-http]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../../sdk/http"
 optional = true
 default-features = false
 
 [dependencies.multiversx-sdk-dapp]
-version = "=0.16.0"
+version = "=0.16.1"
 path = "../../sdk/dapp"
 optional = true
+
+[dev-dependencies]
+serial_test = "3.2"

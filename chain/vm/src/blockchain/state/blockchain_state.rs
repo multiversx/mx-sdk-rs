@@ -75,16 +75,9 @@ impl BlockchainState {
             .get_mut(address)
             .unwrap_or_else(|| panic!("Account not found: {address}"));
         account.egld_balance += amount;
-        let mut storage_v_rew =
-            if let Some(old_storage_value) = account.storage.get(STORAGE_REWARD_KEY) {
-                BigUint::from_bytes_be(old_storage_value)
-            } else {
-                BigUint::zero()
-            };
+        let mut storage_v_rew = BigUint::from_bytes_be(&account.storage_get(STORAGE_REWARD_KEY));
         storage_v_rew += amount;
-        account
-            .storage
-            .insert(STORAGE_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+        account.storage_set(STORAGE_REWARD_KEY, &storage_v_rew.to_bytes_be());
     }
 
     pub fn put_new_token_identifier(&mut self, token_identifier: String) {
