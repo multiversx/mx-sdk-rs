@@ -2740,7 +2740,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kitty"
+name = "kitty-abi"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
@@ -2753,7 +2753,7 @@ dependencies = [
 name = "kitty-auction"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-ownership",
  "multiversx-sc",
  "multiversx-sc-scenario",
@@ -2771,7 +2771,7 @@ dependencies = [
 name = "kitty-genetic-alg"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "random",
@@ -2789,7 +2789,7 @@ dependencies = [
 name = "kitty-ownership"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-genetic-alg",
  "multiversx-sc",
  "multiversx-sc-scenario",

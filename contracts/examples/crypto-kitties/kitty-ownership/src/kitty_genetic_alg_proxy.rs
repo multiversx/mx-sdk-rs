@@ -63,13 +63,13 @@ where
     Gas: TxGas<Env>,
 {
     pub fn generate_kitty_genes<
-        Arg0: ProxyArg<kitty::Kitty>,
-        Arg1: ProxyArg<kitty::Kitty>,
+        Arg0: ProxyArg<kitty_abi::Kitty>,
+        Arg1: ProxyArg<kitty_abi::Kitty>,
     >(
         self,
         matron: Arg0,
         sire: Arg1,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, kitty::KittyGenes> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, kitty_abi::KittyGenes> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("generateKittyGenes")

@@ -1,4 +1,4 @@
-use kitty::{Kitty, KittyGenes};
+use kitty_abi::{Kitty, KittyGenes};
 use multiversx_sc_scenario::imports::*;
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
@@ -24,7 +24,7 @@ fn kitty_genetic_alg_abi_proxy_blackbox() {
     world
         .tx()
         .from(OWNER_ADDRESS)
-        .abi_typed(kitty::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
+        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
         .init()
         .code(CODE_PATH)
         .new_address(KITTY_GENETIC_ALG_ADDRESS)
@@ -36,7 +36,7 @@ fn kitty_genetic_alg_abi_proxy_blackbox() {
     world
         .query()
         .to(KITTY_GENETIC_ALG_ADDRESS)
-        .abi_typed(kitty::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
+        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
         .generate_kitty_genes(matron, sire)
         .returns(ReturnsResult)
         .run();

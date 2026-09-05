@@ -1,5 +1,5 @@
 [package]
-name = "kitty"
+name = "kitty-abi"
 version = "0.0.0"
 authors = [ "dorin-iancu <dorin.iancu@multiversx.com>",]
 edition = "2024"
@@ -13,11 +13,11 @@ workspace = true
 
 [dependencies.multiversx-sc-abi]
 version = "0.25.0"
-path = "../../../../../data/abi"
+path = "../../../../data/abi"
 
 [dependencies.multiversx-sc-abi-derive]
 version = "0.25.0"
-path = "../../../../../data/abi-derive"
+path = "../../../../data/abi-derive"
 
 [dependencies.random]
 version = "0.0.0"
