@@ -21,8 +21,7 @@ pub fn process_contract(
 
     validate_contract(&contract);
 
-    let contract_impl =
-        contract_implementation(&contract, true, call_arg.proxy_name.as_ref());
+    let contract_impl = contract_implementation(&contract, true, call_arg.proxy_name.as_ref());
 
     proc_macro::TokenStream::from(contract_impl)
 }

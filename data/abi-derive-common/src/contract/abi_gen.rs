@@ -339,8 +339,12 @@ pub fn generate_abi_provider(
     extra_impl_items: proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let import = import_tokens(import_crate);
-    let abi_body =
-        generate_abi_method_body(contract, is_contract_main, import_crate, provider_trait_path);
+    let abi_body = generate_abi_method_body(
+        contract,
+        is_contract_main,
+        import_crate,
+        provider_trait_path,
+    );
     quote! {
         pub struct AbiProvider {}
 

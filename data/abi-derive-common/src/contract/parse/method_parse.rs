@@ -1,6 +1,8 @@
 use crate::parse::attributes::extract_doc;
 
-use crate::contract::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
+use crate::contract::model::{
+    Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties,
+};
 
 use super::{
     auto_impl_parse::{

@@ -78,9 +78,8 @@ fn generate_proxy_method(
         .iter()
         .filter(|arg| arg.is_endpoint_arg())
         .collect();
-    let arg_generics: Vec<syn::Ident> = (0..args.len())
-        .map(|i| format_ident!("Arg{}", i))
-        .collect();
+    let arg_generics: Vec<syn::Ident> =
+        (0..args.len()).map(|i| format_ident!("Arg{}", i)).collect();
     let arg_types: Vec<proc_macro2::TokenStream> = args
         .iter()
         .map(|arg| abi_projected_type(&arg.ty, import, self_api_replacement))
