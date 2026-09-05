@@ -7,7 +7,7 @@ use multiversx_sc_codec::{
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
-    api::{ManagedTypeApi, ManagedTypeApiImpl, quick_signal_error},
+    api::{ManagedTypeApi, quick_signal_error},
     err_msg,
     formatter::{FormatBuffer, FormatByteReceiver, SCDisplay},
     typenum::{U4, U8, Unsigned},
@@ -327,7 +327,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for ManagedDecimal<M, NumDecimals> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 
@@ -353,7 +353,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> ManagedVecItem
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

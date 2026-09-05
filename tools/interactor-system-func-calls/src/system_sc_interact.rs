@@ -238,9 +238,8 @@ impl SysFuncCallsInteract {
     pub async fn init(config: Config) -> Self {
         let mut interactor = Interactor::new(config.gateway_uri())
             .await
-            .use_chain_simulator(config.is_chain_simulator());
-
-        interactor.set_current_dir_from_workspace("tools/interactor-system-func-calls");
+            .use_chain_simulator(config.is_chain_simulator())
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"));
         let wallet_address = interactor.register_wallet(test_wallets::carol()).await;
         let other_wallet_address = interactor.register_wallet(test_wallets::carol()).await;
 

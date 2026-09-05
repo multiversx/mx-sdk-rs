@@ -10,13 +10,10 @@ use multiversx_sc_snippets::imports::*;
 use proxies::*;
 use state::State;
 
-const FORWARDER_BLIND_CODE_PATH: FilePath = FilePath("forwarder-blind-bon.wasm");
-
 pub async fn forwarder_blind_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-    let mut interact = ContractInteract::new(config).await;
+    let mut interact = ContractInteract::new().await;
 
     let cli = cli::InteractCli::parse();
     match &cli.command {
@@ -112,27 +109,21 @@ pub struct ContractInteract {
 }
 
 impl ContractInteract {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri()).await;
+    pub async fn new() -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
         interactor.gas_price *= 25;
-        interactor.set_current_dir_from_workspace(
-            "contracts/feature-tests/composability/forwarder-blind/dex-interactor",
-        );
 
-        let wallet_addresses: Vec<Bech32Address> = if config.wallet_pem_paths.is_empty() {
-            println!("WARNING: no wallet_pem_paths configured — all operations will be skipped.");
+        let wallet_addresses: Vec<Bech32Address> = if config.wallets.is_empty() {
+            println!("WARNING: no wallets configured — all operations will be skipped.");
             Vec::new()
         } else {
-            let mut addrs = Vec::new();
-            for pem_path in &config.wallet_pem_paths {
-                let wallet = Wallet::from_pem_file(pem_path)
-                    .unwrap_or_else(|e| panic!("failed to load wallet from {pem_path}: {e}"));
-                addrs.push(interactor.register_wallet(wallet).await.into());
-            }
-            addrs
+            config
+                .wallets
+                .iter()
+                .map(|w| w.wallet().to_address().to_bech32(interactor.get_hrp()))
+                .collect()
         };
-
-        interactor.generate_blocks_until_all_activations().await;
 
         ContractInteract {
             interactor,
@@ -151,7 +142,7 @@ impl ContractInteract {
                     .gas(80_000_000u64)
                     .typed(forwarder_blind_proxy::ForwarderBlindProxy)
                     .init()
-                    .code(FORWARDER_BLIND_CODE_PATH)
+                    .code(&self.config.general.contract_path)
                     .code_metadata(CodeMetadata::PAYABLE)
                     .returns(ReturnsNewBech32Address)
             });
@@ -165,7 +156,7 @@ impl ContractInteract {
 
     pub async fn wrap_egld(&mut self, amount: u64) {
         let wallet_addresses = self.wallet_addresses.clone();
-        let wegld_address = self.config.wegld_address.clone();
+        let wegld_address = self.config.general.wegld_address.clone();
         let mut buffer = self.interactor.homogenous_call_buffer();
         for wallet in &wallet_addresses {
             buffer.push_tx(|tx| {
@@ -212,7 +203,7 @@ impl ContractInteract {
                 .interactor
                 .tx()
                 .from(&wallet)
-                .to(&self.config.pair_address)
+                .to(&self.config.general.pair_address)
                 .gas(50_000_000u64)
                 .raw_data(fc)
                 .payment(
@@ -237,7 +228,7 @@ impl ContractInteract {
     ) {
         let wallet_addresses = self.wallet_addresses.clone();
         let contract_addresses = self.config.contract_addresses.clone();
-        let pair_address = self.config.pair_address.clone();
+        let pair_address = self.config.general.pair_address.clone();
         let fc = self.build_swap_function_call(&want_token_id, want_amount_min);
 
         let mut buffer = self.interactor.homogenous_call_buffer();
@@ -287,22 +278,22 @@ impl ContractInteract {
     }
 
     pub async fn swap1_direct(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
-        let send_token = self.config.wegld_token_id.clone();
-        let want_token = self.config.usdc_token_id.clone();
+        let send_token = self.config.general.wegld_token_id.clone();
+        let want_token = self.config.general.usdc_token_id.clone();
         self.swap_direct_impl(send_token, wegld_amount, want_token, usdc_amount_min)
             .await;
     }
 
     pub async fn swap2_direct(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
-        let send_token = self.config.usdc_token_id.clone();
-        let want_token = self.config.wegld_token_id.clone();
+        let send_token = self.config.general.usdc_token_id.clone();
+        let want_token = self.config.general.wegld_token_id.clone();
         self.swap_direct_impl(send_token, usdc_amount, want_token, wegld_amount_min)
             .await;
     }
 
     pub async fn swap1_sync(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
-        let send_token = self.config.wegld_token_id.clone();
-        let want_token = self.config.usdc_token_id.clone();
+        let send_token = self.config.general.wegld_token_id.clone();
+        let want_token = self.config.general.usdc_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             wegld_amount,
@@ -314,8 +305,8 @@ impl ContractInteract {
     }
 
     pub async fn swap2_sync(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
-        let send_token = self.config.usdc_token_id.clone();
-        let want_token = self.config.wegld_token_id.clone();
+        let send_token = self.config.general.usdc_token_id.clone();
+        let want_token = self.config.general.wegld_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             usdc_amount,
@@ -327,8 +318,8 @@ impl ContractInteract {
     }
 
     pub async fn swap1_async1(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
-        let send_token = self.config.wegld_token_id.clone();
-        let want_token = self.config.usdc_token_id.clone();
+        let send_token = self.config.general.wegld_token_id.clone();
+        let want_token = self.config.general.usdc_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             wegld_amount,
@@ -340,8 +331,8 @@ impl ContractInteract {
     }
 
     pub async fn swap2_async1(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
-        let send_token = self.config.usdc_token_id.clone();
-        let want_token = self.config.wegld_token_id.clone();
+        let send_token = self.config.general.usdc_token_id.clone();
+        let want_token = self.config.general.wegld_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             usdc_amount,
@@ -353,8 +344,8 @@ impl ContractInteract {
     }
 
     pub async fn swap1_async2(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
-        let send_token = self.config.wegld_token_id.clone();
-        let want_token = self.config.usdc_token_id.clone();
+        let send_token = self.config.general.wegld_token_id.clone();
+        let want_token = self.config.general.usdc_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             wegld_amount,
@@ -366,8 +357,8 @@ impl ContractInteract {
     }
 
     pub async fn swap2_async2(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
-        let send_token = self.config.usdc_token_id.clone();
-        let want_token = self.config.wegld_token_id.clone();
+        let send_token = self.config.general.usdc_token_id.clone();
+        let want_token = self.config.general.wegld_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             usdc_amount,
@@ -379,8 +370,8 @@ impl ContractInteract {
     }
 
     pub async fn swap1_te(&mut self, wegld_amount: u64, usdc_amount_min: u64) {
-        let send_token = self.config.wegld_token_id.clone();
-        let want_token = self.config.usdc_token_id.clone();
+        let send_token = self.config.general.wegld_token_id.clone();
+        let want_token = self.config.general.usdc_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             wegld_amount,
@@ -392,8 +383,8 @@ impl ContractInteract {
     }
 
     pub async fn swap2_te(&mut self, usdc_amount: u64, wegld_amount_min: u64) {
-        let send_token = self.config.usdc_token_id.clone();
-        let want_token = self.config.wegld_token_id.clone();
+        let send_token = self.config.general.usdc_token_id.clone();
+        let want_token = self.config.general.wegld_token_id.clone();
         self.swap_via_forwarder_impl(
             send_token,
             usdc_amount,
@@ -406,8 +397,8 @@ impl ContractInteract {
 
     pub async fn drain(&mut self) {
         let contract_addresses = self.config.contract_addresses.clone();
-        let wegld_token_id = self.config.wegld_token_id.clone();
-        let usdc_token_id = self.config.usdc_token_id.clone();
+        let wegld_token_id = self.config.general.wegld_token_id.clone();
+        let usdc_token_id = self.config.general.usdc_token_id.clone();
 
         // For each contract, fetch its on-chain owner and check if we have it registered.
         let mut owner_per_contract: Vec<(Bech32Address, Bech32Address)> = Vec::new();
@@ -471,10 +462,10 @@ impl ContractInteract {
         let amount_out = self
             .interactor
             .query()
-            .to(&self.config.pair_address)
+            .to(&self.config.general.pair_address)
             .typed(pair_proxy::PairProxy)
             .get_amount_out_view(
-                EsdtTokenIdentifier::from(self.config.wegld_token_id.as_str()),
+                EsdtTokenIdentifier::from(self.config.general.wegld_token_id.as_str()),
                 BigUint::from(wegld_amount),
             )
             .returns(ReturnsResultUnmanaged)
@@ -483,7 +474,7 @@ impl ContractInteract {
 
         println!(
             "{wegld_amount} {} -> {} {}",
-            self.config.wegld_token_id, amount_out, self.config.usdc_token_id
+            self.config.general.wegld_token_id, amount_out, self.config.general.usdc_token_id
         );
     }
 
@@ -491,7 +482,7 @@ impl ContractInteract {
         let (wegld_reserve, usdc_reserve, lp_supply) = self
             .interactor
             .query()
-            .to(&self.config.pair_address)
+            .to(&self.config.general.pair_address)
             .typed(pair_proxy::PairProxy)
             .get_reserves_and_total_supply()
             .returns(ReturnsResultUnmanaged)
@@ -499,14 +490,20 @@ impl ContractInteract {
             .await
             .into_tuple();
 
-        println!("{} reserve: {wegld_reserve}", self.config.wegld_token_id);
-        println!("{} reserve: {usdc_reserve}", self.config.usdc_token_id);
+        println!(
+            "{} reserve: {wegld_reserve}",
+            self.config.general.wegld_token_id
+        );
+        println!(
+            "{} reserve: {usdc_reserve}",
+            self.config.general.usdc_token_id
+        );
         println!("LP token supply: {lp_supply}");
     }
 
     pub async fn balances(&mut self) {
-        let wegld_token_id = self.config.wegld_token_id.clone();
-        let usdc_token_id = self.config.usdc_token_id.clone();
+        let wegld_token_id = self.config.general.wegld_token_id.clone();
+        let usdc_token_id = self.config.general.usdc_token_id.clone();
 
         println!("=== Wallet Balances ===");
         for wallet in &self.wallet_addresses.clone() {

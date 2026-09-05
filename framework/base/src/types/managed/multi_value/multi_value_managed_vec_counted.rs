@@ -2,7 +2,7 @@ use core::borrow::Borrow;
 
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
@@ -113,7 +113,7 @@ where
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 

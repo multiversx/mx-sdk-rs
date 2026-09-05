@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 pub use super::cli_args_reproducible_builds::*;
 
+use crate::cli::cli_args_ledger::LedgerArgs;
 use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
@@ -43,7 +44,7 @@ pub enum StandaloneCliAction {
     #[command(
         about = "Calls the meta crates for all contracts under given path with the given arguments."
     )]
-    All(AllArgs),
+    All(Box<AllArgs>),
 
     #[command(
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
@@ -111,7 +112,13 @@ pub enum StandaloneCliAction {
         name = "tx",
         about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
     )]
-    Tx(TxCliArgs),
+    Tx(Box<TxCliArgs>),
+
+    #[command(
+        name = "ledger",
+        about = "Interact with a Ledger hardware wallet (list addresses, get app version)."
+    )]
+    Ledger(LedgerArgs),
 
     #[command(
         name = "data",

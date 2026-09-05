@@ -1,7 +1,11 @@
-
-# chain_type = 'simulator'
-# gateway_uri = 'http://localhost:8085'
-
+[connection]
 chain_type = 'real'
 gateway_uri = 'https://testnet-gateway.multiversx.com'
+
+[wallet]
+test_wallet = 'alice'
+
+# [connection]
+# chain_type = 'simulator'
+# gateway_uri = 'http://localhost:8085'
 

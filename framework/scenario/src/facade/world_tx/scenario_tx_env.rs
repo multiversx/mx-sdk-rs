@@ -1,5 +1,7 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
-use multiversx_sc::types::{H256, ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithTxHash, TxId};
+use multiversx_sc::types::{
+    H256, ManagedAddress, ManagedBuffer, TxEnv, TxEnvWithRelayer, TxEnvWithTxHash, TxId,
+};
 
 use crate::{ScenarioWorld, api::StaticApi, scenario_model::TxExpect};
 
@@ -14,6 +16,7 @@ pub struct ScenarioTxEnvData {
     pub interpreter_context: InterpreterContext,
     pub tx_id: Option<TxId>,
     pub tx_hash: Option<H256>,
+    pub relayer: Option<ManagedAddress<StaticApi>>,
 }
 
 impl TxEnv for ScenarioTxEnvData {
@@ -54,6 +57,17 @@ impl TxEnvWithTxHash for ScenarioTxEnvData {
     }
 }
 
+impl TxEnvWithRelayer for ScenarioTxEnvData {
+    fn set_relayer_address(&mut self, relayer: ManagedAddress<Self::Api>) {
+        assert!(self.relayer.is_none(), "relayer set twice");
+        self.relayer = Some(relayer);
+    }
+
+    fn take_relayer_address(&mut self) -> Option<ManagedAddress<Self::Api>> {
+        core::mem::take(&mut self.relayer)
+    }
+}
+
 impl ScenarioTxEnvData {
     pub fn interpreter_context(&self) -> InterpreterContext {
         self.interpreter_context.clone()
@@ -74,6 +88,7 @@ impl ScenarioWorld {
                 .with_allowed_missing_files(),
             tx_id: None,
             tx_hash: None,
+            relayer: None,
         }
     }
 }

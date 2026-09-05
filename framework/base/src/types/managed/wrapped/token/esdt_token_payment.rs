@@ -1,7 +1,7 @@
 use generic_array::typenum::U16;
 
 use crate::{
-    api::{ManagedTypeApi, ManagedTypeApiImpl},
+    api::ManagedTypeApi,
     types::{
         BigUint, EsdtTokenIdentifier, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedType,
         ManagedVec, ManagedVecItem, ManagedVecItemPayloadBuffer, Payment, PaymentVec, Ref,
@@ -265,7 +265,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     }
 
     fn requires_drop() -> bool {
-        M::managed_type_impl().requires_managed_type_drop()
+        true
     }
 }
 
