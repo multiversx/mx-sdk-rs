@@ -255,7 +255,7 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, kitty::Kitty> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, kitty_abi::Kitty> {
         self.wrapped_tx
             .payment(NotPayable)
             .raw_call("getKittyById")

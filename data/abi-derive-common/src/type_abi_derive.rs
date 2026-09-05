@@ -15,7 +15,7 @@ pub enum TypeAbiImportCrate {
     MultiversxScAbi,
 }
 
-fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
+pub(crate) fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
     match context {
         TypeAbiImportCrate::MultiversxSc => quote! { multiversx_sc::abi },
         TypeAbiImportCrate::MultiversxScAbi => quote! { multiversx_sc_abi },
@@ -178,6 +178,7 @@ pub fn type_abi_derive(
 
         impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
             type Unmanaged = Self;
+            type Abi = Self;
 
             fn type_name() -> #imports::TypeName {
                 #name_str.into()

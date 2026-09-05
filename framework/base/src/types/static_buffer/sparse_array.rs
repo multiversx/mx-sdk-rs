@@ -308,6 +308,7 @@ where
     E: ErrorApi,
 {
     type Unmanaged = Self;
+    type Abi = Self;
 
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {

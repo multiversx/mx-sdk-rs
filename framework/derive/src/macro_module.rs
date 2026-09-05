@@ -10,10 +10,10 @@ pub fn process_module(
     let new_input = trait_preprocessing(input);
     let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
 
-    let contract = parse_contract_trait(args, proc_input);
+    let contract = parse_contract_trait(args.into(), proc_input);
     validate_contract(&contract);
 
-    let contract_impl = contract_implementation(&contract, false);
+    let contract_impl = contract_implementation(&contract, false, None);
 
     proc_macro::TokenStream::from(quote! {
         #contract_impl

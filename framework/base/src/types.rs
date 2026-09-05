@@ -16,3 +16,9 @@ pub use static_buffer::*;
 pub use heap::*;
 
 pub use crate::chain_core::types::*;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::NotPayable;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::ProxyArg;

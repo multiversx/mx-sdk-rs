@@ -11,9 +11,14 @@ use crate::{
 
 /// Provides the implementation for both modules and contracts.
 /// TODO: not a great pattern to have the `is_contract_main` flag, reorganize the code and get rid of it.
+///
+/// `call_proxy_name`, when present (only ever from `#[multiversx_sc::contract(call = ...)]`),
+/// additionally generates a framework-agnostic call proxy under that name; see
+/// `abi_gen::generate_call_proxy`.
 pub fn contract_implementation(
     contract: &ContractTrait,
     is_contract_main: bool,
+    call_proxy_name: Option<&syn::Ident>,
 ) -> proc_macro2::TokenStream {
     let proxy_trait_imports = generate_all_proxy_trait_imports(contract);
     let module_original_attributes = &contract.original_attributes;
@@ -138,6 +143,11 @@ pub fn contract_implementation(
         quote! {}
     };
 
+    let call_proxy = match call_proxy_name {
+        Some(proxy_name) => abi_gen::generate_call_proxy(contract, proxy_name),
+        None => quote! {},
+    };
+
     quote! {
         #module_traits_code
 
@@ -150,5 +160,7 @@ pub fn contract_implementation(
         #proxy_obj_code
 
         #callback_proxies_obj
+
+        #call_proxy
     }
 }

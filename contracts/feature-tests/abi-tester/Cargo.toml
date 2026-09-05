@@ -18,5 +18,13 @@ workspace = true
 [dev-dependencies.multiversx-sc-meta-lib]
 workspace = true
 
+[dev-dependencies.multiversx-sc-abi-derive]
+version = "0.25.0"
+path = "../../../data/abi-derive"
+
+[dev-dependencies.multiversx-sc-abi]
+version = "0.25.0"
+path = "../../../data/abi"
+
 [dependencies]
 bitflags = "2.13"

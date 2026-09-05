@@ -217,6 +217,7 @@ where
     T: TypeAbi + MultiValueConstLength,
 {
     type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = MultiValueVec<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");

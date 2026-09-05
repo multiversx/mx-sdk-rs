@@ -2,7 +2,7 @@
 #![allow(clippy::suspicious_operation_groupings)]
 
 pub mod kitty_genetic_alg_proxy;
-use kitty::{Kitty, KittyGenes};
+use kitty_abi::{Kitty, KittyGenes};
 use multiversx_sc::imports::*;
 
 use core::cmp::max;
@@ -339,7 +339,7 @@ pub trait KittyOwnership {
             let caller = self.blockchain().get_caller();
             self.tx()
                 .to(&gene_science_contract_address)
-                .typed(kitty_genetic_alg_proxy::KittyGeneticAlgProxy)
+                .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
                 .generate_kitty_genes(matron, sire)
                 .callback(
                     self.callbacks()

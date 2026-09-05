@@ -5,8 +5,15 @@
 #![allow(clippy::collapsible_if)]
 #![allow(clippy::manual_is_multiple_of)]
 
+#[macro_use]
+extern crate quote;
+
 /// Common code for derive macros, shared between `data/abi-derive` and `framework/derive`.
 pub mod parse;
+
+/// Contract-trait model, parsing, validation and ABI codegen,
+/// shared between `data/abi-derive` and `framework/derive`.
+pub mod contract;
 
 mod type_abi_derive;
 

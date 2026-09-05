@@ -48,7 +48,7 @@ pub trait KittyAuction {
 
         self.tx()
             .to(&kitty_ownership_contract_address)
-            .typed(kitty_ownership_proxy::KittyOwnershipProxy)
+            .abi_typed(kitty_abi::kitty_ownership_abi::KittyOwnershipAbiProxy)
             .create_gen_zero_kitty()
             .callback(self.callbacks().create_gen_zero_kitty_callback())
             .async_call_and_exit();
@@ -244,7 +244,7 @@ pub trait KittyAuction {
         if !kitty_ownership_contract_address.is_zero() {
             self.tx()
                 .to(&kitty_ownership_contract_address)
-                .typed(kitty_ownership_proxy::KittyOwnershipProxy)
+                .abi_typed(kitty_abi::kitty_ownership_abi::KittyOwnershipAbiProxy)
                 .allow_auctioning(&caller, kitty_id)
                 .callback(self.callbacks().allow_auctioning_callback(
                     auction_type,
@@ -281,7 +281,7 @@ pub trait KittyAuction {
         if !kitty_ownership_contract_address.is_zero() {
             self.tx()
                 .to(&kitty_ownership_contract_address)
-                .typed(kitty_ownership_proxy::KittyOwnershipProxy)
+                .abi_typed(kitty_abi::kitty_ownership_abi::KittyOwnershipAbiProxy)
                 .transfer(address, kitty_id)
                 .callback(self.callbacks().transfer_callback(kitty_id))
                 .async_call_and_exit();
@@ -299,7 +299,7 @@ pub trait KittyAuction {
         if !kitty_ownership_contract_address.is_zero() {
             self.tx()
                 .to(&kitty_ownership_contract_address)
-                .typed(kitty_ownership_proxy::KittyOwnershipProxy)
+                .abi_typed(kitty_abi::kitty_ownership_abi::KittyOwnershipAbiProxy)
                 .approve_siring_and_return_kitty(approved_address, kitty_owner, kitty_id)
                 // not a mistake, same callback for transfer and approveSiringAndReturnKitty
                 .callback(self.callbacks().transfer_callback(kitty_id))

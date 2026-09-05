@@ -18,6 +18,8 @@ version = "0.0.0"
 dependencies = [
  "bitflags 2.13.0",
  "multiversx-sc",
+ "multiversx-sc-abi",
+ "multiversx-sc-abi-derive",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
 ]
@@ -2738,10 +2740,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "kitty"
+name = "kitty-abi"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
+ "multiversx-sc-abi",
+ "multiversx-sc-abi-derive",
  "random",
 ]
 
@@ -2749,7 +2753,7 @@ dependencies = [
 name = "kitty-auction"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-ownership",
  "multiversx-sc",
  "multiversx-sc-scenario",
@@ -2767,7 +2771,7 @@ dependencies = [
 name = "kitty-genetic-alg"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "random",
@@ -2785,7 +2789,7 @@ dependencies = [
 name = "kitty-ownership"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-genetic-alg",
  "multiversx-sc",
  "multiversx-sc-scenario",
@@ -3340,6 +3344,9 @@ name = "multiversx-sc-abi-derive"
 version = "0.25.0"
 dependencies = [
  "multiversx-sc-abi-derive-common",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
 ]
 
 [[package]]

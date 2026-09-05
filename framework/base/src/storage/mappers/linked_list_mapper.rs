@@ -711,6 +711,7 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()

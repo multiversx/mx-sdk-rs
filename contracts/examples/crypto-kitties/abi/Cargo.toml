@@ -1,0 +1,24 @@
+[package]
+name = "kitty-abi"
+version = "0.0.0"
+authors = [ "dorin-iancu <dorin.iancu@multiversx.com>",]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies.multiversx-sc]
+workspace = true
+
+[dependencies.multiversx-sc-abi]
+version = "0.25.0"
+path = "../../../../data/abi"
+
+[dependencies.multiversx-sc-abi-derive]
+version = "0.25.0"
+path = "../../../../data/abi-derive"
+
+[dependencies.random]
+version = "0.0.0"
+path = "../random"
