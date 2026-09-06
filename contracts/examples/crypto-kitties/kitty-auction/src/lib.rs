@@ -4,7 +4,6 @@ use multiversx_sc::imports::*;
 
 pub mod auction;
 use auction::*;
-pub mod kitty_ownership_proxy;
 
 #[multiversx_sc::contract]
 pub trait KittyAuction {
