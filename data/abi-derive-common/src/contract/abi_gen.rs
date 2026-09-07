@@ -6,6 +6,7 @@ use crate::contract::model::{
 use crate::contract::util::clear_all_type_lifetimes;
 use crate::type_abi_derive::import_tokens;
 
+#[allow(clippy::too_many_arguments)]
 fn generate_endpoint_snippet(
     m: &Method,
     endpoint_name: &str,
@@ -276,6 +277,7 @@ fn generate_abi_method_body(
     is_contract_main: bool,
     import_crate: TypeAbiImportCrate,
     provider_trait_path: &proc_macro2::TokenStream,
+    extra_abi_body_stmts: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let import = import_tokens(import_crate);
     let contract_docs = &contract.docs;
@@ -318,6 +320,7 @@ fn generate_abi_method_body(
         #(#event_snippets)*
         #(#supertrait_snippets)*
         #(#esdt_attributes)*
+        #extra_abi_body_stmts
         contract_abi
     }
 }
@@ -331,12 +334,18 @@ fn generate_abi_method_body(
 /// the generated `fn abi()` body references bare `Self::Api` wherever a managed type such
 /// as `BigUint<Self::Api>` shows up in an endpoint signature, and bare `Self::X` only
 /// resolves against the trait currently being implemented.
+///
+/// `extra_abi_body_stmts` are spliced into the `fn abi()` body itself, right before the final
+/// `contract_abi` expression (e.g. pushing `implements_abi`/`implements_abi_exactly` entries) — this
+/// crate stays agnostic about what those statements do, it only knows they act on the local
+/// `contract_abi` variable.
 pub fn generate_abi_provider(
     contract: &ContractTrait,
     is_contract_main: bool,
     import_crate: TypeAbiImportCrate,
     provider_trait_path: &proc_macro2::TokenStream,
     extra_impl_items: proc_macro2::TokenStream,
+    extra_abi_body_stmts: proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let import = import_tokens(import_crate);
     let abi_body = generate_abi_method_body(
@@ -344,6 +353,7 @@ pub fn generate_abi_provider(
         is_contract_main,
         import_crate,
         provider_trait_path,
+        &extra_abi_body_stmts,
     );
     quote! {
         pub struct AbiProvider {}

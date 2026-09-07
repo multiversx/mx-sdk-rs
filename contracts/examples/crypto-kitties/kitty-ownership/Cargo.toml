@@ -23,5 +23,9 @@ path = "../kitty-genetic-alg"
 [dependencies.multiversx-sc]
 workspace = true
 
+[dependencies.multiversx-sc-abi]
+version = "0.25.0"
+path = "../../../../data/abi"
+
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

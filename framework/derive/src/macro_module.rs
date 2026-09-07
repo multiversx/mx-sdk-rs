@@ -13,7 +13,7 @@ pub fn process_module(
     let contract = parse_contract_trait(args.into(), proc_input);
     validate_contract(&contract);
 
-    let contract_impl = contract_implementation(&contract, false, None);
+    let contract_impl = contract_implementation(&contract, false, None, &[], &[]);
 
     proc_macro::TokenStream::from(quote! {
         #contract_impl

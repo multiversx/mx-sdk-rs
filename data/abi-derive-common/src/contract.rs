@@ -1,4 +1,5 @@
 pub mod abi_gen;
+pub mod macro_args;
 pub mod model;
 pub mod parse;
 pub mod proxy_gen;

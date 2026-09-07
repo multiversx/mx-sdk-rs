@@ -217,6 +217,8 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
         esdt_attributes: original_abi.esdt_attributes.clone(),
+        implements_abi: original_abi.implements_abi.clone(),
+        implements_abi_exactly: original_abi.implements_abi_exactly.clone(),
     }
 }
 

@@ -15,10 +15,16 @@ use crate::{
 /// `call_proxy_name`, when present (only ever from `#[multiversx_sc::contract(call = ...)]`),
 /// additionally generates a framework-agnostic call proxy under that name; see
 /// `abi_gen::generate_call_proxy`.
+///
+/// `implements_abi`/`implements_abi_exactly` (only ever from `#[multiversx_sc::contract(implements_abi =
+/// ..., implements_abi_exactly = ...)]`) get forwarded to `abi_gen::generate_abi_provider`, which
+/// records them on the contract's own `ContractAbi` for the meta crate to check later.
 pub fn contract_implementation(
     contract: &ContractTrait,
     is_contract_main: bool,
     call_proxy_name: Option<&syn::Ident>,
+    implements_abi: &[syn::Path],
+    implements_abi_exactly: &[syn::Path],
 ) -> proc_macro2::TokenStream {
     let proxy_trait_imports = generate_all_proxy_trait_imports(contract);
     let module_original_attributes = &contract.original_attributes;
@@ -101,7 +107,12 @@ pub fn contract_implementation(
         }
     };
 
-    let abi_provider = abi_gen::generate_abi_provider(contract, is_contract_main);
+    let abi_provider = abi_gen::generate_abi_provider(
+        contract,
+        is_contract_main,
+        implements_abi,
+        implements_abi_exactly,
+    );
 
     let module_traits_code = quote! {
         #main_definition

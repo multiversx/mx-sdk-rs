@@ -1,0 +1,216 @@
+{
+    "buildInfo": {
+        "contractCrate": {
+            "name": "abi-tester",
+            "version": "0.0.0"
+        },
+        "abi": {
+            "name": "multiversx-sc-abi",
+            "version": "0.25.0"
+        },
+        "framework": {
+            "name": "",
+            "version": ""
+        }
+    },
+    "docs": [
+        "Framework-agnostic ABI description of a subset of the `abi-tester` contract's interface",
+        "(`contracts/feature-tests/abi-tester/src/abi_tester.rs`'s `init`/`upgrade`/",
+        "`echo_abi_test_type`/`echo_enum`), written directly against the real `AbiTestType`/`AbiEnum`/",
+        "`OnlyShowsUpInConstructor` types (all already framework-agnostic — no managed types), with no",
+        "dependency on `multiversx-sc`/`VMApi`.",
+        "",
+        "Exercises `#[contract_abi]`'s ABI generation over a richer type surface than the kitty",
+        "examples: recursive structs (`AbiTestType`), tuples, and a multi-variant enum with both",
+        "tuple and struct payloads (`AbiEnum`)."
+    ],
+    "name": "AbiTesterSpec",
+    "constructor": {
+        "payableInTokens": [
+            "EGLD"
+        ],
+        "inputs": [
+            {
+                "name": "constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
+    "upgradeConstructor": {
+        "inputs": [
+            {
+                "name": "constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "echo_abi_test_type",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "att",
+                    "type": "AbiTestType"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AbiTestType"
+                }
+            ]
+        },
+        {
+            "name": "echo_enum",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "e",
+                    "type": "AbiEnum"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AbiEnum"
+                }
+            ]
+        }
+    ],
+    "esdtAttributes": [],
+    "hasCallback": false,
+    "types": {
+        "AbiEnum": {
+            "type": "enum",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "variants": [
+                {
+                    "name": "Nothing",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Something",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "i32"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomethingMore",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "1",
+                            "type": "OnlyShowsUpAsNested08"
+                        }
+                    ]
+                },
+                {
+                    "name": "SomeStruct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u16"
+                        },
+                        {
+                            "name": "b",
+                            "type": "OnlyShowsUpAsNested09"
+                        }
+                    ]
+                }
+            ]
+        },
+        "AbiTestType": {
+            "type": "struct",
+            "docs": [
+                "Its only purpose is to test that the ABI generator works fine."
+            ],
+            "fields": [
+                {
+                    "docs": [
+                        "This type should only appear here."
+                    ],
+                    "name": "nested",
+                    "type": "OnlyShowsUpAsNested01"
+                },
+                {
+                    "docs": [
+                        "Tests that recursive types will not send the ABI generator into an infinite loop."
+                    ],
+                    "name": "next",
+                    "type": "Option<AbiTestType>"
+                },
+                {
+                    "docs": [
+                        "Tests that tuples tell the ABI of their component types even if they appear nowhere else.",
+                        "Also, just like above, recursive types need to work even when nested into a tuple."
+                    ],
+                    "name": "tuple_madness",
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested01": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested02": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "array0<u8>"
+                }
+            ]
+        },
+        "OnlyShowsUpAsNested08": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpInConstructor": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ],
+            "fields": [
+                {
+                    "name": "something",
+                    "type": "()"
+                }
+            ]
+        }
+    }
+}

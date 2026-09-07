@@ -35,6 +35,7 @@ pub fn contract_abi(
         multiversx_sc_abi_derive_common::TypeAbiImportCrate::MultiversxScAbi,
         &quote::quote! { multiversx_sc_abi::ContractAbiProvider },
         quote::quote! {},
+        quote::quote! {},
     );
     // `Self::Api` never appears in a framework-agnostic trait's argument/return types (there is
     // no managed-type substitution step here), so this placeholder is never actually spliced in.

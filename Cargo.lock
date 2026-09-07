@@ -2792,6 +2792,7 @@ dependencies = [
  "kitty-abi",
  "kitty-genetic-alg",
  "multiversx-sc",
+ "multiversx-sc-abi",
  "multiversx-sc-scenario",
  "random",
 ]

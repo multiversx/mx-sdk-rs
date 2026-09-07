@@ -2,10 +2,10 @@
 
 use multiversx_sc::imports::*;
 
-mod abi_enum;
+pub mod abi_enum;
 pub mod abi_proxy;
-mod abi_test_type;
-mod only_nested;
+pub mod abi_test_type;
+pub mod only_nested;
 
 use abi_enum::*;
 use abi_test_type::*;

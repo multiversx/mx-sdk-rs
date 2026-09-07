@@ -28,6 +28,10 @@ pub struct ContractAbi {
     pub esdt_attributes: Vec<EsdtAttributeAbi>,
     pub has_callback: bool,
     pub type_descriptions: TypeDescriptionContainerImpl,
+    /// ABI specs this contract's ABI must contain (a superset of each; checked by the meta crate).
+    pub implements_abi: Vec<ContractAbi>,
+    /// ABI specs this contract's ABI must match exactly (checked by the meta crate).
+    pub implements_abi_exactly: Vec<ContractAbi>,
 }
 
 impl ContractAbi {
@@ -45,6 +49,8 @@ impl ContractAbi {
             esdt_attributes: Vec::new(),
             has_callback,
             type_descriptions: TypeDescriptionContainerImpl::new(),
+            implements_abi: Vec::new(),
+            implements_abi_exactly: Vec::new(),
         }
     }
 
@@ -61,6 +67,10 @@ impl ContractAbi {
         self.type_descriptions.insert_all(&other.type_descriptions);
         self.esdt_attributes
             .extend_from_slice(other.esdt_attributes.as_slice());
+        self.implements_abi
+            .extend_from_slice(other.implements_abi.as_slice());
+        self.implements_abi_exactly
+            .extend_from_slice(other.implements_abi_exactly.as_slice());
     }
 
     /// A type can provide more than 1 type descripions.

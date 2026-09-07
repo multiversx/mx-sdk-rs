@@ -9,7 +9,7 @@ use core::cmp::max;
 
 use random::*;
 
-#[multiversx_sc::contract]
+#[multiversx_sc::contract(implements_abi = kitty_abi::kitty_ownership_abi::AbiProvider)]
 pub trait KittyOwnership {
     #[allow_multiple_var_args]
     #[init]
