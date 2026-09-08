@@ -47,11 +47,6 @@ pub struct AbiSourceGenerator<'a> {
     pub file: Option<&'a mut dyn std::io::Write>,
     pub proxy_config: &'a ProxyConfig,
     pub mode: AbiSourceMode,
-    /// Local custom types skipped by `write_types` because a field had no pure ABI equivalent
-    /// (a `$API`/`UncallableApi` residue) — consulted by `type_is_usable` so anything
-    /// referencing one of these (a field of another type, or an endpoint arg/output) is also
-    /// skipped, rather than emitted referencing a type that was never defined.
-    unmappable_local_types: std::collections::HashSet<String>,
 }
 
 impl<'a> AbiSourceGenerator<'a> {
@@ -64,7 +59,6 @@ impl<'a> AbiSourceGenerator<'a> {
             file: Some(file),
             proxy_config,
             mode,
-            unmappable_local_types: std::collections::HashSet::new(),
         }
     }
 
@@ -160,22 +154,6 @@ impl<'a> AbiSourceGenerator<'a> {
         process_rust_type(rust_type.to_string(), paths, processed_paths)
     }
 
-    /// A type with no pure ABI equivalent (no `Abi` projection override, and not one of our own
-    /// local types) leaves a literal `$API`/`UncallableApi` marker behind — that's not valid
-    /// Rust, so anything referencing it must be skipped rather than emitted broken.
-    fn has_unmapped_api_residue(rust_type: &str) -> bool {
-        rust_type.contains("$API") || rust_type.contains("UncallableApi")
-    }
-
-    /// False when `type_names` resolves to something unusable: leftover API residue, or (for a
-    /// local custom type) one `write_types` already decided to skip for the same reason.
-    fn type_is_usable(&self, type_names: &TypeNames) -> bool {
-        if self.unmappable_local_types.contains(&type_names.abi) {
-            return false;
-        }
-        !Self::has_unmapped_api_residue(&self.abi_type(type_names))
-    }
-
     fn has_path_rename_for_crate(&self, rust_name: &str) -> bool {
         let crate_prefix = extract_struct_crate(rust_name);
         self.proxy_config
@@ -231,26 +209,7 @@ impl<'a> AbiSourceGenerator<'a> {
         self.writeln("}");
     }
 
-    fn endpoint_is_usable(&self, endpoint: &EndpointAbi) -> bool {
-        endpoint
-            .inputs
-            .iter()
-            .all(|input| self.type_is_usable(&input.type_names))
-            && endpoint
-                .outputs
-                .iter()
-                .all(|output| self.type_is_usable(&output.type_names))
-    }
-
     fn write_trait_method(&mut self, endpoint: &EndpointAbi) {
-        if !self.endpoint_is_usable(endpoint) {
-            self.writeln(format!(
-                "\n    // Skipped: endpoint '{}' uses a type with no pure ABI equivalent.",
-                endpoint.name
-            ));
-            return;
-        }
-
         for doc in &endpoint.docs {
             self.writeln(format!("    /// {doc}"));
         }
@@ -324,13 +283,6 @@ impl<'a> AbiSourceGenerator<'a> {
     fn write_raw_method(&mut self, endpoint: &EndpointAbi, methods_name: &str) {
         if matches!(endpoint.endpoint_type, EndpointTypeAbi::PromisesCallback) {
             return; // no external call surface
-        }
-        if !self.endpoint_is_usable(endpoint) {
-            self.writeln(format!(
-                "\n// Skipped: endpoint '{}' uses a type with no pure ABI equivalent.",
-                endpoint.name
-            ));
-            return;
         }
 
         let payable = !endpoint.payable_in_tokens.is_empty();
@@ -434,18 +386,6 @@ impl<'a> AbiSourceGenerator<'a> {
         type_description: &TypeDescription,
         name: &str,
     ) {
-        let all_fields_usable = enum_variants
-            .iter()
-            .flat_map(|variant| variant.fields.iter())
-            .all(|field| self.type_is_usable(&field.field_type));
-        if !all_fields_usable {
-            self.unmappable_local_types.insert(name.to_string());
-            self.writeln(format!(
-                "\n// Skipped: enum '{name}' has a field with no pure ABI equivalent."
-            ));
-            return;
-        }
-
         if self.enum_contains_struct_variant(enum_variants) {
             self.write("\n#[rustfmt::skip]");
             if let Some(c_type) = c_enum_representation(enum_variants) {
@@ -489,17 +429,6 @@ impl<'a> AbiSourceGenerator<'a> {
         type_description: &TypeDescription,
         name: &str,
     ) {
-        if struct_fields
-            .iter()
-            .any(|field| !self.type_is_usable(&field.field_type))
-        {
-            self.unmappable_local_types.insert(name.to_string());
-            self.writeln(format!(
-                "\n// Skipped: struct '{name}' has a field with no pure ABI equivalent."
-            ));
-            return;
-        }
-
         self.write_macro_attributes(&type_description.macro_attributes);
         self.write(format!("pub struct {name}"));
 
