@@ -498,7 +498,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbiFrom<Self>
 
 impl<M: ManagedTypeApi, DECIMALS: Unsigned> TypeAbi for ManagedDecimal<M, ConstDecimals<DECIMALS>> {
     type Unmanaged = Self;
-    type Abi = crate::abi::DecimalAbi;
+    type Abi = crate::abi::DecimalConstAbi<DECIMALS>;
 
     fn type_name() -> TypeName {
         TypeName::from(alloc::format!("ManagedDecimal<{}>", DECIMALS::to_usize()))

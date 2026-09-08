@@ -3337,6 +3337,7 @@ dependencies = [
  "multiversx-chain-core",
  "multiversx-sc-codec",
  "num-bigint",
+ "typenum",
  "unwrap-infallible",
 ]
 
