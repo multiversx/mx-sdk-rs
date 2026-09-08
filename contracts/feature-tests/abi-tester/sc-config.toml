@@ -16,3 +16,7 @@ add-endpoints = [
 
 [[proxy]]
 path = "src/abi_proxy.rs"
+
+[[proxy]]
+path = "src/abi_tester_full_abi.rs"
+format = "abi"

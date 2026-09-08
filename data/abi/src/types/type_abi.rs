@@ -21,6 +21,7 @@ pub trait TypeAbi: TypeAbiFrom<Self> {
             abi: Self::type_name(),
             rust: Self::type_name_rust(),
             specific: Self::type_name_specific(),
+            pure_rust: <Self::Abi as TypeAbi>::type_name_rust(),
         }
     }
 

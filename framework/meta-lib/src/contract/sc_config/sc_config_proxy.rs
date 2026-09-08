@@ -29,6 +29,21 @@ pub struct ProxyConfigSerde {
     #[serde(default)]
     #[serde(rename = "add-endpoints")]
     pub add_endpoints: Vec<String>,
+
+    /// Output source shape: the legacy `TxProxyTrait`-based proxy (default), a
+    /// `#[contract_abi(call = ...)]`-annotated trait (`"abi"`), or the raw, hand-writable
+    /// `AbiProxyTrait` implementation that macro expands to (`"abi-raw"`, `adder_abi.rs` shape).
+    #[serde(default)]
+    pub format: ProxyFormat,
+}
+
+#[derive(Deserialize, Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[serde(rename_all = "kebab-case")]
+pub enum ProxyFormat {
+    #[default]
+    Proxy,
+    Abi,
+    AbiRaw,
 }
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]

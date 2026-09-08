@@ -39,6 +39,7 @@ impl From<&InputAbiJson> for InputAbi {
                 abi: abi.type_name.clone(),
                 rust: String::new(),
                 specific: abi.type_name_specific.clone(),
+                pure_rust: String::new(),
             },
             multi_arg: abi.multi_arg.unwrap_or(false),
         }
@@ -91,6 +92,7 @@ impl From<&OutputAbiJson> for OutputAbi {
                 abi: abi.type_name.clone(),
                 rust: String::new(),
                 specific: abi.type_name_specific.clone(),
+                pure_rust: String::new(),
             },
             multi_result: abi.multi_result.unwrap_or(false),
         }

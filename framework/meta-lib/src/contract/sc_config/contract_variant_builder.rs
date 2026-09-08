@@ -14,7 +14,7 @@ use crate::{
 
 use super::{
     ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ProxyConfigSerde, ScConfig, ScConfigSerde,
+    ProxyConfigSerde, ProxyFormat, ScConfig, ScConfigSerde,
     contract_variant_settings::{parse_allocator, parse_stack_size},
     proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
@@ -280,6 +280,23 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
     proxy_contracts.push(ProxyConfig::output_dir_proxy_config(original_abi.clone()));
 
     for proxy_config in &config.proxy {
+        // `format = "abi"`/`"abi-raw"` (with no explicit `variant`) exist to faithfully mirror
+        // one contract trait's whole interface, for `implements_abi`/`implements_abi_exactly`
+        // conformance checking - unlike `format = "proxy"` (a proxy for calling one particular
+        // deployed contract variant), they have no reason to apply the label-based filtering
+        // that carves out `contracts.*` variants (e.g. `main` vs `external-view`), so skip it
+        // and use every constructor/upgrade/endpoint from `original_abi` directly.
+        if proxy_config.variant.is_none() && proxy_config.format != ProxyFormat::Proxy {
+            proxy_contracts.push(ProxyConfig::new(
+                PathBuf::from(&proxy_config.path),
+                proxy_config.override_import.to_owned(),
+                proxy_config.path_rename.to_owned(),
+                original_abi.clone(),
+                proxy_config.format,
+            ));
+            continue;
+        }
+
         let mut contract_builders = HashMap::new();
 
         match &proxy_config.variant {
@@ -319,6 +336,7 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
                 proxy_config.override_import.to_owned(),
                 proxy_config.path_rename.to_owned(),
                 contract.abi,
+                proxy_config.format,
             ));
         }
     }
