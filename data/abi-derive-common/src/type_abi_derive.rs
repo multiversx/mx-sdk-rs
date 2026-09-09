@@ -93,11 +93,6 @@ pub fn type_abi_derive(
     let name_str = name.to_string();
     let type_docs = extract_doc(ast.attrs.as_slice());
     let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
-    if macro_attributes.is_empty() {
-        println!(
-            "Warning! {name_str} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi]"
-        );
-    }
 
     let imports = import_tokens(context);
 

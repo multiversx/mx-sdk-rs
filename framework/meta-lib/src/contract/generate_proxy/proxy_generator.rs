@@ -648,7 +648,7 @@ where
         type_description: &TypeDescription,
         name: &str,
     ) {
-        self.write_macro_attributes(&type_description.macro_attributes);
+        self.write_macro_attributes(&type_description.macro_attributes, name);
         self.write(format!(r#"pub {type_type} {name}"#));
 
         if name.contains("<Api>") {
@@ -665,7 +665,7 @@ where
         self.writeln(brace);
     }
 
-    fn write_macro_attributes(&mut self, macro_attributes: &[String]) {
+    fn write_macro_attributes(&mut self, macro_attributes: &[String], name: &str) {
         self.writeln("");
         self.writeln("#[type_abi]");
 
@@ -684,6 +684,9 @@ where
             .collect();
 
         if derive_attrs.is_empty() {
+            println!(
+                "Warning! {name} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi] in the original contract source"
+            );
             self.writeln("#[derive(TopEncode, TopDecode)]");
         } else {
             self.writeln(format!("#[derive({})]", derive_attrs.join(", ")));
