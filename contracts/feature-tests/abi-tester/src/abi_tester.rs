@@ -6,6 +6,7 @@ pub mod abi_enum;
 pub mod abi_proxy;
 pub mod abi_test_type;
 pub mod abi_tester_full_abi;
+pub mod abi_tester_full_abi_raw;
 pub mod only_nested;
 
 use abi_enum::*;

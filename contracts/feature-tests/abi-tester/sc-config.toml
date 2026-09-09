@@ -20,3 +20,7 @@ path = "src/abi_proxy.rs"
 [[proxy]]
 path = "src/abi_tester_full_abi.rs"
 format = "abi"
+
+[[proxy]]
+path = "src/abi_tester_full_abi_raw.rs"
+format = "abi-raw"
