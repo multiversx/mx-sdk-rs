@@ -266,7 +266,6 @@ impl<'a> AbiSourceGenerator<'a> {
         let methods_name =
             super::proxy_process_type_name::proxy_methods_type_name(&self.proxy_config.abi.name);
 
-        self.writeln("\nuse multiversx_sc::abi::ApplyArgument as _;\n");
         self.writeln(format!("pub struct {proxy_name};\n"));
         self.writeln(format!(
             "#[rustfmt::skip]\nimpl<T> AbiProxyTrait<T> for {proxy_name} {{\n    type Methods = {methods_name}<T>;\n\n    fn proxy_methods(self, base_tx: T) -> Self::Methods {{\n        {methods_name} {{ base_tx }}\n    }}\n}}\n"
