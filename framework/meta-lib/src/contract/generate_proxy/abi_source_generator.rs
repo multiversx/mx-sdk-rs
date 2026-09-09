@@ -198,7 +198,7 @@ impl<'a> AbiSourceGenerator<'a> {
         let call_name =
             super::proxy_process_type_name::proxy_type_name(&self.proxy_config.abi.name);
         self.writeln(format!(
-            "\n#[contract_abi(call = {call_name})]\npub trait {} {{",
+            "\n#[rustfmt::skip]\n#[contract_abi(call = {call_name})]\npub trait {} {{",
             self.proxy_config.abi.name
         ));
 
@@ -269,7 +269,7 @@ impl<'a> AbiSourceGenerator<'a> {
         self.writeln("\nuse multiversx_sc::abi::ApplyArgument as _;\n");
         self.writeln(format!("pub struct {proxy_name};\n"));
         self.writeln(format!(
-            "impl<T> AbiProxyTrait<T> for {proxy_name} {{\n    type Methods = {methods_name}<T>;\n\n    fn proxy_methods(self, base_tx: T) -> Self::Methods {{\n        {methods_name} {{ base_tx }}\n    }}\n}}\n"
+            "#[rustfmt::skip]\nimpl<T> AbiProxyTrait<T> for {proxy_name} {{\n    type Methods = {methods_name}<T>;\n\n    fn proxy_methods(self, base_tx: T) -> Self::Methods {{\n        {methods_name} {{ base_tx }}\n    }}\n}}\n"
         ));
         self.writeln(format!(
             "pub struct {methods_name}<T> {{\n    base_tx: T,\n}}"
@@ -351,7 +351,7 @@ impl<'a> AbiSourceGenerator<'a> {
             .collect();
 
         self.writeln(format!(
-            "\nimpl<T> {methods_name}<T> {{\n    pub fn {}<{extra_generic}{}>(\n        self,\n        {payment_param}{}\n    ) -> <T as {into_trait}>::Out\n    where\n        T: {into_trait},\n    {{\n        self.base_tx\n            .{into_method}({call_args}){apply_args}\n    }}\n}}",
+            "\n#[rustfmt::skip]\nimpl<T> {methods_name}<T> {{\n    pub fn {}<{extra_generic}{}>(\n        self,\n        {payment_param}{}\n    ) -> <T as {into_trait}>::Out\n    where\n        T: {into_trait},\n    {{\n        self.base_tx\n            .{into_method}({call_args}){apply_args}\n    }}\n}}",
             endpoint.rust_method_name,
             arg_generics.join(", "),
             arg_params.join(", "),

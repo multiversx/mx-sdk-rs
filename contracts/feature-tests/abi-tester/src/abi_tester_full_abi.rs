@@ -193,6 +193,7 @@ pub struct ManagedDecimalWrapper {
     pub field: DecimalConstAbi<U2>,
 }
 
+#[rustfmt::skip]
 #[contract_abi(call = AbiTesterProxy)]
 pub trait AbiTester {
     /// Contract constructor.
@@ -223,11 +224,7 @@ pub trait AbiTester {
     fn multi_result_4(&self) -> MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03>;
 
     #[endpoint(var_args)]
-    fn var_args(
-        &self,
-        _simple_arg: u32,
-        _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>,
-    );
+    fn var_args(&self, _simple_arg: u32, _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>);
 
     #[endpoint(multi_result_vec)]
     fn multi_result_vec(&self) -> MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>;
@@ -242,11 +239,7 @@ pub trait AbiTester {
     fn address_vs_h256(&self, address: AddressAbi, h256: H256) -> MultiValue2<AddressAbi, H256>;
 
     #[endpoint(managed_address_vs_byte_array)]
-    fn managed_address_vs_byte_array(
-        &self,
-        address: AddressAbi,
-        byte_array: [u8; 32],
-    ) -> MultiValue2<AddressAbi, [u8; 32]>;
+    fn managed_address_vs_byte_array(&self, address: AddressAbi, byte_array: [u8; 32]) -> MultiValue2<AddressAbi, [u8; 32]>;
 
     #[endpoint(process_managed_decimal)]
     fn process_managed_decimal(&self, input: DecimalConstAbi<U10>) -> DecimalAbi;
@@ -261,9 +254,7 @@ pub trait AbiTester {
     fn esdt_token_data(&self) -> EsdtTokenData;
 
     #[endpoint(time_types)]
-    fn time_types(
-        &self,
-    ) -> MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds>;
+    fn time_types(&self) -> MultiValue4<TimestampMillis, TimestampSeconds, DurationMillis, DurationSeconds>;
 
     #[view(sample_storage_mapper)]
     fn sample_storage_mapper(&self) -> OnlyShowsUpAsNestedInSingleValueMapper;
@@ -302,10 +293,7 @@ pub trait AbiTester {
     fn operation_completion_status(&self) -> OperationCompletionStatus;
 
     #[view(takes_object_with_managed_buffer_read_to_end)]
-    fn takes_object_with_managed_buffer_read_to_end(
-        &self,
-        arg: AbiWithManagedBufferReadToEnd,
-    ) -> ListAbi<u8>;
+    fn takes_object_with_managed_buffer_read_to_end(&self, arg: AbiWithManagedBufferReadToEnd) -> ListAbi<u8>;
 
     #[payable("EGLD")]
     #[endpoint(payable_egld)]
@@ -327,4 +315,5 @@ pub trait AbiTester {
 
     #[endpoint(label_b)]
     fn label_b(&self);
+
 }
