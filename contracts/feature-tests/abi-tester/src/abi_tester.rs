@@ -17,7 +17,7 @@ use only_nested::*;
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
-#[multiversx_sc::contract(implements_abi_exactly = abi_tester_full_abi::AbiProvider)]
+#[multiversx_sc::contract(implements_abi_exactly = abi_tester_full_abi::AbiTester)]
 #[esdt_attribute("TICKER1", BigUint)]
 #[esdt_attribute("TICKER2", ManagedBuffer)]
 #[esdt_attribute("TICKER3", u32)]
