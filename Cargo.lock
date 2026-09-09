@@ -974,6 +974,7 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
+ "kitty-abi",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]

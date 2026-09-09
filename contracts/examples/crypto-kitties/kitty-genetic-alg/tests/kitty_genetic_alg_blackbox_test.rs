@@ -13,7 +13,7 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-/// Proves the auto-generated `KittyGeneticAlgAbiProxy` (produced by `#[contract_abi]`, with no
+/// Proves the auto-generated `KittyGeneticAlgCall` (produced by `#[contract_abi]`, with no
 /// dependency on `multiversx-sc`/`VMApi`) interoperates with the real framework `Tx` builder via
 /// `Tx::abi_typed`, exactly like the hand-written `AdderAbiProxy` does in `adder_blackbox_test.rs`.
 #[test]
@@ -24,7 +24,7 @@ fn kitty_genetic_alg_abi_proxy_blackbox() {
     world
         .tx()
         .from(OWNER_ADDRESS)
-        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
+        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgCall)
         .init()
         .code(CODE_PATH)
         .new_address(KITTY_GENETIC_ALG_ADDRESS)
@@ -36,7 +36,7 @@ fn kitty_genetic_alg_abi_proxy_blackbox() {
     world
         .query()
         .to(KITTY_GENETIC_ALG_ADDRESS)
-        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
+        .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgCall)
         .generate_kitty_genes(matron, sire)
         .returns(ReturnsResult)
         .run();

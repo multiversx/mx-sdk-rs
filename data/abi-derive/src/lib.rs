@@ -7,7 +7,7 @@
 /// no managed-type substitution step.
 ///
 /// Pass `call = ProxyName` to also generate a call proxy (`ProxyName` / `ProxyNameMethods`),
-/// e.g. `#[contract_abi(call = KittyGeneticAlgAbiProxy)]`; without it, only `AbiProvider` is
+/// e.g. `#[contract_abi(call = KittyGeneticAlgCall)]`; without it, only `AbiProvider` is
 /// generated.
 ///
 /// Like `#[multiversx_sc::contract]`, the annotated trait is a spec consumed by the macro,

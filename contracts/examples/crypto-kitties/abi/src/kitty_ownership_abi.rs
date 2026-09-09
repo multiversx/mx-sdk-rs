@@ -10,8 +10,8 @@ use multiversx_sc_abi_derive::contract_abi;
 /// Framework-agnostic ABI description of the `kitty-ownership` contract's interface. Mirrors
 /// `kitty_ownership_proxy.rs`, but written directly against pure ABI types, with no dependency
 /// on `multiversx-sc`/`VMApi`.
-#[contract_abi(call = KittyOwnershipAbiProxy)]
-pub trait KittyOwnership {
+#[contract_abi(call = KittyOwnershipCall)]
+pub trait KittyOwnershipAbi {
     #[allow_multiple_var_args]
     #[init]
     fn init(

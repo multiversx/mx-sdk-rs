@@ -26,8 +26,6 @@ crypto-zombies/
 │   ├── zombie_helper.rs
 │   ├── zombie_attack.rs
 │   ├── storage.rs
-│   ├── kitty_obj.rs              # CryptoKitty struct (for ESDT callback)
-│   ├── kitty_ownership_proxy.rs  # Proxy for the kitty ownership contract
 │   └── proxy.rs                  # Auto-generated proxy (sc-meta all proxy)
 ├── tests/
 │   └── crypto_zombies_blackbox_test.rs

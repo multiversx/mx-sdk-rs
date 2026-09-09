@@ -13,3 +13,6 @@ workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true
+
+[dependencies.kitty-abi]
+path = "../crypto-kitties/abi"

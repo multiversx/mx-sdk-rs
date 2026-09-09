@@ -1,7 +1,6 @@
 #![no_std]
 #![allow(clippy::suspicious_operation_groupings)]
 
-pub mod kitty_genetic_alg_proxy;
 use kitty_abi::{Kitty, KittyGenes};
 use multiversx_sc::imports::*;
 
@@ -9,7 +8,7 @@ use core::cmp::max;
 
 use random::*;
 
-#[multiversx_sc::contract(implements_abi = kitty_abi::kitty_ownership_abi::KittyOwnership)]
+#[multiversx_sc::contract(implements_abi = kitty_abi::kitty_ownership_abi::KittyOwnershipCall)]
 pub trait KittyOwnership {
     #[allow_multiple_var_args]
     #[init]
@@ -339,7 +338,7 @@ pub trait KittyOwnership {
             let caller = self.blockchain().get_caller();
             self.tx()
                 .to(&gene_science_contract_address)
-                .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgAbiProxy)
+                .abi_typed(kitty_abi::kitty_genetic_alg_abi::KittyGeneticAlgCall)
                 .generate_kitty_genes(matron, sire)
                 .callback(
                     self.callbacks()
