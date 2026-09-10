@@ -2,9 +2,11 @@ use std::path::PathBuf;
 
 use serde::Deserialize;
 
+/// Fields shared by all three proxy-generation lists (`[[proxy]]`, `[[generate-abi]]`,
+/// `[[generate-abi-raw]]`), flattened into each of them.
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
-pub struct ProxyConfigSerde {
+pub struct ProxyConfigCommon {
     #[serde(default)]
     pub path: PathBuf,
 
@@ -29,16 +31,46 @@ pub struct ProxyConfigSerde {
     #[serde(default)]
     #[serde(rename = "add-endpoints")]
     pub add_endpoints: Vec<String>,
-
-    /// Output source shape: the legacy `TxProxyTrait`-based proxy (default), a
-    /// `#[contract_abi(call = ...)]`-annotated trait (`"abi"`), or the raw, hand-writable
-    /// `AbiProxyTrait` implementation that macro expands to (`"abi-raw"`, `adder_abi.rs` shape).
-    #[serde(default)]
-    pub format: ProxyFormat,
 }
 
-#[derive(Deserialize, Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct ProxyConfigSerde {
+    #[serde(flatten)]
+    pub common: ProxyConfigCommon,
+}
+
+/// Config for `[[generate-abi]]`: produces a `#[contract_abi(call = ...)]`-annotated trait, the
+/// *input* the `contract_abi` macro consumes (framework-agnostic, no `TxProxyTrait`/`VMApi`
+/// dependency), unlike the legacy `[[proxy]]` output.
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct GenerateAbiConfigSerde {
+    #[serde(flatten)]
+    pub common: ProxyConfigCommon,
+
+    /// Name to give the generated call type, i.e. the `call = ...` argument of
+    /// `#[contract_abi(call = ...)]`. Defaults to the usual `<ContractName>Proxy`-style name
+    /// when left unset.
+    #[serde(default)]
+    pub call: Option<String>,
+}
+
+/// Config for `[[generate-abi-raw]]`: produces the raw `AbiProxyTrait`/`ProxyArg`/`IntoXxx`
+/// implementation, hand-writable style, i.e. what the `contract_abi` macro expands a
+/// `[[generate-abi]]` trait to.
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[serde(deny_unknown_fields)]
+pub struct GenerateAbiRawConfigSerde {
+    #[serde(flatten)]
+    pub common: ProxyConfigCommon,
+}
+
+/// Which generator produced a given `ProxyConfig`. No longer read directly from TOML (each
+/// generator now has its own `[[proxy]]`/`[[generate-abi]]`/`[[generate-abi-raw]]` list instead
+/// of a shared list with a `format` flag) — assigned by `process_proxy_contracts` based on which
+/// list an entry came from.
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ProxyFormat {
     #[default]
     Proxy,

@@ -16,7 +16,9 @@ pub use contract_variant::ContractVariant;
 pub use contract_variant_settings::{ContractVariantProfile, ContractVariantSettings};
 pub use execute_command::ExecuteCommandError;
 pub use sc_config_model::ScConfig;
-pub use sc_config_proxy::{ProxyConfigSerde, ProxyFormat};
+pub use sc_config_proxy::{
+    GenerateAbiConfigSerde, GenerateAbiRawConfigSerde, ProxyConfigSerde, ProxyFormat,
+};
 pub use sc_config_serde::{
     ContractVariantProfileSerde, ContractVariantSerde, MultiContractGeneralSettingsSerde,
     ScConfigSerde,

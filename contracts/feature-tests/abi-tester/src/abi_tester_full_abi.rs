@@ -194,7 +194,7 @@ pub struct ManagedDecimalWrapper {
 }
 
 #[rustfmt::skip]
-#[contract_abi(call = AbiTesterProxy)]
+#[contract_abi(call = AbiTesterCall)]
 pub trait AbiTester {
     /// Contract constructor.
     #[payable("EGLD")]

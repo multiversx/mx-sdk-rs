@@ -11,6 +11,9 @@ pub struct ProxyConfig {
     pub path_rename: Vec<PathRename>,
     pub abi: ContractAbi,
     pub format: ProxyFormat,
+    /// `[[generate-abi]]`'s `call` field: the name to give the generated call type, i.e. the
+    /// `call = ...` argument of `#[contract_abi(call = ...)]`. Unused outside `ProxyFormat::Abi`.
+    pub call_name: Option<String>,
 }
 
 impl ProxyConfig {
@@ -20,6 +23,7 @@ impl ProxyConfig {
         path_rename: Option<Vec<PathRename>>,
         abi: ContractAbi,
         format: ProxyFormat,
+        call_name: Option<String>,
     ) -> Self {
         ProxyConfig {
             path,
@@ -27,6 +31,7 @@ impl ProxyConfig {
             path_rename: path_rename.unwrap_or_default(),
             abi,
             format,
+            call_name,
         }
     }
 
@@ -38,6 +43,7 @@ impl ProxyConfig {
             path_rename: Vec::new(),
             abi,
             format: ProxyFormat::Proxy,
+            call_name: None,
         }
     }
 }

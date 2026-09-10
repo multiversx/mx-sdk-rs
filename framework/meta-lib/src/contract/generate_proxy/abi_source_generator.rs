@@ -195,10 +195,15 @@ impl<'a> AbiSourceGenerator<'a> {
     // ---- Trait mode ----
 
     fn write_trait(&mut self) {
-        let call_name =
-            super::proxy_process_type_name::proxy_type_name(&self.proxy_config.abi.name);
+        // Only pass `call = ...` when the config actually asked for a call proxy to be
+        // generated (`[[generate-abi]] call = "..."`) - without it, `#[contract_abi]` on its own
+        // still generates the `AbiProvider` impl, just no `ProxyName`/`ProxyNameMethods` proxy.
+        let contract_abi_attr = match &self.proxy_config.call_name {
+            Some(call_name) => format!("#[contract_abi(call = {call_name})]"),
+            None => "#[contract_abi]".to_owned(),
+        };
         self.writeln(format!(
-            "\n#[rustfmt::skip]\n#[contract_abi(call = {call_name})]\npub trait {} {{",
+            "\n#[rustfmt::skip]\n{contract_abi_attr}\npub trait {} {{",
             self.proxy_config.abi.name
         ));
 
