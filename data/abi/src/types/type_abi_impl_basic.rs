@@ -24,7 +24,7 @@ impl<T, U> TypeAbiFrom<&U> for &T where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &T {
     type Unmanaged = T::Unmanaged;
-    type Abi = Self;
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
         T::type_name()
@@ -62,7 +62,7 @@ impl<T, U> TypeAbiFrom<&[T]> for &[U] where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &[T] {
     type Unmanaged = Vec<T::Unmanaged>;
-    type Abi = Vec<T::Abi>;
+    type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         let t_name = T::type_name();
@@ -89,7 +89,7 @@ impl<T, U> TypeAbiFrom<Vec<T>> for Vec<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     type Unmanaged = Vec<T::Unmanaged>;
-    type Abi = Vec<T::Abi>;
+    type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         <&[T]>::type_name()
@@ -127,7 +127,7 @@ impl<T> TypeAbiFrom<Box<[T]>> for Box<[T]> {}
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
     type Unmanaged = Self;
-    type Abi = Box<[T::Abi]>;
+    type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         <&[T]>::type_name()
@@ -149,7 +149,7 @@ impl TypeAbiFrom<Box<str>> for String {}
 
 impl TypeAbi for String {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = StringAbi;
 
     fn type_name() -> TypeName {
         "utf-8 string".into()
@@ -160,7 +160,7 @@ impl TypeAbiFrom<&'static str> for &'static str {}
 
 impl TypeAbi for &'static str {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = StringAbi;
 
     fn type_name() -> TypeName {
         String::type_name()
@@ -177,7 +177,7 @@ impl TypeAbiFrom<String> for Box<str> {}
 
 impl TypeAbi for Box<str> {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = StringAbi;
 
     fn type_name() -> TypeName {
         String::type_name()

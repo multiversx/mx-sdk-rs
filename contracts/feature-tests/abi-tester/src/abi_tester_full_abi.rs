@@ -51,7 +51,7 @@ pub struct OnlyShowsUpAsNested09 {}
 pub struct AbiManagedType {
     pub big_uint: BigUintAbi,
     pub integer: i32,
-    pub managed_buffer: ListAbi<u8>,
+    pub managed_buffer: BytesAbi,
 }
 
 #[type_abi]
@@ -94,12 +94,12 @@ pub struct EsdtTokenData {
     pub token_type: EsdtTokenType,
     pub amount: BigUintAbi,
     pub frozen: bool,
-    pub hash: ListAbi<u8>,
-    pub name: ListAbi<u8>,
-    pub attributes: ListAbi<u8>,
+    pub hash: BytesAbi,
+    pub name: BytesAbi,
+    pub attributes: BytesAbi,
     pub creator: AddressAbi,
     pub royalties: BigUintAbi,
-    pub uris: ListAbi<ListAbi<u8>>,
+    pub uris: ListAbi<BytesAbi>,
 }
 
 #[type_abi]
@@ -149,7 +149,7 @@ pub struct OnlyShowsUpAsNestedInOption {}
 
 #[type_abi]
 pub struct AbiWithManagedBufferReadToEnd {
-    pub endpoint: ListAbi<u8>,
+    pub endpoint: BytesAbi,
     pub gas: u64,
     pub flush: BytesReadToEndAbi,
 }
@@ -215,10 +215,10 @@ pub trait AbiTester {
     fn take_managed_type(&self, _arg: AbiManagedType);
 
     #[endpoint(multi_result_3)]
-    fn multi_result_3(&self) -> MultiValue3<i32, [u8; 3], BoxedBytes>;
+    fn multi_result_3(&self) -> MultiValue3<i32, [u8; 3], BytesAbi>;
 
     #[endpoint(multi_result_4)]
-    fn multi_result_4(&self) -> MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03>;
+    fn multi_result_4(&self) -> MultiValue4<i32, [u8; 3], BytesAbi, OnlyShowsUpAsNested03>;
 
     #[endpoint(var_args)]
     fn var_args(&self, _simple_arg: u32, _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>);
@@ -257,7 +257,7 @@ pub trait AbiTester {
     fn sample_storage_mapper(&self) -> OnlyShowsUpAsNestedInSingleValueMapper;
 
     #[view(item_for_vec)]
-    fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec>;
+    fn item_for_vec(&self) -> ListAbi<OnlyShowsUpAsNestedInVec>;
 
     #[view(item_for_array_vec)]
     fn item_for_array_vec(&self) -> ListAbi<OnlyShowsUpAsNestedInArrayVec>;
@@ -275,13 +275,13 @@ pub trait AbiTester {
     fn item_for_box(&self) -> OnlyShowsUpAsNestedInBox;
 
     #[view(item_for_boxed_slice)]
-    fn item_for_boxed_slice(&self) -> Box<[OnlyShowsUpAsNestedInBoxedSlice]>;
+    fn item_for_boxed_slice(&self) -> ListAbi<OnlyShowsUpAsNestedInBoxedSlice>;
 
     #[view(item_for_ref)]
     fn item_for_ref(&self, _ref: OnlyShowsUpAsNestedInRef);
 
     #[view(item_for_slice)]
-    fn item_for_slice(&self, _ref: Vec<OnlyShowsUpAsNestedInSlice>);
+    fn item_for_slice(&self, _ref: ListAbi<OnlyShowsUpAsNestedInSlice>);
 
     #[view(item_for_option)]
     fn item_for_option(&self) -> Option<OnlyShowsUpAsNestedInOption>;
@@ -290,7 +290,7 @@ pub trait AbiTester {
     fn operation_completion_status(&self) -> OperationCompletionStatus;
 
     #[view(takes_object_with_managed_buffer_read_to_end)]
-    fn takes_object_with_managed_buffer_read_to_end(&self, arg: AbiWithManagedBufferReadToEnd) -> ListAbi<u8>;
+    fn takes_object_with_managed_buffer_read_to_end(&self, arg: AbiWithManagedBufferReadToEnd) -> BytesAbi;
 
     #[payable("EGLD")]
     #[endpoint(payable_egld)]

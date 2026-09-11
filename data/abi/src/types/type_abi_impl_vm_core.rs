@@ -40,7 +40,7 @@ impl TypeAbiFrom<Self> for BoxedBytes {}
 
 impl TypeAbi for BoxedBytes {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = BytesAbi;
 
     fn type_name() -> TypeName {
         "bytes".into()

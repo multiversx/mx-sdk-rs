@@ -7,6 +7,8 @@ where
     _phantom: core::marker::PhantomData<T>,
 }
 
+pub type BytesAbi = ListAbi<u8>;
+
 impl<T> TypeAbiFrom<Self> for ListAbi<T> where T: TypeAbi {}
 
 impl<T> TypeAbi for ListAbi<T>
@@ -28,6 +30,10 @@ where
     }
 
     fn type_name_rust() -> TypeName {
+        let t_name = T::type_name();
+        if t_name == "u8" {
+            return "BytesAbi".into();
+        }
         let mut repr = TypeName::from("ListAbi<");
         repr.push_str(T::type_name_rust().as_str());
         repr.push('>');

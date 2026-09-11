@@ -13,6 +13,7 @@ mod list_abi;
 mod non_zero_big_uint_abi;
 mod payment_abi;
 mod sign_abi;
+mod string_abi;
 mod token_id_abi;
 
 pub use address_abi::AddressAbi;
@@ -26,8 +27,9 @@ pub use egld_or_esdt_token_identifier_abi::EgldOrEsdtTokenIdentifierAbi;
 pub use elliptic_curve_abi::EllipticCurveAbi;
 pub use esdt_token_identifier_abi::EsdtTokenIdentifierAbi;
 pub use fungible_payment_abi::FungiblePaymentAbi;
-pub use list_abi::ListAbi;
+pub use list_abi::{BytesAbi, ListAbi};
 pub use non_zero_big_uint_abi::NonZeroBigUintAbi;
 pub use payment_abi::PaymentAbi;
 pub use sign_abi::SignAbi;
+pub use string_abi::StringAbi;
 pub use token_id_abi::TokenIdAbi;

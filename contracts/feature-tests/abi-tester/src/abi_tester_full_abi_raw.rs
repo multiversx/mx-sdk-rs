@@ -51,7 +51,7 @@ pub struct OnlyShowsUpAsNested09 {}
 pub struct AbiManagedType {
     pub big_uint: BigUintAbi,
     pub integer: i32,
-    pub managed_buffer: ListAbi<u8>,
+    pub managed_buffer: BytesAbi,
 }
 
 #[type_abi]
@@ -94,12 +94,12 @@ pub struct EsdtTokenData {
     pub token_type: EsdtTokenType,
     pub amount: BigUintAbi,
     pub frozen: bool,
-    pub hash: ListAbi<u8>,
-    pub name: ListAbi<u8>,
-    pub attributes: ListAbi<u8>,
+    pub hash: BytesAbi,
+    pub name: BytesAbi,
+    pub attributes: BytesAbi,
     pub creator: AddressAbi,
     pub royalties: BigUintAbi,
-    pub uris: ListAbi<ListAbi<u8>>,
+    pub uris: ListAbi<BytesAbi>,
 }
 
 #[type_abi]
@@ -149,7 +149,7 @@ pub struct OnlyShowsUpAsNestedInOption {}
 
 #[type_abi]
 pub struct AbiWithManagedBufferReadToEnd {
-    pub endpoint: ListAbi<u8>,
+    pub endpoint: BytesAbi,
     pub gas: u64,
     pub flush: BytesReadToEndAbi,
 }
@@ -286,9 +286,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn multi_result_3<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, MultiValue3<i32, [u8; 3], BoxedBytes>>>::Out
+    ) -> <T as IntoCall<NotPayable, MultiValue3<i32, [u8; 3], BytesAbi>>>::Out
     where
-        T: IntoCall<NotPayable, MultiValue3<i32, [u8; 3], BoxedBytes>>,
+        T: IntoCall<NotPayable, MultiValue3<i32, [u8; 3], BytesAbi>>,
     {
         self.base_tx
             .into_call(NotPayable, "multi_result_3")
@@ -300,9 +300,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn multi_result_4<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03>>>::Out
+    ) -> <T as IntoCall<NotPayable, MultiValue4<i32, [u8; 3], BytesAbi, OnlyShowsUpAsNested03>>>::Out
     where
-        T: IntoCall<NotPayable, MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03>>,
+        T: IntoCall<NotPayable, MultiValue4<i32, [u8; 3], BytesAbi, OnlyShowsUpAsNested03>>,
     {
         self.base_tx
             .into_call(NotPayable, "multi_result_4")
@@ -491,9 +491,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn item_for_vec<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, Vec<OnlyShowsUpAsNestedInVec>>>::Out
+    ) -> <T as IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInVec>>>::Out
     where
-        T: IntoCall<NotPayable, Vec<OnlyShowsUpAsNestedInVec>>,
+        T: IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInVec>>,
     {
         self.base_tx
             .into_call(NotPayable, "item_for_vec")
@@ -577,9 +577,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn item_for_boxed_slice<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, Box<[OnlyShowsUpAsNestedInBoxedSlice]>>>::Out
+    ) -> <T as IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInBoxedSlice>>>::Out
     where
-        T: IntoCall<NotPayable, Box<[OnlyShowsUpAsNestedInBoxedSlice]>>,
+        T: IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInBoxedSlice>>,
     {
         self.base_tx
             .into_call(NotPayable, "item_for_boxed_slice")
@@ -603,7 +603,7 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn item_for_slice<Arg0: ProxyArg<Vec<OnlyShowsUpAsNestedInSlice>>>(
+    pub fn item_for_slice<Arg0: ProxyArg<ListAbi<OnlyShowsUpAsNestedInSlice>>>(
         self,
         _ref: Arg0
     ) -> <T as IntoCall<NotPayable, ()>>::Out
@@ -649,9 +649,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn takes_object_with_managed_buffer_read_to_end<Arg0: ProxyArg<AbiWithManagedBufferReadToEnd>>(
         self,
         arg: Arg0
-    ) -> <T as IntoCall<NotPayable, ListAbi<u8>>>::Out
+    ) -> <T as IntoCall<NotPayable, BytesAbi>>::Out
     where
-        T: IntoCall<NotPayable, ListAbi<u8>>,
+        T: IntoCall<NotPayable, BytesAbi>,
     {
         self.base_tx
             .into_call(NotPayable, "takes_object_with_managed_buffer_read_to_end")
