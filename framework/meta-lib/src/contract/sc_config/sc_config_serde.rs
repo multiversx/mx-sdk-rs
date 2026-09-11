@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::ProxyConfigSerde;
+use super::{GenerateAbiConfigSerde, GenerateAbiRawConfigSerde, ProxyConfigSerde};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -12,6 +12,12 @@ pub struct ScConfigSerde {
     pub contracts: HashMap<String, ContractVariantSerde>,
     #[serde(default)]
     pub proxy: Vec<ProxyConfigSerde>,
+    #[serde(default)]
+    #[serde(rename = "generate-abi")]
+    pub generate_abi: Vec<GenerateAbiConfigSerde>,
+    #[serde(default)]
+    #[serde(rename = "generate-abi-raw")]
+    pub generate_abi_raw: Vec<GenerateAbiRawConfigSerde>,
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,

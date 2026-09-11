@@ -86,6 +86,7 @@ impl<T: TypeAbi> TypeAbiFrom<Self> for AsyncCallResult<T> {}
 
 impl<T: TypeAbi> TypeAbi for AsyncCallResult<T> {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("AsyncCallResult<");

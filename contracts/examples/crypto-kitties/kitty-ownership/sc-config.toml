@@ -1,11 +1,6 @@
-[[proxy]]
-path = "../kitty-auction/src/kitty_ownership_proxy.rs"
-[[proxy.path-rename]]
-from = "kitty::kitty"
-to = "kitty"
-
-[[proxy]]
-path = "../../crypto-zombies/src/kitty_ownership_proxy.rs"
-[[proxy.path-rename]]
-from = "kitty::kitty"
-to = "crate::kitty_obj"
+[[generate-abi]]
+path = "../../crypto-zombies/src/kitty_ownership_abi.rs"
+call = "KittyOwnershipCall"
+[[generate-abi.path-rename]]
+from = "Kitty"
+to = "crate::kitty_obj::Kitty"

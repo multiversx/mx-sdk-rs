@@ -26,7 +26,7 @@ fn adder_blackbox() {
         .tx()
         .id("adder deploy")
         .from(OWNER_ADDRESS)
-        .typed(adder_proxy::AdderProxy)
+        .abi_typed(AdderCall)
         .init(5u32)
         .code(CODE_PATH)
         .new_address(ADDER_ADDRESS)
@@ -38,7 +38,7 @@ fn adder_blackbox() {
     world
         .query()
         .to(ADDER_ADDRESS)
-        .typed(adder_proxy::AdderProxy)
+        .abi_typed(AdderCall)
         .sum()
         .returns(ExpectValue(5u32))
         .run();
@@ -48,14 +48,14 @@ fn adder_blackbox() {
         .id("add 1")
         .from(OWNER_ADDRESS)
         .to(ADDER_ADDRESS)
-        .typed(adder_proxy::AdderProxy)
+        .abi_typed(AdderCall)
         .add(1u32)
         .run();
 
     world
         .query()
         .to(ADDER_ADDRESS)
-        .typed(adder_proxy::AdderProxy)
+        .abi_typed(AdderCall)
         .sum()
         .returns(ExpectValue(6u32))
         .run();
@@ -70,7 +70,7 @@ fn adder_blackbox() {
         .tx()
         .from(OWNER_ADDRESS)
         .to(ADDER_ADDRESS)
-        .typed(adder_proxy::AdderProxy)
+        .abi_typed(AdderCall)
         .upgrade(100u64)
         .code(CODE_PATH)
         .run();

@@ -4,9 +4,16 @@ use std::{
     path::Path,
 };
 
-use crate::{contract::sc_config::proxy_config::ProxyConfig, print_util::print_proxy_error};
+use crate::{
+    contract::sc_config::ProxyFormat, contract::sc_config::proxy_config::ProxyConfig,
+    print_util::print_proxy_error,
+};
 
-use super::{super::meta_config::MetaConfig, proxy_generator::ProxyGenerator};
+use super::{
+    super::meta_config::MetaConfig,
+    abi_source_generator::{AbiSourceGenerator, AbiSourceMode},
+    proxy_generator::ProxyGenerator,
+};
 
 const PROXY_COMPARE_ERR_MSG: &str = "Contract has been modified and proxies have not been updated. Regenerate proxies to avoid inconsistencies.";
 
@@ -31,10 +38,32 @@ impl MetaConfig {
     }
 }
 
+fn write_proxy_content(
+    meta_config: &MetaConfig,
+    file: &mut dyn std::io::Write,
+    proxy_config: &ProxyConfig,
+    verbose: bool,
+) {
+    match proxy_config.format {
+        ProxyFormat::Proxy => {
+            let mut proxy_generator = ProxyGenerator::new(meta_config, file, proxy_config, verbose);
+            proxy_generator.write_proxy_to_file();
+        }
+        ProxyFormat::Abi => {
+            let mut abi_generator =
+                AbiSourceGenerator::new(file, proxy_config, AbiSourceMode::Trait);
+            abi_generator.write_to_file();
+        }
+        ProxyFormat::AbiRaw => {
+            let mut abi_generator = AbiSourceGenerator::new(file, proxy_config, AbiSourceMode::Raw);
+            abi_generator.write_to_file();
+        }
+    }
+}
+
 fn compare_proxy_explicit_path(proxy_config: &ProxyConfig, meta_config: &MetaConfig) {
     let mut temp = Vec::<u8>::new();
-    let mut proxy_generator = ProxyGenerator::new(meta_config, &mut temp, proxy_config, false);
-    proxy_generator.write_proxy_to_file();
+    write_proxy_content(meta_config, &mut temp, proxy_config, false);
 
     let existent_proxy_path = Path::new("..").join(&proxy_config.path);
     let existent_proxy = fs::read_to_string(existent_proxy_path);
@@ -57,9 +86,7 @@ fn write_proxy_with_explicit_path(
 
     match fs::File::create(&path) {
         Ok(mut file) => {
-            let mut proxy_generator =
-                ProxyGenerator::new(meta_config, &mut file, proxy_config, verbose);
-            proxy_generator.write_proxy_to_file();
+            write_proxy_content(meta_config, &mut file, proxy_config, verbose);
         }
         Err(err) => {
             print_proxy_error(&path, err.to_string());

@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{BytesAbi, TypeAbi, TypeAbiFrom, TypeName},
     api::{
         ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi,
         ManagedTypeApiImpl, RawHandle, StaticVarApiImpl, use_raw_handle,
@@ -547,6 +547,7 @@ impl<M> TypeAbiFrom<&Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for ManagedBuffer<M> {
     type Unmanaged = multiversx_sc_codec::Vec<u8>;
+    type Abi = BytesAbi;
 
     fn type_name() -> TypeName {
         "bytes".into()

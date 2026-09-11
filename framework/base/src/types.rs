@@ -15,4 +15,13 @@ pub use static_buffer::*;
 #[cfg(feature = "alloc")]
 pub use heap::*;
 
+// TODO: move somewhere else?
+pub use crate::abi::types::OperationCompletionStatus;
+
 pub use crate::chain_core::types::*;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::NotPayable;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::ProxyArg;

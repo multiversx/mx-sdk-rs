@@ -15,6 +15,7 @@ mod tx_from;
 mod tx_gas;
 mod tx_payment;
 mod tx_proxy;
+mod tx_proxy_abi_impl;
 mod tx_result_handler;
 mod tx_result_handler_list;
 mod tx_to;

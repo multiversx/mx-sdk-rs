@@ -2,10 +2,10 @@ use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::TopEncodeOutput,
-    proxy_imports::TypeAbi,
     types::{ManagedArgBuffer, heap::BoxedBytes},
 };
 use alloc::vec::Vec;
+use multiversx_sc_abi::TypeAbi;
 
 /// Helper structure for providing arguments to all SC call functions other than async_call_raw.
 /// It keeps argument lengths separately from the argument data itself.
@@ -117,6 +117,7 @@ impl TypeAbiFrom<Self> for ArgBuffer {}
 
 impl TypeAbi for ArgBuffer {
     type Unmanaged = Self;
+    type Abi = Self;
 
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {

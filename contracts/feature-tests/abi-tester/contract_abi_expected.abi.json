@@ -1,0 +1,67 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "x.x.x-nightly",
+            "commitHash": "<commit hash here>",
+            "commitDate": "<commit date here>",
+            "channel": "Channel",
+            "host": "<host>",
+            "short": "rustc <version> (<short hash> <date>)",
+            "llvmVersion": "x.x"
+        },
+        "contractCrate": {
+            "name": "abi-tester",
+            "version": "0.0.0",
+            "gitVersion": "<git version here>"
+        },
+        "abi": {
+            "name": "multiversx-sc-abi",
+            "version": "0.25.0"
+        },
+        "framework": {
+            "name": "",
+            "version": ""
+        }
+    },
+    "docs": [
+        "Mirrors `contracts/examples/adder/src/adder.rs`, but written directly against pure",
+        "ABI types instead of managed types, with no dependency on `multiversx-sc`."
+    ],
+    "name": "Adder",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "initial_value",
+                "type": "BigUint"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "getSum",
+            "rustMethodName": "sum",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "add",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "esdtAttributes": [],
+    "hasCallback": false,
+    "types": {}
+}

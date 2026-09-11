@@ -1,17 +1,11 @@
+use multiversx_sc_abi::NotPayable;
+
 use crate::{
     contract_base::TransferExecuteFailed,
     types::{BigUint, ManagedAddress, TxFrom, TxToSpecified},
 };
 
 use super::{FunctionCall, ScenarioPayments, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly};
-
-/// Transaction marker, which indicates that a transaction should never have any payment added to it.
-///
-/// The implementation is completely identical to the empty payment `()`,
-/// the only difference is that the payment methods in `Tx` can only be called on top of `()` payment, not `NotPayable`.
-///
-/// So basically, `NotPayable` acts as a seal, preventing further payments to be added.
-pub struct NotPayable;
 
 impl<Env> TxPayment<Env> for NotPayable
 where

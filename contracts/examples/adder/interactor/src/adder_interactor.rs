@@ -1,6 +1,6 @@
 mod adder_interactor_cli;
 
-use adder::adder_proxy;
+use adder::AdderCall;
 use clap::Parser;
 use multiversx_sc_snippets::imports::*;
 use serde::{Deserialize, Serialize};
@@ -122,7 +122,7 @@ impl AdderInteractor {
             .id("interactor deploy")
             .from(&owner_address)
             .gas(100_000_000)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .init(0u64)
             .code(&self.config.general.contract_path)
             .returns(ReturnsNewBech32Address)
@@ -140,7 +140,7 @@ impl AdderInteractor {
             .from(sender)
             .to(self.state.current_adder_address())
             .gas(6_000_000)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .upgrade(new_value)
             .code(&self.config.general.contract_path)
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -163,7 +163,7 @@ impl AdderInteractor {
         self.interactor
             .query()
             .to(self.state.current_adder_address())
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .sum()
             .returns(ReturnsResultUnmanaged)
             .run()
@@ -177,7 +177,7 @@ impl AdderInteractor {
             .from(self.config.wallet.address())
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .add(value)
             .run()
             .await;
@@ -197,7 +197,7 @@ impl AdderInteractor {
             .from(ledger_wallet.address())
             .to(self.state.current_adder_address())
             .gas(6_000_000u64)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .add(value)
             .run()
             .await;
@@ -221,7 +221,7 @@ impl AdderInteractor {
             .relayer(relayer.address())
             .to(self.state.current_adder_address())
             .gas(6_050_000u64)
-            .typed(adder_proxy::AdderProxy)
+            .abi_typed(AdderCall)
             .add(value)
             .run()
             .await;

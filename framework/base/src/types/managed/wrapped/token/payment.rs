@@ -275,6 +275,7 @@ impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for Payment<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for Payment<M> {
     type Unmanaged = Self;
+    type Abi = crate::abi::PaymentAbi;
 
     fn type_name() -> TypeName {
         "Payment".into()

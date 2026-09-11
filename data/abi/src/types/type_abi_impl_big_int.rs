@@ -1,12 +1,16 @@
-use crate::codec::num_bigint::{BigInt, BigUint};
+use crate::{
+    BigIntAbi,
+    codec::num_bigint::{BigInt, BigUint},
+};
 
-use super::{TypeAbi, TypeAbiFrom, TypeName};
+use super::{BigUintAbi, TypeAbi, TypeAbiFrom, TypeName};
 
 impl TypeAbiFrom<Self> for BigUint {}
 impl TypeAbiFrom<&Self> for BigUint {}
 
 impl TypeAbi for BigUint {
     type Unmanaged = Self;
+    type Abi = BigUintAbi;
 
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
@@ -17,11 +21,14 @@ impl TypeAbi for BigUint {
     }
 }
 
+impl TypeAbiFrom<BigUintAbi> for BigUint {}
+
 impl TypeAbiFrom<Self> for BigInt {}
 impl TypeAbiFrom<&Self> for BigInt {}
 
 impl TypeAbi for BigInt {
     type Unmanaged = Self;
+    type Abi = BigIntAbi;
 
     fn type_name() -> TypeName {
         TypeName::from("BigInt")

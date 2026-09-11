@@ -18,7 +18,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 all-features = true
 
 [features]
-num-bigint = ["multiversx-sc-codec/num-bigint"]
+num-bigint = ["multiversx-sc-codec/num-bigint", "multiversx-sc-abi/num-bigint"]
 alloc = []
 std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []

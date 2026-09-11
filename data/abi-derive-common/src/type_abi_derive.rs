@@ -15,7 +15,7 @@ pub enum TypeAbiImportCrate {
     MultiversxScAbi,
 }
 
-fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
+pub(crate) fn import_tokens(context: TypeAbiImportCrate) -> proc_macro2::TokenStream {
     match context {
         TypeAbiImportCrate::MultiversxSc => quote! { multiversx_sc::abi },
         TypeAbiImportCrate::MultiversxScAbi => quote! { multiversx_sc_abi },
@@ -93,11 +93,6 @@ pub fn type_abi_derive(
     let name_str = name.to_string();
     let type_docs = extract_doc(ast.attrs.as_slice());
     let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
-    if macro_attributes.is_empty() {
-        println!(
-            "Warning! {name_str} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi]"
-        );
-    }
 
     let imports = import_tokens(context);
 
@@ -178,6 +173,7 @@ pub fn type_abi_derive(
 
         impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
             type Unmanaged = Self;
+            type Abi = Self;
 
             fn type_name() -> #imports::TypeName {
                 #name_str.into()

@@ -176,7 +176,7 @@ where
             if crate_name == extract_struct_crate(rust_name) {
                 match &type_description.contents {
                     TypeContents::Struct(_) | TypeContents::Enum(_) => {
-                        if self.has_path_rename_for_crate(rust_name) {
+                        if self.path_rename_for(rust_name).is_some() {
                             skipped_types.push(rust_name);
                         } else {
                             local_types.push(rust_name);
@@ -229,7 +229,7 @@ where
                 continue;
             }
 
-            if self.has_path_rename_for_crate(rust_name) {
+            if self.path_rename_for(rust_name).is_some() {
                 continue;
             }
 
@@ -251,14 +251,47 @@ where
         }
     }
 
-    /// Checks if a path-rename rule applies to this type's crate prefix,
-    /// meaning the type should not be generated in the proxy (it's accessible via the renamed path).
-    fn has_path_rename_for_crate(&self, rust_name: &str) -> bool {
-        let crate_prefix = extract_struct_crate(rust_name);
+    /// Resolves the configured `path-rename` target for a type given its rust path (as embedded
+    /// in a larger composed type, e.g. the `my_crate::my_mod::MyStruct` inside
+    /// `Option<my_crate::my_mod::MyStruct>`), if any applies.
+    ///
+    /// Tried in order:
+    /// 1. `path_rename.from` against the type's own bare ABI name (the preferred, stable form -
+    ///    e.g. `"MyStruct"`); on a hit, `path_rename.to` is the *whole* replacement path, since an
+    ///    ABI name identifies the type unambiguously.
+    /// 2. The legacy match: `path_rename.from` contained anywhere in `rust_path` (typically a
+    ///    crate or module prefix, e.g. `"my_crate::my_mod"`); on a hit, only that substring is
+    ///    spliced out for `path_rename.to`, keeping the rest of `rust_path` (e.g. the trailing
+    ///    struct name) intact — kept for configs still written the old way.
+    ///
+    /// A hit here (either form) means the type should not be generated locally in the proxy -
+    /// it's accessible via the renamed path instead.
+    fn path_rename_for(&self, rust_path: &str) -> Option<String> {
+        let abi_name = self
+            .proxy_config
+            .abi
+            .type_descriptions
+            .0
+            .iter()
+            .find(|(names, _)| names.rust == rust_path)
+            .map(|(names, _)| names.abi.as_str());
+
+        if let Some(abi_name) = abi_name {
+            if let Some(pr) = self
+                .proxy_config
+                .path_rename
+                .iter()
+                .find(|pr| pr.from == abi_name)
+            {
+                return Some(pr.to.clone());
+            }
+        }
+
         self.proxy_config
             .path_rename
             .iter()
-            .any(|pr| pr.from == crate_prefix)
+            .find(|pr| rust_path.contains(pr.from.as_str()))
+            .map(|pr| rust_path.replacen(pr.from.as_str(), pr.to.as_str(), 1))
     }
 
     fn write_constructors(&mut self) {
@@ -637,9 +670,7 @@ where
 
         let processed_paths = self.process_paths(&paths);
 
-        let processed_rust_type = process_rust_type(rust_type.to_string(), paths, processed_paths);
-
-        self.rename_path_with_custom_config(&processed_rust_type)
+        process_rust_type(rust_type.to_string(), paths, processed_paths)
     }
 
     fn start_write_type(
@@ -648,7 +679,7 @@ where
         type_description: &TypeDescription,
         name: &str,
     ) {
-        self.write_macro_attributes(&type_description.macro_attributes);
+        self.write_macro_attributes(&type_description.macro_attributes, name);
         self.write(format!(r#"pub {type_type} {name}"#));
 
         if name.contains("<Api>") {
@@ -665,7 +696,7 @@ where
         self.writeln(brace);
     }
 
-    fn write_macro_attributes(&mut self, macro_attributes: &[String]) {
+    fn write_macro_attributes(&mut self, macro_attributes: &[String], name: &str) {
         self.writeln("");
         self.writeln("#[type_abi]");
 
@@ -684,6 +715,9 @@ where
             .collect();
 
         if derive_attrs.is_empty() {
+            println!(
+                "Warning! {name} #[type_abi] implementation sees no derive traits. Make sure that the derive attribute comes after #[type_abi] in the original contract source"
+            );
             self.writeln("#[derive(TopEncode, TopDecode)]");
         } else {
             self.writeln(format!("#[derive({})]", derive_attrs.join(", ")));
@@ -710,19 +744,6 @@ where
         self.writeln("    }");
     }
 
-    fn rename_path_with_custom_config(&self, processed_type: &str) -> String {
-        let mut renamed_processed_type = processed_type.to_owned();
-
-        for path_rename in &self.proxy_config.path_rename {
-            if processed_type.contains(&path_rename.from) {
-                renamed_processed_type =
-                    renamed_processed_type.replace(&path_rename.from, &path_rename.to);
-            }
-        }
-
-        renamed_processed_type
-    }
-
     fn process_paths(&self, paths: &Vec<String>) -> Vec<String> {
         let mut processed_paths: Vec<String> = Vec::new();
         let crate_name = self.proxy_config.abi.get_crate_name_for_code();
@@ -731,13 +752,13 @@ where
             let type_rust_name = path.split("::").last().unwrap();
             if TYPES_FROM_FRAMEWORK.contains(&type_rust_name) {
                 processed_paths.push(type_rust_name.to_string());
+            } else if let Some(renamed) = self.path_rename_for(path) {
+                // Applies regardless of which crate `path` belongs to: a rename can point at an
+                // external type just as well as a local one (e.g. stripping a re-exported
+                // submodule prefix on a dependency's own type).
+                processed_paths.push(renamed);
             } else if crate_name == extract_struct_crate(path) {
-                if self.has_path_rename_for_crate(path) {
-                    // Keep full path so rename_path_with_custom_config can apply the rename.
-                    processed_paths.push(path.to_string());
-                } else {
-                    processed_paths.push(type_rust_name.to_string());
-                }
+                processed_paths.push(type_rust_name.to_string());
             } else {
                 processed_paths.push(path.to_string());
             }

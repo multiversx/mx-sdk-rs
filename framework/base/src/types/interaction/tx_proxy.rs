@@ -1,12 +1,12 @@
-use multiversx_sc_codec::TopEncodeMulti;
-
-use crate::abi::TypeAbiFrom;
-
 use super::{
     DeployCall, FunctionCall, OriginalResultMarker, Tx, TxEnv, TxFrom, TxGas, TxTo, UpgradeCall,
 };
 
 /// Defines a proxy object for a smart contract.
+///
+/// Framework-level version, with explicit `Env`, `From`, `To`, `Gas` type parameters.
+/// Used by generated proxies. For the abi-level version that abstracts away `Tx`,
+/// see `multiversx_sc_abi::AbiProxyTrait`.
 pub trait TxProxyTrait<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -56,15 +56,3 @@ pub type TxProxyUpgrade<Env, From, To, Gas, Original> =
 /// Alias for a `Tx` generated from a proxy, in `upgrade`.
 pub type TxTypedUpgrade<Env, From, To, Payment, Gas, Original> =
     Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, OriginalResultMarker<Original>>;
-
-/// Trait that is automatically implemented for all types that are allowed as proxy inputs.
-///
-/// Is automatically implemented for all traits that are `TypeAbiInto<O> + TopEncodeMulti`.
-pub trait ProxyArg<O>: TopEncodeMulti {}
-
-impl<O, T> ProxyArg<O> for T
-where
-    O: TypeAbiFrom<T>,
-    T: TopEncodeMulti,
-{
-}
