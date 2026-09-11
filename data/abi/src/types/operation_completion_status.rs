@@ -1,16 +1,9 @@
 use multiversx_sc_codec::{
-    DecodeError, DecodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, Vec,
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput, Vec,
 };
 
-use crate::{
-    abi::{
-        ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents, TypeDescription,
-        TypeDescriptionContainer, TypeName,
-    },
-    api::ManagedTypeApi,
-    codec::EncodeErrorHandler,
-    types::ManagedBuffer,
-};
+use super::*;
 
 const COMPLETED_STR: &str = "completed";
 const INTERRUPTED_STR: &str = "interrupted";
@@ -72,10 +65,6 @@ impl TopDecode for OperationCompletionStatus {
         }
     }
 }
-
-impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
-impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
-impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 
 impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 

@@ -15,5 +15,5 @@ pub use typenum::{
 };
 
 // TODO: guard them by an "alloc" feature flag?
-pub use multiversx_chain_core::types::*;
 pub use alloc::{boxed::Box, string::String, vec::Vec};
+pub use multiversx_chain_core::types::*;

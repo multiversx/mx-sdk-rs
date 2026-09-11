@@ -1,5 +1,5 @@
 pub use crate::{
-    abi::{types::*},
+    abi::types::*,
     api::{ErrorApiImpl, ManagedTypeApi, VMApi},
     arrayvec::ArrayVec,
     codec::{

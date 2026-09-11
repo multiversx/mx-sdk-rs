@@ -7,7 +7,6 @@
 #![allow(dead_code)]
 #![allow(clippy::all)]
 
-use multiversx_sc::types::OperationCompletionStatus;
 use multiversx_sc_abi::imports::*;
 
 #[type_abi]
