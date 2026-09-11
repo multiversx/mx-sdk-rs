@@ -276,14 +276,15 @@ where
             .find(|(names, _)| names.rust == rust_path)
             .map(|(names, _)| names.abi.as_str());
 
-        if let Some(abi_name) = abi_name
-            && let Some(pr) = self
+        if let Some(abi_name) = abi_name {
+            if let Some(pr) = self
                 .proxy_config
                 .path_rename
                 .iter()
                 .find(|pr| pr.from == abi_name)
-        {
-            return Some(pr.to.clone());
+            {
+                return Some(pr.to.clone());
+            }
         }
 
         self.proxy_config
