@@ -1,12 +1,14 @@
 #![no_std]
 
+pub use multiversx_sc_abi_derive::contract_abi;
+
 // re-export basic heap types
 extern crate alloc;
 
 mod contract_abi;
 mod contract_abi_provider;
 mod proxy_abi_traits;
-mod types;
+pub mod types;
 
 pub use contract_abi::*;
 pub use contract_abi_provider::*;

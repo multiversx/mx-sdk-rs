@@ -8,8 +8,7 @@ use multiversx_sc::abi::{
 use crate::contract::sc_config::proxy_config::ProxyConfig;
 
 use super::proxy_process_type_name::{
-    c_enum_representation, explicit_discriminant, extract_paths, extract_struct_crate,
-    process_rust_type,
+    c_enum_representation, explicit_discriminant, extract_paths, process_rust_type,
 };
 
 const ZERO: &str = "0";
@@ -89,20 +88,12 @@ impl<'a> AbiSourceGenerator<'a> {
             return;
         }
 
-        self.writeln("use multiversx_sc::abi::*;");
-        // The local pure type definitions below (see `write_types`) never carry an `Api`
-        // generic, so deriving them via the framework's own macros (already a dependency of
-        // any crate this file lives in) is just as "pure" as a standalone equivalent would be —
-        // `derive_imports` is the exact same bundle `abi_tester.rs` itself uses.
-        self.writeln("use multiversx_sc::derive_imports::*;");
-        // `pure_rust` leaves framework types with no `Api` generic (`H256`, `MultiValueN<...>`,
-        // `OptionalValue<T>`, `ArrayVec<T, N>`, `Box<T>`, `OperationCompletionStatus`, ...)
-        // referenced as-is, since they're already framework-agnostic - only `imports` exposes
-        // them under their bare names.
-        self.writeln("use multiversx_sc::imports::*;");
-        if self.mode == AbiSourceMode::Trait {
-            self.writeln("use multiversx_sc_abi_derive::contract_abi;");
-        }
+        // The primary source for everything this file needs - the ABI marker types (`BigUintAbi`,
+        // `AddressAbi`, ...), `AbiProxyTrait`/`ProxyArg`/`IntoXxx`, the codec traits, and the
+        // `#[contract_abi(...)]` macro - kept deliberately free of any `multiversx-sc`/`VMApi`
+        // dependency. A glob import costs nothing when a mode/file doesn't end up using part of
+        // it (e.g. `contract_abi` in Raw mode).
+        self.writeln("use multiversx_sc_abi::imports::*;");
     }
 
     /// Resolves an ABI type reference to a pure Rust type name: the bare local name for a
@@ -119,47 +110,71 @@ impl<'a> AbiSourceGenerator<'a> {
     /// applies to the whole string, exactly mirroring what `ProxyGenerator::clean_paths` does
     /// for `.rust` names.
     fn abi_type(&self, type_names: &TypeNames) -> String {
-        if self.is_local_type_name(&type_names.abi) {
-            return type_names.abi.clone();
+        if let Some(resolved) = self.resolve_local_type(&type_names.abi, &type_names.rust) {
+            return resolved;
         }
         self.clean_local_paths(&type_names.pure_rust)
     }
 
-    fn is_local_type_name(&self, abi_name: &str) -> bool {
-        self.proxy_config
-            .abi
-            .type_descriptions
-            .find(abi_name)
-            .is_some_and(|desc| desc.contents.is_specified())
+    /// If `abi_name` denotes a type this generator would otherwise define locally (see
+    /// `write_types` — a described struct/enum with actual contents), resolves it to whichever
+    /// applies: the `path_rename` target configured for it (see `path_rename_for`), or, if none
+    /// applies, its own bare local name (the definition `write_types` emits for it).
+    fn resolve_local_type(&self, abi_name: &str, rust_name: &str) -> Option<String> {
+        let desc = self.proxy_config.abi.type_descriptions.find(abi_name)?;
+        if !desc.contents.is_specified() {
+            return None;
+        }
+        Some(
+            self.path_rename_for(abi_name, rust_name)
+                .unwrap_or_else(|| abi_name.to_string()),
+        )
     }
 
-    /// Strips every embedded path down to its bare local name when that name is one of our own
-    /// local types (see `write_types`) — the same technique `ProxyGenerator::clean_paths` uses
-    /// for `.rust` names, applied to `pure_rust` strings instead. Paths that aren't local types
-    /// (external crates, or a residual `$API`/`UncallableApi` placeholder left over from a
-    /// managed type with no registered pure ABI equivalent) are left untouched.
+    /// Resolves the configured `path-rename` target for a locally-described type, if any applies.
+    ///
+    /// Tried in order:
+    /// 1. `path_rename.from` against the type's own bare ABI name (the preferred, stable form -
+    ///    e.g. `"MyStruct"`); on a hit, `path_rename.to` is the *whole* replacement path, since an
+    ///    ABI name identifies the type unambiguously.
+    /// 2. The legacy match: `path_rename.from` contained anywhere in `rust_name` (typically a
+    ///    crate or module prefix, e.g. `"my_crate::my_mod"`); on a hit, only that substring is
+    ///    spliced out for `path_rename.to`, keeping the rest of `rust_name` (e.g. the trailing
+    ///    struct name) intact — kept for configs still written the old way.
+    fn path_rename_for(&self, abi_name: &str, rust_name: &str) -> Option<String> {
+        if let Some(pr) = self
+            .proxy_config
+            .path_rename
+            .iter()
+            .find(|pr| pr.from == abi_name)
+        {
+            return Some(pr.to.clone());
+        }
+
+        self.proxy_config
+            .path_rename
+            .iter()
+            .find(|pr| rust_name.contains(pr.from.as_str()))
+            .map(|pr| rust_name.replacen(pr.from.as_str(), pr.to.as_str(), 1))
+    }
+
+    /// Strips every embedded path down to its resolved local reference (bare name, or its
+    /// `path_rename` target) when that name is one of our own local types (see `write_types`) —
+    /// the same technique `ProxyGenerator::clean_paths` uses for `.rust` names, applied to
+    /// `pure_rust` strings instead. Paths that aren't local types (external crates, or a residual
+    /// `$API`/`UncallableApi` placeholder left over from a managed type with no registered pure
+    /// ABI equivalent) are left untouched.
     fn clean_local_paths(&self, rust_type: &str) -> String {
         let paths = extract_paths(rust_type);
         let processed_paths: Vec<String> = paths
             .iter()
             .map(|path| {
                 let bare_name = path.rsplit("::").next().unwrap_or(path);
-                if self.is_local_type_name(bare_name) {
-                    bare_name.to_string()
-                } else {
-                    path.clone()
-                }
+                self.resolve_local_type(bare_name, path)
+                    .unwrap_or_else(|| path.clone())
             })
             .collect();
         process_rust_type(rust_type.to_string(), paths, processed_paths)
-    }
-
-    fn has_path_rename_for_crate(&self, rust_name: &str) -> bool {
-        let crate_prefix = extract_struct_crate(rust_name);
-        self.proxy_config
-            .path_rename
-            .iter()
-            .any(|pr| pr.from == crate_prefix)
     }
 
     // ---- exported functions (constructors / upgrades / endpoints) ----
@@ -199,8 +214,8 @@ impl<'a> AbiSourceGenerator<'a> {
         // generated (`[[generate-abi]] call = "..."`) - without it, `#[contract_abi]` on its own
         // still generates the `AbiProvider` impl, just no `ProxyName`/`ProxyNameMethods` proxy.
         let contract_abi_attr = match &self.proxy_config.call_name {
-            Some(call_name) => format!("#[contract_abi(call = {call_name})]"),
-            None => "#[contract_abi]".to_owned(),
+            Some(call_name) => format!("#[multiversx_sc_abi::contract_abi(call = {call_name})]"),
+            None => "#[multiversx_sc_abi::contract_abi]".to_owned(),
         };
         self.writeln(format!(
             "\n#[rustfmt::skip]\n{contract_abi_attr}\npub trait {} {{",
@@ -365,13 +380,15 @@ impl<'a> AbiSourceGenerator<'a> {
     // ---- local type definitions (structs / enums), shared by both modes ----
 
     fn write_types(&mut self) {
+        let reachable = self.reachable_local_abi_names();
+
         let type_descriptions = self.proxy_config.abi.type_descriptions.0.clone();
         for (_, type_description) in &type_descriptions {
             if !type_description.contents.is_specified() {
                 continue;
             }
-            let rust_name = type_description.names.rust.as_str();
-            if self.has_path_rename_for_crate(rust_name) {
+            let abi_name = type_description.names.abi.as_str();
+            if !reachable.contains(abi_name) {
                 continue;
             }
 
@@ -382,6 +399,86 @@ impl<'a> AbiSourceGenerator<'a> {
                 TypeContents::ExplicitEnum(_) | TypeContents::NotSpecified => {}
             }
         }
+    }
+
+    /// Every locally-described type this generator must define, i.e. every type reachable from
+    /// the exported endpoints' inputs/outputs, event inputs, and `#[esdt_attribute]` types, by
+    /// following struct fields/enum variant fields transitively — *except* the traversal stops at
+    /// (and never emits) a type that `path_rename_for` redirects elsewhere: whatever shape it has
+    /// doesn't belong to this file anymore, so its own field types must not be pulled in on its
+    /// account either. Without this, a struct that's ONLY ever reachable through a renamed type
+    /// (e.g. `Color`, reachable only through a renamed `Kitty`) would still get emitted here as
+    /// orphaned, unreferenced dead code.
+    fn reachable_local_abi_names(&self) -> std::collections::HashSet<String> {
+        let mut reachable = std::collections::HashSet::new();
+        let mut stack: Vec<String> = Vec::new();
+
+        for endpoint in Self::exported_endpoints(self.proxy_config) {
+            for input in &endpoint.inputs {
+                stack.extend(self.top_level_abi_candidates(&input.type_names.pure_rust));
+            }
+            for output in &endpoint.outputs {
+                stack.extend(self.top_level_abi_candidates(&output.type_names.pure_rust));
+            }
+        }
+        for event in &self.proxy_config.abi.events {
+            for input in &event.inputs {
+                stack.extend(self.top_level_abi_candidates(&input.type_name));
+            }
+        }
+        for esdt_attribute in &self.proxy_config.abi.esdt_attributes {
+            stack.extend(self.top_level_abi_candidates(&esdt_attribute.ty));
+        }
+
+        while let Some(abi_name) = stack.pop() {
+            if reachable.contains(&abi_name) {
+                continue;
+            }
+            let Some(desc) = self.proxy_config.abi.type_descriptions.find(&abi_name) else {
+                continue;
+            };
+            if !desc.contents.is_specified() {
+                continue;
+            }
+            if self.path_rename_for(&abi_name, &desc.names.rust).is_some() {
+                continue; // redirected elsewhere - don't emit, don't descend into its fields
+            }
+
+            reachable.insert(abi_name);
+
+            match &desc.contents {
+                TypeContents::Struct(fields) => {
+                    for field in fields {
+                        stack.extend(self.top_level_abi_candidates(&field.field_type.pure_rust));
+                    }
+                }
+                TypeContents::Enum(variants) => {
+                    for variant in variants {
+                        for field in &variant.fields {
+                            stack
+                                .extend(self.top_level_abi_candidates(&field.field_type.pure_rust));
+                        }
+                    }
+                }
+                TypeContents::ExplicitEnum(_) | TypeContents::NotSpecified => {}
+            }
+        }
+
+        reachable
+    }
+
+    /// Extracts the bare names of every type embedded in a rust-ish type name (itself, if it's a
+    /// plain reference, or each of its generic parameters if it's a composite like
+    /// `Option<Kitty>` or `MultiValueEncoded<Kitty>`) as candidate locally-described type names to
+    /// feed into `reachable_local_abi_names`'s traversal - mirroring the same path-extraction
+    /// `clean_local_paths` uses to resolve those references when actually writing them out. Also
+    /// works on a bare bracketed ABI `TypeName` string (event inputs, `#[esdt_attribute]` types),
+    /// which uses the same `<>,` composite syntax.
+    fn top_level_abi_candidates(&self, type_name: &str) -> Vec<String> {
+        extract_paths(type_name)
+            .iter()
+            .map(|path| path.rsplit("::").next().unwrap_or(path).to_string())
+            .collect()
     }
 
     fn write_enum(

@@ -974,8 +974,9 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
- "kitty-abi",
  "multiversx-sc",
+ "multiversx-sc-abi",
+ "multiversx-sc-abi-derive",
  "multiversx-sc-scenario",
 ]
 
@@ -3336,6 +3337,7 @@ version = "0.25.0"
 dependencies = [
  "bitflags 2.13.0",
  "multiversx-chain-core",
+ "multiversx-sc-abi-derive",
  "multiversx-sc-codec",
  "num-bigint",
  "typenum",

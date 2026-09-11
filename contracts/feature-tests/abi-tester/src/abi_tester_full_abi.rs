@@ -7,10 +7,8 @@
 #![allow(dead_code)]
 #![allow(clippy::all)]
 
-use multiversx_sc::abi::*;
-use multiversx_sc::derive_imports::*;
-use multiversx_sc::imports::*;
-use multiversx_sc_abi_derive::contract_abi;
+use multiversx_sc::types::OperationCompletionStatus;
+use multiversx_sc_abi::imports::*;
 
 #[type_abi]
 pub struct OnlyShowsUpInConstructor {
@@ -194,7 +192,7 @@ pub struct ManagedDecimalWrapper {
 }
 
 #[rustfmt::skip]
-#[contract_abi(call = AbiTesterCall)]
+#[multiversx_sc_abi::contract_abi(call = AbiTesterCall)]
 pub trait AbiTester {
     /// Contract constructor.
     #[payable("EGLD")]
@@ -263,7 +261,7 @@ pub trait AbiTester {
     fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec>;
 
     #[view(item_for_array_vec)]
-    fn item_for_array_vec(&self) -> ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3usize>;
+    fn item_for_array_vec(&self) -> ListAbi<OnlyShowsUpAsNestedInArrayVec>;
 
     #[view(item_for_managed_vec)]
     fn item_for_managed_vec(&self) -> ListAbi<AbiManagedVecItem>;

@@ -7,9 +7,8 @@
 #![allow(dead_code)]
 #![allow(clippy::all)]
 
-use multiversx_sc::abi::*;
-use multiversx_sc::derive_imports::*;
-use multiversx_sc::imports::*;
+use multiversx_sc::types::OperationCompletionStatus;
+use multiversx_sc_abi::imports::*;
 
 #[type_abi]
 pub struct OnlyShowsUpInConstructor {
@@ -507,9 +506,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn item_for_array_vec<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3usize>>>::Out
+    ) -> <T as IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInArrayVec>>>::Out
     where
-        T: IntoCall<NotPayable, ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3usize>>,
+        T: IntoCall<NotPayable, ListAbi<OnlyShowsUpAsNestedInArrayVec>>,
     {
         self.base_tx
             .into_call(NotPayable, "item_for_array_vec")

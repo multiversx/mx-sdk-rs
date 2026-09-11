@@ -1,0 +1,6 @@
+[[generate-abi]]
+path = "../../crypto-zombies/src/kitty_ownership_abi.rs"
+call = "KittyOwnershipCall"
+[[generate-abi.path-rename]]
+from = "Kitty"
+to = "crate::kitty_obj::Kitty"

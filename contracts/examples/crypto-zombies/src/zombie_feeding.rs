@@ -1,8 +1,9 @@
 use multiversx_sc::imports::*;
 
-use kitty_abi::Kitty;
-
-use crate::{storage, zombie_factory, zombie_helper};
+use crate::{
+    kitty_obj::Kitty, kitty_ownership_abi::KittyOwnershipCall, storage, zombie_factory,
+    zombie_helper,
+};
 
 #[multiversx_sc::module]
 pub trait ZombieFeeding:
@@ -57,7 +58,7 @@ pub trait ZombieFeeding:
         let crypto_kitties_sc_address = self.crypto_kitties_sc_address().get();
         self.tx()
             .to(&crypto_kitties_sc_address)
-            .abi_typed(kitty_abi::kitty_ownership_abi::KittyOwnershipCall)
+            .abi_typed(KittyOwnershipCall)
             .get_kitty_by_id_endpoint(kitty_id)
             .callback(self.callbacks().get_kitty_callback(zombie_id))
             .async_call_and_exit();

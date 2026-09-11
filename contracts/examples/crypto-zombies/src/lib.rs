@@ -9,6 +9,8 @@ mod zombie_attack;
 mod zombie_factory;
 mod zombie_feeding;
 mod zombie_helper;
+pub mod kitty_obj;
+pub mod kitty_ownership_abi;
 
 #[multiversx_sc::contract]
 pub trait CryptoZombies:

@@ -108,7 +108,7 @@ impl<T: TypeAbi, const CAP: usize> TypeAbiFrom<ArrayVec<T, CAP>> for ArrayVec<T,
 
 impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
     type Unmanaged = Self;
-    type Abi = ArrayVec<T::Abi, CAP>;
+    type Abi = ListAbi<T::Abi>; // TODO: should we also specify the cap in the ABI?
 
     fn type_name() -> TypeName {
         <&[T]>::type_name()

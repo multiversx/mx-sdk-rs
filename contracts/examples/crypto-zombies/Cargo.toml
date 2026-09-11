@@ -11,8 +11,12 @@ path = "src/lib.rs"
 [dependencies.multiversx-sc]
 workspace = true
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-abi]
 workspace = true
 
-[dependencies.kitty-abi]
-path = "../crypto-kitties/abi"
+[dependencies.multiversx-sc-abi-derive]
+version = "0.25.0"
+path = "../../../data/abi-derive"
+
+[dev-dependencies.multiversx-sc-scenario]
+workspace = true
