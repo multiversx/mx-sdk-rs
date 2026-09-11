@@ -5,7 +5,7 @@ use crate::{
 
 /// `#[multiversx_sc::contract(...)]` takes three optional arguments:
 /// - `call = ProxyName`, which also generates a framework-agnostic call proxy under that name
-///   (the same kind produced by `#[contract_abi(call = ...)]`);
+///   (the same kind produced by `#[multiversx_sc_abi::contract_abi(call = ...)]`);
 /// - `implements_abi = Path` (repeatable), recording that this contract's ABI must contain the
 ///   referenced ABI spec's exports;
 /// - `implements_abi_exactly = Path` (repeatable), recording that this contract's ABI must match

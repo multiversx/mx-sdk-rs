@@ -1,12 +1,11 @@
 use std::{fs, fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbiProvider, imports::*};
-use multiversx_sc_abi_derive::contract_abi;
+use multiversx_sc::abi::imports::*;
 use multiversx_sc_meta_lib::abi_json;
 
 /// Mirrors `contracts/examples/adder/src/adder.rs`, but written directly against pure
 /// ABI types instead of managed types, with no dependency on `multiversx-sc`.
-#[contract_abi]
+#[multiversx_sc_abi::contract_abi]
 pub trait Adder {
     #[view(getSum)]
     fn sum(&self) -> BigUintAbi;

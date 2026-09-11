@@ -12,12 +12,7 @@ path = "src/lib.rs"
 workspace = true
 
 [dependencies.multiversx-sc-abi]
-version = "0.25.0"
-path = "../../../../data/abi"
-
-[dependencies.multiversx-sc-abi-derive]
-version = "0.25.0"
-path = "../../../../data/abi-derive"
+workspace = true
 
 [dependencies.random]
 version = "0.0.0"

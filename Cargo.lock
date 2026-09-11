@@ -19,7 +19,6 @@ dependencies = [
  "bitflags 2.13.0",
  "multiversx-sc",
  "multiversx-sc-abi",
- "multiversx-sc-abi-derive",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
 ]
@@ -976,7 +975,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-abi",
- "multiversx-sc-abi-derive",
  "multiversx-sc-scenario",
 ]
 
@@ -2747,7 +2745,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-abi",
- "multiversx-sc-abi-derive",
  "random",
 ]
 

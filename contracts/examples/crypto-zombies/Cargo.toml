@@ -14,9 +14,5 @@ workspace = true
 [dependencies.multiversx-sc-abi]
 workspace = true
 
-[dependencies.multiversx-sc-abi-derive]
-version = "0.25.0"
-path = "../../../data/abi-derive"
-
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

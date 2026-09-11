@@ -2,7 +2,7 @@
 ///
 /// - `call = ProxyName`: see `proxy_gen::ProxyCallArg` (same meaning, shared parsing style).
 /// - `implements_abi = Path` (repeatable): the contract's ABI must contain every export declared by
-///   the referenced ABI spec - a path to a `#[contract_abi]`-annotated trait (e.g. `some_module::
+///   the referenced ABI spec - a path to a `#[multiversx_sc_abi::contract_abi]`-annotated trait (e.g. `some_module::
 ///   SomeTrait`, or bare `SomeTrait` if declared in the current module); its generated `AbiProvider`
 ///   sibling is resolved from the path in `framework/derive`'s `generate::abi_gen::abi_provider_path`.
 ///   The contract may have additional exports beyond the spec.

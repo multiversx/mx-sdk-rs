@@ -1,9 +1,9 @@
 use crate::model::ContractTrait;
 
-/// Given a path to a `#[contract_abi]`-annotated ABI spec trait (e.g. `some_module::SomeTrait`,
+/// Given a path to a `#[multiversx_sc_abi::contract_abi]`-annotated ABI spec trait (e.g. `some_module::SomeTrait`,
 /// or just `SomeTrait` when it's declared in the current module), returns the path to its
 /// generated `AbiProvider` sibling: the same leading module path, with the trait name swapped
-/// out for the fixed `AbiProvider` ident `#[contract_abi]` always generates alongside it
+/// out for the fixed `AbiProvider` ident `#[multiversx_sc_abi::contract_abi]` always generates alongside it
 /// (regardless of any `call = ProxyName` argument it was given) - the same "resolve a sibling
 /// generated item from a module/trait path" trick contract module supertraits use to reach their
 /// own `EndpointWrappers`/`ProxyTrait`/etc. (see `parse::split_path_last`, `model::Supertrait`,
@@ -19,7 +19,7 @@ fn abi_provider_path(trait_path: &syn::Path) -> syn::Path {
 }
 
 /// `implements_abi`/`implements_abi_exactly` are the paths given via `#[multiversx_sc::contract(
-/// implements_abi = ..., implements_abi_exactly = ...)]`: each names a `#[contract_abi]`-annotated
+/// implements_abi = ..., implements_abi_exactly = ...)]`: each names a `#[multiversx_sc_abi::contract_abi]`-annotated
 /// ABI spec trait (its generated `AbiProvider` sibling is resolved via `abi_provider_path`).
 /// Their `abi()` is called and recorded on the contract's own `ContractAbi`, for the meta crate to
 /// check conformance against later.
@@ -49,7 +49,7 @@ pub fn generate_abi_provider(
 }
 
 /// Generates a framework-agnostic call proxy (`proxy_name` / `proxy_name`+`Methods`), the same
-/// kind produced by `data/abi-derive`'s `#[contract_abi(call = ...)]`, but from a real
+/// kind produced by `data/abi-derive`'s `#[multiversx_sc_abi::contract_abi(call = ...)]`, but from a real
 /// `#[multiversx_sc::contract]`/`#[multiversx_sc::module]` trait (already gone through the
 /// managed-type substitution, e.g. bare `BigUint` became `multiversx_sc::types::BigUint<Self::
 /// Api>`). `UncallableApi` stands in for that `Self::Api` wherever it appears in an argument or

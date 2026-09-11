@@ -12,7 +12,8 @@ pub struct ProxyConfig {
     pub abi: ContractAbi,
     pub format: ProxyFormat,
     /// `[[generate-abi]]`'s `call` field: the name to give the generated call type, i.e. the
-    /// `call = ...` argument of `#[contract_abi(call = ...)]`. Unused outside `ProxyFormat::Abi`.
+    /// `call = ...` argument of `#[multiversx_sc_abi::contract_abi(call = ...)]`.
+    /// Unused outside `ProxyFormat::Abi`.
     pub call_name: Option<String>,
 }
 

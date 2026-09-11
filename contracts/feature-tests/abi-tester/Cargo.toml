@@ -12,13 +12,8 @@ path = "src/abi_tester.rs"
 workspace = true
 features = ["alloc"]
 
-[dependencies.multiversx-sc-abi-derive]
-version = "0.25.0"
-path = "../../../data/abi-derive"
-
 [dependencies.multiversx-sc-abi]
-version = "0.25.0"
-path = "../../../data/abi"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

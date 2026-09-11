@@ -40,7 +40,7 @@ pub struct ProxyConfigSerde {
     pub common: ProxyConfigCommon,
 }
 
-/// Config for `[[generate-abi]]`: produces a `#[contract_abi(call = ...)]`-annotated trait, the
+/// Config for `[[generate-abi]]`: produces a `#[multiversx_sc_abi::contract_abi(call = ...)]`-annotated trait, the
 /// *input* the `contract_abi` macro consumes (framework-agnostic, no `TxProxyTrait`/`VMApi`
 /// dependency), unlike the legacy `[[proxy]]` output.
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
@@ -50,7 +50,7 @@ pub struct GenerateAbiConfigSerde {
     pub common: ProxyConfigCommon,
 
     /// Name to give the generated call type, i.e. the `call = ...` argument of
-    /// `#[contract_abi(call = ...)]`. Defaults to the usual `<ContractName>Proxy`-style name
+    /// `#[multiversx_sc_abi::contract_abi(call = ...)]`. Defaults to the usual `<ContractName>Proxy`-style name
     /// when left unset.
     #[serde(default)]
     pub call: Option<String>,

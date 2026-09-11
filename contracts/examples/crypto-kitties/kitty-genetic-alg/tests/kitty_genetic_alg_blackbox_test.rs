@@ -13,7 +13,7 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-/// Proves the auto-generated `KittyGeneticAlgCall` (produced by `#[contract_abi]`, with no
+/// Proves the auto-generated `KittyGeneticAlgCall` (produced by `#[multiversx_sc_abi::contract_abi]`, with no
 /// dependency on `multiversx-sc`/`VMApi`) interoperates with the real framework `Tx` builder via
 /// `Tx::abi_typed`, exactly like the hand-written `AdderAbiProxy` does in `adder_blackbox_test.rs`.
 #[test]

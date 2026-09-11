@@ -6,7 +6,7 @@ use crate::contract::util::{clear_all_type_lifetimes, replace_self_api};
 use crate::type_abi_derive::import_tokens;
 
 /// Arguments to the `call = ProxyName` macro argument, shared between `data/abi-derive`'s
-/// `#[contract_abi(...)]` and `framework/derive`'s `#[multiversx_sc::contract(...)]`. `call`
+/// `#[multiversx_sc_abi::contract_abi(...)]` and `framework/derive`'s `#[multiversx_sc::contract(...)]`. `call`
 /// names the generated call-proxy struct explicitly, so there is no magic naming derived from
 /// the trait name. Omitting it skips proxy generation entirely.
 pub struct ProxyCallArg {
@@ -48,7 +48,7 @@ enum ProxyMethodKind {
 /// Rewrites a method's argument/return type into the `ProxyArg`/`IntoXxx` output type: any
 /// `Self::Api` is replaced with `self_api_replacement` (see `replace_self_api`), then the whole
 /// type is projected through `TypeAbi::Abi` to land on its pure ABI counterpart (a no-op for
-/// types that are already pure, e.g. everything the framework-agnostic `#[contract_abi]` sees).
+/// types that are already pure, e.g. everything the framework-agnostic `#[multiversx_sc_abi::contract_abi]` sees).
 fn abi_projected_type(
     ty: &syn::Type,
     import: &proc_macro2::TokenStream,
