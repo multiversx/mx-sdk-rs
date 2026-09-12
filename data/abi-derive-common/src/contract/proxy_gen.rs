@@ -61,9 +61,9 @@ fn abi_projected_type(
 }
 
 /// Builds one dedicated `impl<T, ..> #methods_name<T> where T: IntoXxx<Payment, Output> { .. }`
-/// block for a single method, mirroring `contracts/examples/adder/src/adder_abi.rs`'s
-/// hand-written pattern: every method gets its own impl block, since `Output` (and, for payable
-/// methods, `Payment`) differs per method.
+/// block for a single method, mirroring the hand-writable pattern shown in
+/// `contracts/feature-tests/abi-tester/src/abi_tester_full_abi_raw.rs`: every method gets its own
+/// impl block, since `Output` (and, for payable methods, `Payment`) differs per method.
 fn generate_proxy_method(
     m: &Method,
     kind: &ProxyMethodKind,
@@ -91,11 +91,12 @@ fn generate_proxy_method(
         syn::ReturnType::Type(_, ty) => abi_projected_type(ty, import, self_api_replacement),
     };
 
-    // A `NotPayable` endpoint hardcodes the marker, exactly like `adder_abi.rs`. A payable
-    // endpoint (e.g. kitty's `#[payable("EGLD")] breedWith`) instead takes a fresh `Payment`
-    // generic as its first parameter, leaving the caller free to supply whatever payment type
-    // the underlying `T` accepts (the framework binding in `tx_proxy_abi_impl.rs` is what
-    // actually constrains it, e.g. to EGLD-only for deploys/upgrades).
+    // A `NotPayable` endpoint hardcodes the marker, exactly like the raw shape in
+    // `abi_tester_full_abi_raw.rs`. A payable endpoint (e.g. kitty's `#[payable("EGLD")]
+    // breedWith`) instead takes a fresh `Payment` generic as its first parameter, leaving the
+    // caller free to supply whatever payment type the underlying `T` accepts (the framework
+    // binding in `tx_proxy_abi_impl.rs` is what actually constrains it, e.g. to EGLD-only for
+    // deploys/upgrades).
     let payable = m.payable_metadata().is_payable();
     let payment_ty: proc_macro2::TokenStream = if payable {
         quote! { Payment }
@@ -157,7 +158,8 @@ fn generate_proxy_method(
 
 /// Generates a proxy pair (`#proxy_name` / `#proxy_name`+`Methods`) for the given contract,
 /// following the `AbiProxyTrait<T>`/`IntoCall`/`IntoDeploy`/`IntoUpgrade` pattern from
-/// `multiversx_sc_abi::proxy_abi_traits`, matching `adder_abi.rs`'s hand-written shape.
+/// `multiversx_sc_abi::proxy_abi_traits`, matching the hand-writable shape shown in
+/// `contracts/feature-tests/abi-tester/src/abi_tester_full_abi_raw.rs`.
 ///
 /// `proxy_name` is caller-supplied rather than derived from the trait name, so there is no
 /// magic naming: it is the exact struct name that ends up callable at the use site (e.g. via

@@ -30,8 +30,9 @@ pub enum AbiSourceMode {
     /// A `#[multiversx_sc_abi::contract_abi(call = ...)]`-annotated trait: the *input*
     /// the macro consumes.
     Trait,
-    /// The raw `AbiProxyTrait`/`ProxyArg`/`IntoXxx` implementation, hand-writable style
-    /// (`contracts/examples/adder/src/adder_abi.rs`): what that macro *expands to*.
+    /// The raw `AbiProxyTrait`/`ProxyArg`/`IntoXxx` implementation, hand-writable style (see
+    /// `contracts/feature-tests/abi-tester/src/abi_tester_full_abi_raw.rs`): what that macro
+    /// *expands to*.
     Raw,
 }
 
