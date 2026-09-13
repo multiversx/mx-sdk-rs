@@ -27,6 +27,7 @@ use core::cmp::Ordering;
 use super::{
     ManagedDecimal,
     decimals::{ConstDecimals, Decimals, NumDecimals},
+    scaling_factor::scaling_factor,
 };
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
@@ -44,7 +45,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     /// Divides the raw fixed-point integer by the scaling factor, discarding the fractional part.
     /// For example, `-1.75` with 2 decimals returns `-1`.
     pub fn trunc(&self) -> BigInt<M> {
-        &self.data / self.decimals.scaling_factor().as_big_int()
+        &self.data / scaling_factor::<M>(self.decimals.num_decimals()).as_big_int()
     }
 
     /// Returns a reference to the underlying raw fixed-point integer.
@@ -90,7 +91,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
 
     /// Returns the scaling factor `10^decimals` as a static reference.
     pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
-        self.decimals.scaling_factor()
+        scaling_factor::<M>(self.decimals.num_decimals())
     }
 
     /// Adjusts the raw integer to represent the same value at `scale_to_num_decimals` decimal places.
@@ -103,13 +104,13 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
-                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(delta_decimals);
                 &self.data * &scaling_factor.value
             }
             Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
-                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(delta_decimals);
                 &self.data / &scaling_factor.value
             }
         }
@@ -166,7 +167,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigInt<M>>
 {
     fn from(mut value: BigInt<M>) -> Self {
         let decimals = ConstDecimals::new();
-        value *= decimals.scaling_factor().as_big_int();
+        value *= scaling_factor::<M>(decimals.num_decimals()).as_big_int();
         ManagedDecimalSigned {
             data: value,
             decimals,
@@ -189,7 +190,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
     pub fn to_big_float(&self) -> BigFloat<M> {
         let result = BigFloat::from_big_int(&self.data);
         let temp_handle: M::BigFloatHandle = use_raw_handle(const_handles::BIG_FLOAT_TEMPORARY);
-        let denominator = self.decimals.scaling_factor::<M>();
+        let denominator = scaling_factor::<M>(self.decimals.num_decimals());
         M::managed_type_impl().bf_set_bi(temp_handle.clone(), denominator.handle);
         M::managed_type_impl().bf_div(result.handle.clone(), result.handle.clone(), temp_handle);
         result
@@ -203,7 +204,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimalSigned<M, D> {
         big_float: &BigFloat<M>,
         num_decimals: T,
     ) -> ManagedDecimalSigned<M, T> {
-        let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
+        let scaling_factor: &BigUint<M> = &scaling_factor::<M>(num_decimals.num_decimals());
 
         let scaled = &BigFloat::from(scaling_factor) * big_float;
         let fixed_big_int = scaled.trunc();

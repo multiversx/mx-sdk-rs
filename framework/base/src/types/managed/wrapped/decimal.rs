@@ -13,6 +13,7 @@ mod managed_decimal_op_mul_signed;
 mod managed_decimal_op_sub;
 mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
+pub(crate) mod scaling_factor;
 
 pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
 pub use managed_decimal::ManagedDecimal;

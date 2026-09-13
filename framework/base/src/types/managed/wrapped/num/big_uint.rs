@@ -16,6 +16,7 @@ use crate::{
     types::{
         BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedDecimal, ManagedRef, ManagedType,
         NonZeroBigUint, heap::BoxedBytes,
+        managed::wrapped::decimal::scaling_factor::scaling_factor,
     },
 };
 
@@ -508,7 +509,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             return None;
         };
 
-        let scaling_factor_9 = LnDecimals::new().scaling_factor();
+        let scaling_factor_9 = scaling_factor::<M>(LnDecimals::new().num_decimals());
         let divisor = BigUint::from(1u64) << log2_floor as usize;
         let normalized = self * &*scaling_factor_9 / divisor;
 

@@ -18,7 +18,9 @@ use crate::{
     },
 };
 
-use super::{ConstDecimals, Decimals, ManagedDecimalSigned, NumDecimals};
+use super::{
+    ConstDecimals, Decimals, ManagedDecimalSigned, NumDecimals, scaling_factor::scaling_factor,
+};
 
 /// Fixed-point decimal numbers that accept either a constant or variable number of decimals.
 ///
@@ -36,7 +38,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     /// Divides the raw fixed-point integer by the scaling factor, discarding the fractional part.
     /// For example, `1.75` with 2 decimals returns `1`.
     pub fn trunc(&self) -> BigUint<M> {
-        &self.data / self.decimals.scaling_factor().deref()
+        &self.data / scaling_factor::<M>(self.decimals.num_decimals()).deref()
     }
 
     /// Returns a reference to the underlying raw fixed-point integer.
@@ -81,7 +83,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     /// The raw value is `10^decimals` (the scaling factor), so that
     /// `self.trunc()` returns `1` and all arithmetic treats it as unity.
     pub fn one(decimals: D) -> Self {
-        let data = (*decimals.scaling_factor::<M>()).clone();
+        let data = (*scaling_factor::<M>(decimals.num_decimals())).clone();
         ManagedDecimal { data, decimals }
     }
 
@@ -92,7 +94,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
     /// Returns the scaling factor `10^decimals` as a static reference.
     pub fn scaling_factor(&self) -> ManagedRef<'static, M, BigUint<M>> {
-        self.decimals.scaling_factor()
+        scaling_factor::<M>(self.decimals.num_decimals())
     }
 
     /// Adjusts the raw integer to represent the same value at `scale_to_num_decimals` decimal places.
@@ -105,13 +107,13 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
-                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(delta_decimals);
                 &self.data * scaling_factor
             }
             Ordering::Equal => self.data.clone(),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
-                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(delta_decimals);
                 &self.data / scaling_factor
             }
         }
@@ -143,7 +145,7 @@ impl<M: ManagedTypeApi, DECIMALS: Unsigned> From<BigUint<M>>
 {
     fn from(mut value: BigUint<M>) -> Self {
         let decimals = ConstDecimals::new();
-        value *= decimals.scaling_factor().deref();
+        value *= scaling_factor::<M>(decimals.num_decimals()).deref();
         ManagedDecimal {
             data: value,
             decimals,
@@ -204,7 +206,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
             return self.clone();
         }
 
-        let sf = self.decimals.scaling_factor::<M>();
+        let sf = scaling_factor::<M>(self.decimals.num_decimals());
         // Multiply by sf^(k-1) before rooting so the decimal position is preserved.
         // For k==0, the check in BigUint::nth_root handles the error signal.
         let scaled = &self.data * &sf.pow(k.saturating_sub(1));

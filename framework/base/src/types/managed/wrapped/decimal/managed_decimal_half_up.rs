@@ -4,7 +4,7 @@ use multiversx_sc_abi::Sign;
 
 use crate::api::ManagedTypeApi;
 
-use super::{Decimals, ManagedDecimal, ManagedDecimalSigned};
+use super::{Decimals, ManagedDecimal, ManagedDecimalSigned, scaling_factor::scaling_factor};
 
 impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
     /// Multiplies two decimals with half-up rounding to a target precision.
@@ -37,7 +37,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
         let product = scaled_a.data * scaled_b.data;
 
         // Half-up rounding at precision
-        let scale = precision.scaling_factor();
+        let scale = scaling_factor::<M>(precision.num_decimals());
         let half_scaled = scale.deref().clone() / 2u64;
 
         // Round half-up
@@ -73,7 +73,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimal<M, D1> {
 
         // Perform division in BigUint
         let scale: crate::types::ManagedRef<'_, M, crate::types::BigUint<M>> =
-            precision.scaling_factor();
+            scaling_factor::<M>(precision.num_decimals());
         let numerator = scaled_a.data * &*scale;
         let denominator = scaled_b.data;
 
@@ -118,7 +118,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
         let product = scaled_a.data * scaled_b.data;
 
         // Half-up rounding at precision
-        let scale = precision.scaling_factor();
+        let scale = scaling_factor::<M>(precision.num_decimals());
         let half_scaled = (scale.deref().clone() / 2u64).into_big_int();
 
         // Sign-aware "away-from-zero" rounding
@@ -164,7 +164,7 @@ impl<M: ManagedTypeApi, D1: Decimals> ManagedDecimalSigned<M, D1> {
         let scaled_a = self.rescale(precision.clone());
         let scaled_b = other.rescale(precision.clone());
 
-        let scale = precision.scaling_factor();
+        let scale = scaling_factor::<M>(precision.num_decimals());
         let numerator = scaled_a.data * scale.as_big_int();
         let denominator = scaled_b.data;
 
