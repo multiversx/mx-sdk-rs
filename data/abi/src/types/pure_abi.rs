@@ -12,7 +12,6 @@ mod fungible_payment_abi;
 mod list_abi;
 mod non_zero_big_uint_abi;
 mod payment_abi;
-mod sign_abi;
 mod string_abi;
 mod token_id_abi;
 
@@ -30,6 +29,5 @@ pub use fungible_payment_abi::FungiblePaymentAbi;
 pub use list_abi::{BytesAbi, ListAbi};
 pub use non_zero_big_uint_abi::NonZeroBigUintAbi;
 pub use payment_abi::PaymentAbi;
-pub use sign_abi::SignAbi;
 pub use string_abi::StringAbi;
 pub use token_id_abi::TokenIdAbi;

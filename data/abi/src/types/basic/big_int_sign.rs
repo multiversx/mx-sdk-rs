@@ -3,7 +3,7 @@ use crate::codec::{
     NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-use crate::abi::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{TypeAbi, TypeAbiFrom, TypeName};
 
 // BigInt sign.
 #[allow(clippy::enum_variant_names)]
@@ -83,7 +83,7 @@ impl TypeAbiFrom<Self> for Sign {}
 
 impl TypeAbi for Sign {
     type Unmanaged = Self;
-    type Abi = crate::abi::SignAbi;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         TypeName::from("Sign")

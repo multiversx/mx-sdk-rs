@@ -3,7 +3,10 @@ use multiversx_sc_codec::{
     TopEncodeOutput, Vec,
 };
 
-use super::*;
+use crate::{
+    ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents, TypeDescription,
+    TypeDescriptionContainer, TypeName,
+};
 
 const COMPLETED_STR: &str = "completed";
 const INTERRUPTED_STR: &str = "interrupted";

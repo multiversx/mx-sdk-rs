@@ -1,3 +1,5 @@
+use multiversx_sc_abi::Sign;
+
 use super::ManagedDecimalSigned;
 use super::decimals::{Decimals, LnDecimals};
 use super::{ManagedDecimal, NumDecimals};
@@ -6,7 +8,7 @@ use crate::types::ManagedRef;
 use crate::{
     api::ManagedTypeApi,
     contract_base::ErrorHelper,
-    types::{BigInt, BigUint, Sign},
+    types::{BigInt, BigUint},
 };
 
 fn compute_ln<M: ManagedTypeApi>(

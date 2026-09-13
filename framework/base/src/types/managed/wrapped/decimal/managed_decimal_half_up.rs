@@ -1,6 +1,8 @@
 use core::ops::Deref;
 
-use crate::{api::ManagedTypeApi, types::Sign};
+use multiversx_sc_abi::Sign;
+
+use crate::api::ManagedTypeApi;
 
 use super::{Decimals, ManagedDecimal, ManagedDecimalSigned};
 

@@ -1,3 +1,5 @@
+use multiversx_sc_abi::Sign;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
@@ -9,7 +11,7 @@ use crate::{
     typenum::{U4, U8, Unsigned},
     types::{
         BigFloat, BigInt, BigUint, ManagedBufferCachedBuilder, ManagedRef, ManagedVecItem,
-        ManagedVecItemPayloadBuffer, Ref, Sign, managed_vec_item_read_from_payload_index,
+        ManagedVecItemPayloadBuffer, Ref, managed_vec_item_read_from_payload_index,
         managed_vec_item_save_to_payload_index,
     },
 };
