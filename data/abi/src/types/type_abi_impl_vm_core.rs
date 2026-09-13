@@ -25,7 +25,7 @@ impl TypeAbiFrom<Self> for Address {}
 
 impl TypeAbi for Address {
     type Unmanaged = Self;
-    type Abi = AddressAbi;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "Address".into()

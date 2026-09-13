@@ -3,7 +3,7 @@
 
 /// Generates the `AbiProvider` (`fn abi() -> ContractAbi`) for a contract-like trait, with no
 /// dependency on `multiversx-sc`/`VMApi`. Meant for traits written directly against pure ABI
-/// types (e.g. `BigUintAbi`, `AddressAbi`, ...), so unlike `#[multiversx_sc::contract]` there is
+/// types (e.g. `BigUintAbi`, `Address`, ...), so unlike `#[multiversx_sc::contract]` there is
 /// no managed-type substitution step.
 ///
 /// Pass `call = ProxyName` to also generate a call proxy (`ProxyName` / `ProxyNameMethods`),

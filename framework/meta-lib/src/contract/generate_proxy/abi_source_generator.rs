@@ -91,7 +91,7 @@ impl<'a> AbiSourceGenerator<'a> {
         }
 
         // The primary source for everything this file needs - the ABI marker types (`BigUintAbi`,
-        // `AddressAbi`, ...), `AbiProxyTrait`/`ProxyArg`/`IntoXxx`, the codec traits, and the
+        // `Address`, ...), `AbiProxyTrait`/`ProxyArg`/`IntoXxx`, the codec traits, and the
         // `#[multiversx_sc_abi::contract_abi(...)]` macro - kept deliberately free of any `multiversx-sc`/`VMApi`
         // dependency. A glob import costs nothing when a mode/file doesn't end up using part of
         // it (e.g. `contract_abi` in Raw mode).
@@ -591,7 +591,7 @@ impl<'a> AbiSourceGenerator<'a> {
 
     /// Unlike `ProxyGenerator` (which reconstructs real, encodable managed types and so keeps
     /// the original `TopEncode`/`TopDecode`/`Clone`/`Debug`/... derives), these local
-    /// definitions only ever compose pure ABI marker types (`BigUintAbi`, `AddressAbi`,
+    /// definitions only ever compose pure ABI marker types (`BigUintAbi`, `Address`,
     /// `ListAbi<T>`, ...), which themselves derive *nothing* beyond `TypeAbi` — they're never
     /// instantiated, only used as type-level markers (e.g. `ProxyArg<BigUintAbi>`). `TypeAbi`
     /// has no `TopEncode`/`Clone`/etc. bound, so `#[type_abi]` alone is both sufficient and the

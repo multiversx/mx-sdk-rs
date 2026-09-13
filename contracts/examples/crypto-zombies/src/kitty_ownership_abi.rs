@@ -14,15 +14,15 @@ use multiversx_sc_abi::imports::*;
 pub trait KittyOwnership {
     #[allow_multiple_var_args]
     #[init]
-    fn init(&self, birth_fee: BigUintAbi, opt_gene_science_contract_address: OptionalValue<AddressAbi>, opt_kitty_auction_contract_address: OptionalValue<AddressAbi>);
+    fn init(&self, birth_fee: BigUintAbi, opt_gene_science_contract_address: OptionalValue<Address>, opt_kitty_auction_contract_address: OptionalValue<Address>);
 
     #[only_owner]
     #[endpoint(setGeneScienceContractAddress)]
-    fn set_gene_science_contract_address_endpoint(&self, address: AddressAbi);
+    fn set_gene_science_contract_address_endpoint(&self, address: Address);
 
     #[only_owner]
     #[endpoint(setKittyAuctionContractAddress)]
-    fn set_kitty_auction_contract_address_endpoint(&self, address: AddressAbi);
+    fn set_kitty_auction_contract_address_endpoint(&self, address: Address);
 
     #[only_owner]
     #[endpoint(claim)]
@@ -32,28 +32,28 @@ pub trait KittyOwnership {
     fn total_supply(&self) -> u32;
 
     #[view(balanceOf)]
-    fn balance_of(&self, address: AddressAbi) -> u32;
+    fn balance_of(&self, address: Address) -> u32;
 
     #[view(ownerOf)]
-    fn owner_of(&self, kitty_id: u32) -> AddressAbi;
+    fn owner_of(&self, kitty_id: u32) -> Address;
 
     #[endpoint(approve)]
-    fn approve(&self, to: AddressAbi, kitty_id: u32);
+    fn approve(&self, to: Address, kitty_id: u32);
 
     #[endpoint(transfer)]
-    fn transfer(&self, to: AddressAbi, kitty_id: u32);
+    fn transfer(&self, to: Address, kitty_id: u32);
 
     #[endpoint(transfer_from)]
-    fn transfer_from(&self, from: AddressAbi, to: AddressAbi, kitty_id: u32);
+    fn transfer_from(&self, from: Address, to: Address, kitty_id: u32);
 
     #[view(tokensOfOwner)]
-    fn tokens_of_owner(&self, address: AddressAbi) -> MultiValueVec<u32>;
+    fn tokens_of_owner(&self, address: Address) -> MultiValueVec<u32>;
 
     #[endpoint(allowAuctioning)]
-    fn allow_auctioning(&self, by: AddressAbi, kitty_id: u32);
+    fn allow_auctioning(&self, by: Address, kitty_id: u32);
 
     #[endpoint(approveSiringAndReturnKitty)]
-    fn approve_siring_and_return_kitty(&self, approved_address: AddressAbi, kitty_owner: AddressAbi, kitty_id: u32);
+    fn approve_siring_and_return_kitty(&self, approved_address: Address, kitty_owner: Address, kitty_id: u32);
 
     #[endpoint(createGenZeroKitty)]
     fn create_gen_zero_kitty(&self) -> u32;
@@ -71,7 +71,7 @@ pub trait KittyOwnership {
     fn can_breed_with(&self, matron_id: u32, sire_id: u32) -> bool;
 
     #[endpoint(approveSiring)]
-    fn approve_siring(&self, address: AddressAbi, kitty_id: u32);
+    fn approve_siring(&self, address: Address, kitty_id: u32);
 
     #[payable("EGLD")]
     #[endpoint(breedWith)]

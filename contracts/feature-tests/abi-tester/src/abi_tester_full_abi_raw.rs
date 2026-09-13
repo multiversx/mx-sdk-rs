@@ -97,7 +97,7 @@ pub struct EsdtTokenData {
     pub hash: BytesAbi,
     pub name: BytesAbi,
     pub attributes: BytesAbi,
-    pub creator: AddressAbi,
+    pub creator: Address,
     pub royalties: BigUintAbi,
     pub uris: ListAbi<BytesAbi>,
 }
@@ -371,12 +371,12 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn address_vs_h256<Arg0: ProxyArg<AddressAbi>, Arg1: ProxyArg<H256>>(
+    pub fn address_vs_h256<Arg0: ProxyArg<Address>, Arg1: ProxyArg<H256>>(
         self,
         address: Arg0, h256: Arg1
-    ) -> <T as IntoCall<NotPayable, MultiValue2<AddressAbi, H256>>>::Out
+    ) -> <T as IntoCall<NotPayable, MultiValue2<Address, H256>>>::Out
     where
-        T: IntoCall<NotPayable, MultiValue2<AddressAbi, H256>>,
+        T: IntoCall<NotPayable, MultiValue2<Address, H256>>,
     {
         self.base_tx
             .into_call(NotPayable, "address_vs_h256")
@@ -387,12 +387,12 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn managed_address_vs_byte_array<Arg0: ProxyArg<AddressAbi>, Arg1: ProxyArg<[u8; 32]>>(
+    pub fn managed_address_vs_byte_array<Arg0: ProxyArg<Address>, Arg1: ProxyArg<[u8; 32]>>(
         self,
         address: Arg0, byte_array: Arg1
-    ) -> <T as IntoCall<NotPayable, MultiValue2<AddressAbi, [u8; 32]>>>::Out
+    ) -> <T as IntoCall<NotPayable, MultiValue2<Address, [u8; 32]>>>::Out
     where
-        T: IntoCall<NotPayable, MultiValue2<AddressAbi, [u8; 32]>>,
+        T: IntoCall<NotPayable, MultiValue2<Address, [u8; 32]>>,
     {
         self.base_tx
             .into_call(NotPayable, "managed_address_vs_byte_array")

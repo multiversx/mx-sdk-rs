@@ -1,7 +1,7 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::{
-    abi::{AddressAbi, TypeAbi, TypeAbiFrom, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{ManagedTypeApi, RawHandle, use_raw_handle},
     codec::{
         DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -272,7 +272,7 @@ where
     M: ManagedTypeApi,
 {
     type Unmanaged = crate::types::heap::Address;
-    type Abi = crate::abi::AddressAbi;
+    type Abi = crate::types::heap::Address;
 
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
@@ -311,6 +311,3 @@ impl<M> TypeAbiFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}
-
-impl<M: ManagedTypeApi> TypeAbiFrom<ManagedAddress<M>> for AddressAbi {}
-impl<M: ManagedTypeApi> TypeAbiFrom<&ManagedAddress<M>> for AddressAbi {}

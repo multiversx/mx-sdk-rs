@@ -97,7 +97,7 @@ pub struct EsdtTokenData {
     pub hash: BytesAbi,
     pub name: BytesAbi,
     pub attributes: BytesAbi,
-    pub creator: AddressAbi,
+    pub creator: Address,
     pub royalties: BigUintAbi,
     pub uris: ListAbi<BytesAbi>,
 }
@@ -233,10 +233,10 @@ pub trait AbiTester {
     fn optional_result(&self) -> OptionalValue<OnlyShowsUpAsNested07>;
 
     #[endpoint(address_vs_h256)]
-    fn address_vs_h256(&self, address: AddressAbi, h256: H256) -> MultiValue2<AddressAbi, H256>;
+    fn address_vs_h256(&self, address: Address, h256: H256) -> MultiValue2<Address, H256>;
 
     #[endpoint(managed_address_vs_byte_array)]
-    fn managed_address_vs_byte_array(&self, address: AddressAbi, byte_array: [u8; 32]) -> MultiValue2<AddressAbi, [u8; 32]>;
+    fn managed_address_vs_byte_array(&self, address: Address, byte_array: [u8; 32]) -> MultiValue2<Address, [u8; 32]>;
 
     #[endpoint(process_managed_decimal)]
     fn process_managed_decimal(&self, input: DecimalConstAbi<U10>) -> DecimalAbi;

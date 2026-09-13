@@ -1,4 +1,3 @@
-mod address_abi;
 mod big_float_abi;
 mod big_int_abi;
 mod big_uint_abi;
@@ -15,7 +14,6 @@ mod payment_abi;
 mod string_abi;
 mod token_id_abi;
 
-pub use address_abi::AddressAbi;
 pub use big_float_abi::BigFloatAbi;
 pub use big_int_abi::BigIntAbi;
 pub use big_uint_abi::BigUintAbi;
