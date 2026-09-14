@@ -7,7 +7,7 @@ pub struct TypeNames {
     pub specific: Option<alloc::string::String>,
     /// The pure (framework-agnostic) Rust type name, i.e. `<Self::Abi as TypeAbi>::type_name_rust()`.
     /// Not part of the JSON ABI — used only by sc-meta's proxy/abi-trait source generators.
-    pub pure_rust: alloc::string::String,
+    pub abi_rust: alloc::string::String,
 }
 
 impl TypeNames {
@@ -16,7 +16,7 @@ impl TypeNames {
             abi: alloc::string::String::new(),
             rust: alloc::string::String::new(),
             specific: None,
-            pure_rust: alloc::string::String::new(),
+            abi_rust: alloc::string::String::new(),
         }
     }
 
@@ -25,7 +25,7 @@ impl TypeNames {
             abi: abi_name,
             rust: alloc::string::String::new(),
             specific: None,
-            pure_rust: alloc::string::String::new(),
+            abi_rust: alloc::string::String::new(),
         }
     }
 

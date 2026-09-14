@@ -151,7 +151,7 @@ impl StructFieldDescriptionJson {
                 abi: self.field_type.clone(),
                 rust: "<unspecified>".into(),
                 specific: None,
-                pure_rust: String::new(),
+                abi_rust: String::new(),
             },
         }
     }

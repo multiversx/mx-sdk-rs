@@ -115,7 +115,7 @@ impl<'a> AbiSourceGenerator<'a> {
         if let Some(resolved) = self.resolve_local_type(&type_names.abi, &type_names.rust) {
             return resolved;
         }
-        self.clean_local_paths(&type_names.pure_rust)
+        self.clean_local_paths(&type_names.abi_rust)
     }
 
     /// If `abi_name` denotes a type this generator would otherwise define locally (see
@@ -417,10 +417,10 @@ impl<'a> AbiSourceGenerator<'a> {
 
         for endpoint in Self::exported_endpoints(self.proxy_config) {
             for input in &endpoint.inputs {
-                stack.extend(self.top_level_abi_candidates(&input.type_names.pure_rust));
+                stack.extend(self.top_level_abi_candidates(&input.type_names.abi_rust));
             }
             for output in &endpoint.outputs {
-                stack.extend(self.top_level_abi_candidates(&output.type_names.pure_rust));
+                stack.extend(self.top_level_abi_candidates(&output.type_names.abi_rust));
             }
         }
         for event in &self.proxy_config.abi.events {
@@ -451,14 +451,13 @@ impl<'a> AbiSourceGenerator<'a> {
             match &desc.contents {
                 TypeContents::Struct(fields) => {
                     for field in fields {
-                        stack.extend(self.top_level_abi_candidates(&field.field_type.pure_rust));
+                        stack.extend(self.top_level_abi_candidates(&field.field_type.abi_rust));
                     }
                 }
                 TypeContents::Enum(variants) => {
                     for variant in variants {
                         for field in &variant.fields {
-                            stack
-                                .extend(self.top_level_abi_candidates(&field.field_type.pure_rust));
+                            stack.extend(self.top_level_abi_candidates(&field.field_type.abi_rust));
                         }
                     }
                 }
