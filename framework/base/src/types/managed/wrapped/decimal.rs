@@ -1,4 +1,3 @@
-mod decimals;
 mod managed_decimal;
 mod managed_decimal_cmp;
 mod managed_decimal_cmp_signed;
@@ -15,6 +14,7 @@ mod managed_decimal_op_sub_signed;
 mod managed_decimal_signed;
 pub(crate) mod scaling_factor;
 
-pub use decimals::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};
 pub use managed_decimal::ManagedDecimal;
 pub use managed_decimal_signed::ManagedDecimalSigned;
+
+pub use multiversx_sc_abi::{ConstDecimals, Decimals, EgldDecimals, LnDecimals, NumDecimals};

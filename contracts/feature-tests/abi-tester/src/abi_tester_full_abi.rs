@@ -187,7 +187,7 @@ pub enum ExplicitDiscriminantMixed {
 
 #[type_abi]
 pub struct ManagedDecimalWrapper {
-    pub field: DecimalConstAbi<U2>,
+    pub field: DecimalAbi<ConstDecimals<U2>>,
 }
 
 #[rustfmt::skip]
@@ -239,7 +239,7 @@ pub trait AbiTester {
     fn managed_address_vs_byte_array(&self, address: Address, byte_array: [u8; 32]) -> MultiValue2<Address, [u8; 32]>;
 
     #[endpoint(process_managed_decimal)]
-    fn process_managed_decimal(&self, input: DecimalConstAbi<U10>) -> DecimalAbi;
+    fn process_managed_decimal(&self, input: DecimalAbi<ConstDecimals<U10>>) -> DecimalAbi<NumDecimals>;
 
     #[endpoint(esdt_local_role)]
     fn esdt_local_role(&self) -> EsdtLocalRole;

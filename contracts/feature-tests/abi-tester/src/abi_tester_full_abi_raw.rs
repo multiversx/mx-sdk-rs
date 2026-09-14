@@ -187,7 +187,7 @@ pub enum ExplicitDiscriminantMixed {
 
 #[type_abi]
 pub struct ManagedDecimalWrapper {
-    pub field: DecimalConstAbi<U2>,
+    pub field: DecimalAbi<ConstDecimals<U2>>,
 }
 pub struct AbiTesterProxy;
 
@@ -403,12 +403,12 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn process_managed_decimal<Arg0: ProxyArg<DecimalConstAbi<U10>>>(
+    pub fn process_managed_decimal<Arg0: ProxyArg<DecimalAbi<ConstDecimals<U10>>>>(
         self,
         input: Arg0
-    ) -> <T as IntoCall<NotPayable, DecimalAbi>>::Out
+    ) -> <T as IntoCall<NotPayable, DecimalAbi<NumDecimals>>>::Out
     where
-        T: IntoCall<NotPayable, DecimalAbi>,
+        T: IntoCall<NotPayable, DecimalAbi<NumDecimals>>,
     {
         self.base_tx
             .into_call(NotPayable, "process_managed_decimal")

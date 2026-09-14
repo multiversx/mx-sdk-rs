@@ -1,19 +1,24 @@
-use crate::{TypeAbi, TypeAbiFrom, TypeName};
+use crate::{ConstDecimals, Decimals, NumDecimals, TypeAbi, TypeAbiFrom, TypeName};
 use alloc::format;
 use core::marker::PhantomData;
 use typenum::Unsigned;
 
-/// Pure ABI counterpart of `ManagedDecimal<M, NumDecimals>` (variable number of decimals).
+/// Pure ABI counterpart of `ManagedDecimal<M, D>`.
 ///
-/// Provides a stable, framework-agnostic type representation for fixed-point decimals
-/// with a runtime-determined number of decimal places.
+/// Provides a stable, framework-agnostic type representation for fixed-point decimals.
 /// Using this type ensures ABI compatibility across multiple versions of the framework
 /// or across different framework implementations entirely.
-pub struct DecimalAbi;
+///
+/// Mirrors `ManagedDecimal`'s own `D: Decimals` type parameter, so that `DecimalAbi<NumDecimals>`
+/// and `DecimalAbi<ConstDecimals<DECIMALS>>` map directly to `ManagedDecimal<M, NumDecimals>`
+/// and `ManagedDecimal<M, ConstDecimals<DECIMALS>>` respectively.
+pub struct DecimalAbi<D: Decimals> {
+    _phantom: PhantomData<D>,
+}
 
-impl TypeAbiFrom<Self> for DecimalAbi {}
+impl<D: Decimals> TypeAbiFrom<Self> for DecimalAbi<D> {}
 
-impl TypeAbi for DecimalAbi {
+impl TypeAbi for DecimalAbi<NumDecimals> {
     type Unmanaged = Self;
     type Abi = Self;
 
@@ -22,29 +27,11 @@ impl TypeAbi for DecimalAbi {
     }
 
     fn type_name_rust() -> TypeName {
-        TypeName::from("DecimalAbi")
+        TypeName::from("DecimalAbi<NumDecimals>")
     }
 }
 
-/// Pure ABI counterpart of `ManagedDecimal<M, ConstDecimals<DECIMALS>>` (compile-time fixed number of decimals).
-///
-/// The type-level number `DECIMALS` encodes the number of decimal places at the type level,
-/// mirroring `ConstDecimals<DECIMALS>`'s own `Unsigned` type parameter - unlike a plain
-/// `const usize` parameter, this can be substituted directly from `ManagedDecimal`'s own
-/// `DECIMALS: Unsigned` type parameter in its `TypeAbi::Abi` projection, with no const-generic
-/// conversion (which would require the unstable `generic_const_exprs` feature).
-///
-/// Provides a stable, framework-agnostic type representation for fixed-point decimals
-/// with a compile-time-fixed number of decimal places.
-/// Using this type ensures ABI compatibility across multiple versions of the framework
-/// or across different framework implementations entirely.
-pub struct DecimalConstAbi<DECIMALS: Unsigned> {
-    _phantom: PhantomData<DECIMALS>,
-}
-
-impl<DECIMALS: Unsigned> TypeAbiFrom<Self> for DecimalConstAbi<DECIMALS> {}
-
-impl<DECIMALS: Unsigned> TypeAbi for DecimalConstAbi<DECIMALS> {
+impl<DECIMALS: Unsigned> TypeAbi for DecimalAbi<ConstDecimals<DECIMALS>> {
     type Unmanaged = Self;
     type Abi = Self;
 
@@ -53,6 +40,6 @@ impl<DECIMALS: Unsigned> TypeAbi for DecimalConstAbi<DECIMALS> {
     }
 
     fn type_name_rust() -> TypeName {
-        format!("DecimalConstAbi<U{}>", DECIMALS::to_usize())
+        format!("DecimalAbi<ConstDecimals<U{}>>", DECIMALS::to_usize())
     }
 }

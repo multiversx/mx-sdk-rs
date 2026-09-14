@@ -1,9 +1,8 @@
 use multiversx_sc_abi::Sign;
 
 use super::ManagedDecimalSigned;
-use super::decimals::{Decimals, LnDecimals};
 use super::scaling_factor::scaling_factor;
-use super::{ManagedDecimal, NumDecimals};
+use super::{Decimals, LnDecimals, ManagedDecimal, NumDecimals};
 
 use crate::types::ManagedRef;
 use crate::{

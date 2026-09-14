@@ -3,7 +3,7 @@ use core::{
     ops::{Add, Sub},
 };
 
-use crate::typenum::{U9, U18, Unsigned};
+use typenum::{U9, U18, Unsigned};
 
 /// Decimals are represented as usize. This type is also used as variable decimals.
 pub type NumDecimals = usize;
@@ -73,5 +73,35 @@ where
     type Output = ConstDecimals<<DEC1 as Sub<DEC2>>::Output>;
     fn sub(self, _rhs: ConstDecimals<DEC2>) -> Self::Output {
         ConstDecimals::new()
+    }
+}
+
+// Mixed const/variable combinations always resolve to a variable number of decimals,
+// since the number of decimals can no longer be known at compile time.
+impl<DECIMALS: Unsigned> Add<ConstDecimals<DECIMALS>> for NumDecimals {
+    type Output = NumDecimals;
+    fn add(self, rhs: ConstDecimals<DECIMALS>) -> Self::Output {
+        self + rhs.num_decimals()
+    }
+}
+
+impl<DECIMALS: Unsigned> Add<NumDecimals> for ConstDecimals<DECIMALS> {
+    type Output = NumDecimals;
+    fn add(self, rhs: NumDecimals) -> Self::Output {
+        self.num_decimals() + rhs
+    }
+}
+
+impl<DECIMALS: Unsigned> Sub<ConstDecimals<DECIMALS>> for NumDecimals {
+    type Output = NumDecimals;
+    fn sub(self, rhs: ConstDecimals<DECIMALS>) -> Self::Output {
+        self - rhs.num_decimals()
+    }
+}
+
+impl<DECIMALS: Unsigned> Sub<NumDecimals> for ConstDecimals<DECIMALS> {
+    type Output = NumDecimals;
+    fn sub(self, rhs: NumDecimals) -> Self::Output {
+        self.num_decimals() - rhs
     }
 }
