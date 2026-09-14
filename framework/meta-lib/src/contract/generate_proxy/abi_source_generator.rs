@@ -1,4 +1,7 @@
-use std::fmt::Display;
+use std::{
+    collections::{HashSet, VecDeque},
+    fmt::Display,
+};
 
 use multiversx_sc::abi::{
     EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, EnumVariantDescription, OutputAbi,
@@ -411,61 +414,79 @@ impl<'a> AbiSourceGenerator<'a> {
     /// account either. Without this, a struct that's ONLY ever reachable through a renamed type
     /// (e.g. `Color`, reachable only through a renamed `Kitty`) would still get emitted here as
     /// orphaned, unreferenced dead code.
-    fn reachable_local_abi_names(&self) -> std::collections::HashSet<String> {
-        let mut reachable = std::collections::HashSet::new();
-        let mut stack: Vec<String> = Vec::new();
+    ///
+    /// Driven by a queue of not-yet-examined type-name strings: each one is broken into candidate
+    /// bare names (`top_level_abi_candidates`) and resolved straight against the full
+    /// `TypeDescription`s already sitting in `type_descriptions` - no separate bookkeeping of
+    /// "types found so far" beyond the `reachable` set itself, since that container already knows
+    /// every locally-described type there is.
+    fn reachable_local_abi_names(&self) -> HashSet<String> {
+        let mut reachable = HashSet::new();
+        let mut queue: VecDeque<String> = VecDeque::new();
 
         for endpoint in Self::exported_endpoints(self.proxy_config) {
-            for input in &endpoint.inputs {
-                stack.extend(self.top_level_abi_candidates(&input.type_names.abi_rust));
-            }
-            for output in &endpoint.outputs {
-                stack.extend(self.top_level_abi_candidates(&output.type_names.abi_rust));
-            }
+            queue.extend(
+                endpoint
+                    .inputs
+                    .iter()
+                    .map(|i| i.type_names.abi_rust.clone()),
+            );
+            queue.extend(
+                endpoint
+                    .outputs
+                    .iter()
+                    .map(|o| o.type_names.abi_rust.clone()),
+            );
         }
         for event in &self.proxy_config.abi.events {
-            for input in &event.inputs {
-                stack.extend(self.top_level_abi_candidates(&input.type_name));
-            }
+            queue.extend(event.inputs.iter().map(|i| i.type_name.clone()));
         }
-        for esdt_attribute in &self.proxy_config.abi.esdt_attributes {
-            stack.extend(self.top_level_abi_candidates(&esdt_attribute.ty));
-        }
+        queue.extend(
+            self.proxy_config
+                .abi
+                .esdt_attributes
+                .iter()
+                .map(|esdt_attribute| esdt_attribute.ty.clone()),
+        );
 
-        while let Some(abi_name) = stack.pop() {
-            if reachable.contains(&abi_name) {
-                continue;
-            }
-            let Some(desc) = self.proxy_config.abi.type_descriptions.find(&abi_name) else {
-                continue;
-            };
-            if !desc.contents.is_specified() {
-                continue;
-            }
-            if self.path_rename_for(&abi_name, &desc.names.rust).is_some() {
-                continue; // redirected elsewhere - don't emit, don't descend into its fields
-            }
-
-            reachable.insert(abi_name);
-
-            match &desc.contents {
-                TypeContents::Struct(fields) => {
-                    for field in fields {
-                        stack.extend(self.top_level_abi_candidates(&field.field_type.abi_rust));
-                    }
+        while let Some(type_name) = queue.pop_front() {
+            for abi_name in self.top_level_abi_candidates(&type_name) {
+                if reachable.contains(&abi_name) {
+                    continue;
                 }
-                TypeContents::Enum(variants) => {
-                    for variant in variants {
-                        for field in &variant.fields {
-                            stack.extend(self.top_level_abi_candidates(&field.field_type.abi_rust));
-                        }
-                    }
+                let Some(desc) = self.proxy_config.abi.type_descriptions.find(&abi_name) else {
+                    continue;
+                };
+                if !desc.contents.is_specified() {
+                    continue;
                 }
-                TypeContents::ExplicitEnum(_) | TypeContents::NotSpecified => {}
+                if self.path_rename_for(&abi_name, &desc.names.rust).is_some() {
+                    continue; // redirected elsewhere - don't emit, don't descend into its fields
+                }
+
+                reachable.insert(abi_name);
+                queue.extend(Self::field_type_names(&desc.contents));
             }
         }
 
         reachable
+    }
+
+    /// The `abi_rust` type name of every field directly nested in a struct/enum's contents (both
+    /// variant tuple and struct-style fields), fed back into `reachable_local_abi_names`'s queue.
+    fn field_type_names(contents: &TypeContents) -> Vec<String> {
+        match contents {
+            TypeContents::Struct(fields) => fields
+                .iter()
+                .map(|f| f.field_type.abi_rust.clone())
+                .collect(),
+            TypeContents::Enum(variants) => variants
+                .iter()
+                .flat_map(|variant| &variant.fields)
+                .map(|f| f.field_type.abi_rust.clone())
+                .collect(),
+            TypeContents::ExplicitEnum(_) | TypeContents::NotSpecified => Vec::new(),
+        }
     }
 
     /// Extracts the bare names of every type embedded in a rust-ish type name (itself, if it's a
