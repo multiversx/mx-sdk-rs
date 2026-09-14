@@ -91,10 +91,6 @@ pub trait TypeAbi: TypeAbiFrom<Self> {
     }
 }
 
-pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
-    format!("variadic<{}>", T::type_name())
-}
-
 pub fn type_name_multi_value_encoded<T: TypeAbi>() -> TypeName {
     format!("MultiValueEncoded<$API, {}>", T::type_name_rust())
 }

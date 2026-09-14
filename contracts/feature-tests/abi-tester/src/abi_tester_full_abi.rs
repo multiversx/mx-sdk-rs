@@ -221,10 +221,10 @@ pub trait AbiTester {
     fn multi_result_4(&self) -> MultiValue4<i32, [u8; 3], BytesAbi, OnlyShowsUpAsNested03>;
 
     #[endpoint(var_args)]
-    fn var_args(&self, _simple_arg: u32, _var_args: MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>);
+    fn var_args(&self, _simple_arg: u32, _var_args: VariadicAbi<MultiValue2<OnlyShowsUpAsNested04, i32>>);
 
     #[endpoint(multi_result_vec)]
-    fn multi_result_vec(&self) -> MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>;
+    fn multi_result_vec(&self) -> VariadicAbi<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>;
 
     #[endpoint(optional_arg)]
     fn optional_arg(&self, _simple_arg: u32, _opt_args: OptionalValue<OnlyShowsUpAsNested06>);

@@ -4,7 +4,7 @@ use multiversx_sc_codec::{
 };
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{BytesAbi, TypeAbi, TypeAbiFrom, TypeName, VariadicAbi},
     api::{
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
         ManagedTypeApi,
@@ -137,10 +137,10 @@ where
     Api: ManagedTypeApi,
 {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = VariadicAbi<BytesAbi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

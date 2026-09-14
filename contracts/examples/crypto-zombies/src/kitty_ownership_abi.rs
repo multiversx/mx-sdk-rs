@@ -47,7 +47,7 @@ pub trait KittyOwnership {
     fn transfer_from(&self, from: Address, to: Address, kitty_id: u32);
 
     #[view(tokensOfOwner)]
-    fn tokens_of_owner(&self, address: Address) -> MultiValueVec<u32>;
+    fn tokens_of_owner(&self, address: Address) -> VariadicAbi<u32>;
 
     #[endpoint(allowAuctioning)]
     fn allow_auctioning(&self, by: Address, kitty_id: u32);

@@ -311,7 +311,7 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn var_args<Arg0: ProxyArg<u32>, Arg1: ProxyArg<MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>>>(
+    pub fn var_args<Arg0: ProxyArg<u32>, Arg1: ProxyArg<VariadicAbi<MultiValue2<OnlyShowsUpAsNested04, i32>>>>(
         self,
         _simple_arg: Arg0, _var_args: Arg1
     ) -> <T as IntoCall<NotPayable, ()>>::Out
@@ -330,9 +330,9 @@ impl<T> AbiTesterProxyMethods<T> {
     pub fn multi_result_vec<>(
         self,
         
-    ) -> <T as IntoCall<NotPayable, MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>>>::Out
+    ) -> <T as IntoCall<NotPayable, VariadicAbi<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>>>::Out
     where
-        T: IntoCall<NotPayable, MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>>,
+        T: IntoCall<NotPayable, VariadicAbi<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>>,
     {
         self.base_tx
             .into_call(NotPayable, "multi_result_vec")

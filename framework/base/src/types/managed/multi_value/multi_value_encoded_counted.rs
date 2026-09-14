@@ -2,7 +2,7 @@ use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::multi_types::MultiValueVec;
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecode, TopDecodeMulti,
@@ -217,7 +217,7 @@ where
     T: TypeAbi + MultiValueConstLength,
 {
     type Unmanaged = MultiValueVec<T::Unmanaged>;
-    type Abi = MultiValueVec<T::Abi>;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");
@@ -252,6 +252,22 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti + MultiValueConstLength,
     U: TypeAbiFrom<T>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<VariadicAbi<T>> for MultiValueEncodedCounted<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TypeAbi,
+    U: TypeAbiFrom<T> + MultiValueConstLength,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<MultiValueEncodedCounted<M, T>> for VariadicAbi<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti + MultiValueConstLength,
+    U: TypeAbi + TypeAbiFrom<T>,
 {
 }
 

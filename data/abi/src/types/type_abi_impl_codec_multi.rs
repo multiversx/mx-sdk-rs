@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi,
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
@@ -14,10 +14,10 @@ where
 
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
-    type Abi = crate::codec::multi_types::MultiValueVec<T::Abi>;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        super::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

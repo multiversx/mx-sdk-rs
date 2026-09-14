@@ -11,7 +11,7 @@ use super::{
     source::{CurrentStorage, StorageAddress},
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::{ErrorApiImpl, StorageMapperApi},
     storage::StorageKey,
     storage_set,
@@ -282,10 +282,10 @@ where
     SA: StorageMapperApi,
 {
     type Unmanaged = Self;
-    type Abi = Self;
+    type Abi = VariadicAbi<usize>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<usize>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

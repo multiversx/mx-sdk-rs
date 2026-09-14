@@ -13,6 +13,7 @@ mod non_zero_big_uint_abi;
 mod payment_abi;
 mod string_abi;
 mod token_id_abi;
+mod variadic_abi;
 
 pub use big_float_abi::BigFloatAbi;
 pub use big_int_abi::BigIntAbi;
@@ -29,3 +30,4 @@ pub use non_zero_big_uint_abi::NonZeroBigUintAbi;
 pub use payment_abi::PaymentAbi;
 pub use string_abi::StringAbi;
 pub use token_id_abi::TokenIdAbi;
+pub use variadic_abi::VariadicAbi;
