@@ -22,3 +22,9 @@ pub use multiversx_sc_abi::NotPayable;
 
 // Re-exported for backwards compatibility.
 pub use multiversx_sc_abi::ProxyArg;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::OperationCompletionStatus;
+
+// Re-exported for backwards compatibility.
+pub use multiversx_sc_abi::Sign;
