@@ -33,6 +33,24 @@ pub struct ProxyConfigCommon {
     pub add_endpoints: Vec<String>,
 }
 
+impl ProxyConfigCommon {
+    /// Rejects `path-rename` entries with an empty `from`: `PathRename::from` defaults to `""`
+    /// when the field is omitted, which would otherwise make every generated path match (via
+    /// `rust_path.contains("")`) and get silently rewritten.
+    pub fn validate(&self) {
+        if let Some(path_rename) = &self.path_rename {
+            for pr in path_rename {
+                assert!(
+                    !pr.from.is_empty(),
+                    "invalid `path-rename` entry: `from` is missing or empty (`to` = {:?}); \
+                     `from` must be set to the ABI name or path to rename",
+                    pr.to
+                );
+            }
+        }
+    }
+}
+
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(deny_unknown_fields)]
 pub struct ProxyConfigSerde {

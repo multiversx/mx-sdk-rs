@@ -496,6 +496,7 @@ impl ScConfig {
             Ok(raw_contents) => {
                 let config_serde: ScConfigSerde = toml::from_str(&raw_contents)
                     .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {error}"));
+                config_serde.validate();
                 Some(Self::load_from_config(
                     path.as_ref(),
                     &config_serde,

@@ -23,6 +23,22 @@ pub struct ScConfigSerde {
     pub labels_for_contracts: HashMap<String, Vec<String>>,
 }
 
+impl ScConfigSerde {
+    /// Validates fields that plain deserialization cannot enforce, e.g. rejecting
+    /// `path-rename` entries with an empty `from` (see `ProxyConfigCommon::validate`).
+    pub fn validate(&self) {
+        for entry in &self.proxy {
+            entry.common.validate();
+        }
+        for entry in &self.generate_abi {
+            entry.common.validate();
+        }
+        for entry in &self.generate_abi_raw {
+            entry.common.validate();
+        }
+    }
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ContractVariantSerde {
