@@ -14,12 +14,10 @@ use crate::{
 
 use super::{
     ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    GenerateAbiConfigSerde, GenerateAbiRawConfigSerde, ProxyConfigSerde, ProxyFormat, ScConfig,
-    ScConfigSerde,
+    ProxyConfigSerde, ProxyFormat, ScConfig, ScConfigSerde,
     contract_variant_settings::{parse_allocator, parse_stack_size},
     proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
-    sc_config_proxy::{PathRename, ProxyConfigCommon},
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -276,93 +274,27 @@ fn process_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<
     contracts
 }
 
-/// Fields shared by `ProxyConfigSerde`/`GenerateAbiConfigSerde`/`GenerateAbiRawConfigSerde` -
-/// lets `process_proxy_entry`/`alter_builder_with_proxy_config` work uniformly over any of the
-/// three `sc-config.toml` lists (`[[proxy]]`, `[[generate-abi]]`, `[[generate-abi-raw]]`), which
-/// only otherwise differ in the `call` field (`[[generate-abi]]` only) and the `ProxyFormat`
-/// they're processed as.
-struct ProxyEntryCommon<'a> {
-    path: &'a PathBuf,
-    override_import: &'a Option<String>,
-    path_rename: &'a Option<Vec<PathRename>>,
-    variant: &'a Option<String>,
-    add_unlabelled: Option<bool>,
-    add_labels: &'a [String],
-    add_endpoints: &'a [String],
-    call: Option<&'a str>,
-}
-
-impl<'a> ProxyEntryCommon<'a> {
-    fn from_common(c: &'a ProxyConfigCommon, call: Option<&'a str>) -> Self {
-        ProxyEntryCommon {
-            path: &c.path,
-            override_import: &c.override_import,
-            path_rename: &c.path_rename,
-            variant: &c.variant,
-            add_unlabelled: c.add_unlabelled,
-            add_labels: &c.add_labels,
-            add_endpoints: &c.add_endpoints,
-            call,
-        }
-    }
-}
-
-impl<'a> From<&'a ProxyConfigSerde> for ProxyEntryCommon<'a> {
-    fn from(c: &'a ProxyConfigSerde) -> Self {
-        ProxyEntryCommon::from_common(&c.common, None)
-    }
-}
-
-impl<'a> From<&'a GenerateAbiConfigSerde> for ProxyEntryCommon<'a> {
-    fn from(c: &'a GenerateAbiConfigSerde) -> Self {
-        ProxyEntryCommon::from_common(&c.common, c.call.as_deref())
-    }
-}
-
-impl<'a> From<&'a GenerateAbiRawConfigSerde> for ProxyEntryCommon<'a> {
-    fn from(c: &'a GenerateAbiRawConfigSerde) -> Self {
-        ProxyEntryCommon::from_common(&c.common, None)
-    }
-}
-
 fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -> Vec<ProxyConfig> {
     let mut proxy_contracts = Vec::new();
 
     proxy_contracts.push(ProxyConfig::output_dir_proxy_config(original_abi.clone()));
 
-    for proxy_config in &config.proxy {
-        process_proxy_entry(
-            proxy_config.into(),
-            ProxyFormat::Proxy,
-            config,
-            original_abi,
-            &mut proxy_contracts,
-        );
-    }
-    for generate_abi_config in &config.generate_abi {
-        process_proxy_entry(
-            generate_abi_config.into(),
-            ProxyFormat::Abi,
-            config,
-            original_abi,
-            &mut proxy_contracts,
-        );
-    }
-    for generate_abi_raw_config in &config.generate_abi_raw {
-        process_proxy_entry(
-            generate_abi_raw_config.into(),
-            ProxyFormat::AbiRaw,
-            config,
-            original_abi,
-            &mut proxy_contracts,
-        );
+    let lists = [
+        (&config.proxy, ProxyFormat::Proxy),
+        (&config.generate_abi, ProxyFormat::Abi),
+        (&config.generate_abi_raw, ProxyFormat::AbiRaw),
+    ];
+    for (entries, format) in lists {
+        for entry in entries {
+            process_proxy_entry(entry, format, config, original_abi, &mut proxy_contracts);
+        }
     }
 
     proxy_contracts
 }
 
 fn process_proxy_entry(
-    entry: ProxyEntryCommon,
+    entry: &ProxyConfigSerde,
     format: ProxyFormat,
     config: &ScConfigSerde,
     original_abi: &ContractAbi,
@@ -381,14 +313,14 @@ fn process_proxy_entry(
             entry.path_rename.to_owned(),
             original_abi.clone(),
             format,
-            entry.call.map(str::to_owned),
+            entry.call.clone(),
         ));
         return;
     }
 
     let mut contract_builders = HashMap::new();
 
-    match entry.variant {
+    match &entry.variant {
         Some(variant) => {
             let setting_contract = config
                 .contracts
@@ -397,13 +329,13 @@ fn process_proxy_entry(
                 .unwrap_or_else(|| panic!("No contact with this name"));
             let (contract_id, mut contract_builder) =
                 ContractVariantBuilder::map_from_config(setting_contract);
-            alter_builder_with_proxy_config(&entry, &mut contract_builder);
+            alter_builder_with_proxy_config(entry, &mut contract_builder);
 
             contract_builders = HashMap::from([(contract_id, contract_builder)]);
         }
         None => {
             let mut contract_builder = ContractVariantBuilder::default();
-            alter_builder_with_proxy_config(&entry, &mut contract_builder);
+            alter_builder_with_proxy_config(entry, &mut contract_builder);
 
             contract_builders.insert(entry.path.to_string_lossy().to_string(), contract_builder);
         }
@@ -423,7 +355,7 @@ fn process_proxy_entry(
             entry.path_rename.to_owned(),
             contract.abi,
             format,
-            entry.call.map(str::to_owned),
+            entry.call.clone(),
         ));
     }
 }
@@ -449,7 +381,7 @@ impl ScConfig {
 }
 
 fn alter_builder_with_proxy_config(
-    entry: &ProxyEntryCommon,
+    entry: &ProxyConfigSerde,
     contract_builder: &mut ContractVariantBuilder,
 ) {
     let default = ContractVariantBuilder::default();

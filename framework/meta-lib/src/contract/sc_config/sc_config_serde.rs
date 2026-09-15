@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::{GenerateAbiConfigSerde, GenerateAbiRawConfigSerde, ProxyConfigSerde};
+use super::{ProxyConfigSerde, ProxyFormat};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -14,27 +14,26 @@ pub struct ScConfigSerde {
     pub proxy: Vec<ProxyConfigSerde>,
     #[serde(default)]
     #[serde(rename = "generate-abi")]
-    pub generate_abi: Vec<GenerateAbiConfigSerde>,
+    pub generate_abi: Vec<ProxyConfigSerde>,
     #[serde(default)]
     #[serde(rename = "generate-abi-raw")]
-    pub generate_abi_raw: Vec<GenerateAbiRawConfigSerde>,
+    pub generate_abi_raw: Vec<ProxyConfigSerde>,
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,
 }
 
 impl ScConfigSerde {
-    /// Validates fields that plain deserialization cannot enforce, e.g. rejecting
-    /// `path-rename` entries with an empty `from` (see `ProxyConfigCommon::validate`).
+    /// Validates fields that plain deserialization cannot enforce (see `ProxyConfigSerde::validate`).
     pub fn validate(&self) {
         for entry in &self.proxy {
-            entry.common.validate();
+            entry.validate(ProxyFormat::Proxy);
         }
         for entry in &self.generate_abi {
-            entry.common.validate();
+            entry.validate(ProxyFormat::Abi);
         }
         for entry in &self.generate_abi_raw {
-            entry.common.validate();
+            entry.validate(ProxyFormat::AbiRaw);
         }
     }
 }
