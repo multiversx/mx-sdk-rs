@@ -1,8 +1,0 @@
-[[proxy]]
-path = "../kitty-ownership/src/kitty_genetic_alg_proxy.rs"
-[[proxy.path-rename]]
-from = "kitty::kitty"
-to = "kitty"
-[[proxy.path-rename]]
-from = "kitty_genes"
-to = "kitty"

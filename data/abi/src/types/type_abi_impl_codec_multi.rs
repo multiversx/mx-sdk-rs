@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName,
+    OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi,
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
 
@@ -14,9 +14,10 @@ where
 
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        super::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -36,6 +37,7 @@ impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
 
 impl TypeAbi for IgnoreValue {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         TypeName::from("ignore")
@@ -58,6 +60,7 @@ impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     type Unmanaged = OptionalValue<T::Unmanaged>;
+    type Abi = OptionalValue<T::Abi>;
 
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()
@@ -89,6 +92,7 @@ macro_rules! multi_arg_impls {
                 $($t: TypeAbi,)+
             {
                 type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
+                type Abi = crate::codec::multi_types::$mval_struct<$($t::Abi,)+>;
 
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");

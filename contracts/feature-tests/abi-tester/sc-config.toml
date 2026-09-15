@@ -16,3 +16,10 @@ add-endpoints = [
 
 [[proxy]]
 path = "src/abi_proxy.rs"
+
+[[generate-abi]]
+path = "src/abi_tester_full_abi.rs"
+call = "AbiTesterCall"
+
+[[generate-abi-raw]]
+path = "src/abi_tester_full_abi_raw.rs"

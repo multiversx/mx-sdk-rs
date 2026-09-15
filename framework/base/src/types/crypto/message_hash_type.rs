@@ -44,6 +44,7 @@ impl TypeAbiFrom<Self> for MessageHashType {}
 
 impl TypeAbi for MessageHashType {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         "MessageHashType".into()

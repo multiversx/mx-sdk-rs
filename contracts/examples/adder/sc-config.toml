@@ -1,2 +1,0 @@
-[[proxy]]
-path = "src/adder_proxy.rs"

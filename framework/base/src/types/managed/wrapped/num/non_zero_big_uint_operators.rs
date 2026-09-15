@@ -1,7 +1,9 @@
+use multiversx_sc_abi::Sign;
+
 use crate::{
     api::{ManagedTypeApi, quick_signal_error},
     err_msg,
-    types::{BigInt, BigUint, NonZeroBigUint, Sign},
+    types::{BigInt, BigUint, NonZeroBigUint},
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 

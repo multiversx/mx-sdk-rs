@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper, StorageMapperFromAddress};
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::StorageMapperApi,
     codec::{
         self, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
@@ -367,9 +367,10 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     type Unmanaged = Self;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

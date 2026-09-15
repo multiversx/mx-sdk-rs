@@ -328,6 +328,11 @@ where
     T: TopEncode + TopDecode + TypeAbi,
 {
     type Unmanaged = T::Unmanaged;
+    // Matches `type_name()`/`type_name_rust()`/`Unmanaged` below: a `SingleValueMapper<T>`
+    // return type is a local storage-access idiom, not a real wire value (it isn't even
+    // `TopEncode`, only `TopEncodeMulti`, which reads and encodes the current value on the
+    // fly) — its ABI-erased "value type" is `T`'s, not its own.
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
         T::type_name()

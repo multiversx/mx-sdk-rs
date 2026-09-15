@@ -8,7 +8,7 @@ use crate::types::{
     EsdtTokenIdentifier, EsdtTokenPayment, NonZeroBigUint, Payment, PaymentMultiValue, TokenId,
 };
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, MultiValueConstLength, TopDecode, TopDecodeMulti,
@@ -369,9 +369,10 @@ where
     T: TypeAbi,
 {
     type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -400,6 +401,22 @@ where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: TypeAbiFrom<T>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<VariadicAbi<T>> for MultiValueEncoded<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TypeAbi,
+    U: TypeAbiFrom<T>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for VariadicAbi<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbi + TypeAbiFrom<T>,
 {
 }
 

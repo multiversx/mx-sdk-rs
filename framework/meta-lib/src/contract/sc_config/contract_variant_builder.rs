@@ -14,7 +14,7 @@ use crate::{
 
 use super::{
     ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ProxyConfigSerde, ScConfig, ScConfigSerde,
+    ProxyConfigSerde, ProxyFormat, ScConfig, ScConfigSerde,
     contract_variant_settings::{parse_allocator, parse_stack_size},
     proxy_config::ProxyConfig,
     sc_config_model::SC_CONFIG_FILE_NAMES,
@@ -217,6 +217,8 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
         esdt_attributes: original_abi.esdt_attributes.clone(),
+        implements_abi: original_abi.implements_abi.clone(),
+        implements_abi_exactly: original_abi.implements_abi_exactly.clone(),
     }
 }
 
@@ -277,51 +279,85 @@ fn process_proxy_contracts(config: &ScConfigSerde, original_abi: &ContractAbi) -
 
     proxy_contracts.push(ProxyConfig::output_dir_proxy_config(original_abi.clone()));
 
-    for proxy_config in &config.proxy {
-        let mut contract_builders = HashMap::new();
-
-        match &proxy_config.variant {
-            Some(variant) => {
-                let setting_contract = config
-                    .contracts
-                    .iter()
-                    .find(|setting| setting.0.eq(variant))
-                    .unwrap_or_else(|| panic!("No contact with this name"));
-                let (contract_id, mut contract_builder) =
-                    ContractVariantBuilder::map_from_config(setting_contract);
-                alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
-
-                contract_builders = HashMap::from([(contract_id, contract_builder)]);
-            }
-            None => {
-                let mut contract_builder = ContractVariantBuilder::default();
-                alter_builder_with_proxy_config(proxy_config, &mut contract_builder);
-
-                contract_builders.insert(
-                    proxy_config.path.to_string_lossy().to_string(),
-                    contract_builder,
-                );
-            }
-        }
-
-        collect_and_process_endpoints(
-            &mut contract_builders,
-            original_abi,
-            &config.labels_for_contracts,
-        );
-        if let Some((_, builder)) = contract_builders.into_iter().next() {
-            let contract = build_contract(builder, original_abi);
-
-            proxy_contracts.push(ProxyConfig::new(
-                PathBuf::from(&proxy_config.path),
-                proxy_config.override_import.to_owned(),
-                proxy_config.path_rename.to_owned(),
-                contract.abi,
-            ));
+    let lists = [
+        (&config.proxy, ProxyFormat::Proxy),
+        (&config.generate_abi, ProxyFormat::Abi),
+        (&config.generate_abi_raw, ProxyFormat::AbiRaw),
+    ];
+    for (entries, format) in lists {
+        for entry in entries {
+            process_proxy_entry(entry, format, config, original_abi, &mut proxy_contracts);
         }
     }
 
     proxy_contracts
+}
+
+fn process_proxy_entry(
+    entry: &ProxyConfigSerde,
+    format: ProxyFormat,
+    config: &ScConfigSerde,
+    original_abi: &ContractAbi,
+    proxy_contracts: &mut Vec<ProxyConfig>,
+) {
+    // `[[generate-abi]]`/`[[generate-abi-raw]]` (with no explicit `variant`) exist to faithfully
+    // mirror one contract trait's whole interface, for `implements_abi`/`implements_abi_exactly`
+    // conformance checking - unlike `[[proxy]]` (a proxy for calling one particular deployed
+    // contract variant), they have no reason to apply the label-based filtering that carves out
+    // `contracts.*` variants (e.g. `main` vs `external-view`), so skip it and use every
+    // constructor/upgrade/endpoint from `original_abi` directly.
+    if entry.variant.is_none() && format != ProxyFormat::Proxy {
+        proxy_contracts.push(ProxyConfig::new(
+            entry.path.clone(),
+            entry.override_import.to_owned(),
+            entry.path_rename.to_owned(),
+            original_abi.clone(),
+            format,
+            entry.call.clone(),
+        ));
+        return;
+    }
+
+    let mut contract_builders = HashMap::new();
+
+    match &entry.variant {
+        Some(variant) => {
+            let setting_contract = config
+                .contracts
+                .iter()
+                .find(|setting| setting.0.eq(variant))
+                .unwrap_or_else(|| panic!("No contact with this name"));
+            let (contract_id, mut contract_builder) =
+                ContractVariantBuilder::map_from_config(setting_contract);
+            alter_builder_with_proxy_config(entry, &mut contract_builder);
+
+            contract_builders = HashMap::from([(contract_id, contract_builder)]);
+        }
+        None => {
+            let mut contract_builder = ContractVariantBuilder::default();
+            alter_builder_with_proxy_config(entry, &mut contract_builder);
+
+            contract_builders.insert(entry.path.to_string_lossy().to_string(), contract_builder);
+        }
+    }
+
+    collect_and_process_endpoints(
+        &mut contract_builders,
+        original_abi,
+        &config.labels_for_contracts,
+    );
+    if let Some((_, builder)) = contract_builders.into_iter().next() {
+        let contract = build_contract(builder, original_abi);
+
+        proxy_contracts.push(ProxyConfig::new(
+            entry.path.clone(),
+            entry.override_import.to_owned(),
+            entry.path_rename.to_owned(),
+            contract.abi,
+            format,
+            entry.call.clone(),
+        ));
+    }
 }
 
 impl ScConfig {
@@ -345,16 +381,14 @@ impl ScConfig {
 }
 
 fn alter_builder_with_proxy_config(
-    proxy_config: &ProxyConfigSerde,
+    entry: &ProxyConfigSerde,
     contract_builder: &mut ContractVariantBuilder,
 ) {
     let default = ContractVariantBuilder::default();
 
-    contract_builder.add_unlabelled = proxy_config
-        .add_unlabelled
-        .unwrap_or(default.add_unlabelled);
-    contract_builder.add_endpoints = proxy_config.add_endpoints.iter().cloned().collect();
-    contract_builder.add_labels = proxy_config.add_labels.iter().cloned().collect();
+    contract_builder.add_unlabelled = entry.add_unlabelled.unwrap_or(default.add_unlabelled);
+    contract_builder.add_endpoints = entry.add_endpoints.iter().cloned().collect();
+    contract_builder.add_labels = entry.add_labels.iter().cloned().collect();
 }
 
 fn collect_and_process_endpoints(
@@ -394,6 +428,7 @@ impl ScConfig {
             Ok(raw_contents) => {
                 let config_serde: ScConfigSerde = toml::from_str(&raw_contents)
                     .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {error}"));
+                config_serde.validate();
                 Some(Self::load_from_config(
                     path.as_ref(),
                     &config_serde,

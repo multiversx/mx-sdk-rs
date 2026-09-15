@@ -574,6 +574,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         EsdtTokenIdentifier::<SA>::type_name()

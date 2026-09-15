@@ -12,11 +12,16 @@ use alloc::{format, string::ToString, vec::Vec};
 pub trait TypeAbi: TypeAbiFrom<Self> {
     type Unmanaged;
 
+    /// The pure ABI type, without any managed API type parameters.
+    /// For most types this is `Self`, but for managed types (e.g. `BigUint`) it points to a dedicated ABI counterpart.
+    type Abi: TypeAbi;
+
     fn type_names() -> TypeNames {
         TypeNames {
             abi: Self::type_name(),
             rust: Self::type_name_rust(),
             specific: Self::type_name_specific(),
+            abi_rust: <Self::Abi as TypeAbi>::type_name_rust(),
         }
     }
 
@@ -84,10 +89,6 @@ pub trait TypeAbi: TypeAbiFrom<Self> {
         });
         result
     }
-}
-
-pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
-    format!("variadic<{}>", T::type_name())
 }
 
 pub fn type_name_multi_value_encoded<T: TypeAbi>() -> TypeName {

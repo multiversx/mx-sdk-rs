@@ -1,5 +1,7 @@
 use core::{convert::TryInto, marker::PhantomData};
 
+use multiversx_sc_abi::Sign;
+
 use crate::{
     abi::{TypeAbiFrom, TypeName},
     api::{
@@ -11,9 +13,7 @@ use crate::{
         NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     formatter::{FormatByteReceiver, SCDisplay, hex_util::encode_bytes_as_hex},
-    types::{
-        BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, Sign, heap::BoxedBytes,
-    },
+    types::{BigUint, ManagedBuffer, ManagedOption, ManagedRef, ManagedType, heap::BoxedBytes},
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -184,6 +184,7 @@ impl<M> TypeAbiFrom<&Self> for BigInt<M> where M: ManagedTypeApi {}
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     #[cfg(feature = "num-bigint")]
     type Unmanaged = crate::codec::num_bigint::BigInt;
+    type Abi = crate::abi::BigIntAbi;
 
     #[cfg(not(feature = "num-bigint"))]
     type Unmanaged = Self;

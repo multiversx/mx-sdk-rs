@@ -450,6 +450,7 @@ impl<M> TypeAbiFrom<&Self> for BigFloat<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for BigFloat<M> {
     type Unmanaged = f64;
+    type Abi = crate::abi::BigFloatAbi;
 
     fn type_name() -> String {
         String::from("BigFloat")

@@ -1,7 +1,7 @@
 use core::convert::TryInto;
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeName},
+    abi::{BigUintAbi, TypeAbi, TypeAbiFrom, TypeName},
     api::{
         BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
         RawHandle, const_handles, quick_signal_error, use_raw_handle,
@@ -16,6 +16,7 @@ use crate::{
     types::{
         BigInt, Decimals, LnDecimals, ManagedBuffer, ManagedDecimal, ManagedRef, ManagedType,
         NonZeroBigUint, heap::BoxedBytes,
+        managed::wrapped::decimal::scaling_factor::scaling_factor,
     },
 };
 
@@ -218,6 +219,9 @@ impl<M: ManagedTypeApi> TypeAbiFrom<BigUint<M>> for crate::codec::num_bigint::Bi
 impl<M> TypeAbiFrom<Self> for BigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for BigUint<M> where M: ManagedTypeApi {}
 
+impl<M: ManagedTypeApi> TypeAbiFrom<BigUint<M>> for BigUintAbi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&BigUint<M>> for BigUintAbi {}
+
 impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
     #[cfg(feature = "num-bigint")]
     type Unmanaged = crate::codec::num_bigint::BigUint;
@@ -225,8 +229,10 @@ impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
     #[cfg(not(feature = "num-bigint"))]
     type Unmanaged = Self;
 
+    type Abi = BigUintAbi;
+
     fn type_name() -> TypeName {
-        TypeName::from("BigUint")
+        BigUintAbi::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -503,7 +509,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
             return None;
         };
 
-        let scaling_factor_9 = LnDecimals::new().scaling_factor();
+        let scaling_factor_9 = scaling_factor::<M>(LnDecimals::new().num_decimals());
         let divisor = BigUint::from(1u64) << log2_floor as usize;
         let normalized = self * &*scaling_factor_9 / divisor;
 

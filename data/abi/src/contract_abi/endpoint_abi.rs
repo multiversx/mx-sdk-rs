@@ -22,7 +22,7 @@ pub struct OutputAbi {
 
 pub type OutputAbis = Vec<OutputAbi>;
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub enum EndpointMutabilityAbi {
     #[default]
     Mutable,
@@ -30,7 +30,7 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
-#[derive(Clone, Default, Debug)]
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub enum EndpointTypeAbi {
     #[default]
     Init,
