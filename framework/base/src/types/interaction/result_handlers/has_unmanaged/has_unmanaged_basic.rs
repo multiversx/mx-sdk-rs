@@ -1,6 +1,8 @@
-use multiversx_sc::codec::arrayvec::ArrayVec;
+use alloc::{boxed::Box, string::String, vec::Vec};
 
-use crate::facade::result_handlers::HasUnmanaged;
+use crate::codec::arrayvec::ArrayVec;
+
+use crate::types::HasUnmanaged;
 
 impl HasUnmanaged for () {
     type Unmanaged = Self;

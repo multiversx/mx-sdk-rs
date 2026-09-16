@@ -1,7 +1,6 @@
-use multiversx_sc::{
-    codec::TopDecodeMulti,
-    types::{RHListItem, TxEnv},
-};
+use multiversx_sc_codec::TopDecodeMulti;
+
+use crate::types::{RHListItem, TxEnv};
 
 use super::HasUnmanaged;
 

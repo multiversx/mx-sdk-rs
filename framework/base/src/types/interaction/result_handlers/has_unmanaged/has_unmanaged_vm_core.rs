@@ -1,10 +1,10 @@
-use multiversx_sc::types::{
+use crate::types::{
     Address, BLSKey, BLSSignature, BoxedBytes, CodeMetadata, DurationMillis, DurationSeconds,
     EsdtLocalRole, EsdtTokenType, H256, MessageHashType, OperationCompletionStatus,
     TimestampMillis, TimestampSeconds,
 };
 
-use crate::facade::result_handlers::HasUnmanaged;
+use crate::types::HasUnmanaged;
 
 macro_rules! has_unmanaged_self {
     ($ty:ty) => {

@@ -3,14 +3,14 @@ use multiversx_sc::{
     codec::TopDecodeMulti,
     tuple_util::NestedTupleFlatten,
     types::{
-        ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
+        HasUnmanaged, ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
         ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
-        ReturnsRawResult, ReturnsResult, ReturnsResultAs, TxEnv, WithNewAddress, WithResultAs,
+        ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
+        WithNewAddress, WithResultAs,
     },
 };
 
 use crate::{
-    facade::result_handlers::{HasUnmanaged, ReturnsResultUnmanaged},
     imports::TxExpect,
     scenario_model::{CheckValue, TxResponse, TxResponseStatus, TypedResponse},
 };

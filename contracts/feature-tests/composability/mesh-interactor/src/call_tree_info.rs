@@ -1,5 +1,4 @@
 use mesh_node::{Trace, TraceName, mesh_node_proxy};
-use multiversx_sc::codec::multi_types::MultiValueVec;
 use multiversx_sc_snippets::imports::*;
 
 use crate::{

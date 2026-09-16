@@ -1,5 +1,6 @@
-use multiversx_sc::{
-    api::ManagedTypeApi,
+use crate::{
+    abi::TypeAbi,
+    api::{ManagedTypeApi, UnmanagedApi},
     codec::{MultiValueConstLength, multi_types::*},
     types::{
         EgldOrEsdtTokenPaymentMultiValue, EsdtTokenPaymentMultiValue, ManagedAsyncCallResult,
@@ -8,7 +9,7 @@ use multiversx_sc::{
     },
 };
 
-use crate::{api::StaticApi, facade::result_handlers::HasUnmanaged};
+use crate::types::HasUnmanaged;
 
 impl HasUnmanaged for IgnoreValue {
     type Unmanaged = Self;
@@ -55,24 +56,24 @@ multi_value_impls! {
 
 impl<M, T> HasUnmanaged for ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi,
-    T: multiversx_sc::abi::TypeAbi,
+    M: UnmanagedApi,
+    T: TypeAbi,
 {
-    type Unmanaged = ManagedAsyncCallResult<StaticApi, T>;
+    type Unmanaged = Self;
 }
 
 impl<M> HasUnmanaged for EgldOrEsdtTokenPaymentMultiValue<M>
 where
-    M: ManagedTypeApi,
+    M: UnmanagedApi,
 {
-    type Unmanaged = EgldOrEsdtTokenPaymentMultiValue<StaticApi>;
+    type Unmanaged = Self;
 }
 
 impl<M> HasUnmanaged for EsdtTokenPaymentMultiValue<M>
 where
-    M: ManagedTypeApi,
+    M: UnmanagedApi,
 {
-    type Unmanaged = EsdtTokenPaymentMultiValue<StaticApi>;
+    type Unmanaged = Self;
 }
 
 impl<M, T> HasUnmanaged for MultiValueEncoded<M, T>
@@ -101,15 +102,15 @@ where
 
 impl<M, T> HasUnmanaged for MultiValueManagedVecCounted<M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + multiversx_sc::abi::TypeAbi,
+    M: UnmanagedApi,
+    T: ManagedVecItem + TypeAbi,
 {
-    type Unmanaged = MultiValueManagedVecCounted<StaticApi, T>;
+    type Unmanaged = Self;
 }
 
 impl<M> HasUnmanaged for PaymentMultiValue<M>
 where
-    M: ManagedTypeApi,
+    M: UnmanagedApi,
 {
-    type Unmanaged = PaymentMultiValue<StaticApi>;
+    type Unmanaged = Self;
 }

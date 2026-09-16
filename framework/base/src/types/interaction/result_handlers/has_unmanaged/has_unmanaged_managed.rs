@@ -1,5 +1,7 @@
-use multiversx_sc::{
-    api::ManagedTypeApi,
+use alloc::vec::Vec;
+
+use crate::{
+    api::{ManagedTypeApi, UnmanagedApi},
     typenum::Unsigned,
     types::{
         ConstDecimals, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedBufferReadToEnd,
@@ -8,7 +10,7 @@ use multiversx_sc::{
     },
 };
 
-use crate::{api::StaticApi, facade::result_handlers::HasUnmanaged};
+use crate::types::HasUnmanaged;
 
 impl<M: ManagedTypeApi> HasUnmanaged for ManagedBuffer<M> {
     type Unmanaged = Vec<u8>;
@@ -37,7 +39,7 @@ impl<M> HasUnmanaged for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = multiversx_sc::types::heap::Address;
+    type Unmanaged = crate::types::heap::Address;
 }
 
 impl<M, T> HasUnmanaged for ManagedOption<M, T>
@@ -48,26 +50,26 @@ where
     type Unmanaged = Option<T::Unmanaged>;
 }
 
-impl<M: ManagedTypeApi> HasUnmanaged for EllipticCurve<M> {
-    type Unmanaged = EllipticCurve<StaticApi>;
+impl<M: UnmanagedApi> HasUnmanaged for EllipticCurve<M> {
+    type Unmanaged = Self;
 }
 
-impl<M: ManagedTypeApi> HasUnmanaged for ManagedDecimal<M, NumDecimals> {
-    type Unmanaged = ManagedDecimal<StaticApi, NumDecimals>;
+impl<M: UnmanagedApi> HasUnmanaged for ManagedDecimal<M, NumDecimals> {
+    type Unmanaged = Self;
 }
 
-impl<M: ManagedTypeApi, DECIMALS: Unsigned> HasUnmanaged
+impl<M: UnmanagedApi, DECIMALS: Unsigned> HasUnmanaged
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    type Unmanaged = ManagedDecimal<StaticApi, ConstDecimals<DECIMALS>>;
+    type Unmanaged = Self;
 }
 
-impl<M: ManagedTypeApi> HasUnmanaged for ManagedDecimalSigned<M, NumDecimals> {
-    type Unmanaged = ManagedDecimalSigned<StaticApi, NumDecimals>;
+impl<M: UnmanagedApi> HasUnmanaged for ManagedDecimalSigned<M, NumDecimals> {
+    type Unmanaged = Self;
 }
 
-impl<M: ManagedTypeApi, DECIMALS: Unsigned> HasUnmanaged
+impl<M: UnmanagedApi, DECIMALS: Unsigned> HasUnmanaged
     for ManagedDecimalSigned<M, ConstDecimals<DECIMALS>>
 {
-    type Unmanaged = ManagedDecimalSigned<StaticApi, ConstDecimals<DECIMALS>>;
+    type Unmanaged = Self;
 }
