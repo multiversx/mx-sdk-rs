@@ -332,7 +332,6 @@ impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Unmanaged = Self;
     type Abi = VariadicAbi<<ManagedAddress<SA> as TypeAbi>::Abi>;
 
     fn type_name() -> TypeName {

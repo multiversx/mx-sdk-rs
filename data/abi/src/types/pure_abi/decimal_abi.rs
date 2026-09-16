@@ -19,7 +19,6 @@ pub struct DecimalAbi<D: Decimals> {
 impl<D: Decimals> TypeAbiFrom<Self> for DecimalAbi<D> {}
 
 impl TypeAbi for DecimalAbi<NumDecimals> {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {
@@ -32,7 +31,6 @@ impl TypeAbi for DecimalAbi<NumDecimals> {
 }
 
 impl<DECIMALS: Unsigned> TypeAbi for DecimalAbi<ConstDecimals<DECIMALS>> {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

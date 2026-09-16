@@ -963,7 +963,6 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
-    type Unmanaged = Vec<T::Unmanaged>;
     type Abi = ListAbi<T::Abi>;
 
     /// It is semantically equivalent to any list of `T`.

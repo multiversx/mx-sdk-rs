@@ -366,7 +366,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
-    type Unmanaged = Self;
     type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {

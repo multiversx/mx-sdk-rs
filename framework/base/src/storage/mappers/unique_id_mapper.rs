@@ -281,7 +281,6 @@ impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Unmanaged = Self;
     type Abi = VariadicAbi<usize>;
 
     fn type_name() -> TypeName {

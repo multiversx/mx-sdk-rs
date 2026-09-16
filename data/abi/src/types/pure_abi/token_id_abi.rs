@@ -11,7 +11,6 @@ pub struct TokenIdAbi;
 impl TypeAbiFrom<Self> for TokenIdAbi {}
 
 impl TypeAbi for TokenIdAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

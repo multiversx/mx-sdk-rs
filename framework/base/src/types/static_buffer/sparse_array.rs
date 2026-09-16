@@ -307,7 +307,6 @@ impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
-    type Unmanaged = Self;
     type Abi = ListAbi<u32>;
 
     /// It is semantically equivalent to any list of `usize`.

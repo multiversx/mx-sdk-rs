@@ -1,3 +1,4 @@
+mod has_unmanaged;
 mod pass_value;
 mod returns_bt;
 mod returns_bt_egld;
@@ -18,6 +19,7 @@ mod with_raw_result;
 mod with_result;
 mod with_result_as;
 
+pub use has_unmanaged::HasUnmanaged;
 pub use pass_value::PassValue;
 pub use returns_bt::ReturnsBackTransfers;
 pub use returns_bt_egld::ReturnsBackTransfersEGLD;

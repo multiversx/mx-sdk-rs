@@ -573,7 +573,6 @@ impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

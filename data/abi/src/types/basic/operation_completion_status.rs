@@ -72,7 +72,6 @@ impl TopDecode for OperationCompletionStatus {
 impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 
 impl TypeAbi for OperationCompletionStatus {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

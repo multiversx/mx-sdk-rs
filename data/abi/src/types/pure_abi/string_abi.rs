@@ -5,7 +5,6 @@ pub struct StringAbi;
 impl TypeAbiFrom<Self> for StringAbi {}
 
 impl TypeAbi for StringAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

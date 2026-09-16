@@ -11,7 +11,6 @@ pub struct EgldOrEsdtTokenIdentifierAbi;
 impl TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifierAbi {}
 
 impl TypeAbi for EgldOrEsdtTokenIdentifierAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

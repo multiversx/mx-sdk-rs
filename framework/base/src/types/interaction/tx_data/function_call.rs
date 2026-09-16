@@ -136,7 +136,6 @@ impl<Api> TypeAbi for FunctionCall<Api>
 where
     Api: ManagedTypeApi,
 {
-    type Unmanaged = Self;
     type Abi = VariadicAbi<BytesAbi>;
 
     fn type_name() -> TypeName {

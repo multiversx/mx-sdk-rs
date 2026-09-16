@@ -13,7 +13,6 @@ pub struct BytesReadToEndAbi;
 impl TypeAbiFrom<Self> for BytesReadToEndAbi {}
 
 impl TypeAbi for BytesReadToEndAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

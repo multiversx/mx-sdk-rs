@@ -10,7 +10,6 @@ pub struct BigFloatAbi;
 impl TypeAbiFrom<Self> for BigFloatAbi {}
 
 impl TypeAbi for BigFloatAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

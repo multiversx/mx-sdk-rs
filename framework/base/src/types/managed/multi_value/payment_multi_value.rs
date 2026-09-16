@@ -119,7 +119,6 @@ impl<M> TypeAbi for PaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = Self;
     type Abi = MultiValue3<EsdtTokenIdentifierAbi, u64, NonZeroBigUintAbi>;
 
     fn type_name() -> TypeName {

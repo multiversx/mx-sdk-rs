@@ -5,6 +5,11 @@ mod proxy;
 use multiversx_sc_snippets::imports::*;
 pub use proxy::Color;
 
+// `proxy::CallbackData` is a separate (generated) type from `forwarder::common::CallbackData`.
+impl<M: UnmanagedApi> HasUnmanaged for proxy::CallbackData<M> {
+    type Unmanaged = Self;
+}
+
 pub const FORWARDER_DEPLOY_INTERACTOR_TRACE_PATH: &str =
     "scenarios/forwarder_deploy_scenario.scen.json";
 pub const FORWARDER_BUILTIN_INTERACTOR_TRACE_PATH: &str =
@@ -717,7 +722,7 @@ impl ContractInteract {
             .run()
             .await;
 
-        println!("Result: {:?}", result_value.0);
+        println!("Result: {result_value:?}");
     }
 
     pub async fn callback_data_at_index(&mut self) {

@@ -54,6 +54,10 @@ pub struct Trace<M: ManagedTypeApi> {
     pub results: ManagedVec<M, ManagedBuffer<M>>,
 }
 
+impl<M: UnmanagedApi> HasUnmanaged for Trace<M> {
+    type Unmanaged = Self;
+}
+
 /// Testing multiple calls per transaction.
 #[multiversx_sc::contract]
 pub trait MeshNode {

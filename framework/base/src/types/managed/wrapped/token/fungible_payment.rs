@@ -40,7 +40,6 @@ impl<M: ManagedTypeApi> TypeAbiFrom<Self> for FungiblePayment<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for FungiblePayment<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for FungiblePayment<M> {
-    type Unmanaged = Self;
     type Abi = crate::abi::FungiblePaymentAbi;
 
     fn type_name() -> TypeName {

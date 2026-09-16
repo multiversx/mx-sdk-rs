@@ -10,7 +10,6 @@ pub struct EllipticCurveAbi;
 impl TypeAbiFrom<Self> for EllipticCurveAbi {}
 
 impl TypeAbi for EllipticCurveAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {
