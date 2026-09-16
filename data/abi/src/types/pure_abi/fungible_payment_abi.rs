@@ -11,7 +11,6 @@ pub struct FungiblePaymentAbi;
 impl TypeAbiFrom<Self> for FungiblePaymentAbi {}
 
 impl TypeAbi for FungiblePaymentAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

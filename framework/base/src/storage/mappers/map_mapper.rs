@@ -624,7 +624,6 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,
     V: TopEncode + TopDecode + TypeAbi + 'static,
 {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

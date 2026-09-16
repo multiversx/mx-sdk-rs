@@ -10,7 +10,6 @@ pub struct EsdtTokenIdentifierAbi;
 impl TypeAbiFrom<Self> for EsdtTokenIdentifierAbi {}
 
 impl TypeAbi for EsdtTokenIdentifierAbi {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

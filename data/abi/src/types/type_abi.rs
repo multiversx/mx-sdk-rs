@@ -10,8 +10,6 @@ use alloc::{format, string::ToString, vec::Vec};
 ///
 /// Will be automatically implemented for struct ad enum types via the `#[type_abi]` annotation.
 pub trait TypeAbi: TypeAbiFrom<Self> {
-    type Unmanaged;
-
     /// The pure ABI type, without any managed API type parameters.
     /// For most types this is `Self`, but for managed types (e.g. `BigUint`) it points to a dedicated ABI counterpart.
     type Abi: TypeAbi;

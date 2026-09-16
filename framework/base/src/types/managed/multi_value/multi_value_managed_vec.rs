@@ -295,7 +295,6 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Unmanaged = MultiValueVec<T::Unmanaged>;
     type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {

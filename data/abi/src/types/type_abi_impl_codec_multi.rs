@@ -13,7 +13,6 @@ where
 }
 
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
-    type Unmanaged = crate::codec::multi_types::MultiValueVec<T::Unmanaged>;
     type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -36,7 +35,6 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
 impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
 
 impl TypeAbi for IgnoreValue {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {
@@ -59,7 +57,6 @@ impl<T, U> TypeAbiFrom<OptionalValue<U>> for OptionalValue<T> where T: TypeAbiFr
 impl<T> TypeAbiFrom<IgnoreValue> for OptionalValue<T> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
-    type Unmanaged = OptionalValue<T::Unmanaged>;
     type Abi = OptionalValue<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -91,7 +88,6 @@ macro_rules! multi_arg_impls {
             where
                 $($t: TypeAbi,)+
             {
-                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
                 type Abi = crate::codec::multi_types::$mval_struct<$($t::Abi,)+>;
 
                 fn type_name() -> TypeName {

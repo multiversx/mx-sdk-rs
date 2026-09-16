@@ -9,7 +9,6 @@ impl TypeAbiFrom<Self> for BigUint {}
 impl TypeAbiFrom<&Self> for BigUint {}
 
 impl TypeAbi for BigUint {
-    type Unmanaged = Self;
     type Abi = BigUintAbi;
 
     fn type_name() -> TypeName {
@@ -27,7 +26,6 @@ impl TypeAbiFrom<Self> for BigInt {}
 impl TypeAbiFrom<&Self> for BigInt {}
 
 impl TypeAbi for BigInt {
-    type Unmanaged = Self;
     type Abi = BigIntAbi;
 
     fn type_name() -> TypeName {

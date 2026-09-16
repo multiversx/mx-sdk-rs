@@ -1,16 +1,16 @@
 use multiversx_sc::{
-    abi::{TypeAbi, TypeAbiFrom},
+    abi::TypeAbiFrom,
     codec::TopDecodeMulti,
     tuple_util::NestedTupleFlatten,
     types::{
         ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
         ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
-        ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
-        WithNewAddress, WithResultAs,
+        ReturnsRawResult, ReturnsResult, ReturnsResultAs, TxEnv, WithNewAddress, WithResultAs,
     },
 };
 
 use crate::{
+    facade::result_handlers::{HasUnmanaged, ReturnsResultUnmanaged},
     imports::TxExpect,
     scenario_model::{CheckValue, TxResponse, TxResponseStatus, TypedResponse},
 };
@@ -44,7 +44,7 @@ where
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResultUnmanaged
 where
     Env: TxEnv,
-    Original: TypeAbi,
+    Original: HasUnmanaged,
     Original::Unmanaged: TopDecodeMulti,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {

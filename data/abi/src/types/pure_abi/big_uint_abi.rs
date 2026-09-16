@@ -11,12 +11,6 @@ impl TypeAbiFrom<u64> for BigUintAbi {}
 impl TypeAbiFrom<u128> for BigUintAbi {}
 
 impl TypeAbi for BigUintAbi {
-    #[cfg(feature = "num-bigint")]
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-
-    #[cfg(not(feature = "num-bigint"))]
-    type Unmanaged = Self;
-
     type Abi = Self;
 
     fn type_name() -> TypeName {

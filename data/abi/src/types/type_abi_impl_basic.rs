@@ -10,7 +10,6 @@ use alloc::{
 impl TypeAbiFrom<()> for () {}
 
 impl TypeAbi for () {
-    type Unmanaged = Self;
     type Abi = Self;
 
     /// No another exception from the 1-type-1-output-abi rule:
@@ -23,7 +22,6 @@ impl TypeAbi for () {
 impl<T, U> TypeAbiFrom<&U> for &T where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &T {
-    type Unmanaged = T::Unmanaged;
     type Abi = T::Abi;
 
     fn type_name() -> TypeName {
@@ -42,7 +40,6 @@ impl<T: TypeAbi> TypeAbi for &T {
 impl<T, U> TypeAbiFrom<Box<U>> for Box<T> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Box<T> {
-    type Unmanaged = Box<T::Unmanaged>;
     type Abi = Box<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -61,7 +58,6 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
 impl<T, U> TypeAbiFrom<&[T]> for &[U] where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for &[T] {
-    type Unmanaged = Vec<T::Unmanaged>;
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -88,7 +84,6 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 impl<T, U> TypeAbiFrom<Vec<T>> for Vec<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
-    type Unmanaged = Vec<T::Unmanaged>;
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -107,7 +102,6 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
 impl<T: TypeAbi, const CAP: usize> TypeAbiFrom<ArrayVec<T, CAP>> for ArrayVec<T, CAP> {}
 
 impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
-    type Unmanaged = Self;
     type Abi = ListAbi<T::Abi>; // TODO: should we also specify the cap in the ABI?
 
     fn type_name() -> TypeName {
@@ -126,7 +120,6 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 impl<T> TypeAbiFrom<Box<[T]>> for Box<[T]> {}
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
-    type Unmanaged = Self;
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -148,7 +141,6 @@ impl TypeAbiFrom<&str> for String {}
 impl TypeAbiFrom<Box<str>> for String {}
 
 impl TypeAbi for String {
-    type Unmanaged = Self;
     type Abi = StringAbi;
 
     fn type_name() -> TypeName {
@@ -159,7 +151,6 @@ impl TypeAbi for String {
 impl TypeAbiFrom<&'static str> for &'static str {}
 
 impl TypeAbi for &'static str {
-    type Unmanaged = Self;
     type Abi = StringAbi;
 
     fn type_name() -> TypeName {
@@ -176,7 +167,6 @@ impl TypeAbiFrom<&str> for Box<str> {}
 impl TypeAbiFrom<String> for Box<str> {}
 
 impl TypeAbi for Box<str> {
-    type Unmanaged = Self;
     type Abi = StringAbi;
 
     fn type_name() -> TypeName {
@@ -194,7 +184,6 @@ macro_rules! type_abi_name_only {
         impl TypeAbiFrom<&$ty> for $ty {}
 
         impl TypeAbi for $ty {
-            type Unmanaged = Self;
             type Abi = Self;
 
             fn type_name() -> TypeName {
@@ -269,7 +258,6 @@ impl<T> TypeAbi for Option<T>
 where
     T: TypeAbi,
 {
-    type Unmanaged = Option<T::Unmanaged>;
     type Abi = Option<T::Abi>;
 
     fn type_name() -> TypeName {
@@ -288,7 +276,6 @@ where
 impl<T: TypeAbi, E> TypeAbiFrom<Self> for Result<T, E> {}
 
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
-    type Unmanaged = Result<T::Unmanaged, E>;
     type Abi = Result<T::Abi, E>;
 
     fn type_name() -> TypeName {
@@ -325,7 +312,6 @@ macro_rules! tuple_impls {
             where
                 $($name: TypeAbi,)+
             {
-                type Unmanaged = ($($name::Unmanaged,)+);
                 type Abi = ($($name::Abi,)+);
 
                 fn type_name() -> TypeName {
@@ -384,7 +370,6 @@ tuple_impls! {
 impl<T, U, const N: usize> TypeAbiFrom<[U; N]> for [T; N] where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
-    type Unmanaged = [T::Unmanaged; N];
     type Abi = [T::Abi; N];
 
     fn type_name() -> TypeName {

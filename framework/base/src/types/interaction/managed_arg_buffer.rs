@@ -361,7 +361,6 @@ impl<M> TypeAbi for ManagedArgBuffer<M>
 where
     M: ManagedTypeApi,
 {
-    type Unmanaged = ArgBuffer;
     type Abi = ArgBuffer;
 
     /// It is semantically equivalent to any list of `T`.

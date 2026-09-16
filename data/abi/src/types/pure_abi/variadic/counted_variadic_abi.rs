@@ -43,7 +43,6 @@ impl<T> TypeAbi for CountedVariadicAbi<T>
 where
     T: TypeAbi,
 {
-    type Unmanaged = Self;
     type Abi = Self;
 
     fn type_name() -> TypeName {

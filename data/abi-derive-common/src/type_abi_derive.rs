@@ -172,7 +172,6 @@ pub fn type_abi_derive(
         impl #impl_generics #imports::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
 
         impl #impl_generics #imports::TypeAbi for #name #ty_generics #where_clause {
-            type Unmanaged = Self;
             type Abi = Self;
 
             fn type_name() -> #imports::TypeName {
