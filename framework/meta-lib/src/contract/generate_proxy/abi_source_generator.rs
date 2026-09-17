@@ -312,49 +312,32 @@ impl<'a> AbiSourceGenerator<'a> {
         let payable = !endpoint.payable_in_tokens.is_empty();
         let output_ty = self.output_type(&endpoint.outputs);
 
-        let (into_trait, into_method, extra_generic, payment_param, call_args): (
-            String,
-            &str,
-            &str,
-            &str,
-            String,
-        ) = match endpoint.endpoint_type {
-            EndpointTypeAbi::Init => (
-                format!(
-                    "IntoDeploy<{}, {output_ty}>",
-                    if payable { "Payment" } else { "NotPayable" }
+        // A payable endpoint takes no payment parameter: the payment type is left as `()`, to be
+        // filled in later by the caller via chained builder calls (e.g. `.egld(amount)`), matching
+        // the hand-writable shape of every other proxy in the codebase. A `NotPayable` endpoint
+        // hardcodes the marker instead.
+        let payment_ty = if payable { "()" } else { "NotPayable" };
+        let payment_arg = if payable { "()" } else { "NotPayable" };
+
+        let (into_trait, into_method, call_args): (String, &str, String) =
+            match endpoint.endpoint_type {
+                EndpointTypeAbi::Init => (
+                    format!("IntoDeploy<{payment_ty}, {output_ty}>"),
+                    "into_deploy",
+                    payment_arg.to_string(),
                 ),
-                "into_deploy",
-                if payable { "Payment, " } else { "" },
-                if payable { "payment: Payment, " } else { "" },
-                (if payable { "payment" } else { "NotPayable" }).to_string(),
-            ),
-            EndpointTypeAbi::Upgrade => (
-                format!(
-                    "IntoUpgrade<{}, {output_ty}>",
-                    if payable { "Payment" } else { "NotPayable" }
+                EndpointTypeAbi::Upgrade => (
+                    format!("IntoUpgrade<{payment_ty}, {output_ty}>"),
+                    "into_upgrade",
+                    payment_arg.to_string(),
                 ),
-                "into_upgrade",
-                if payable { "Payment, " } else { "" },
-                if payable { "payment: Payment, " } else { "" },
-                (if payable { "payment" } else { "NotPayable" }).to_string(),
-            ),
-            EndpointTypeAbi::Endpoint => (
-                format!(
-                    "IntoCall<{}, {output_ty}>",
-                    if payable { "Payment" } else { "NotPayable" }
+                EndpointTypeAbi::Endpoint => (
+                    format!("IntoCall<{payment_ty}, {output_ty}>"),
+                    "into_call",
+                    format!("{payment_arg}, \"{}\"", endpoint.name),
                 ),
-                "into_call",
-                if payable { "Payment, " } else { "" },
-                if payable { "payment: Payment, " } else { "" },
-                format!(
-                    "{}, \"{}\"",
-                    if payable { "payment" } else { "NotPayable" },
-                    endpoint.name
-                ),
-            ),
-            EndpointTypeAbi::PromisesCallback => unreachable!(),
-        };
+                EndpointTypeAbi::PromisesCallback => unreachable!(),
+            };
 
         let arg_generics: Vec<String> = endpoint
             .inputs
@@ -375,7 +358,7 @@ impl<'a> AbiSourceGenerator<'a> {
             .collect();
 
         self.writeln(format!(
-            "\n#[rustfmt::skip]\nimpl<T> {methods_name}<T> {{\n    pub fn {}<{extra_generic}{}>(\n        self,\n        {payment_param}{}\n    ) -> <T as {into_trait}>::Out\n    where\n        T: {into_trait},\n    {{\n        self.base_tx\n            .{into_method}({call_args}){apply_args}\n    }}\n}}",
+            "\n#[rustfmt::skip]\nimpl<T> {methods_name}<T> {{\n    pub fn {}<{}>(\n        self,\n        {}\n    ) -> <T as {into_trait}>::Out\n    where\n        T: {into_trait},\n    {{\n        self.base_tx\n            .{into_method}({call_args}){apply_args}\n    }}\n}}",
             endpoint.rust_method_name,
             arg_generics.join(", "),
             arg_params.join(", "),
