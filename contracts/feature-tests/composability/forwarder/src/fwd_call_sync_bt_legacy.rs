@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use crate::vault_proxy;
+use composability_abi::vault_abi;
 
 multiversx_sc::imports!();
 
@@ -17,7 +17,7 @@ pub trait BackTransfersLegacyModule {
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .returns(ReturnsBackTransfersLegacy)
             .sync_call();
@@ -44,7 +44,7 @@ pub trait BackTransfersLegacyModule {
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
             .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
@@ -62,7 +62,7 @@ pub trait BackTransfersLegacyModule {
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .returns(ReturnsBackTransfersLegacyReset)
             .sync_call();
@@ -89,7 +89,7 @@ pub trait BackTransfersLegacyModule {
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
             .returns(ReturnsBackTransfersLegacy)
             .sync_call();
@@ -107,7 +107,7 @@ pub trait BackTransfersLegacyModule {
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .returns(ReturnsBackTransfersLegacy)
             .sync_call();
