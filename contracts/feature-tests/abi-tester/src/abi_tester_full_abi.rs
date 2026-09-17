@@ -238,6 +238,11 @@ pub trait AbiTester {
     #[endpoint(managed_address_vs_byte_array)]
     fn managed_address_vs_byte_array(&self, address: Address, byte_array: [u8; 32]) -> MultiValue2<Address, [u8; 32]>;
 
+    /// `ManagedBuffer` (`BytesAbi`) and `Vec<u8>` (`ListAbi<u8>`) are distinct ABI marker
+    /// types, even though `BytesAbi` used to be just a type alias for `ListAbi<u8>`.
+    #[endpoint(bytes_vs_list)]
+    fn bytes_vs_list(&self, bytes: BytesAbi, list: BytesAbi) -> MultiValue2<BytesAbi, BytesAbi>;
+
     #[endpoint(process_managed_decimal)]
     fn process_managed_decimal(&self, input: DecimalAbi<ConstDecimals<U10>>) -> DecimalAbi<NumDecimals>;
 

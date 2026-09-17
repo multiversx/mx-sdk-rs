@@ -403,6 +403,22 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
+    pub fn bytes_vs_list<Arg0: ProxyArg<BytesAbi>, Arg1: ProxyArg<BytesAbi>>(
+        self,
+        bytes: Arg0, list: Arg1
+    ) -> <T as IntoCall<NotPayable, MultiValue2<BytesAbi, BytesAbi>>>::Out
+    where
+        T: IntoCall<NotPayable, MultiValue2<BytesAbi, BytesAbi>>,
+    {
+        self.base_tx
+            .into_call(NotPayable, "bytes_vs_list")
+            .apply_argument(&bytes)
+            .apply_argument(&list)
+    }
+}
+
+#[rustfmt::skip]
+impl<T> AbiTesterProxyMethods<T> {
     pub fn process_managed_decimal<Arg0: ProxyArg<DecimalAbi<ConstDecimals<U10>>>>(
         self,
         input: Arg0

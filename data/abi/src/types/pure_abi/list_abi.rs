@@ -7,8 +7,6 @@ where
     _phantom: core::marker::PhantomData<T>,
 }
 
-pub type BytesAbi = ListAbi<u8>;
-
 impl<T> TypeAbiFrom<Self> for ListAbi<T> where T: TypeAbi {}
 
 impl<T> TypeAbi for ListAbi<T>
