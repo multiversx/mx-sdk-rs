@@ -3,7 +3,10 @@ use alloc::{string::String, vec::Vec};
 #[cfg(feature = "num-bigint")]
 use crate::abi::{BigIntAbi, BigUintAbi};
 use crate::{
-    abi::{BigFloatAbi, BytesReadToEndAbi, CountedVariadicAbi, ListAbi, StringAbi, VariadicAbi},
+    abi::{
+        BigFloatAbi, BytesAbi, BytesReadToEndAbi, CountedVariadicAbi, ListAbi, StringAbi,
+        VariadicAbi,
+    },
     codec::{MultiValueConstLength, multi_types::MultiValueVec},
 };
 
@@ -26,6 +29,10 @@ impl HasUnmanaged for BigUintAbi {
 }
 
 impl HasUnmanaged for BytesReadToEndAbi {
+    type Unmanaged = Vec<u8>;
+}
+
+impl HasUnmanaged for BytesAbi {
     type Unmanaged = Vec<u8>;
 }
 
