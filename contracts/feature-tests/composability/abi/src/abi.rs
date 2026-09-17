@@ -5,3 +5,4 @@
 //! ABI (e.g. `forwarder` calling `vault` this way, see `fwd_call_sync_abi.rs`).
 
 pub mod vault_abi;
+pub mod vault_upgrade_abi;

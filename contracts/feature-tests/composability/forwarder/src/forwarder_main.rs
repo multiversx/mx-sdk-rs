@@ -22,7 +22,6 @@ pub mod fwd_roles;
 pub mod fwd_sft;
 pub mod fwd_storage;
 pub mod fwd_upgrade;
-pub mod vault_upgrade_proxy;
 
 multiversx_sc::imports!();
 
