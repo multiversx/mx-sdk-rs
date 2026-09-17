@@ -6,6 +6,9 @@ use crate::{TypeAbi, TypeAbiFrom, TypeName};
 pub struct BytesAbi;
 
 impl TypeAbiFrom<Self> for BytesAbi {}
+impl TypeAbiFrom<&[u8]> for BytesAbi {}
+impl TypeAbiFrom<&str> for BytesAbi {}
+impl<const N: usize> TypeAbiFrom<&[u8; N]> for BytesAbi {}
 
 impl TypeAbi for BytesAbi {
     type Abi = Self;
