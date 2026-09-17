@@ -63,7 +63,9 @@ fn abi_projected_type(
 /// Builds one dedicated `impl<T, ..> #methods_name<T> where T: IntoXxx<Payment, Output> { .. }`
 /// block for a single method, mirroring the hand-writable pattern shown in
 /// `contracts/feature-tests/abi-tester/src/abi_tester_full_abi_raw.rs`: every method gets its own
-/// impl block, since `Output` (and, for payable methods, `Payment`) differs per method.
+/// impl block, since `Output` differs per method. `Payment` is not a generic here: it is
+/// hardcoded to `NotPayable` for non-payable endpoints, or `()` for payable ones (to be filled
+/// in later by the caller via chained builder calls, e.g. `.egld(amount)`).
 fn generate_proxy_method(
     m: &Method,
     kind: &ProxyMethodKind,
