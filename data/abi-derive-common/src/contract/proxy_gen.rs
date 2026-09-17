@@ -63,7 +63,9 @@ fn abi_projected_type(
 /// Builds one dedicated `impl<T, ..> #methods_name<T> where T: IntoXxx<Payment, Output> { .. }`
 /// block for a single method, mirroring the hand-writable pattern shown in
 /// `contracts/feature-tests/abi-tester/src/abi_tester_full_abi_raw.rs`: every method gets its own
-/// impl block, since `Output` (and, for payable methods, `Payment`) differs per method.
+/// impl block, since `Output` differs per method. `Payment` is not a generic here: it is
+/// hardcoded to `NotPayable` for non-payable endpoints, or `()` for payable ones (to be filled
+/// in later by the caller via chained builder calls, e.g. `.egld(amount)`).
 fn generate_proxy_method(
     m: &Method,
     kind: &ProxyMethodKind,
@@ -91,23 +93,20 @@ fn generate_proxy_method(
         syn::ReturnType::Type(_, ty) => abi_projected_type(ty, import, self_api_replacement),
     };
 
-    // A `NotPayable` endpoint hardcodes the marker, exactly like the raw shape in
-    // `abi_tester_full_abi_raw.rs`. A payable endpoint (e.g. kitty's `#[payable("EGLD")]
-    // breedWith`) instead takes a fresh `Payment` generic as its first parameter, leaving the
-    // caller free to supply whatever payment type the underlying `T` accepts (the framework
-    // binding in `tx_proxy_abi_impl.rs` is what actually constrains it, e.g. to EGLD-only for
-    // deploys/upgrades).
+    // A `NotPayable` endpoint hardcodes the marker. A payable endpoint (e.g. kitty's
+    // `#[payable("EGLD")] breedWith`) takes no payment parameter either: the payment type is
+    // left as `()`, to be filled in later by the caller via chained builder calls (e.g.
+    // `.egld(amount)`), matching the hand-writable shape of every other proxy in the codebase
+    // (see e.g. `contracts/feature-tests/composability/forwarder-raw/output/forwarder_raw_proxy.rs`'s
+    // `init_sync_call`).
     let payable = m.payable_metadata().is_payable();
     let payment_ty: proc_macro2::TokenStream = if payable {
-        quote! { Payment }
+        quote! { () }
     } else {
         quote! { #import::NotPayable }
     };
-    let extra_generic: Option<proc_macro2::TokenStream> = payable.then(|| quote! { Payment, });
-    let payment_param: Option<proc_macro2::TokenStream> =
-        payable.then(|| quote! { payment: Payment, });
     let payment_arg: proc_macro2::TokenStream = if payable {
-        quote! { payment }
+        quote! { () }
     } else {
         quote! { #import::NotPayable }
     };
@@ -134,15 +133,10 @@ fn generate_proxy_method(
         ),
     };
 
-    // `Payment` can't be an impl-level generic: it wouldn't appear in the impl's self type
-    // (`#methods_name<T>`), only in the where clause and method body, which rustc rejects as an
-    // unconstrained type parameter (E0207). It's a method-level generic instead, alongside the
-    // `ArgN` ones, with the `T: IntoXxx<Payment, Output>` bound moved onto the method itself.
     quote! {
         impl<T> #methods_name<T> {
-            pub fn #rust_name<#extra_generic #(#arg_generics: #import::ProxyArg<#arg_types>),*>(
+            pub fn #rust_name<#(#arg_generics: #import::ProxyArg<#arg_types>),*>(
                 self,
-                #payment_param
                 #(#arg_pats: #arg_generics),*
             ) -> <T as #into_trait>::Out
             where

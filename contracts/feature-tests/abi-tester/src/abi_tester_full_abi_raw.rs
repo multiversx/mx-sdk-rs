@@ -206,15 +206,15 @@ pub struct AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn init<Payment, Arg0: ProxyArg<i32>, Arg1: ProxyArg<OnlyShowsUpInConstructor>>(
+    pub fn init<Arg0: ProxyArg<i32>, Arg1: ProxyArg<OnlyShowsUpInConstructor>>(
         self,
-        payment: Payment, _constructor_arg_1: Arg0, _constructor_arg_2: Arg1
-    ) -> <T as IntoDeploy<Payment, ()>>::Out
+        _constructor_arg_1: Arg0, _constructor_arg_2: Arg1
+    ) -> <T as IntoDeploy<(), ()>>::Out
     where
-        T: IntoDeploy<Payment, ()>,
+        T: IntoDeploy<(), ()>,
     {
         self.base_tx
-            .into_deploy(payment)
+            .into_deploy(())
             .apply_argument(&_constructor_arg_1)
             .apply_argument(&_constructor_arg_2)
     }
@@ -661,43 +661,43 @@ impl<T> AbiTesterProxyMethods<T> {
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn payable_egld<Payment, >(
+    pub fn payable_egld<>(
         self,
-        payment: Payment, 
-    ) -> <T as IntoCall<Payment, ()>>::Out
+        
+    ) -> <T as IntoCall<(), ()>>::Out
     where
-        T: IntoCall<Payment, ()>,
+        T: IntoCall<(), ()>,
     {
         self.base_tx
-            .into_call(payment, "payable_egld")
+            .into_call((), "payable_egld")
     }
 }
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn payable_some_token<Payment, >(
+    pub fn payable_some_token<>(
         self,
-        payment: Payment, 
-    ) -> <T as IntoCall<Payment, ()>>::Out
+        
+    ) -> <T as IntoCall<(), ()>>::Out
     where
-        T: IntoCall<Payment, ()>,
+        T: IntoCall<(), ()>,
     {
         self.base_tx
-            .into_call(payment, "payable_some_token")
+            .into_call((), "payable_some_token")
     }
 }
 
 #[rustfmt::skip]
 impl<T> AbiTesterProxyMethods<T> {
-    pub fn payable_any_token<Payment, >(
+    pub fn payable_any_token<>(
         self,
-        payment: Payment, 
-    ) -> <T as IntoCall<Payment, ()>>::Out
+        
+    ) -> <T as IntoCall<(), ()>>::Out
     where
-        T: IntoCall<Payment, ()>,
+        T: IntoCall<(), ()>,
     {
         self.base_tx
-            .into_call(payment, "payable_any_token")
+            .into_call((), "payable_any_token")
     }
 }
 
