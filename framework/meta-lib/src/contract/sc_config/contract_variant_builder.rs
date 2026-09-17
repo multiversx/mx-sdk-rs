@@ -300,24 +300,6 @@ fn process_proxy_entry(
     original_abi: &ContractAbi,
     proxy_contracts: &mut Vec<ProxyConfig>,
 ) {
-    // `[[generate-abi]]`/`[[generate-abi-raw]]` (with no explicit `variant`) exist to faithfully
-    // mirror one contract trait's whole interface, for `implements_abi`/`implements_abi_exactly`
-    // conformance checking - unlike `[[proxy]]` (a proxy for calling one particular deployed
-    // contract variant), they have no reason to apply the label-based filtering that carves out
-    // `contracts.*` variants (e.g. `main` vs `external-view`), so skip it and use every
-    // constructor/upgrade/endpoint from `original_abi` directly.
-    if entry.variant.is_none() && format != ProxyFormat::Proxy {
-        proxy_contracts.push(ProxyConfig::new(
-            entry.path.clone(),
-            entry.override_import.to_owned(),
-            entry.path_rename.to_owned(),
-            original_abi.clone(),
-            format,
-            entry.call.clone(),
-        ));
-        return;
-    }
-
     let mut contract_builders = HashMap::new();
 
     match &entry.variant {
