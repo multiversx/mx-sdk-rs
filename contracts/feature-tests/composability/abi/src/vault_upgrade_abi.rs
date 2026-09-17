@@ -10,7 +10,7 @@
 use multiversx_sc_abi::imports::*;
 
 #[rustfmt::skip]
-#[multiversx_sc_abi::contract_abi]
+#[multiversx_sc_abi::contract_abi(call = VaultUpgradeCall)]
 pub trait Vault {
     #[upgrade]
     fn upgrade(&self, opt_arg_to_echo: OptionalValue<BytesAbi>) -> MultiValue2<StringAbi, OptionalValue<BytesAbi>>;

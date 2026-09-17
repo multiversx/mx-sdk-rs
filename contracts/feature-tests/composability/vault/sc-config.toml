@@ -20,3 +20,4 @@ add-labels = ["upgrade"] # full interface
 path = "../abi/src/vault_upgrade_abi.rs"
 add-unlabelled = false
 add-labels = ["upgrade"]
+call = "VaultUpgradeCall"
