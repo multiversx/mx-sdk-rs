@@ -9,8 +9,11 @@ publish = false
 path = "src/adder.rs"
 
 [dependencies.multiversx-sc]
-workspace = true
+version = "0.66.2"
 
 [dev-dependencies.multiversx-sc-scenario]
-workspace = true
+version = "0.66.2"
 features = ["wasmer-experimental"]
+
+[workspace]
+members = [".", "meta"]

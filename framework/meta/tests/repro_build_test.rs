@@ -256,15 +256,25 @@ fn check_artifacts(output_dir: &Path, expected_contracts: &[&str]) {
     }
 }
 
+/// `adder-old` lives outside `contracts/examples` (as its own self-contained
+/// workspace, since it duplicates the `adder` crate name) so it doesn't get
+/// picked up by tooling that scans the examples folder.
+fn contract_source_dir(workspace: &Path, contract: &str) -> PathBuf {
+    let subdir = match contract {
+        "adder-old" => "temp",
+        _ => "examples",
+    };
+    workspace.join("contracts").join(subdir).join(contract)
+}
+
 fn setup_build_dir(workspace: &Path, build_dir: &Path, contracts: &[&str]) {
     if build_dir.exists() {
         fs::remove_dir_all(build_dir).unwrap();
     }
     fs::create_dir_all(build_dir).unwrap();
 
-    let examples = workspace.join("contracts").join("examples");
     for contract in contracts {
-        copy_dir::copy_dir(examples.join(contract), build_dir.join(contract))
+        copy_dir::copy_dir(contract_source_dir(workspace, contract), build_dir.join(contract))
             .unwrap_or_else(|e| panic!("failed to copy {contract}: {e}"));
     }
 
