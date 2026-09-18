@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 #[multiversx_sc::module]
 pub trait ChangeOwnerModule {
@@ -20,9 +20,9 @@ pub trait ChangeOwnerModule {
     fn get_owner_of_vault_contract(&self, address: ManagedAddress) -> ManagedAddress {
         self.tx()
             .to(&address)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .get_owner_address()
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call()
     }
 }

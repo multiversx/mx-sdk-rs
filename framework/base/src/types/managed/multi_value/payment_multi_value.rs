@@ -1,3 +1,5 @@
+use multiversx_sc_abi::TokenIdAbi;
+
 use crate::{
     abi::TypeAbiFrom,
     codec::{
@@ -8,7 +10,7 @@ use crate::{
 };
 
 use crate::{
-    abi::{EsdtTokenIdentifierAbi, NonZeroBigUintAbi, TypeAbi, TypeName},
+    abi::{NonZeroBigUintAbi, TypeAbi, TypeName},
     api::ManagedTypeApi,
     types::{ManagedVecItem, Payment},
 };
@@ -119,7 +121,7 @@ impl<M> TypeAbi for PaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
-    type Abi = MultiValue3<EsdtTokenIdentifierAbi, u64, NonZeroBigUintAbi>;
+    type Abi = MultiValue3<TokenIdAbi, u64, NonZeroBigUintAbi>;
 
     fn type_name() -> TypeName {
         Self::Abi::type_name()

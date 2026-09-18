@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 #[multiversx_sc::module]
 pub trait DeployContractModule {
@@ -36,11 +36,11 @@ pub trait DeployContractModule {
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
         self.tx()
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .init(opt_arg)
             .code(code.clone())
             .returns(ReturnsNewManagedAddress)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call()
     }
 
@@ -51,12 +51,12 @@ pub trait DeployContractModule {
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
         self.tx()
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .init(opt_arg)
             .code_metadata(CodeMetadata::EMPTY)
             .from_source(source_address)
             .returns(ReturnsNewManagedAddress)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call()
             .into()
     }

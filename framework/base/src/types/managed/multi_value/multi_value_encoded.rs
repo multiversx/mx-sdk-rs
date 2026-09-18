@@ -419,6 +419,14 @@ where
 {
 }
 
+impl<M, T, U> TypeAbiFrom<&MultiValueEncoded<M, T>> for VariadicAbi<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbi + TypeAbiFrom<T>,
+{
+}
+
 impl<M, V> FromIterator<V> for MultiValueEncoded<M, V>
 where
     M: ManagedTypeApi,

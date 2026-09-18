@@ -24,7 +24,7 @@ use super::{
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
 };
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{EsdtTokenIdentifierAbi, TypeAbi, TypeName},
     api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     storage::StorageKey,
@@ -573,10 +573,10 @@ impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type Abi = Self;
+    type Abi = EsdtTokenIdentifierAbi;
 
     fn type_name() -> TypeName {
-        EsdtTokenIdentifier::<SA>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

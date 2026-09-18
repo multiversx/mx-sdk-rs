@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 #[multiversx_sc::module]
 pub trait BackTransfersModule {
@@ -13,7 +13,7 @@ pub trait BackTransfersModule {
         let bt_multi = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_multi(&transfers)
             .returns(ReturnsBackTransfers)
             .sync_call();
@@ -48,14 +48,14 @@ pub trait BackTransfersModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_multi(&transfers)
             .sync_call();
 
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_multi(&transfers)
             .returns(ReturnsBackTransfers)
             .sync_call();
@@ -72,14 +72,14 @@ pub trait BackTransfersModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_multi(&transfers)
             .sync_call();
 
         let back_transfers = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_multi(&transfers)
             .returns(ReturnsBackTransfersReset)
             .sync_call();

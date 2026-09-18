@@ -328,6 +328,10 @@ impl<M> TypeAbiFrom<&TestTokenIdentifier<'_>> for TokenId<M> where M: ManagedTyp
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenId<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenId<M> {}
 
+impl<M: ManagedTypeApi> TypeAbiFrom<TokenId<M>> for crate::abi::TokenIdAbi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&TokenId<M>> for crate::abi::TokenIdAbi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<crate::abi::TokenIdAbi> for TokenId<M> {}
+
 impl<M: ManagedTypeApi> TypeAbi for TokenId<M> {
     type Abi = crate::abi::TokenIdAbi;
 

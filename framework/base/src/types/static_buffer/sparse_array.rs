@@ -311,7 +311,7 @@ where
 
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {
-        <&[usize] as TypeAbi>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

@@ -61,14 +61,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        let t_name = T::type_name();
-        if t_name == "u8" {
-            return "bytes".into();
-        }
-        let mut repr = TypeName::from("List<");
-        repr.push_str(t_name.as_str());
-        repr.push('>');
-        repr
+        ListAbi::<T::Abi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -87,7 +80,7 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        <&[T]>::type_name()
+        ListAbi::<T::Abi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -105,7 +98,7 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
     type Abi = ListAbi<T::Abi>; // TODO: should we also specify the cap in the ABI?
 
     fn type_name() -> TypeName {
-        <&[T]>::type_name()
+        ListAbi::<T::Abi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {
@@ -123,7 +116,7 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
     type Abi = ListAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        <&[T]>::type_name()
+        ListAbi::<T::Abi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

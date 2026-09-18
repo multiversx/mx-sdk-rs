@@ -16,9 +16,16 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
 name = "bitflags"
-version = "2.11.1"
+version = "2.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4512299f36f043ab09a583e57bceb5a5aab7a73db1805848e8fef3c9e8c78b3"
+checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
+
+[[package]]
+name = "composability-abi"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-abi",
+]
 
 [[package]]
 name = "endian-type"
@@ -30,6 +37,7 @@ checksum = "869b0adbda23651a9c5c0c3d270aac9fcb52e8622a8f2b17e57802d7791962f2"
 name = "forwarder"
 version = "0.0.0"
 dependencies = [
+ "composability-abi",
  "multiversx-sc",
 ]
 
@@ -72,10 +80,42 @@ dependencies = [
  "bitflags",
  "generic-array",
  "multiversx-chain-core",
+ "multiversx-sc-abi",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
  "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi"
+version = "0.25.0"
+dependencies = [
+ "bitflags",
+ "multiversx-chain-core",
+ "multiversx-sc-abi-derive",
+ "multiversx-sc-codec",
+ "typenum",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive"
+version = "0.25.0"
+dependencies = [
+ "multiversx-sc-abi-derive-common",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive-common"
+version = "0.25.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -103,7 +143,7 @@ dependencies = [
 name = "multiversx-sc-derive"
 version = "0.66.2"
 dependencies = [
- "hex",
+ "multiversx-sc-abi-derive-common",
  "proc-macro2",
  "quote",
  "radix_trie",

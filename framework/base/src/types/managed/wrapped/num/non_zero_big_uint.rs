@@ -224,6 +224,12 @@ impl<M: ManagedTypeApi> NonZeroBigUint<M> {
 impl<M> TypeAbiFrom<Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for NonZeroBigUint<M> where M: ManagedTypeApi {}
 
+impl<M: ManagedTypeApi> TypeAbiFrom<NonZeroBigUint<M>> for crate::abi::NonZeroBigUintAbi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&NonZeroBigUint<M>> for crate::abi::NonZeroBigUintAbi {}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<crate::abi::NonZeroBigUintAbi> for NonZeroBigUint<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&crate::abi::NonZeroBigUintAbi> for NonZeroBigUint<M> {}
+
 impl<M: ManagedTypeApi> TypeAbi for NonZeroBigUint<M> {
     type Abi = crate::abi::NonZeroBigUintAbi;
 

@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_sc_abi::VariadicAbi;
+
 use crate::{
     abi::TypeAbiFrom,
     codec::{
@@ -443,10 +445,10 @@ where
         + PartialEq
         + TypeAbi,
 {
-    type Abi = Self;
+    type Abi = VariadicAbi<MultiValue2<K::Abi, V::Abi>>;
 
     fn type_name() -> TypeName {
-        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

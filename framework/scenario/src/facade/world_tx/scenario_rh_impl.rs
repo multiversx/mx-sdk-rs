@@ -3,10 +3,10 @@ use multiversx_sc::{
     codec::TopDecodeMulti,
     tuple_util::NestedTupleFlatten,
     types::{
-        HasUnmanaged, ManagedAddress, RHListExec, RHListItemExec, ReturnsHandledOrError,
-        ReturnsHandledOrErrorRawResult, ReturnsNewAddress, ReturnsNewManagedAddress,
-        ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
-        WithNewAddress, WithResultAs,
+        HasManaged, HasUnmanaged, ManagedAddress, RHListExec, RHListItemExec,
+        ReturnsHandledOrError, ReturnsHandledOrErrorRawResult, ReturnsNewAddress,
+        ReturnsNewManagedAddress, ReturnsRawResult, ReturnsResult, ReturnsResultAs,
+        ReturnsResultManaged, ReturnsResultUnmanaged, TxEnv, WithNewAddress, WithResultAs,
     },
 };
 
@@ -52,6 +52,20 @@ where
         response
             .result
             .expect("ReturnsResultUnmanaged expects that transaction is successful")
+    }
+}
+
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResultManaged
+where
+    Env: TxEnv,
+    Original: HasManaged<Env::Api>,
+    Original::Managed: TopDecodeMulti,
+{
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
+        let response = TypedResponse::<Original::Managed>::from_raw(tx_response);
+        response
+            .result
+            .expect("ReturnsResultManaged expects that transaction is successful")
     }
 }
 
