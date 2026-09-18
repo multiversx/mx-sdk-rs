@@ -274,8 +274,11 @@ fn setup_build_dir(workspace: &Path, build_dir: &Path, contracts: &[&str]) {
     fs::create_dir_all(build_dir).unwrap();
 
     for contract in contracts {
-        copy_dir::copy_dir(contract_source_dir(workspace, contract), build_dir.join(contract))
-            .unwrap_or_else(|e| panic!("failed to copy {contract}: {e}"));
+        copy_dir::copy_dir(
+            contract_source_dir(workspace, contract),
+            build_dir.join(contract),
+        )
+        .unwrap_or_else(|e| panic!("failed to copy {contract}: {e}"));
     }
 
     // Interactors are not needed for the build and pull in extra dependencies.
