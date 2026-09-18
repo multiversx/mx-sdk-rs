@@ -188,10 +188,10 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
-    type Abi = Self;
+    type Abi = T::Abi;
 
     fn type_name() -> TypeName {
-        T::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {
