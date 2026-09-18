@@ -1,0 +1,16 @@
+[package]
+name = "adder"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/adder.rs"
+
+[dependencies.multiversx-sc]
+workspace = true
+
+[dev-dependencies.multiversx-sc-scenario]
+workspace = true
+features = ["wasmer-experimental"]

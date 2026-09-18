@@ -31,11 +31,17 @@ const TEST_DIR_PATH_SOURCE_PACK: &str = "contracts/test-reproducible-build/sourc
 const TEST_DIR_PATH_SOURCE_ROUNDTRIP: &str = "contracts/test-reproducible-build/source-roundtrip";
 const TEST_DIR_PATH_SOURCE_ROUNDTRIP_OUT: &str =
     "contracts/test-reproducible-build/source-roundtrip-out";
-const CONTRACTS: [&str; 2] = ["adder", "crypto-kitties"];
+// TODO: switch back to CONTRACTS = ["adder", "crypto-kitties"] once the new
+// unreleased features they now depend on have been published to crates.io:
+// - adder uses the new `call = AdderCall` contract macro syntax, not yet
+//   supported by the published multiversx-sc-derive.
+// - crypto-kitties' kitty-ownership depends directly on the brand-new
+//   multiversx-sc-abi crate, which isn't published to crates.io at all yet.
+const CONTRACTS: [&str; 1] = ["adder-old"];
 
 /// Local-build half of the reproducible build test.
 ///
-/// Copies adder and crypto-kitties (each with their own config), strips path
+/// Copies each contract in `CONTRACTS` (with its own config), strips path
 /// deps, then runs `local_build` per contract and prints release notes.
 ///
 /// Run with:
@@ -100,7 +106,7 @@ fn repro_build_local() {
 
 /// Docker-build half of the reproducible build test.
 ///
-/// Copies adder and crypto-kitties (each with their own config), strips path
+/// Copies each contract in `CONTRACTS` (with its own config), strips path
 /// deps, then runs `docker_build` per contract (image and output are read from
 /// each contract's config) and prints release notes.
 ///
@@ -175,7 +181,7 @@ fn repro_build_docker() {
 /// `sc-reproducible-build.toml` inside each contract subdirectory.
 fn expected_contracts(contract: &str) -> &'static [&'static str] {
     match contract {
-        "adder" => &["adder"],
+        "adder" | "adder-old" => &["adder"],
         "crypto-kitties" => &["kitty-auction", "kitty-genetic-alg", "kitty-ownership"],
         other => panic!("unknown contract: {other}"),
     }
@@ -262,10 +268,12 @@ fn setup_build_dir(workspace: &Path, build_dir: &Path, contracts: &[&str]) {
             .unwrap_or_else(|e| panic!("failed to copy {contract}: {e}"));
     }
 
-    // The interactor is not needed for the build and pulls in extra dependencies.
-    let adder_interactor = build_dir.join("adder").join("interactor");
-    if adder_interactor.exists() {
-        fs::remove_dir_all(&adder_interactor).unwrap();
+    // Interactors are not needed for the build and pull in extra dependencies.
+    for contract in contracts {
+        let interactor_dir = build_dir.join(contract).join("interactor");
+        if interactor_dir.exists() {
+            fs::remove_dir_all(&interactor_dir).unwrap();
+        }
     }
 
     strip_path(
