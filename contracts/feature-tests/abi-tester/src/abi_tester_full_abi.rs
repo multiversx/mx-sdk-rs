@@ -241,7 +241,7 @@ pub trait AbiTester {
     /// `ManagedBuffer` (`BytesAbi`) and `Vec<u8>` (`ListAbi<u8>`) are distinct ABI marker
     /// types, even though `BytesAbi` used to be just a type alias for `ListAbi<u8>`.
     #[endpoint(bytes_vs_list)]
-    fn bytes_vs_list(&self, bytes: BytesAbi, list: BytesAbi) -> MultiValue2<BytesAbi, BytesAbi>;
+    fn bytes_vs_list(&self, bytes: BytesAbi, list: ListAbi<u8>) -> MultiValue2<BytesAbi, ListAbi<u8>>;
 
     #[endpoint(process_managed_decimal)]
     fn process_managed_decimal(&self, input: DecimalAbi<ConstDecimals<U10>>) -> DecimalAbi<NumDecimals>;

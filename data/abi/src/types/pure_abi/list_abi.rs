@@ -17,9 +17,6 @@ where
 
     fn type_name() -> TypeName {
         let t_name = T::type_name();
-        if t_name == "u8" {
-            return "bytes".into();
-        }
         let mut repr = TypeName::from("List<");
         repr.push_str(t_name.as_str());
         repr.push('>');
@@ -27,10 +24,6 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        let t_name = T::type_name();
-        if t_name == "u8" {
-            return "BytesAbi".into();
-        }
         let mut repr = TypeName::from("ListAbi<");
         repr.push_str(T::type_name_rust().as_str());
         repr.push('>');

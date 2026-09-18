@@ -552,7 +552,7 @@ impl<M: ManagedTypeApi> TypeAbi for ManagedBuffer<M> {
     type Abi = BytesAbi;
 
     fn type_name() -> TypeName {
-        "bytes".into()
+        BytesAbi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

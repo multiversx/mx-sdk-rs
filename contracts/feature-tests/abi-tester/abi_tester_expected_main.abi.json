@@ -267,7 +267,7 @@
                 },
                 {
                     "name": "list",
-                    "type": "bytes"
+                    "type": "List<u8>"
                 }
             ],
             "outputs": [
@@ -275,7 +275,7 @@
                     "type": "bytes"
                 },
                 {
-                    "type": "bytes"
+                    "type": "List<u8>"
                 }
             ]
         },
