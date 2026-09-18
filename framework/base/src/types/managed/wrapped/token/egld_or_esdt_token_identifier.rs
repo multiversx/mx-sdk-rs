@@ -336,8 +336,17 @@ impl<M> TypeAbiFrom<&TestTokenIdentifier<'_>> for EgldOrEsdtTokenIdentifier<M> w
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifier<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for EgldOrEsdtTokenIdentifier<M> {}
 
+impl<M: ManagedTypeApi> TypeAbiFrom<EgldOrEsdtTokenIdentifier<M>>
+    for crate::abi::EgldOrEsdtTokenIdentifierAbi
+{
+}
+impl<M: ManagedTypeApi> TypeAbiFrom<&EgldOrEsdtTokenIdentifier<M>>
+    for crate::abi::EgldOrEsdtTokenIdentifierAbi
+{
+}
+
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
-    type Unmanaged = Self;
+    type Abi = crate::abi::EgldOrEsdtTokenIdentifierAbi;
 
     fn type_name() -> TypeName {
         "EgldOrEsdtTokenIdentifier".into()

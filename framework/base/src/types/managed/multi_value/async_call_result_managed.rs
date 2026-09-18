@@ -109,7 +109,7 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
-    type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("AsyncCallResult<");

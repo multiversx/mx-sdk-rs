@@ -2,6 +2,9 @@
 resolver = "3"
 
 members = [
+  "data/abi",
+  "data/abi-derive-common",
+  "data/abi-derive",
   "data/codec",
   "data/codec-derive",
   "data/human-readable",
@@ -136,6 +139,7 @@ members = [
   "contracts/feature-tests/big-float-features",
   "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
+  "contracts/feature-tests/composability/abi",
   "contracts/feature-tests/composability/builtin-func-features",
   "contracts/feature-tests/composability/builtin-func-features/meta",
   "contracts/feature-tests/composability/esdt-contract-pair",
@@ -216,6 +220,10 @@ members = [
   # "chain/wasmer-prod", ## not included, references wasmer 2.2
   # "contracts/feature-tests/gas-tests", ## uncomment for easier development
 ]
+
+[workspace.dependencies.multiversx-sc-abi]
+version = "0.25.0"
+path = "data/abi"
 
 [workspace.dependencies.multiversx-sc]
 version = "0.66.2"

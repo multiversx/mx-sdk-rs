@@ -8,9 +8,9 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
-[dependencies.kitty]
+[dependencies.kitty-abi]
 version = "0.0.0"
-path = "../common/kitty"
+path = "../abi"
 
 [dependencies.kitty-ownership]
 version = "0.0.0"

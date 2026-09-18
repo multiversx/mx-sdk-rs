@@ -83,6 +83,8 @@ impl From<ContractAbiJson> for ContractAbi {
                 .collect(),
             has_callback: abi_json.has_callback,
             type_descriptions: convert_json_to_type_descriptions(abi_json.types),
+            implements_abi: Vec::new(),
+            implements_abi_exactly: Vec::new(),
         }
     }
 }

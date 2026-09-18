@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
@@ -15,9 +15,9 @@ pub trait ForwarderSyncCallModule {
             .tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .echo_arguments(args)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -36,9 +36,9 @@ pub trait ForwarderSyncCallModule {
             .tx()
             .to(&to)
             .gas(one_third_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .echo_arguments(args.clone())
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -47,9 +47,9 @@ pub trait ForwarderSyncCallModule {
             .tx()
             .to(&to)
             .gas(one_third_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .echo_arguments(args)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultManaged)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -68,10 +68,10 @@ pub trait ForwarderSyncCallModule {
             .tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds_echo_payment()
             .payment(payment)
-            .returns(ReturnsResult)
+            .returns(ReturnsResultAs::<MultiValueEncoded<PaymentMultiValue>>::new())
             .sync_call();
 
         self.accept_funds_sync_result_event(&result);
@@ -86,7 +86,7 @@ pub trait ForwarderSyncCallModule {
         self.tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_received_funds_immediately()
             .egld(payment)
             .returns(ReturnsBackTransfersEGLD)
@@ -106,7 +106,7 @@ pub trait ForwarderSyncCallModule {
             .tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_received_funds_immediately()
             .single_esdt(
                 &payment.token_identifier,
@@ -132,7 +132,7 @@ pub trait ForwarderSyncCallModule {
         self.tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_received_funds_immediately()
             .payment(payment)
             .returns(ReturnsBackTransfersLegacyMultiESDT)
@@ -148,7 +148,7 @@ pub trait ForwarderSyncCallModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -171,14 +171,14 @@ pub trait ForwarderSyncCallModule {
         let payment = self.call_value().all();
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment)
             .sync_call();
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .call_counts(b"accept_funds")
             .returns(ReturnsResult)
             .sync_call()
@@ -194,7 +194,7 @@ pub trait ForwarderSyncCallModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .sync_call();
     }
@@ -211,7 +211,7 @@ pub trait ForwarderSyncCallModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds_with_transfer_exec(
                 token,
                 amount,
@@ -233,7 +233,7 @@ pub trait ForwarderSyncCallModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .sync_call();

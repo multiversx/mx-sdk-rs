@@ -12,7 +12,7 @@ use super::{
     source::{CurrentStorage, StorageAddress},
 };
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeName, VariadicAbi},
     api::StorageMapperApi,
     storage::{StorageKey, storage_set},
     types::{ManagedAddress, ManagedType, ManagedVec, MultiValueEncoded},
@@ -332,10 +332,10 @@ impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
-    type Unmanaged = Self;
+    type Abi = VariadicAbi<<ManagedAddress<SA> as TypeAbi>::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

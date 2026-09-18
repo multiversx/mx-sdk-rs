@@ -2,7 +2,7 @@ use std::path::Path;
 
 use crate::{
     cli::{ContractCliAction, ContractCliArgs},
-    contract::{meta_config::MetaConfig, sc_config::ScConfig},
+    contract::{abi_conformance, meta_config::MetaConfig, sc_config::ScConfig},
 };
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
@@ -39,6 +39,8 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
 
 fn process_original_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs) -> MetaConfig {
     let input_abi = <AbiObj as ContractAbiProvider>::abi();
+    abi_conformance::validate_abi_conformance(&input_abi)
+        .unwrap_or_else(|err| panic!("ABI conformance check failed: {err}"));
     let mut meta_config = MetaConfig::create(input_abi, cli_args.load_abi_git_version);
     meta_config.sc_config.validate_contract_variants();
     meta_config.write_contract_abis();
@@ -52,6 +54,8 @@ where
     AbiObj: ContractAbiProvider,
 {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
+    abi_conformance::validate_abi_conformance(&original_contract_abi)
+        .unwrap_or_else(|err| panic!("ABI conformance check failed: {err}"));
 
     let sc_config =
         ScConfig::load_from_crate_or_default(contract_crate_path, &original_contract_abi);

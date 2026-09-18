@@ -14,6 +14,10 @@
             "version": "0.0.0",
             "gitVersion": "<git version here>"
         },
+        "abi": {
+            "name": "multiversx-sc-abi",
+            "version": "0.25.0"
+        },
         "framework": {
             "name": "multiversx-sc",
             "version": "0.66.2"
@@ -246,6 +250,32 @@
                 },
                 {
                     "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "`ManagedBuffer` (`BytesAbi`) and `Vec<u8>` (`ListAbi<u8>`) are distinct ABI marker",
+                "types, even though `BytesAbi` used to be just a type alias for `ListAbi<u8>`."
+            ],
+            "name": "bytes_vs_list",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bytes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "list",
+                    "type": "List<u8>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                },
+                {
+                    "type": "List<u8>"
                 }
             ]
         },

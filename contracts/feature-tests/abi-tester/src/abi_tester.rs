@@ -2,10 +2,12 @@
 
 use multiversx_sc::imports::*;
 
-mod abi_enum;
+pub mod abi_enum;
 pub mod abi_proxy;
-mod abi_test_type;
-mod only_nested;
+pub mod abi_test_type;
+pub mod abi_tester_full_abi;
+pub mod abi_tester_full_abi_raw;
+pub mod only_nested;
 
 use abi_enum::*;
 use abi_test_type::*;
@@ -16,7 +18,7 @@ use only_nested::*;
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
-#[multiversx_sc::contract]
+#[multiversx_sc::contract(implements_abi_exactly = abi_tester_full_abi::AbiTester)]
 #[esdt_attribute("TICKER1", BigUint)]
 #[esdt_attribute("TICKER2", ManagedBuffer)]
 #[esdt_attribute("TICKER3", u32)]
@@ -108,6 +110,17 @@ pub trait AbiTester {
         byte_array: ManagedByteArray<Self::Api, 32>,
     ) -> MultiValue2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
         (address, byte_array).into()
+    }
+
+    /// `ManagedBuffer` (`BytesAbi`) and `Vec<u8>` (`ListAbi<u8>`) are distinct ABI marker
+    /// types, even though `BytesAbi` used to be just a type alias for `ListAbi<u8>`.
+    #[endpoint]
+    fn bytes_vs_list(
+        &self,
+        bytes: ManagedBuffer,
+        list: Vec<u8>,
+    ) -> MultiValue2<ManagedBuffer, Vec<u8>> {
+        (bytes, list).into()
     }
 
     #[endpoint]

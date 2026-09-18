@@ -18,7 +18,6 @@ files_include = [
     "tests",
     "Cargo.toml",
     "README.md",
-    "sc-config.toml",
     "multiversx.json",
     "wasm/Cargo.lock",
     "interactor/Cargo.toml",

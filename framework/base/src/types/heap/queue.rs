@@ -139,7 +139,7 @@ impl<T: NestedDecode> TopDecode for Queue<T> {
 impl<T: TypeAbi> TypeAbiFrom<Self> for Queue<T> {}
 
 impl<T: TypeAbi> TypeAbi for Queue<T> {
-    type Unmanaged = Self;
+    type Abi = Self;
 
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("Queue<");

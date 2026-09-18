@@ -12,6 +12,9 @@ path = "src/abi_tester.rs"
 workspace = true
 features = ["alloc"]
 
+[dependencies.multiversx-sc-abi]
+workspace = true
+
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true
 

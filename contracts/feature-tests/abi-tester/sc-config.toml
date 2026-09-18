@@ -16,3 +16,12 @@ add-endpoints = [
 
 [[proxy]]
 path = "src/abi_proxy.rs"
+
+[[generate-abi]]
+path = "src/abi_tester_full_abi.rs"
+call = "AbiTesterCall"
+add-labels = ["test-external-view", "label1", "label2"] # full interface, for implements_abi_exactly
+
+[[generate-abi-raw]]
+path = "src/abi_tester_full_abi_raw.rs"
+add-labels = ["test-external-view", "label1", "label2"] # full interface, for implements_abi_exactly

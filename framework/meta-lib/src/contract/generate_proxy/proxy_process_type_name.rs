@@ -1,10 +1,10 @@
 use multiversx_sc::abi::EnumVariantDescription;
 
-pub(super) fn proxy_type_name(contract_trait_name: &str) -> String {
+pub(crate) fn proxy_type_name(contract_trait_name: &str) -> String {
     format!("{contract_trait_name}Proxy")
 }
 
-pub(super) fn proxy_methods_type_name(contract_trait_name: &str) -> String {
+pub(crate) fn proxy_methods_type_name(contract_trait_name: &str) -> String {
     format!("{contract_trait_name}ProxyMethods")
 }
 
@@ -19,12 +19,12 @@ pub(super) fn proxy_methods_type_name(contract_trait_name: &str) -> String {
 /// assert_eq!(extract_struct_crate("my_crate::module::MyStruct"), "my_crate");
 /// assert_eq!(extract_struct_crate("MyStruct"), "MyStruct");
 /// ```
-pub(super) fn extract_struct_crate(struct_path: &str) -> String {
+pub(crate) fn extract_struct_crate(struct_path: &str) -> String {
     let crate_name = struct_path.split("::").next().unwrap_or(struct_path);
     crate_name.to_string()
 }
 
-pub(super) fn process_rust_type(
+pub(crate) fn process_rust_type(
     rust_type: String,
     paths: Vec<String>,
     processed_paths: Vec<String>,
@@ -40,8 +40,8 @@ pub(super) fn process_rust_type(
     processed_rust_type
 }
 
-pub(super) fn extract_paths(rust_type: &str) -> Vec<String> {
-    let delimiters = "<>,()[] ";
+pub(crate) fn extract_paths(rust_type: &str) -> Vec<String> {
+    let delimiters = "<>,()[]; ";
     rust_type
         .split(|c| delimiters.contains(c))
         .filter(|s| !s.is_empty())
@@ -49,7 +49,7 @@ pub(super) fn extract_paths(rust_type: &str) -> Vec<String> {
         .collect()
 }
 
-pub(super) fn explicit_discriminant(
+pub(crate) fn explicit_discriminant(
     index: usize,
     variant: &EnumVariantDescription,
     variants: &[EnumVariantDescription],
@@ -69,7 +69,7 @@ pub(super) fn explicit_discriminant(
     None
 }
 
-pub(super) fn c_enum_representation(enum_variants: &[EnumVariantDescription]) -> Option<String> {
+pub(crate) fn c_enum_representation(enum_variants: &[EnumVariantDescription]) -> Option<String> {
     enum_variants
         .iter()
         .enumerate()

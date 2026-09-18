@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/forwarder_main.rs"
 
+[dependencies.composability-abi]
+path = "../abi"
+
 [dependencies.multiversx-sc]
 workspace = true
 

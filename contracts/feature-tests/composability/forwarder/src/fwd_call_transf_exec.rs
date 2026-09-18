@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
@@ -12,7 +12,7 @@ pub trait ForwarderTransferExecuteModule {
         let payment = self.call_value().all();
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment)
             .transfer_execute();
@@ -27,7 +27,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -46,7 +46,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -58,7 +58,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -82,7 +82,7 @@ pub trait ForwarderTransferExecuteModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(&*payment)
             .transfer_execute();
@@ -105,7 +105,7 @@ pub trait ForwarderTransferExecuteModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .transfer_execute()
@@ -119,7 +119,7 @@ pub trait ForwarderTransferExecuteModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .reject_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .transfer_execute()

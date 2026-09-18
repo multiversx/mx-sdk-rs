@@ -1,7 +1,7 @@
 use multiversx_chain_core::types::EsdtLocalRole;
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom},
+    abi::{EsdtTokenIdentifierAbi, TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
     codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage::mappers::{
@@ -438,10 +438,10 @@ impl<SA> TypeAbi for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    type Unmanaged = Self;
+    type Abi = EsdtTokenIdentifierAbi;
 
     fn type_name() -> TypeName {
-        EsdtTokenIdentifier::<SA>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

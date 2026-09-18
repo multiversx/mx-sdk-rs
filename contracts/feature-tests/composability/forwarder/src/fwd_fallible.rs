@@ -1,6 +1,6 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
+
+use composability_abi::vault_abi;
 
 #[multiversx_sc::module]
 pub trait ForwarderFallibleModule {
@@ -40,7 +40,7 @@ pub trait ForwarderFallibleModule {
         let result = self
             .tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .returns(ReturnsHandledOrError::new())
@@ -63,7 +63,7 @@ pub trait ForwarderFallibleModule {
             .tx()
             .to(&to)
             .gas(half_gas)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .reject_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .returns(ReturnsHandledOrError::new())

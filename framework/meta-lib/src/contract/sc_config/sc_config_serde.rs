@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
-use super::ProxyConfigSerde;
+use super::{ProxyConfigSerde, ProxyFormat};
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
@@ -13,8 +13,29 @@ pub struct ScConfigSerde {
     #[serde(default)]
     pub proxy: Vec<ProxyConfigSerde>,
     #[serde(default)]
+    #[serde(rename = "generate-abi")]
+    pub generate_abi: Vec<ProxyConfigSerde>,
+    #[serde(default)]
+    #[serde(rename = "generate-abi-raw")]
+    pub generate_abi_raw: Vec<ProxyConfigSerde>,
+    #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,
+}
+
+impl ScConfigSerde {
+    /// Validates fields that plain deserialization cannot enforce (see `ProxyConfigSerde::validate`).
+    pub fn validate(&self) {
+        for entry in &self.proxy {
+            entry.validate(ProxyFormat::Proxy);
+        }
+        for entry in &self.generate_abi {
+            entry.validate(ProxyFormat::Abi);
+        }
+        for entry in &self.generate_abi_raw {
+            entry.validate(ProxyFormat::AbiRaw);
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]

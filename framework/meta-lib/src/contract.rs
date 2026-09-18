@@ -1,3 +1,4 @@
+pub mod abi_conformance;
 pub mod generate_proxy;
 pub mod generate_snippets;
 pub mod meta_abi;

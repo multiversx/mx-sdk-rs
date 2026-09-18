@@ -3,7 +3,7 @@
 use multiversx_sc::imports::*;
 
 pub mod kitty_obj;
-pub mod kitty_ownership_proxy;
+pub mod kitty_ownership_abi;
 pub mod proxy;
 mod storage;
 mod zombie;

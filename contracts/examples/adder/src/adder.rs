@@ -2,11 +2,9 @@
 
 use multiversx_sc::imports::*;
 
-pub mod adder_proxy;
-
 /// One of the simplest smart contracts possible,
 /// it holds a single variable in storage, which anyone can increment.
-#[multiversx_sc::contract]
+#[multiversx_sc::contract(call = AdderCall)]
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]

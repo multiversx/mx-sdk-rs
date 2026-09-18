@@ -1,9 +1,8 @@
 multiversx_sc::imports!();
 
-use crate::{
-    common::{self, CallbackData},
-    vault_proxy,
-};
+use composability_abi::vault_abi;
+
+use crate::common::{self, CallbackData};
 
 #[multiversx_sc::module]
 pub trait CallPromisesModule: common::CommonModule {
@@ -15,7 +14,7 @@ pub trait CallPromisesModule: common::CommonModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .gas(gas_limit)
             .payment(payment)
@@ -34,7 +33,7 @@ pub trait CallPromisesModule: common::CommonModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .gas(gas_limit)
             .callback(self.callbacks().retrieve_funds_callback())
