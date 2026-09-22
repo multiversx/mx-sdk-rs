@@ -44,6 +44,7 @@ tools/coverage
 my-vm-tests.sh
 quick.sh
 .DS_Store
+.claude
 
 # Zip output with example wasm binaries
 examples-wasm.zip
