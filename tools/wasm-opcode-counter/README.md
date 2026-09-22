@@ -21,3 +21,8 @@ If `<folder>` is omitted, the current directory is scanned.
 ```bash
 cargo run --release -p wasm-opcode-counter -- ./output --per-file --top 10
 ```
+
+## Reports
+
+- [`2026-09-20/`](2026-09-20) — combined opcode counts for all mainnet, testnet and
+  devnet contracts as of that date.
