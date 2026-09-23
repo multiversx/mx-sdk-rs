@@ -34,14 +34,19 @@ type OpcodeCounts = HashMap<String, usize>;
 fn main() {
     let args = Args::parse();
 
-    let wasm_files = collect_wasm_files(&args.folder);
+    let mut scan_errors = 0usize;
+    let wasm_files = collect_wasm_files(&args.folder, &mut scan_errors);
     if wasm_files.is_empty() {
         eprintln!("No .wasm files found under {}", args.folder.display());
+        if scan_errors > 0 {
+            eprintln!("{scan_errors} folder(s) could not be scanned.");
+        }
         std::process::exit(1);
     }
 
     let mut total_counts: OpcodeCounts = HashMap::new();
     let mut total_ops = 0usize;
+    let mut failed_files = 0usize;
     let mut progress = Progress::new(wasm_files.len());
 
     for wasm_path in &wasm_files {
@@ -65,13 +70,30 @@ fn main() {
             Err(err) => {
                 progress.clear_line();
                 eprintln!("Failed to parse {}: {err}", wasm_path.display());
+                failed_files += 1;
             }
         }
     }
     progress.finish();
 
-    println!("\nTotals across {} file(s):", wasm_files.len());
+    let parsed_files = wasm_files.len() - failed_files;
+    if failed_files == 0 {
+        println!("\nTotals across {} file(s):", wasm_files.len());
+    } else {
+        println!(
+            "\nTotals across {parsed_files} of {} discovered file(s) ({failed_files} failed to parse):",
+            wasm_files.len()
+        );
+    }
     print_counts(&total_counts, total_ops, args.top);
+
+    if failed_files > 0 || scan_errors > 0 {
+        eprintln!(
+            "\n{failed_files} .wasm file(s) failed to parse and {scan_errors} folder(s)/entries \
+             could not be scanned; the totals above are incomplete."
+        );
+        std::process::exit(1);
+    }
 }
 
 /// Reports "[i/N]: <path>" progress on stderr while files are processed.
@@ -131,26 +153,41 @@ impl Progress {
 }
 
 /// Recursively collects all `.wasm` files under `folder`, sorted by path.
-fn collect_wasm_files(folder: &Path) -> Vec<PathBuf> {
+///
+/// `scan_errors` is incremented for every directory or entry that could not
+/// be read, so the caller can tell a clean scan apart from one where some
+/// part of the tree (and therefore some `.wasm` files) may be missing from
+/// the result entirely.
+fn collect_wasm_files(folder: &Path, scan_errors: &mut usize) -> Vec<PathBuf> {
     let mut result = Vec::new();
-    collect_wasm_files_recursive(folder, &mut result);
+    collect_wasm_files_recursive(folder, &mut result, scan_errors);
     result.sort();
     result
 }
 
-fn collect_wasm_files_recursive(folder: &Path, result: &mut Vec<PathBuf>) {
+fn collect_wasm_files_recursive(folder: &Path, result: &mut Vec<PathBuf>, scan_errors: &mut usize) {
     let entries = match fs::read_dir(folder) {
         Ok(entries) => entries,
         Err(err) => {
             eprintln!("Failed to read directory {}: {err}", folder.display());
+            *scan_errors += 1;
             return;
         }
     };
 
-    for entry in entries.flatten() {
+    for entry in entries {
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(err) => {
+                eprintln!("Failed to read an entry in {}: {err}", folder.display());
+                *scan_errors += 1;
+                continue;
+            }
+        };
+
         let path = entry.path();
         if path.is_dir() {
-            collect_wasm_files_recursive(&path, result);
+            collect_wasm_files_recursive(&path, result, scan_errors);
         } else if path.extension().and_then(|ext| ext.to_str()) == Some("wasm") {
             result.push(path);
         }
@@ -166,8 +203,9 @@ fn count_opcodes_in_file(path: &Path) -> Result<OpcodeCounts, String> {
     for payload in WasmParser::new(0).parse_all(&data) {
         let payload = payload.map_err(|err| err.to_string())?;
         if let Payload::CodeSectionEntry(body) = payload {
-            let mut reader = body.get_operators_reader().map_err(|err| err.to_string())?;
-            while let Ok(op) = reader.read() {
+            let reader = body.get_operators_reader().map_err(|err| err.to_string())?;
+            for op in reader {
+                let op = op.map_err(|err| err.to_string())?;
                 *counts.entry(opcode_name(op)).or_insert(0) += 1;
             }
         }
