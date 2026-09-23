@@ -1,0 +1,15 @@
+[package]
+name = "wasm-opcode-counter"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+description = "Counts the occurrences of WASM opcodes in all .wasm files in a folder"
+
+[[bin]]
+name = "wasm-opcode-counter"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+wasmparser = "0.249"
