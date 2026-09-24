@@ -1,0 +1,71 @@
+{
+    "name": "test-adder",
+    "comment": "run foundry-like test for Adder",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:k": {
+                    "nonce": "1",
+                    "balance": "100000"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:k",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:k-test"
+                }
+            ]
+        },
+        {
+            "step": "fetchWasmSource",
+            "wasmPath": "file:../../../../deps/mx-sdk-rs/contracts/examples/adder/output/adder.wasm" 
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy test",
+            "comment": "deploy the test contract",
+            "tx": {
+                "from": "address:k",
+                "contractCode": "file:../output/test-adder.wasm",
+                "arguments": [
+                    "file:../../../../deps/mx-sdk-rs/contracts/examples/adder/output/adder.wasm"
+                ],
+                "gasLimit": "5,000,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call test",
+            "comment": "call the parametric test endpoint with a concrete value",
+            "tx": {
+                "from": "address:k",
+                "to": "sc:k-test",
+                "function": "test_call_add",
+                "value": "0",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

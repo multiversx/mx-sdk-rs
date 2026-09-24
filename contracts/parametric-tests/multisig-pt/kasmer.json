@@ -1,0 +1,8 @@
+{
+  "contracts": [
+    {
+      "path": "../../examples/multisig",
+      "name": "multisig"
+    }
+  ]
+}

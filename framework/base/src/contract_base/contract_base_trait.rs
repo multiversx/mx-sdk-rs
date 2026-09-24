@@ -1,6 +1,6 @@
 use super::{
     BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer,
-    SendRawWrapper, SendWrapper, StorageRawWrapper,
+    SendRawWrapper, SendWrapper, StorageRawWrapper, TestRawWrapper,
 };
 use crate::{
     api::VMApi,
@@ -70,5 +70,10 @@ pub trait ContractBase: Sized {
     #[inline]
     fn storage_raw(&self) -> StorageRawWrapper<Self::Api> {
         StorageRawWrapper::new()
+    }
+
+    #[inline]
+    fn test_raw(&self) -> TestRawWrapper<Self::Api> {
+        TestRawWrapper::new()
     }
 }

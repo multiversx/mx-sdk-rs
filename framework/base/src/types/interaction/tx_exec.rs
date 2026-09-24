@@ -4,6 +4,7 @@ mod tx_exec_async_promises;
 mod tx_exec_deploy;
 mod tx_exec_sync;
 mod tx_exec_te;
+mod tx_exec_test_call;
 mod tx_exec_upgrade;
 
 pub use tx_env_sc::*;

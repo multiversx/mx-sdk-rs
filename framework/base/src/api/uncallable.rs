@@ -17,6 +17,7 @@ mod print_api_uncallable;
 mod send_api_uncallable;
 mod static_var_api_uncallable;
 mod storage_api_uncallable;
+mod test_api_uncallable;
 mod vm_api_uncallable;
 
 /// Dummy type with no implementation.
