@@ -13,6 +13,21 @@ impl WalletSignature {
         Self(ed25519::Ed25519Signature::from_bytes(&bytes))
     }
 
+    /// An all-zero signature.
+    ///
+    /// Not a valid ed25519 signature for any key; it is what a
+    /// [`Signer::None`](crate::wallet::Signer::None) wallet produces, for
+    /// networks that accept any signature.
+    pub fn zero() -> Self {
+        Self::from_bytes([0u8; 64])
+    }
+
+    /// Returns `true` if all 64 bytes are zero, i.e. this is the placeholder
+    /// signature produced by a [`Signer::None`](crate::wallet::Signer::None) wallet.
+    pub fn is_zero(&self) -> bool {
+        self.to_bytes() == [0u8; 64]
+    }
+
     pub fn to_bytes(&self) -> [u8; 64] {
         self.0.to_bytes()
     }

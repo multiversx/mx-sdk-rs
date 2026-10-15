@@ -11,7 +11,10 @@ use multiversx_sdk::gateway::{
 
 use crate::InteractorBase;
 
-/// A user account that can sign transactions (a pem is present).
+/// A user account registered as a transaction sender.
+///
+/// Normally its wallet signs the transactions; a wallet with no signer
+/// (see [`Wallet::new_unsigned`]) produces all-zero signatures instead.
 pub struct Sender {
     pub address: Address,
     pub hrp: Bech32Hrp,

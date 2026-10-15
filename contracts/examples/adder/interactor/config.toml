@@ -25,6 +25,11 @@ test_wallet = 'ivan'
 # keyfile = 'path/to/wallet.json'
 # keystore_password = 'password'
 
+# On a shadow fork, or on a chain simulator configured to skip signature
+# verification, an address alone is enough - transactions go out unsigned,
+# with an all-zero signature:
+# no_sig = 'erd1...'
+
 [ledger-wallet]
 ledger = true
 
