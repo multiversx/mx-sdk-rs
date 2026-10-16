@@ -1,10 +1,9 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use crate::{
-    common::{self, CallbackData},
-    vault_proxy,
-};
+use composability_abi::vault_abi;
+
+use crate::common::{self, CallbackData};
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
@@ -14,7 +13,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .echo_arguments(args)
             .callback(self.callbacks().echo_args_callback())
             .async_call_and_exit();
@@ -52,7 +51,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
         let payment = self.call_value().all();
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment)
             .async_call_and_exit()
@@ -66,7 +65,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
         let half_payment = &payment.amount / 2u32;
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -85,7 +84,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
 
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(PaymentRefs::new(
                 &payment.token_identifier,
@@ -105,7 +104,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .callback(self.callbacks().retrieve_funds_callback())
             .async_call_and_exit()
@@ -117,7 +116,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
         let payment = self.call_value().all();
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .reject_funds()
             .payment(MultiTransfer(payment))
             .callback(self.callbacks().retrieve_funds_callback())
@@ -155,7 +154,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     ) {
         self.tx()
             .to(to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .egld_or_single_esdt(token_identifier, 0u64, amount)
             .callback(
@@ -174,7 +173,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     ) {
         self.tx()
             .to(to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .egld_or_single_esdt(token_identifier, 0u64, cb_amount)
             .async_call_and_exit();
@@ -188,7 +187,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .accept_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .async_call_and_exit();
@@ -202,7 +201,7 @@ pub trait ForwarderAsyncCallModule: common::CommonModule {
     ) {
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .reject_funds()
             .payment(payment_args.convert_payment_multi_triples())
             .async_call_and_exit();

@@ -1,0 +1,31 @@
+name = "adder"
+contract_trait = "Adder"
+src_file = "adder.rs"
+rename_pairs = [
+    [
+        "blockchain.set_current_dir_from_workspace(\"contracts/examples/adder\");",
+        "// blockchain.set_current_dir_from_workspace(\"relative path to your workspace, if applicable\");",
+    ],
+    [
+        "interactor.set_current_dir_from_workspace(\"contracts/examples/adder/interactor\");",
+        "// interactor.set_current_dir_from_workspace(\"relative path to your workspace, if applicable\");",
+    ],
+]
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "Cargo.toml",
+    "README.md",
+    "sc-config.toml",
+    "multiversx.json",
+    "wasm/Cargo.lock",
+    "interactor/Cargo.toml",
+    "interactor/config.toml",
+    "interactor/.gitignore",
+    "interactor/src",
+    "interactor/tests/adder_interactor_cs_test.rs",
+    "snippets/adder.snippets.sh",
+]
+has_interactor = true

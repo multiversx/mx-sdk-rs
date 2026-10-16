@@ -21,7 +21,6 @@ mod tx_payment_vec_ref;
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
 pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
-pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
     api::{CallTypeApi, ManagedTypeApi, quick_signal_error},

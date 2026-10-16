@@ -211,8 +211,14 @@ impl<M> TypeAbiFrom<Vec<u8>> for EsdtTokenIdentifier<M> where M: ManagedTypeApi 
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EsdtTokenIdentifier<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for EsdtTokenIdentifier<M> {}
 
+impl<M: ManagedTypeApi> TypeAbiFrom<EsdtTokenIdentifier<M>> for crate::abi::EsdtTokenIdentifierAbi {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&EsdtTokenIdentifier<M>>
+    for crate::abi::EsdtTokenIdentifierAbi
+{
+}
+
 impl<M: ManagedTypeApi> TypeAbi for EsdtTokenIdentifier<M> {
-    type Unmanaged = Self;
+    type Abi = crate::abi::EsdtTokenIdentifierAbi;
 
     fn type_name() -> TypeName {
         // for backwards compatibility with existing tooling

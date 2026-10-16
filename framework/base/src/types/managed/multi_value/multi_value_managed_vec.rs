@@ -3,7 +3,7 @@ use core::borrow::Borrow;
 use multiversx_sc_codec::multi_types::{IgnoreValue, MultiValueVec};
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
@@ -267,6 +267,22 @@ where
 {
 }
 
+impl<M, T, U> TypeAbiFrom<VariadicAbi<U>> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi + TypeAbiFrom<U>,
+    U: TypeAbi,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<MultiValueManagedVec<M, T>> for VariadicAbi<U>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi,
+    U: TypeAbi + TypeAbiFrom<T>,
+{
+}
+
 impl<M, T> TypeAbiFrom<IgnoreValue> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
@@ -279,10 +295,10 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Unmanaged = MultiValueVec<T::Unmanaged>;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

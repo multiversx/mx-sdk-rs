@@ -236,6 +236,24 @@ where
             .original_result()
     }
 
+    /// `ManagedBuffer` (`BytesAbi`) and `Vec<u8>` (`ListAbi<u8>`) are distinct ABI marker 
+    /// types, even though `BytesAbi` used to be just a type alias for `ListAbi<u8>`. 
+    pub fn bytes_vs_list<
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<Vec<u8>>,
+    >(
+        self,
+        bytes: Arg0,
+        list: Arg1,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedBuffer<Env::Api>, Vec<u8>>> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("bytes_vs_list")
+            .argument(&bytes)
+            .argument(&list)
+            .original_result()
+    }
+
     pub fn process_managed_decimal<
         Arg0: ProxyArg<ManagedDecimal<Env::Api, ConstDecimals<U10>>>,
     >(

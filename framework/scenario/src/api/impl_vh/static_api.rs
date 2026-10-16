@@ -1,6 +1,6 @@
 use multiversx_chain_vm::host::vm_hooks::VMHooksDispatcher;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
-use multiversx_sc::types::Address;
+use multiversx_sc::{api::UnmanagedApi, types::Address};
 use std::sync::Mutex;
 
 use crate::{
@@ -54,6 +54,10 @@ impl VMHooksApiBackend for StaticApiBackend {
 }
 
 pub type StaticApi = VMHooksApi<StaticApiBackend>;
+
+/// `StaticApi` requires no live VM connection, so managed types built on it can be treated as
+/// their own "unmanaged" representation. See `HasUnmanaged`.
+impl UnmanagedApi for StaticApi {}
 
 impl StaticApi {
     /// The static API does not allow interrogating the Tx input,

@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{ListAbi, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ErrorApiImpl},
     codec::{self, NestedDecode, NestedEncode, TopDecode, TopEncode, arrayvec::ArrayVec},
 };
@@ -307,11 +307,11 @@ impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
-    type Unmanaged = Self;
+    type Abi = ListAbi<u32>;
 
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {
-        <&[usize] as TypeAbi>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

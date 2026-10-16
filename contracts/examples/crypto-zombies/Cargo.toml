@@ -11,5 +11,8 @@ path = "src/lib.rs"
 [dependencies.multiversx-sc]
 workspace = true
 
+[dependencies.multiversx-sc-abi]
+workspace = true
+
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

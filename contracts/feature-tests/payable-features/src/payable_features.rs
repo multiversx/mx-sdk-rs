@@ -7,7 +7,7 @@ pub mod payable_features_proxy;
 
 /// Contract that only tests the call value features,
 /// i.e. the framework/Arwen functionality for accepting EGLD and ESDT payments.
-#[multiversx_sc::contract]
+#[multiversx_sc::contract(call = PayableFeaturesCall)]
 pub trait PayableFeatures {
     #[init]
     fn init(&self) {}

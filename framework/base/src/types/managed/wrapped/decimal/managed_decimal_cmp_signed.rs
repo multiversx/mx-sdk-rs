@@ -5,6 +5,8 @@ use crate::{
     types::{BigUint, Decimals, ManagedDecimalSigned},
 };
 
+use super::scaling_factor::scaling_factor;
+
 impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimalSigned<M, D2>>
     for ManagedDecimalSigned<M, D1>
 {
@@ -16,13 +18,13 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimalSign
         {
             Ordering::Less => {
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(diff_decimals);
                 &self.data * scaling_factor.as_big_int() == other.data
             }
             Ordering::Equal => self.data == other.data,
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(diff_decimals);
                 &other.data * scaling_factor.as_big_int() == self.data
             }
         }
@@ -40,14 +42,14 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialOrd<ManagedDecimalSig
         {
             Ordering::Less => {
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(diff_decimals);
 
                 Some((&self.data * scaling_factor.as_big_int()).cmp(&other.data))
             }
             Ordering::Equal => Some((self.data).cmp(&other.data)),
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
-                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                let scaling_factor: &BigUint<M> = &scaling_factor::<M>(diff_decimals);
                 Some((&other.data * scaling_factor.as_big_int()).cmp(&self.data))
             }
         }
