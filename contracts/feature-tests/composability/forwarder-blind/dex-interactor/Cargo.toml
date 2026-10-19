@@ -12,9 +12,6 @@ path = "src/dex_interactor_main.rs"
 [lib]
 path = "src/dex_interactor.rs"
 
-[dependencies.forwarder-blind]
-path = ".."
-
 [dependencies.multiversx-sc-snippets]
 workspace = true
 

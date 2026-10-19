@@ -1647,7 +1647,6 @@ name = "forwarder-blind-dex-interactor"
 version = "0.0.0"
 dependencies = [
  "clap",
- "forwarder-blind",
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
@@ -1668,7 +1667,6 @@ name = "forwarder-interact"
 version = "0.0.0"
 dependencies = [
  "clap",
- "forwarder",
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
@@ -2144,7 +2142,6 @@ dependencies = [
  "clap",
  "delegation-sc-interact",
  "multiversx-sc-snippets",
- "payable-interactor",
  "serde",
  "tokio",
  "toml",
@@ -3219,7 +3216,6 @@ dependencies = [
 name = "multiversx-chain-vm"
 version = "0.23.1"
 dependencies = [
- "anyhow",
  "bitflags 2.13.2",
  "colored 3.1.1",
  "hex",
@@ -3378,10 +3374,8 @@ dependencies = [
  "anyhow",
  "clap",
  "colored 3.1.1",
- "convert_case 0.12.0",
  "hex",
  "lazy_static",
- "multiversx-chain-scenario-format",
  "multiversx-sc",
  "rustc_version",
  "semver",
@@ -3486,7 +3480,6 @@ name = "multiversx-sdk-dapp"
 version = "0.16.1"
 dependencies = [
  "anyhow",
- "getrandom 0.4.3",
  "gloo-net 0.7.0",
  "hex",
  "itertools 0.15.0",
@@ -4365,7 +4358,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "vault",
 ]
 
 [[package]]

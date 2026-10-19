@@ -12,9 +12,6 @@ path = "src/interactor_main.rs"
 [lib]
 path = "src/interact.rs"
 
-[dependencies.forwarder]
-path = "../forwarder"
-
 [dependencies.multiversx-sc-snippets]
 workspace = true
 
