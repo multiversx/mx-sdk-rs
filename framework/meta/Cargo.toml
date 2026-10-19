@@ -39,7 +39,7 @@ convert_case = "0.12"
 semver = "1.0.20"
 ruplacer = { version = "0.10", default-features = false }
 # transitive dependency of ruplacer; 0.4.30+ requires let-chains (Rust 1.88+)
-ignore = "<0.4.30"
+ignore = ">=0.4, <0.4.30"
 regex = "1.11"
 reqwest = { version = "0.13", features = ["rustls", "blocking", "json"] }
 copy_dir = "0.1"
