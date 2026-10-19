@@ -297,3 +297,42 @@ fn codehash_verify_unreadable_hash_file_is_not_missing() {
         2
     );
 }
+
+/// Directory symlinks must not be followed: clearing `project` must not touch hashes
+/// behind a link that points outside of it.
+#[cfg(unix)]
+#[test]
+fn codehash_clear_does_not_follow_dir_symlink() {
+    let root = setup("clear_symlink");
+    let project = root.join("a");
+    let external = root.join("external");
+    fs::create_dir_all(&external).unwrap();
+    fs::copy(ADDER_WASM, external.join("adder.wasm")).unwrap();
+    let external_hash = external.join("adder.codehash.txt");
+    fs::write(&external_hash, ADDER_CODEHASH).unwrap();
+
+    let link = project.join("link");
+    std::os::unix::fs::symlink(external.canonicalize().unwrap(), &link).unwrap();
+    let inner_hash = project.join("adder.codehash.txt");
+    fs::write(&inner_hash, ADDER_CODEHASH).unwrap();
+
+    assert_eq!(
+        find_codehash_files(&project, true, &[]).unwrap(),
+        vec![inner_hash.clone()]
+    );
+    assert_eq!(
+        find_wasm_files(&project, true, &[]).unwrap().len(),
+        2,
+        "wasm files behind the symlink must not be listed"
+    );
+
+    run(CodehashCliAction::Clear(CodehashClearArgs {
+        target: target(&project),
+        dry_run: false,
+    }));
+
+    assert!(!inner_hash.exists());
+    assert!(external_hash.exists(), "hash behind symlink was deleted");
+    assert!(external.join("adder.wasm").exists());
+    assert!(link.is_symlink());
+}

@@ -105,15 +105,19 @@ fn collect_files(
 ) -> Result<()> {
     let read_dir = fs::read_dir(dir).with_context(|| dir_context(dir))?;
     for entry in read_dir {
-        let path = entry.with_context(|| dir_context(dir))?.path();
-        if path.is_dir() {
+        let entry = entry.with_context(|| dir_context(dir))?;
+        // `DirEntry::file_type` does not follow symlinks, so links are never traversed
+        // or matched, and the search cannot leave the selected tree.
+        let file_type = entry.file_type().with_context(|| dir_context(dir))?;
+        let path = entry.path();
+        if file_type.is_dir() {
             let ignored = path
                 .file_name()
                 .is_some_and(|name| ignore.iter().any(|i| name.to_string_lossy() == i.as_str()));
             if recursive && !ignored {
                 collect_files(&path, recursive, ignore, matches, result)?;
             }
-        } else if matches(&path) {
+        } else if file_type.is_file() && matches(&path) {
             result.push(path);
         }
     }
