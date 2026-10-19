@@ -3,7 +3,7 @@ use std::{
     io::{self, Read, Write},
 };
 
-use bip39::Language;
+use bip39::{Language, WordCount};
 use rand::Rng;
 
 use multiversx_sc::types::Address;
@@ -168,7 +168,7 @@ fn bech32_conversion(bech32_args: &WalletBech32Args) {
 }
 
 pub fn generate_mnemonic() -> Mnemonic {
-    Mnemonic::from(bip39::Mnemonic::generate_in(Language::English, 24).unwrap())
+    Mnemonic::from(bip39::Mnemonic::generate_in(Language::English, WordCount::Words24).unwrap())
 }
 
 struct NewWalletInfo {
