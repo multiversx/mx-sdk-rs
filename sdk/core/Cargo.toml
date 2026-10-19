@@ -23,7 +23,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order"] }
 serde_repr = "0.1"
 anyhow = "1.0"
-bip39 = "2.0"
+bip39 = "3.0"
 sha2 = "0.11"
 sha3 = "0.12"
 hmac = "0.13"
@@ -31,14 +31,14 @@ hex = "0.4"
 pbkdf2 = { version = "0.13", default-features = false }
 zeroize = "1.4"
 itertools = "0.15"
-pem = "3.0"
+pem = "4.0"
 log = "0.4"
 scrypt = { version = "0.12", default-features = false }
 aes = "0.9"
 ctr = "0.10"
 bitflags = "2.13"
-ledger-transport-hid = { version = "0.10", optional = true }
-ledger-apdu          = { version = "0.10", optional = true }
+ledger-transport-hid = { version = "0.11", optional = true }
+ledger-apdu          = { version = "0.11", optional = true }
 
 [dependencies.multiversx-chain-core]
 version = "=0.23.1"

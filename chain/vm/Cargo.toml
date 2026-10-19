@@ -24,7 +24,7 @@ wasmer-experimental = ["multiversx-chain-vm-executor-wasmer-experimental"]
 # default = ["wasmer-experimental"] ## uncomment for easier development
 
 [dependencies]
-num-bigint = "0.4"
+num-bigint = "0.5"
 num-traits = "0.2"
 hex = "0.4"
 itertools = "0.15"

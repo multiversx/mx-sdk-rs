@@ -19,7 +19,7 @@ path = "../../feature-tests/basic-features"
 workspace = true
 
 [dev-dependencies]
-num-bigint = "0.4"
+num-bigint = "0.5"
 num-traits = "0.2"
 hex = "0.4"
 
