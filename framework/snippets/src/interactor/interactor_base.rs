@@ -343,6 +343,17 @@ where
         self.register_wallet(wallet).await.to_bech32(self.get_hrp())
     }
 
+    /// Registers an address as a transaction sender, with no signing capability.
+    ///
+    /// Transactions sent from it carry an all-zero signature, so this only
+    /// works against networks that accept any signature: shadow forks, and
+    /// chain simulators configured to skip signature verification.
+    ///
+    /// Returns the wallet address.
+    pub async fn register_address(&mut self, address: Bech32Address) -> Address {
+        self.register_wallet(address.into()).await
+    }
+
     /// Registers an optional wallet as a transaction sender and funds it in
     /// simulator mode.
     ///

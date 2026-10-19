@@ -44,6 +44,27 @@ impl Wallet {
             source: WalletSource::Ledger { address_index, hrp },
         }
     }
+
+    /// Creates a wallet that knows its address, but has no way of signing.
+    ///
+    /// [`Wallet::sign_tx`] and [`Wallet::sign_bytes`] then return an all-zero
+    /// signature. Only usable on networks that accept any signature, such as
+    /// shadow forks and chain simulators configured to skip signature
+    /// verification.
+    pub fn new_unsigned(address: Address, hrp: Bech32Hrp) -> Self {
+        Wallet {
+            signer: Signer::None,
+            address,
+            source: WalletSource::AddressOnly(hrp),
+        }
+    }
+}
+
+/// Creates a wallet with no signing capability, see [`Wallet::new_unsigned`].
+impl From<Bech32Address> for Wallet {
+    fn from(address: Bech32Address) -> Self {
+        Self::new_unsigned(address.address, address.hrp)
+    }
 }
 
 impl From<WalletPem> for Wallet {
@@ -112,31 +133,44 @@ impl Wallet {
         let hrp = match &self.source {
             WalletSource::PemFile(hrp)
             | WalletSource::Keystore(hrp)
-            | WalletSource::Ledger { hrp, .. } => *hrp,
+            | WalletSource::Ledger { hrp, .. }
+            | WalletSource::AddressOnly(hrp) => *hrp,
             _ => Bech32Hrp::default(),
         };
         Bech32Address::encode_address(hrp, self.address.clone())
     }
 
-    /// Returns a reference to the private key, or `None` for Ledger wallets.
+    /// Returns `true` if this wallet produces real signatures.
+    ///
+    /// `false` for wallets created via [`Wallet::new_unsigned`], which sign
+    /// with all zeros.
+    pub fn can_sign(&self) -> bool {
+        self.signer.can_sign()
+    }
+
+    /// Returns a reference to the private key, or `None` for Ledger and
+    /// unsigned wallets.
     pub fn private_key(&self) -> Option<&PrivateKey> {
         match &self.signer {
             Signer::PrivateKey(pk) => Some(pk),
-            Signer::Ledger { .. } => None,
+            Signer::Ledger { .. } | Signer::None => None,
         }
     }
 
-    /// Returns the private key as a hex-encoded seed string, or `None` for Ledger wallets.
+    /// Returns the private key as a hex-encoded seed string, or `None` for
+    /// Ledger and unsigned wallets.
     pub fn private_key_hex(&self) -> Option<String> {
         self.private_key().map(|pk| pk.to_seed_hex())
     }
 
-    /// Returns the public key derived from the private key, or `None` for Ledger wallets.
+    /// Returns the public key derived from the private key, or `None` for
+    /// Ledger and unsigned wallets.
     pub fn public_key(&self) -> Option<PublicKey> {
         self.private_key().map(PublicKey::from)
     }
 
-    /// Returns the public key as a hex string, or `None` for Ledger wallets.
+    /// Returns the public key as a hex string, or `None` for Ledger and
+    /// unsigned wallets.
     pub fn public_key_hex(&self) -> Option<String> {
         self.public_key().map(|pk| pk.to_hex())
     }
@@ -145,7 +179,8 @@ impl Wallet {
     ///
     /// For `PrivateKey` wallets the signing is local and infallible (barring
     /// bugs). For `Ledger` wallets the device must be connected and the user
-    /// must confirm on-screen; errors are returned as `Err`.
+    /// must confirm on-screen; errors are returned as `Err`. For `None`
+    /// signers the result is an all-zero signature.
     pub fn sign_tx(&self, unsign_tx: &Transaction) -> Result<WalletSignature> {
         let mut unsign_tx = unsign_tx.clone();
         unsign_tx.signature = None;
@@ -160,6 +195,7 @@ impl Wallet {
                 Ok(pk.sign(tx_bytes))
             }
             Signer::Ledger { address_index } => ledger_sign_tx(*address_index, &unsign_tx),
+            Signer::None => Ok(WalletSignature::zero()),
         }
     }
 
@@ -167,19 +203,22 @@ impl Wallet {
     ///
     /// For `Ledger` wallets the message bytes are prefixed with a 4-byte
     /// big-endian length before being sent to the device (matching the Python SDK).
+    /// For `None` signers the result is an all-zero signature.
     pub fn sign_bytes(&self, data: impl AsRef<[u8]>) -> Result<WalletSignature> {
         match &self.signer {
             Signer::PrivateKey(pk) => Ok(pk.sign(data)),
             Signer::Ledger { address_index } => ledger_sign_bytes(*address_index, data),
+            Signer::None => Ok(WalletSignature::zero()),
         }
     }
 
     /// Converts this wallet to a PEM representation.
-    /// Returns an error for Ledger wallets (the private key is never exported).
+    /// Returns an error for Ledger wallets (the private key is never exported)
+    /// and for unsigned wallets (there is no private key).
     pub fn to_pem(&self, hrp: Bech32Hrp) -> Result<WalletPem> {
-        let pk = self.private_key().ok_or_else(|| {
-            anyhow!("cannot export a Ledger wallet to PEM: the private key is not available")
-        })?;
+        let pk = self
+            .private_key()
+            .ok_or_else(|| anyhow!("cannot export wallet to PEM: no private key available"))?;
         Ok(WalletPem {
             private_key: pk.clone(),
             address: Bech32Address::encode_address(hrp, self.address.clone()),

@@ -17,4 +17,20 @@ pub enum Signer {
     /// Signs on a connected Ledger hardware device at the given BIP-44 address
     /// index (account is always 0 for MultiversX).
     Ledger { address_index: u32 },
+
+    /// No signing capability: only the public key (i.e. the address) is known.
+    ///
+    /// Signing yields an all-zero signature. This is only useful on networks
+    /// that accept any signature, such as shadow forks and chain simulators
+    /// configured to skip signature verification.
+    None,
+}
+
+impl Signer {
+    /// Returns `true` if this signer produces real signatures.
+    ///
+    /// `false` only for [`Signer::None`], whose signatures are all zeros.
+    pub fn can_sign(&self) -> bool {
+        !matches!(self, Signer::None)
+    }
 }

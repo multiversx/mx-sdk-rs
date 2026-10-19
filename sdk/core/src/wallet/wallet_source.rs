@@ -14,4 +14,7 @@ pub enum WalletSource {
         address_index: u32,
         hrp: Bech32Hrp,
     },
+    /// Wallet created from an address alone, with no signing capability.
+    /// Carries the HRP the address was given with (for bech32 encoding).
+    AddressOnly(Bech32Hrp),
 }

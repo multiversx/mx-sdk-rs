@@ -20,6 +20,7 @@ struct WalletConfigRaw {
     ledger: bool,
     #[serde(default)]
     ledger_address_index: u32,
+    no_sig: Option<String>,
 }
 
 /// Wallet configuration embeddable in a TOML/JSON config file.
@@ -46,6 +47,13 @@ pub struct WalletConfig {
     /// Address index to use on the Ledger device (default: 0).
     pub ledger_address_index: u32,
 
+    /// Bech32 address of a wallet with no signing capability.
+    ///
+    /// Transactions sent from it carry an all-zero signature, so this is only
+    /// usable against networks that accept any signature: shadow forks, and
+    /// chain simulators configured to skip signature verification.
+    pub no_sig: Option<String>,
+
     cache: OnceLock<Wallet>,
 }
 
@@ -58,41 +66,57 @@ impl From<WalletConfigRaw> for WalletConfig {
             keystore_password: raw.keystore_password,
             ledger: raw.ledger,
             ledger_address_index: raw.ledger_address_index,
+            no_sig: raw.no_sig,
             cache: OnceLock::new(),
         }
     }
 }
 
 impl WalletConfig {
-    /// Creates a `WalletConfig` from a built-in test wallet name.
-    pub fn from_test_wallet(name: impl Into<String>) -> Self {
+    /// A config with no wallet source set. Callers fill in exactly one.
+    fn blank() -> Self {
         WalletConfig {
-            test_wallet: Some(name.into()),
+            test_wallet: None,
             pem: None,
             keyfile: None,
             keystore_password: None,
             ledger: false,
             ledger_address_index: 0,
+            no_sig: None,
             cache: OnceLock::new(),
+        }
+    }
+
+    /// Creates a `WalletConfig` from a built-in test wallet name.
+    pub fn from_test_wallet(name: impl Into<String>) -> Self {
+        WalletConfig {
+            test_wallet: Some(name.into()),
+            ..Self::blank()
         }
     }
 
     /// Creates a `WalletConfig` from a PEM file path.
     pub fn from_pem(path: impl Into<PathBuf>) -> Self {
         WalletConfig {
-            test_wallet: None,
             pem: Some(path.into()),
-            keyfile: None,
-            keystore_password: None,
-            ledger: false,
-            ledger_address_index: 0,
-            cache: OnceLock::new(),
+            ..Self::blank()
+        }
+    }
+
+    /// Creates a `WalletConfig` from a bech32 address, with no signing capability.
+    ///
+    /// Only usable on networks that accept any signature, see
+    /// [`WalletConfig::no_sig`].
+    pub fn from_no_sig(address: impl Into<String>) -> Self {
+        WalletConfig {
+            no_sig: Some(address.into()),
+            ..Self::blank()
         }
     }
 
     /// Returns the wallet, loading and caching it on first call.
     ///
-    /// Priority: `test_wallet` > `pem` > `keyfile` > `ledger`.
+    /// Priority: `test_wallet` > `pem` > `keyfile` > `ledger` > `no_sig`.
     /// Panics if none of the sources are set, or if loading fails.
     pub fn wallet(&self) -> &Wallet {
         self.cache.get_or_init(|| self.load_wallet())
@@ -120,8 +144,12 @@ impl WalletConfig {
                 .expect("failed to decrypt wallet")
         } else if self.ledger {
             self.load_ledger_wallet()
+        } else if let Some(address) = &self.no_sig {
+            Bech32Address::from_bech32_str(address.as_str()).into()
         } else {
-            panic!("WalletConfig requires one of: `test_wallet`, `pem`, `keyfile`, or `ledger`")
+            panic!(
+                "WalletConfig requires one of: `test_wallet`, `pem`, `keyfile`, `ledger`, or `no_sig`"
+            )
         }
     }
 
@@ -144,5 +172,38 @@ impl WalletConfig {
     #[cfg(not(feature = "ledger"))]
     fn load_ledger_wallet(&self) -> Wallet {
         panic!("Ledger support is not compiled in; rebuild with the `ledger` feature enabled")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const ALICE: &str = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
+
+    #[test]
+    fn from_no_sig_yields_an_unsigned_wallet() {
+        let config = WalletConfig::from_no_sig(ALICE);
+
+        assert_eq!(config.address(), Bech32Address::from_bech32_str(ALICE));
+        assert!(!config.wallet().can_sign());
+    }
+
+    #[test]
+    fn no_sig_can_be_deserialized_from_toml() {
+        let config: WalletConfig = toml::from_str(&format!("no_sig = '{ALICE}'")).unwrap();
+
+        assert_eq!(config.no_sig.as_deref(), Some(ALICE));
+        assert_eq!(config.address(), Bech32Address::from_bech32_str(ALICE));
+        assert!(!config.wallet().can_sign());
+    }
+
+    #[test]
+    fn test_wallet_takes_priority_over_no_sig() {
+        let config: WalletConfig =
+            toml::from_str(&format!("test_wallet = 'alice'\nno_sig = '{ALICE}'")).unwrap();
+
+        assert_eq!(config.address(), Bech32Address::from_bech32_str(ALICE));
+        assert!(config.wallet().can_sign());
     }
 }
