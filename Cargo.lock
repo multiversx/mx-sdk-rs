@@ -2491,9 +2491,9 @@ dependencies = [
 
 [[package]]
 name = "ignore"
-version = "0.4.30"
+version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b009b6744c1445efd7244084e25e498636412effb6760b55067553baa925cc7"
+checksum = "d4ffa3a0547a138e59ddd6fa3b7c672ed47e6ad6a3cd177984ff1116aa5ba742"
 dependencies = [
  "crossbeam-deque",
  "globset",
@@ -3347,6 +3347,7 @@ dependencies = [
  "convert_case 0.12.0",
  "copy_dir",
  "hex",
+ "ignore",
  "indexmap",
  "multiversx-chain-core",
  "multiversx-sc",
