@@ -189,11 +189,9 @@ fn test_price_aggregator_submit() {
             let submissions = sc.submissions().get(&token_pair).unwrap();
             assert_eq!(submissions.len(), SUBMISSION_COUNT - 1);
 
-            for index in 0..SUBMISSION_COUNT - 1 {
+            for oracle in state.oracles.iter().take(SUBMISSION_COUNT - 1) {
                 assert_eq!(
-                    sc.oracle_status()
-                        .get(&managed_address!(&state.oracles[index]))
-                        .unwrap(),
+                    sc.oracle_status().get(&managed_address!(oracle)).unwrap(),
                     OracleStatus {
                         total_submissions: 1,
                         accepted_submissions: 1

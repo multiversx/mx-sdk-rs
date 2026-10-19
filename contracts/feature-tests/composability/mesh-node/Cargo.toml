@@ -11,10 +11,5 @@ path = "src/mesh_node.rs"
 [dependencies.multiversx-sc]
 workspace = true
 
-[dependencies.multiversx-sc-wasm-adapter]
-version = "0.66.2"
-path = "../../../../framework/wasm-adapter"
-optional = true
-
 [dev-dependencies.multiversx-sc-scenario]
 workspace = true

@@ -58,7 +58,7 @@ impl PrettyPrintTreeNode {
 
         if self.children.len() == 1 {
             let only_child = self.children.first_entry().unwrap().remove();
-            self.name = format!("{}/{}", &self.name, &only_child.name);
+            self.name = format!("{}/{}", self.name, only_child.name);
             self.children = only_child.children;
         }
     }
@@ -68,7 +68,7 @@ impl PrettyPrintTreeNode {
         PrintName: Fn(&RelevantDirectory),
     {
         let num_children = self.children.len();
-        print!("{prefix} {}", &self.name);
+        print!("{prefix} {}", self.name);
         if let Some(dir) = &self.dir {
             print_name(dir);
         }

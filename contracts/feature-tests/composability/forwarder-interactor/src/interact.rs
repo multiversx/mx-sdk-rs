@@ -117,7 +117,7 @@ pub async fn forwarder_cli() {
         "setLocalRoles" => interact.set_local_roles().await,
         "unsetLocalRoles" => interact.unset_local_roles().await,
         "lastErrorMessage" => interact.last_error_message().await,
-        _ => panic!("unknown command: {}", &cmd),
+        _ => panic!("unknown command: {}", cmd),
     }
 }
 
@@ -1435,7 +1435,7 @@ impl ContractInteract {
                 royalties,
                 hash,
                 attributes,
-                &ManagedBuffer::from(uri),
+                ManagedBuffer::from(uri),
             )
             .returns(ReturnsResultUnmanaged)
             .run()
