@@ -3,7 +3,7 @@ use multiversx_sc_meta::{
         CodehashArgs, CodehashClearArgs, CodehashCliAction, CodehashGenerateArgs,
         CodehashPrintArgs, CodehashTargetArgs, CodehashVerifyArgs,
     },
-    cmd::reproducible_builds::codehash,
+    cmd::reproducible_builds::{codehash, run_verify},
 };
 use multiversx_sc_meta_lib::tools::{compute_codehash, find_codehash_files, find_wasm_files};
 use std::{
@@ -62,14 +62,17 @@ fn codehash_find_files() {
     let root = setup("find");
     let ignore = vec!["target".to_string()];
 
-    assert_eq!(find_wasm_files(&root, true, &ignore).len(), 2);
-    assert_eq!(find_wasm_files(&root, true, &[]).len(), 3);
-    assert_eq!(find_wasm_files(&root.join("a"), false, &[]).len(), 1);
+    assert_eq!(find_wasm_files(&root, true, &ignore).unwrap().len(), 2);
+    assert_eq!(find_wasm_files(&root, true, &[]).unwrap().len(), 3);
     assert_eq!(
-        find_wasm_files(&root.join("a/adder.wasm"), true, &[]),
+        find_wasm_files(&root.join("a"), false, &[]).unwrap().len(),
+        1
+    );
+    assert_eq!(
+        find_wasm_files(&root.join("a/adder.wasm"), true, &[]).unwrap(),
         vec![root.join("a/adder.wasm")]
     );
-    assert!(find_codehash_files(&root, true, &[]).is_empty());
+    assert!(find_codehash_files(&root, true, &[]).unwrap().is_empty());
 }
 
 #[test]
@@ -145,7 +148,7 @@ fn codehash_print_writes_nothing() {
         ..Default::default()
     }));
 
-    assert!(find_codehash_files(&root, true, &[]).is_empty());
+    assert!(find_codehash_files(&root, true, &[]).unwrap().is_empty());
 }
 
 /// Verify exits the process on failure, so only the passing cases can run in-process.
@@ -179,7 +182,7 @@ fn codehash_clear() {
         target: target(&root),
         dry_run: true,
     }));
-    assert_eq!(find_codehash_files(&root, true, &[]).len(), 3);
+    assert_eq!(find_codehash_files(&root, true, &[]).unwrap().len(), 3);
 
     // single file
     run(CodehashCliAction::Clear(CodehashClearArgs {
@@ -198,5 +201,99 @@ fn codehash_clear() {
     assert!(ignored_hash.exists());
 
     // .wasm files are never deleted
-    assert_eq!(find_wasm_files(&root, true, &[]).len(), 3);
+    assert_eq!(find_wasm_files(&root, true, &[]).unwrap().len(), 3);
+}
+
+/// An explicitly named file must still be of the right kind: `clear` deletes whatever
+/// `find_codehash_files` returns, so a stray `--path Cargo.toml` must yield nothing.
+#[test]
+fn codehash_explicit_file_must_match() {
+    let root = setup("explicit_file");
+    let unrelated = root.join("Cargo.toml");
+    fs::write(&unrelated, "[package]").unwrap();
+
+    assert!(
+        find_codehash_files(&unrelated, true, &[])
+            .unwrap()
+            .is_empty(),
+        "a non-codehash file must never be offered up for deletion"
+    );
+    assert!(find_wasm_files(&unrelated, true, &[]).unwrap().is_empty());
+
+    run(CodehashCliAction::Clear(CodehashClearArgs {
+        target: target(&unrelated),
+        dry_run: false,
+    }));
+    assert!(
+        unrelated.exists(),
+        "clear must not delete an unrelated file"
+    );
+
+    // a codehash file named directly is still found
+    generate(&root);
+    let hash_file = root.join("a/adder.codehash.txt");
+    assert_eq!(
+        find_codehash_files(&hash_file, true, &[]).unwrap(),
+        vec![hash_file]
+    );
+}
+
+/// A scan that cannot read part of the tree must fail rather than silently return the
+/// readable subset, which would let `verify` pass on an incomplete set of files.
+#[cfg(unix)]
+#[test]
+fn codehash_unreadable_dir_is_an_error() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let root = setup("unreadable_dir");
+    let blocked = root.join("a/b");
+    fs::set_permissions(&blocked, fs::Permissions::from_mode(0o000)).unwrap();
+
+    let result = find_wasm_files(&root, true, &[]);
+
+    // restore before asserting, so a failure still leaves a cleanable tree
+    fs::set_permissions(&blocked, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let err = result.expect_err("an unreadable subdirectory must not be skipped silently");
+    assert!(
+        err.to_string().contains("a/b"),
+        "error should name the unreadable directory, got: {err}"
+    );
+}
+
+/// `--allow-missing` excuses an absent hash file, never one that exists but cannot be read.
+#[test]
+fn codehash_verify_unreadable_hash_file_is_not_missing() {
+    let root = setup("verify_unreadable");
+    generate(&root);
+
+    // invalid UTF-8 where a hex hash is expected
+    fs::write(root.join("a/adder.codehash.txt"), [0xff, 0xfe, 0xfd]).unwrap();
+
+    let failures = run_verify(&CodehashVerifyArgs {
+        target: target(&root),
+        allow_missing: true,
+    });
+    assert_eq!(
+        failures, 1,
+        "an unreadable hash file must count as a failure even with --allow-missing"
+    );
+
+    // a genuinely missing file is still excused
+    let other = setup("verify_still_allows_missing");
+    assert_eq!(
+        run_verify(&CodehashVerifyArgs {
+            target: target(&other),
+            allow_missing: true,
+        }),
+        0
+    );
+    // ...and still fails when not allowed
+    assert_eq!(
+        run_verify(&CodehashVerifyArgs {
+            target: target(&other),
+            allow_missing: false,
+        }),
+        2
+    );
 }

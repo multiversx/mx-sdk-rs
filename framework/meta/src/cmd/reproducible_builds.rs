@@ -23,7 +23,7 @@ pub use source_json_model::{PackedSource, SCHEMA_VERSION, SourceFileEntry, Sourc
 
 pub use build_cmd::docker_build;
 pub use check::check_contract_verification;
-pub use codehash::codehash;
+pub use codehash::{codehash, run_verify};
 pub use download::download_contract_verification;
 pub use init_config::init_config;
 pub use local_build::local_build;

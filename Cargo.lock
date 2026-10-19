@@ -3403,6 +3403,7 @@ dependencies = [
 name = "multiversx-sc-meta-lib"
 version = "0.66.2"
 dependencies = [
+ "anyhow",
  "clap",
  "colored 3.1.1",
  "convert_case 0.11.0",

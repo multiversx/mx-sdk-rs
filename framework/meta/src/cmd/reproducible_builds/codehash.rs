@@ -1,5 +1,5 @@
 use std::{
-    fs,
+    fs, io,
     path::{Path, PathBuf},
 };
 
@@ -31,7 +31,8 @@ fn collect_targets(target: &CodehashTargetArgs) -> Vec<PathBuf> {
     if !path.exists() {
         exit_with_error(format!("path does not exist: {}", path.display()));
     }
-    let files = find_wasm_files(path, !target.no_recursive, &target.ignore);
+    let files = find_wasm_files(path, !target.no_recursive, &target.ignore)
+        .unwrap_or_else(|e| exit_with_error(format!("{e:#}")));
     if files.is_empty() {
         exit_with_error(format!("no .wasm files found in {}", path.display()));
     }
@@ -89,17 +90,36 @@ fn print(args: &CodehashPrintArgs) {
 }
 
 fn verify(args: &CodehashVerifyArgs) {
+    let failures = run_verify(args);
+    if failures > 0 {
+        exit_with_error(format!("{failures} codehash check(s) failed"));
+    }
+}
+
+/// Checks every target and returns the number of failures, so that the outcome can be
+/// asserted on without exiting the process.
+pub fn run_verify(args: &CodehashVerifyArgs) -> u32 {
     let mut failures = 0;
     for wasm in collect_targets(&args.target) {
         let codehash_path = codehash_path_for(&wasm);
-        let Ok(expected) = fs::read_to_string(&codehash_path) else {
-            if args.allow_missing {
-                println!("MISSING (allowed): {}", wasm.display());
-            } else {
-                println!("MISSING: {}", codehash_path.display());
-                failures += 1;
+        let expected = match fs::read_to_string(&codehash_path) {
+            Ok(expected) => expected,
+            Err(err) if err.kind() == io::ErrorKind::NotFound => {
+                if args.allow_missing {
+                    println!("MISSING (allowed): {}", wasm.display());
+                } else {
+                    println!("MISSING: {}", codehash_path.display());
+                    failures += 1;
+                }
+                continue;
             }
-            continue;
+            Err(err) => {
+                // present but unusable (bad UTF-8, no permission, a directory in its place)
+                // is not the same as absent, so `--allow-missing` must not excuse it
+                println!("UNREADABLE: {} ({err})", codehash_path.display());
+                failures += 1;
+                continue;
+            }
         };
         let actual = compute_codehash(&wasm);
         if expected.trim().eq_ignore_ascii_case(&actual) {
@@ -113,9 +133,7 @@ fn verify(args: &CodehashVerifyArgs) {
             failures += 1;
         }
     }
-    if failures > 0 {
-        exit_with_error(format!("{failures} codehash check(s) failed"));
-    }
+    failures
 }
 
 fn clear(args: &CodehashClearArgs) {
@@ -123,7 +141,8 @@ fn clear(args: &CodehashClearArgs) {
     if !path.exists() {
         exit_with_error(format!("path does not exist: {}", path.display()));
     }
-    let files = find_codehash_files(path, !args.target.no_recursive, &args.target.ignore);
+    let files = find_codehash_files(path, !args.target.no_recursive, &args.target.ignore)
+        .unwrap_or_else(|e| exit_with_error(format!("{e:#}")));
     if files.is_empty() {
         println!("No codehash files found in {}", path.display());
         return;
