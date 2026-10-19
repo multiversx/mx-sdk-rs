@@ -14,7 +14,7 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "wasm", "wasm-bindgen"]
 
 [dependencies]
-getrandom = { version = "0.4", features = ["wasm_js"] } # wasm_js feature overrides import from sdk
+getrandom = { version = "0.4", features = ["wasm_js"] } # feature enabled on purpose; see use in src/lib.rs
 web-sys = { version = "0.3" }
 js-sys = { version = "0.3" }
 wasm-bindgen = { version = "0.2" }
