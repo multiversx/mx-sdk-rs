@@ -1,12 +1,14 @@
+use multiversx_sc_abi::Sign;
+
 use super::ManagedDecimalSigned;
-use super::decimals::{Decimals, LnDecimals};
-use super::{ManagedDecimal, NumDecimals};
+use super::scaling_factor::scaling_factor;
+use super::{Decimals, LnDecimals, ManagedDecimal, NumDecimals};
 
 use crate::types::ManagedRef;
 use crate::{
     api::ManagedTypeApi,
     contract_base::ErrorHelper,
-    types::{BigInt, BigUint, Sign},
+    types::{BigInt, BigUint},
 };
 
 fn compute_ln<M: ManagedTypeApi>(
@@ -19,7 +21,7 @@ fn compute_ln<M: ManagedTypeApi>(
         return None;
     };
 
-    let scaling_factor_9 = LnDecimals::new().scaling_factor();
+    let scaling_factor_9 = scaling_factor::<M>(LnDecimals::new().num_decimals());
     let divisor = BigUint::from(1u64) << log2_floor as usize;
     let normalized = data * &*scaling_factor_9 / divisor;
 
@@ -51,7 +53,7 @@ fn compute_log2<M: ManagedTypeApi>(
         return None;
     };
 
-    let scaling_factor_9 = LnDecimals::new().scaling_factor();
+    let scaling_factor_9 = scaling_factor::<M>(LnDecimals::new().num_decimals());
     let divisor = BigUint::from(1u64) << log2_floor as usize;
     let normalized = data * &*scaling_factor_9 / divisor;
 

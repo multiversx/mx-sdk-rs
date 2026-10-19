@@ -1,10 +1,9 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use crate::{
-    common::{self, CallbackData},
-    vault_proxy,
-};
+use composability_abi::vault_abi;
+
+use crate::common::{self, CallbackData};
 #[multiversx_sc::module]
 pub trait CallPromisesBackTransfersModule: common::CommonModule {
     #[endpoint]
@@ -18,7 +17,7 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
         self.tx()
             .to(&to)
-            .typed(vault_proxy::VaultProxy)
+            .abi_typed(vault_abi::VaultCall)
             .retrieve_funds(token, token_nonce, amount)
             .gas(gas_limit)
             .callback(self.callbacks().retrieve_funds_back_transfers_callback())

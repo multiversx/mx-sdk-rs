@@ -6,7 +6,7 @@ use super::{
     source::{CurrentStorage, StorageAddress},
 };
 use crate::{
-    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName, VariadicAbi},
     api::StorageMapperApi,
     codec::{
         EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti,
@@ -292,10 +292,10 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
-    type Unmanaged = Self;
+    type Abi = VariadicAbi<T::Abi>;
 
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

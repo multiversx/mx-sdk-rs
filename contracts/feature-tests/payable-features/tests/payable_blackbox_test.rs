@@ -1,7 +1,7 @@
 use std::num::NonZeroU64;
 
 use multiversx_sc_scenario::imports::*;
-use payable_features::payable_features_proxy;
+use payable_features::{PayableFeaturesCall, payable_features_proxy};
 
 const PAYABLE_FEATURES_CODE_PATH: MxscPath = MxscPath::new("output/payable-features.mxsc.json");
 const PAYABLE_FEATURES_ADDRESS: TestSCAddress = TestSCAddress::new("payable-features");
@@ -193,4 +193,27 @@ fn test_esdt_transfer_legacy() {
         .run();
 
     assert_eq!(result, vec![Payment::try_new(TOKEN_1, 0, 100u64).unwrap()]);
+}
+
+/// Exercises the `#[multiversx_sc::contract(call = ...)]`/`multiversx_sc_abi::contract_abi`
+/// call-proxy infrastructure (`.abi_typed`), as opposed to the legacy `.typed` proxy used above.
+///
+/// `payable_all` is `#[payable("*")]` and declares no explicit arguments, so its abi-typed call
+/// proxy method must take none either - payment is attached afterwards via `.payment(...)`,
+/// exactly like the legacy proxy. A generator bug used to force an extra `payment: Payment`
+/// parameter onto every payable endpoint's proxy method; this would fail to compile here if it
+/// ever regressed.
+#[test]
+fn payable_all_blackbox_abi_typed() {
+    let mut world = world();
+    init_account(&mut world);
+
+    world
+        .tx()
+        .from(USER)
+        .to(PAYABLE_FEATURES_ADDRESS)
+        .abi_typed(PayableFeaturesCall)
+        .payable_all()
+        .payment((TOKEN_1, 0, AMOUNT_100))
+        .run();
 }

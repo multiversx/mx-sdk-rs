@@ -16,14 +16,15 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
 name = "bitflags"
-version = "2.11.1"
+version = "2.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4512299f36f043ab09a583e57bceb5a5aab7a73db1805848e8fef3c9e8c78b3"
+checksum = "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da"
 
 [[package]]
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
+ "kitty-abi",
  "multiversx-sc",
 ]
 
@@ -58,6 +59,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "kitty-abi"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-abi",
+ "multiversx-sc-abi-derive",
+ "random",
+]
+
+[[package]]
 name = "multiversx-chain-core"
 version = "0.23.1"
 dependencies = [
@@ -72,10 +83,41 @@ dependencies = [
  "bitflags",
  "generic-array",
  "multiversx-chain-core",
+ "multiversx-sc-abi",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
  "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi"
+version = "0.25.0"
+dependencies = [
+ "bitflags",
+ "multiversx-chain-core",
+ "multiversx-sc-codec",
+ "typenum",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive"
+version = "0.25.0"
+dependencies = [
+ "multiversx-sc-abi-derive-common",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive-common"
+version = "0.25.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -103,7 +145,7 @@ dependencies = [
 name = "multiversx-sc-derive"
 version = "0.66.2"
 dependencies = [
- "hex",
+ "multiversx-sc-abi-derive-common",
  "proc-macro2",
  "quote",
  "radix_trie",
@@ -161,6 +203,13 @@ checksum = "3b4431027dcd37fc2a73ef740b5f233aa805897935b8bce0195e41bbf9a3289a"
 dependencies = [
  "endian-type",
  "nibble_vec",
+]
+
+[[package]]
+name = "random"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
 ]
 
 [[package]]

@@ -18,6 +18,7 @@ version = "0.0.0"
 dependencies = [
  "bitflags 2.13.0",
  "multiversx-sc",
+ "multiversx-sc-abi",
  "multiversx-sc-meta-lib",
  "multiversx-sc-scenario",
 ]
@@ -718,6 +719,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2382f75942f4b3be3690fe4f86365e9c853c1587d6ee58212cebf6e2a9ccd101"
 
 [[package]]
+name = "composability-abi"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-abi",
+]
+
+[[package]]
 name = "composability-tests"
 version = "0.0.0"
 dependencies = [
@@ -973,6 +981,7 @@ name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
+ "multiversx-sc-abi",
  "multiversx-sc-scenario",
 ]
 
@@ -1662,6 +1671,7 @@ dependencies = [
 name = "forwarder"
 version = "0.0.0"
 dependencies = [
+ "composability-abi",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]
@@ -2738,10 +2748,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "kitty"
+name = "kitty-abi"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
+ "multiversx-sc-abi",
  "random",
 ]
 
@@ -2749,7 +2760,7 @@ dependencies = [
 name = "kitty-auction"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-ownership",
  "multiversx-sc",
  "multiversx-sc-scenario",
@@ -2767,7 +2778,7 @@ dependencies = [
 name = "kitty-genetic-alg"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "multiversx-sc",
  "multiversx-sc-scenario",
  "random",
@@ -2785,9 +2796,10 @@ dependencies = [
 name = "kitty-ownership"
 version = "0.0.0"
 dependencies = [
- "kitty",
+ "kitty-abi",
  "kitty-genetic-alg",
  "multiversx-sc",
+ "multiversx-sc-abi",
  "multiversx-sc-scenario",
  "random",
 ]
@@ -3177,7 +3189,7 @@ dependencies = [
 
 [[package]]
 name = "multisig"
-version = "1.0.0"
+version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3317,10 +3329,43 @@ dependencies = [
  "bitflags 2.13.0",
  "generic-array 1.4.3",
  "multiversx-chain-core",
+ "multiversx-sc-abi",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
  "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi"
+version = "0.25.0"
+dependencies = [
+ "bitflags 2.13.0",
+ "multiversx-chain-core",
+ "multiversx-sc-abi-derive",
+ "multiversx-sc-codec",
+ "num-bigint",
+ "typenum",
+ "unwrap-infallible",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive"
+version = "0.25.0"
+dependencies = [
+ "multiversx-sc-abi-derive-common",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
+]
+
+[[package]]
+name = "multiversx-sc-abi-derive-common"
+version = "0.25.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
 ]
 
 [[package]]
@@ -3357,7 +3402,7 @@ dependencies = [
 name = "multiversx-sc-derive"
 version = "0.66.2"
 dependencies = [
- "hex",
+ "multiversx-sc-abi-derive-common",
  "proc-macro2",
  "quote",
  "radix_trie",

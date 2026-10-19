@@ -18,7 +18,7 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 all-features = true
 
 [features]
-num-bigint = ["multiversx-sc-codec/num-bigint"]
+num-bigint = ["multiversx-sc-codec/num-bigint", "multiversx-sc-abi/num-bigint"]
 alloc = []
 std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
@@ -35,6 +35,10 @@ generic-array = "1.2"
 [dependencies.multiversx-sc-derive]
 version = "=0.66.2"
 path = "../derive"
+
+[dependencies.multiversx-sc-abi]
+version = "=0.25.0"
+path = "../../data/abi"
 
 [dependencies.multiversx-sc-codec]
 version = "=0.25.0"

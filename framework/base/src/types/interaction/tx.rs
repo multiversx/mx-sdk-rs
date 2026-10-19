@@ -6,6 +6,7 @@ use crate::types::{
 };
 
 use alloc::borrow::ToOwned;
+use multiversx_sc_abi::AbiProxyTrait;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
@@ -670,6 +671,16 @@ where
     pub fn typed<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
     where
         Proxy: TxProxyTrait<Env, From, To, Gas>,
+    {
+        proxy.proxy_methods(self)
+    }
+
+    /// Starts a proxy call, deploy, or upgrade.
+    ///
+    /// The proxy object will be given, the subsequent call will be from a proxy context, containing all the contract endpoint names.
+    pub fn abi_typed<Proxy>(self, proxy: Proxy) -> Proxy::Methods
+    where
+        Proxy: AbiProxyTrait<Tx<Env, From, To, (), Gas, (), ()>>,
     {
         proxy.proxy_methods(self)
     }

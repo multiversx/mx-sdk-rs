@@ -1,6 +1,6 @@
 pub use crate::{
-    abi::TypeAbi,
-    api::{ErrorApiImpl, ManagedTypeApi, VMApi},
+    abi::types::*,
+    api::{ErrorApiImpl, ManagedTypeApi, UnmanagedApi, VMApi},
     arrayvec::ArrayVec,
     codec::{
         DecodeError, Empty, IntoMultiValue, NestedDecode, NestedEncode, TopDecode, TopEncode,

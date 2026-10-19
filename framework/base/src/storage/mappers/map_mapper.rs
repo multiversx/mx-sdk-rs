@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use multiversx_sc_abi::VariadicAbi;
+
 use super::{
     SetMapper, StorageClearable, StorageMapper, StorageMapperFromAddress,
     set_mapper::{self},
@@ -624,10 +626,10 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,
     V: TopEncode + TopDecode + TypeAbi + 'static,
 {
-    type Unmanaged = Self;
+    type Abi = VariadicAbi<MultiValue2<K::Abi, V::Abi>>;
 
     fn type_name() -> TypeName {
-        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
+        Self::Abi::type_name()
     }
 
     fn type_name_rust() -> TypeName {

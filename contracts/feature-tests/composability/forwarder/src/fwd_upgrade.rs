@@ -1,4 +1,4 @@
-use crate::vault_upgrade_proxy;
+use composability_abi::vault_upgrade_abi;
 
 multiversx_sc::imports!();
 
@@ -13,7 +13,7 @@ pub trait UpgradeContractModule {
     ) {
         self.tx()
             .to(child_sc_address)
-            .typed(vault_upgrade_proxy::VaultProxy)
+            .abi_typed(vault_upgrade_abi::VaultUpgradeCall)
             .upgrade(opt_arg)
             .code(new_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
@@ -29,7 +29,7 @@ pub trait UpgradeContractModule {
     ) {
         self.tx()
             .to(child_sc_address)
-            .typed(vault_upgrade_proxy::VaultProxy)
+            .abi_typed(vault_upgrade_abi::VaultUpgradeCall)
             .upgrade(opt_arg)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .from_source(source_address)

@@ -342,7 +342,7 @@ impl PingPongEgldInteract {
             .to(self.state.current_ping_pong_egld_address())
             .typed(proxy::PingPongEgldProxy)
             .deadline()
-            .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsResult)
             .run()
             .await
     }
@@ -353,7 +353,7 @@ impl PingPongEgldInteract {
             .to(self.state.current_ping_pong_egld_address())
             .typed(proxy::PingPongEgldProxy)
             .activation_timestamp()
-            .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsResult)
             .run()
             .await
     }
@@ -386,7 +386,7 @@ impl PingPongEgldInteract {
             .to(self.state.current_ping_pong_egld_address())
             .typed(proxy::PingPongEgldProxy)
             .pong_all_last_user()
-            .returns(ReturnsResultUnmanaged)
+            .returns(ReturnsResult)
             .run()
             .await
     }

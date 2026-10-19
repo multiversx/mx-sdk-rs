@@ -7,6 +7,12 @@ mod types;
 
 use types::{ContractState, UserStatus};
 
+// `proxy::UserStatus` is a separate (generated) type from `types::UserStatus`, with no managed
+// fields, so it can implement `HasUnmanaged` unconditionally.
+impl HasUnmanaged for proxy::UserStatus {
+    type Unmanaged = Self;
+}
+
 /// Derived empirically.
 const PONG_ALL_LOW_GAS_LIMIT: u64 = 3_000_000;
 
