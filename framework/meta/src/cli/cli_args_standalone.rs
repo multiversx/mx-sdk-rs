@@ -1,6 +1,7 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+pub use super::cli_args_codehash::*;
 pub use super::cli_args_reproducible_builds::*;
 
 use crate::cli::cli_args_ledger::LedgerArgs;
