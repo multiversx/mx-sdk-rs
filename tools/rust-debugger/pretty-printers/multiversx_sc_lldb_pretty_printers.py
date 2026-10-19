@@ -167,9 +167,17 @@ def bytes_to_int(bytes: Collection[int]) -> int:
     return hex_to_int(bytes_hex)
 
 
-def num_bigint_data_to_int(value_vec_u64: lldb.value) -> int:
-    value_hex = "".join(reversed(list(map(sb_value_to_hex, value_vec_u64.sbvalue))))
-    return hex_to_int(value_hex)
+def num_bigint_data_to_int(big_digits: lldb.value) -> int:
+    """
+    Reads the `BigDigits` enum of `num_bigint` 0.5+:
+    either `Inline(Option<u64>)` or `Heap(Vec<u64>)`, little-endian digits.
+    """
+    payload = big_digits.sbvalue.GetChildAtIndex(0)
+    if payload.GetTypeName().startswith("core::option::Option"):
+        digits = [payload.GetChildAtIndex(0)] if payload.GetNumChildren() > 0 else []
+    else:
+        digits = [payload.GetChildAtIndex(i) for i in range(payload.GetNumChildren())]
+    return sum(d.GetValueAsUnsigned() << (64 * i) for i, d in enumerate(digits))
 
 
 def ints_to_hex(ints: Iterable[int]) -> str:
