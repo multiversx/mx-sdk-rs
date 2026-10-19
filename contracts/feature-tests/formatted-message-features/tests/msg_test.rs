@@ -89,3 +89,19 @@ fn test_print_codecs() {
     fmf.print_message_codec(i32::MIN);
     check_printed_and_clear("Printing x: 80000000");
 }
+
+#[test]
+fn test_panic_in_expression_position() {
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+
+    // empty message: the `if` branch is not taken, no panic
+    fmf.panic_in_expression_position(multiversx_sc::types::ManagedBuffer::new());
+}
+
+#[test]
+#[should_panic]
+fn test_panic_in_expression_position_panics() {
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+
+    fmf.panic_in_expression_position(multiversx_sc::types::ManagedBuffer::from("error"));
+}
