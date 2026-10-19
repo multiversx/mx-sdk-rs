@@ -62,7 +62,7 @@ impl ContractVariant {
         command
             .arg(self.settings.rustc_version.to_cli_arg())
             .arg("build")
-            .arg(format!("--target={}", &self.settings.rustc_target))
+            .arg(format!("--target={}", self.settings.rustc_target))
             .arg("--release")
             .current_dir(self.wasm_crate_path());
         if build_args.locked {

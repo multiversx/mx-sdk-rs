@@ -1647,7 +1647,6 @@ name = "forwarder-blind-dex-interactor"
 version = "0.0.0"
 dependencies = [
  "clap",
- "forwarder-blind",
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
@@ -1668,7 +1667,6 @@ name = "forwarder-interact"
 version = "0.0.0"
 dependencies = [
  "clap",
- "forwarder",
  "multiversx-sc",
  "multiversx-sc-snippets",
  "serde",
@@ -2144,7 +2142,6 @@ dependencies = [
  "clap",
  "delegation-sc-interact",
  "multiversx-sc-snippets",
- "payable-interactor",
  "serde",
  "tokio",
  "toml",
@@ -3071,7 +3068,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "multiversx-sc-wasm-adapter",
 ]
 
 [[package]]
@@ -3219,7 +3215,6 @@ dependencies = [
 name = "multiversx-chain-vm"
 version = "0.23.1"
 dependencies = [
- "anyhow",
  "bitflags 2.13.2",
  "colored 3.1.1",
  "hex",
@@ -3378,10 +3373,8 @@ dependencies = [
  "anyhow",
  "clap",
  "colored 3.1.1",
- "convert_case 0.12.0",
  "hex",
  "lazy_static",
- "multiversx-chain-scenario-format",
  "multiversx-sc",
  "rustc_version",
  "semver",
@@ -4365,7 +4358,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "vault",
 ]
 
 [[package]]
@@ -6247,9 +6239,9 @@ dependencies = [
 
 [[package]]
 name = "webpki-root-certs"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b96554aa2acc8ccdb7e1c9a58a7a68dd5d13bccc69cd124cb09406db612a1c9b"
+checksum = "58ec80e73fd8baf57bf0d9615554c75348bda990d6d5bbeab964dd068319fecb"
 dependencies = [
  "rustls-pki-types",
 ]

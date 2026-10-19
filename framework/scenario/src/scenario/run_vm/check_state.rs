@@ -211,14 +211,14 @@ pub fn check_esdt_data(
     if !expected.last_nonce.check(actual.last_nonce) {
         errors.push(format!(
             "bad last nonce. Address: {}. Token Name: {}. Want: {}. Have: {}\n",
-            address, token, expected.last_nonce, &actual.last_nonce
+            address, token, expected.last_nonce, actual.last_nonce
         ));
     }
 
     if !expected.frozen.check(u64::from(actual.frozen)) {
         errors.push(format!(
             "bad last nonce. Address: {}. Token Name: {}. Want: {}. Have: {}\n",
-            address, token, expected.frozen, &actual.frozen
+            address, token, expected.frozen, actual.frozen
         ));
     }
 
@@ -273,7 +273,7 @@ pub fn check_token_instance(
             token,
             expected_value.nonce.value,
             expected_value.balance,
-            &actual_value.balance,
+            actual_value.balance,
         ))
     }
 
@@ -284,7 +284,7 @@ pub fn check_token_instance(
             token,
             expected_value.nonce.value,
             expected_value.balance,
-            &actual_value.balance,
+            actual_value.balance,
         ))
     }
     let actual_creator = if let Some(creator) = &actual_value.metadata.creator {

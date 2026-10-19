@@ -411,15 +411,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "convert_case"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
-dependencies = [
- "unicode-segmentation",
-]
-
-[[package]]
 name = "corosensei"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -622,7 +613,7 @@ version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "799a97264921d8623a957f6c3b9011f3b5492f557bbb7a5a19b7fa6d06ba8dcb"
 dependencies = [
- "convert_case 0.10.0",
+ "convert_case",
  "proc-macro2",
  "quote",
  "rustc_version",
@@ -1378,7 +1369,6 @@ dependencies = [
 name = "multiversx-chain-vm"
 version = "0.23.1"
 dependencies = [
- "anyhow",
  "bitflags 2.13.2",
  "colored",
  "hex",
@@ -1462,7 +1452,6 @@ name = "multiversx-sc-codec"
 version = "0.25.0"
 dependencies = [
  "arrayvec",
- "bitflags 2.13.2",
  "multiversx-sc-codec-derive",
  "num-bigint",
  "num-traits",
@@ -1497,10 +1486,8 @@ dependencies = [
  "anyhow",
  "clap",
  "colored",
- "convert_case 0.12.0",
  "hex",
  "lazy_static",
- "multiversx-chain-scenario-format",
  "multiversx-sc",
  "rustc_version",
  "semver",
@@ -1509,7 +1496,6 @@ dependencies = [
  "toml",
  "wasmparser 0.252.0",
  "wasmprinter",
- "wat",
 ]
 
 [[package]]

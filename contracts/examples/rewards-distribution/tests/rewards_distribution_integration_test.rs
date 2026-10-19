@@ -197,7 +197,7 @@ fn test_raffle_and_claim() {
             .from(ALICE_ADDRESS)
             .to(REWARDS_DISTRIBUTION_ADDRESS)
             .typed(rewards_distribution_proxy::RewardsDistributionProxy)
-            .compute_claimable_amount(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .compute_claimable_amount(0u64, EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
             .returns(ReturnsResult)
             .run();
         rewards.push(reward);
@@ -238,7 +238,7 @@ fn test_raffle_and_claim() {
             .from(ALICE_ADDRESS)
             .to(REWARDS_DISTRIBUTION_ADDRESS)
             .typed(rewards_distribution_proxy::RewardsDistributionProxy)
-            .compute_claimable_amount(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .compute_claimable_amount(0u64, EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
             .returns(ExpectValue(expected_reward))
             .run();
     }
@@ -266,7 +266,7 @@ fn test_raffle_and_claim() {
             .query()
             .to(REWARDS_DISTRIBUTION_ADDRESS)
             .typed(rewards_distribution_proxy::RewardsDistributionProxy)
-            .was_claimed(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .was_claimed(0u64, EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
             .returns(ExpectValue(true))
             .run();
     }

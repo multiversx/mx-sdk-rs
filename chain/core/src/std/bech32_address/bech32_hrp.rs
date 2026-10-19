@@ -82,6 +82,14 @@ impl TryFrom<&str> for Bech32Hrp {
     }
 }
 
+impl core::str::FromStr for Bech32Hrp {
+    type Err = bech32::primitives::hrp::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Hrp::parse(s).map(Bech32Hrp)
+    }
+}
+
 impl PartialEq<str> for Bech32Hrp {
     fn eq(&self, other: &str) -> bool {
         self.0.as_str() == other

@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/recursive_caller.rs"
 
-[dependencies.vault]
-path = "../vault"
-
 [dependencies.multiversx-sc]
 workspace = true
 

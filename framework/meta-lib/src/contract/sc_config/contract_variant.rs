@@ -73,7 +73,7 @@ impl ContractVariant {
         if self.wasm_dir_short_name {
             "wasm".to_string()
         } else {
-            format!("wasm-{}", &self.contract_name)
+            format!("wasm-{}", self.contract_name)
         }
     }
 
@@ -107,7 +107,7 @@ impl ContractVariant {
     /// This is where Rust will initially compile the WASM binary.
     pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> PathBuf {
         let target_dir = self.resolve_wasm_target_dir(explicit_target_dir);
-        let wasm_file_name = format!("{}.wasm", &self.wasm_crate_name_snake_case());
+        let wasm_file_name = format!("{}.wasm", self.wasm_crate_name_snake_case());
 
         Path::new(&target_dir)
             .join(&self.settings.rustc_target)
@@ -116,14 +116,14 @@ impl ContractVariant {
     }
 
     pub fn abi_output_name(&self) -> String {
-        format!("{}.abi.json", &self.contract_name)
+        format!("{}.abi.json", self.contract_name)
     }
 
     fn output_name_base(&self, build_args: &BuildArgs) -> String {
         if let Some(wasm_name_override) = &build_args.wasm_name_override {
             wasm_name_override.clone()
         } else if let Some(suffix) = &build_args.wasm_name_suffix {
-            format!("{}-{suffix}", &self.contract_name)
+            format!("{}-{suffix}", self.contract_name)
         } else {
             self.contract_name.clone()
         }

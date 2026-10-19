@@ -8,7 +8,7 @@ publish = false
 [lib]
 path = "src/crowdfunding_erc20.rs"
 
-[dependencies.erc20]
+[dev-dependencies.erc20]
 path = "../erc20"
 
 [dependencies.multiversx-sc]

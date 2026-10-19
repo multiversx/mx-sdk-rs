@@ -25,18 +25,15 @@ rustc_version = "0.4"
 toml = { version = "1.0", features = ["preserve_order"] }
 colored = "3.0"
 lazy_static = "1.4.0"
-convert_case = "0.12"
 hex = "0.4"
 wasmparser = "0.252"
 wasmprinter = "0.252"
 semver = "1.0.20"
-wat = "1.217.0"
 
 [dependencies.multiversx-sc]
 version = "=0.66.2"
 path = "../base"
 features = ["alloc", "num-bigint", "std"]
 
-[dependencies.multiversx-chain-scenario-format]
-version = "0.26.1"
-path = "../../sdk/scenario-format"
+[dev-dependencies]
+wat = "1.217.0"

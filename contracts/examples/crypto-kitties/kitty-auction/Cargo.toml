@@ -12,7 +12,7 @@ path = "src/lib.rs"
 version = "0.0.0"
 path = "../common/kitty"
 
-[dependencies.kitty-ownership]
+[dev-dependencies.kitty-ownership]
 version = "0.0.0"
 path = "../kitty-ownership"
 

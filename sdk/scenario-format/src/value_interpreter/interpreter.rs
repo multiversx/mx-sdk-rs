@@ -19,7 +19,7 @@ pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Ve
         }
         ValueSubTree::Map(m) => {
             let mut concat = Vec::<u8>::new();
-            for (_, value) in m.iter() {
+            for value in m.values() {
                 concat.extend_from_slice(interpret_subtree(value, context).as_slice());
             }
             concat

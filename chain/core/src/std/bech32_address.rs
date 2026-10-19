@@ -156,7 +156,7 @@ impl Bech32Address {
     /// Returns the address as a `bech32:`-prefixed expression (e.g. `"bech32:erd1..."`),
     /// used in scenario / mandos files.
     pub fn to_bech32_expr(&self) -> String {
-        format!("{BECH32_PREFIX}{}", &self.bech32)
+        format!("{BECH32_PREFIX}{}", self.bech32)
     }
 }
 

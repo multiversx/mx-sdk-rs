@@ -174,7 +174,7 @@ impl ScenarioGoInstaller {
     }
 
     async fn download_zip(&self, release: &ScenarioGoRelease) -> Result<(), reqwest::Error> {
-        println_green(format!("Downloading binaries: {}", &release.download_url));
+        println_green(format!("Downloading binaries: {}", release.download_url));
         let response = reqwest::Client::builder()
             .user_agent(&self.user_agent)
             .build()?

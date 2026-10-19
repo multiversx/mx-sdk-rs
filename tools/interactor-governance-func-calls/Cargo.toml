@@ -26,12 +26,8 @@ features = ["derive"]
 [dependencies.multiversx-sc-snippets]
 workspace = true
 
-[dependencies.delegation-sc-interact]
+[dev-dependencies.delegation-sc-interact]
 path = "../interactor-delegation-func-calls"
-
-
-[dependencies.payable-interactor]
-path = "../../contracts/feature-tests/payable-features/interactor"
 
 [features]
 chain-simulator-tests = []

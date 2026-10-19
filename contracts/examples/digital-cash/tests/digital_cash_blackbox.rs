@@ -71,7 +71,7 @@ pub fn claim_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_01, &SIGNATURE_01)
+        .claim(DEPOSIT_KEY_01, SIGNATURE_01)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -86,7 +86,7 @@ pub fn claim_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_02, &SIGNATURE_01)
+        .claim(DEPOSIT_KEY_02, SIGNATURE_01)
         .with_result(ExpectError(4, "deposit expired"))
         .run();
 
@@ -101,7 +101,7 @@ pub fn claim_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_02, ScenarioValueRaw::new("0x12bb9e58dad361e9dadd0af1021ce53f9ca12b6580f5b3ab4f9c321ee055a38bcdcf35924eb46aef7a80b22387ded0b837734ac8a57e19ea12c33ef808f996c00"))
+        .claim(DEPOSIT_KEY_02, ScenarioValueRaw::new("0x12bb9e58dad361e9dadd0af1021ce53f9ca12b6580f5b3ab4f9c321ee055a38bcdcf35924eb46aef7a80b22387ded0b837734ac8a57e19ea12c33ef808f996c00"))
         .with_result(ExpectError(4, "argument decode error (signature): bad array length"))
         .run();
 
@@ -111,7 +111,7 @@ pub fn claim_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_02, &SIGNATURE_01)
+        .claim(DEPOSIT_KEY_02, SIGNATURE_01)
         .run();
 
     world.check_account(SC_ADDRESS)
@@ -138,7 +138,7 @@ pub fn claim_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_03, &SIGNATURE_02)
+        .claim(DEPOSIT_KEY_03, SIGNATURE_02)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -153,7 +153,7 @@ pub fn claim_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_04, &SIGNATURE_02)
+        .claim(DEPOSIT_KEY_04, SIGNATURE_02)
         .with_result(ExpectError(4, "deposit expired"))
         .run();
 
@@ -168,7 +168,7 @@ pub fn claim_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_04, ScenarioValueRaw::new("0x1dd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"))
+        .claim(DEPOSIT_KEY_04, ScenarioValueRaw::new("0x1dd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"))
         .with_result(ExpectError(4, "argument decode error (signature): bad array length"))
         .run();
 
@@ -178,7 +178,7 @@ pub fn claim_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_04, &SIGNATURE_02)
+        .claim(DEPOSIT_KEY_04, SIGNATURE_02)
         .run();
 
     world.check_account(SC_ADDRESS)
@@ -246,7 +246,7 @@ pub fn claim_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_05, &SIGNATURE_03)
+        .claim(DEPOSIT_KEY_05, SIGNATURE_03)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -261,7 +261,7 @@ pub fn claim_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_06, &SIGNATURE_03)
+        .claim(DEPOSIT_KEY_06, SIGNATURE_03)
         .with_result(ExpectError(4, "deposit expired"))
         .run();
 
@@ -276,7 +276,7 @@ pub fn claim_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_06, ScenarioValueRaw::new("0x11ac4f6d4d45836d97ffeda83a66aaea7631a3bb3d4063421ccb2b9de9485bdb4c9bd6e44e003f6a9c9eb74379467238204ff579471d203b1878c3f1530592a02"))
+        .claim(DEPOSIT_KEY_06, ScenarioValueRaw::new("0x11ac4f6d4d45836d97ffeda83a66aaea7631a3bb3d4063421ccb2b9de9485bdb4c9bd6e44e003f6a9c9eb74379467238204ff579471d203b1878c3f1530592a02"))
         .with_result(ExpectError(4, "argument decode error (signature): bad array length"))
         .run();
 
@@ -286,7 +286,7 @@ pub fn claim_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .claim(&DEPOSIT_KEY_06, &SIGNATURE_03)
+        .claim(DEPOSIT_KEY_06, SIGNATURE_03)
         .run();
 
     world.check_account(SC_ADDRESS)
@@ -313,7 +313,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .forward(&DEPOSIT_KEY_02, &DEPOSIT_KEY_07, &SIGNATURE_01)
+        .forward(DEPOSIT_KEY_02, DEPOSIT_KEY_07, SIGNATURE_01)
         .with_result(ExpectError(
             4,
             "forward deposit needs to exist in advance, with fees paid",
@@ -326,7 +326,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .deposit_fees(&DEPOSIT_KEY_07)
+        .deposit_fees(DEPOSIT_KEY_07)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .run();
 
@@ -336,7 +336,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .forward(&DEPOSIT_KEY_02, &DEPOSIT_KEY_07, &SIGNATURE_01)
+        .forward(DEPOSIT_KEY_02, DEPOSIT_KEY_07, SIGNATURE_01)
         .run();
 
     world
@@ -345,7 +345,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .deposit_fees(&DEPOSIT_KEY_08)
+        .deposit_fees(DEPOSIT_KEY_08)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 500u64).unwrap())
         .run();
 
@@ -355,7 +355,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .forward(&DEPOSIT_KEY_06, &DEPOSIT_KEY_06, &SIGNATURE_03)
+        .forward(DEPOSIT_KEY_06, DEPOSIT_KEY_06, SIGNATURE_03)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 500u64).unwrap())
         .with_result(ExpectError(
             4,
@@ -369,7 +369,7 @@ pub fn forward_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .forward(&DEPOSIT_KEY_06, &DEPOSIT_KEY_08, &SIGNATURE_03)
+        .forward(DEPOSIT_KEY_06, DEPOSIT_KEY_08, SIGNATURE_03)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 500u64).unwrap())
         .run();
 
@@ -398,7 +398,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .with_result(ExpectError(
             4,
@@ -412,7 +412,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .deposit_fees(&DEPOSIT_KEY_02)
+        .deposit_fees(DEPOSIT_KEY_02)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .run();
 
@@ -422,7 +422,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_399_000u64))
+        .fund(DEPOSIT_KEY_02, TimestampMillis::new(86_399_000u64))
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .run();
 
@@ -438,7 +438,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .deposit_fees(&DEPOSIT_KEY_04)
+        .deposit_fees(DEPOSIT_KEY_04)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .run();
 
@@ -448,7 +448,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .fund(&DEPOSIT_KEY_04, TimestampMillis::new(86_400_000u64))
+        .fund(DEPOSIT_KEY_04, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_123456, 0, 50u64).unwrap())
         .run();
 
@@ -465,7 +465,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .fund(&DEPOSIT_KEY_04, TimestampMillis::new(86_400_000u64))
+        .fund(DEPOSIT_KEY_04, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_112233, 0, 50u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_445566, 0, 50u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_778899, 0, 50u64).unwrap())
@@ -478,7 +478,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .deposit_fees(&DEPOSIT_KEY_06)
+        .deposit_fees(DEPOSIT_KEY_06)
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1_000u64).unwrap())
         .run();
 
@@ -488,7 +488,7 @@ pub fn fund_egld_and_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .fund(&DEPOSIT_KEY_06, TimestampMillis::new(86_400_000u64))
+        .fund(DEPOSIT_KEY_06, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_112233, 0, 50u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_445566, 0, 50u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_778899, 0, 50u64).unwrap())
@@ -518,7 +518,7 @@ pub fn pay_fee_and_fund_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .pay_fee_and_fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .pay_fee_and_fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 9u64).unwrap())
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 1u64).unwrap())
         .with_result(ExpectError(4, "insufficient fees provided"))
@@ -530,7 +530,7 @@ pub fn pay_fee_and_fund_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .pay_fee_and_fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .pay_fee_and_fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 10u64).unwrap())
         .payment(Payment::try_new(TestTokenId::EGLD_000000, 0, 990u64).unwrap())
         .run();
@@ -557,7 +557,7 @@ pub fn pay_fee_and_fund_esdt_multiple_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .pay_fee_and_fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .pay_fee_and_fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_445566, 0, 50u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_112233, 0, 50u64).unwrap())
         .with_result(ExpectError(4, "invalid fee token"))
@@ -569,7 +569,7 @@ pub fn pay_fee_and_fund_esdt_multiple_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .pay_fee_and_fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .pay_fee_and_fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_778899, 0, 6u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_778899, 0, 44u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_112233, 0, 50u64).unwrap())
@@ -597,7 +597,7 @@ pub fn pay_fee_and_fund_esdt_single_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC3_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .pay_fee_and_fund(&DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
+        .pay_fee_and_fund(DEPOSIT_KEY_02, TimestampMillis::new(86_400_000u64))
         .payment(Payment::try_new(CASHTOKEN_778899, 0, 3u64).unwrap())
         .payment(Payment::try_new(CASHTOKEN_112233, 0, 50u64).unwrap())
         .run();
@@ -710,7 +710,7 @@ pub fn withdraw_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_02)
+        .withdraw_expired(DEPOSIT_KEY_02)
         .with_result(ExpectError(4, "cannot withdraw, deposit not expired yet"))
         .run();
 
@@ -728,7 +728,7 @@ pub fn withdraw_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_09)
+        .withdraw_expired(DEPOSIT_KEY_09)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -743,7 +743,7 @@ pub fn withdraw_egld_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC1_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_02)
+        .withdraw_expired(DEPOSIT_KEY_02)
         .run();
 
     world.check_account(SC_ADDRESS)
@@ -769,7 +769,7 @@ pub fn withdraw_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_04)
+        .withdraw_expired(DEPOSIT_KEY_04)
         .with_result(ExpectError(4, "cannot withdraw, deposit not expired yet"))
         .run();
 
@@ -787,7 +787,7 @@ pub fn withdraw_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_10)
+        .withdraw_expired(DEPOSIT_KEY_10)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -802,7 +802,7 @@ pub fn withdraw_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_04)
+        .withdraw_expired(DEPOSIT_KEY_04)
         .run();
 
     world.check_account(SC_ADDRESS)
@@ -828,7 +828,7 @@ pub fn withdraw_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_04)
+        .withdraw_expired(DEPOSIT_KEY_04)
         .with_result(ExpectError(4, "cannot withdraw, deposit not expired yet"))
         .run();
 
@@ -846,7 +846,7 @@ pub fn withdraw_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_05)
+        .withdraw_expired(DEPOSIT_KEY_05)
         .with_result(ExpectError(4, "non-existent key"))
         .run();
 
@@ -861,7 +861,7 @@ pub fn withdraw_multi_esdt_scen_steps(world: &mut ScenarioWorld) {
         .from(ACC2_ADDRESS)
         .to(SC_ADDRESS)
         .typed(digital_cash_proxy::DigitalCashProxy)
-        .withdraw_expired(&DEPOSIT_KEY_06)
+        .withdraw_expired(DEPOSIT_KEY_06)
         .run();
 
     world.check_account(SC_ADDRESS)
