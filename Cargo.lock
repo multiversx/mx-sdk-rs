@@ -3234,18 +3234,18 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm-executor"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b72af69cd251075c0bc020ea72f0d2056ac0966fc17aced17b866a5324536e28"
+checksum = "a6703f868449e081c46791de1f3713c82cfb724dceff9f23bde13d241422e323"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "multiversx-chain-vm-executor-wasmer-experimental"
-version = "0.5.1"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9a714b389463294ca1f9c8895804a6a2bac11b9609aaeabe633cfb033ac62f7"
+checksum = "992efe1889c8da08ac80b35dde82a1c941dbe75aa0f4556074a85d12571f0a2e"
 dependencies = [
  "log",
  "loupe",

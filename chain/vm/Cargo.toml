@@ -42,10 +42,10 @@ path = "../core"
 features = ["std"]
 
 [dependencies.multiversx-chain-vm-executor]
-version = "=0.5.1"
+version = "=0.5.2"
 
 [dependencies.multiversx-chain-vm-executor-wasmer-experimental]
-version = "=0.5.1"
+version = "=0.5.2"
 optional = true
 
 [dependencies.multiversx-bls]
