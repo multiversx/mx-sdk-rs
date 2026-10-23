@@ -27,6 +27,12 @@ static CS_TESTS: &[CsTest] = &[
         package: "multiversx-sc-snippets",
         test_file: "set_state_cs_test",
     },
+    // Tests validator rewards via the chain simulator, no contracts
+    CsTest {
+        build_paths: &[],
+        package: "multiversx-sc-snippets",
+        test_file: "validator_rewards_cs_test",
+    },
     // Tests built-in system contracts — no wasm build step required.
     CsTest {
         build_paths: &[],
