@@ -1,0 +1,12 @@
+[package]
+name = "validator-rewards-feature-meta"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[dependencies.validator-rewards-feature]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+workspace = true

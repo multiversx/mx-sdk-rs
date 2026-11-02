@@ -211,6 +211,9 @@ members = [
   "contracts/feature-tests/tiny/interactor",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+  "contracts/feature-tests/validator-rewards-feature",
+  "contracts/feature-tests/validator-rewards-feature/meta",
+  "contracts/feature-tests/validator-rewards-feature/interactor",
 
 
   # "chain/wasmer-prod", ## not included, references wasmer 2.2

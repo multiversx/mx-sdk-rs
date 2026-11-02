@@ -1,0 +1,5 @@
+[contracts.main]
+name = "validator-rewards-feature"
+
+[[proxy]]
+path = "src/validator_rewards_feature_proxy.rs"

@@ -60,6 +60,11 @@ static CS_TESTS: &[CsTest] = &[
         test_file: "interact_cs_tests",
     },
     CsTest {
+        build_paths: &["contracts/feature-tests/validator-rewards-feature"],
+        package: "validator-rewards-interactor",
+        test_file: "validator_rewards_cs_test",
+    },
+    CsTest {
         build_paths: &["contracts/feature-tests/payable-features"],
         package: "payable-interactor",
         test_file: "payable_interactor_cs_test",

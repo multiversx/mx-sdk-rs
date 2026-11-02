@@ -5834,6 +5834,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "validator-rewards-feature"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "validator-rewards-feature-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta-lib",
+ "validator-rewards-feature",
+]
+
+[[package]]
+name = "validator-rewards-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+ "validator-rewards-feature",
+]
+
+[[package]]
 name = "vault"
 version = "0.0.0"
 dependencies = [
