@@ -153,9 +153,18 @@ where
     /// otherwise reset it to zero. Code and the remaining fields are left empty, which the
     /// simulator treats as "leave as is".
     ///
+    /// Takes `&mut self` on purpose: the method reads the balance and the reward counter, then
+    /// writes back absolute values, so two overlapping calls on the same account would both
+    /// start from the same state and one reward would be lost. The exclusive borrow rules out
+    /// overlapping calls on a single interactor.
+    ///
+    /// The same applies across clients: nothing else may modify `address` on the simulator
+    /// (other interactors, transactions, other `set-state` calls) between the read and the
+    /// write. Callers must have exclusive access to the account while injecting.
+    ///
     /// Does nothing if the interactor is not connected to a chain simulator.
     pub async fn inject_validator_reward(
-        &self,
+        &mut self,
         address: &Bech32Address,
         amount: &RustBigUint,
     ) -> Result<String, Error> {

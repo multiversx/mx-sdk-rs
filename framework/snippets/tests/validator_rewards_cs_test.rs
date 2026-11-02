@@ -85,7 +85,7 @@ async fn inject_validator_reward_cs_test() {
 async fn inject_validator_reward_without_simulator_test() {
     // Not connected to a simulator: the call is skipped, like the other chain-simulator
     // operations, rather than corrupting a real chain's expectations.
-    let interactor = HttpInteractor::empty().use_chain_simulator(false);
+    let mut interactor = HttpInteractor::empty().use_chain_simulator(false);
 
     let address = Bech32Address::from(&test_wallets::judy().to_address());
     let response = interactor
