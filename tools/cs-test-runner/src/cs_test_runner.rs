@@ -21,6 +21,12 @@ static CS_TESTS: &[CsTest] = &[
         package: "multiversx-sc-meta",
         test_file: "cs_tx_cli_test",
     },
+    // sc-meta tx system esdt, against the ESDT system SC, no contracts
+    CsTest {
+        build_paths: &[],
+        package: "multiversx-sc-meta",
+        test_file: "cs_tx_system_esdt_test",
+    },
     // Tests framework functionality directly, no contracts
     CsTest {
         build_paths: &[],

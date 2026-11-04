@@ -2,6 +2,7 @@ use clap::{Args, Subcommand};
 use std::path::PathBuf;
 
 pub use super::cli_args_sender::{RelayerArgs, SenderArgs};
+use super::cli_args_tx_system::SystemCliArgs;
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct TxCliArgs {
@@ -36,6 +37,9 @@ pub enum TxCliAction {
         about = "Adds the relayer signature to a previously signed transaction (relayed v3)."
     )]
     Relay(RelayArgs),
+
+    #[command(about = "Interacts with the system smart contracts (ESDT, ...).")]
+    System(SystemCliArgs),
 }
 
 /// Gateway / network arguments shared by commands that talk to the blockchain.
