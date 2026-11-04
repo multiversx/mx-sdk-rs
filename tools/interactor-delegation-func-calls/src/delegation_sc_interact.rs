@@ -122,6 +122,9 @@ pub async fn delegation_sc_interact_cli() {
     }
 }
 
+/// The unjail price per node in the default chain config (2.5 EGLD).
+const UNJAIL_PRICE_PER_NODE: u128 = 2_500_000_000_000_000_000;
+
 pub struct DelegateCallsInteract {
     pub interactor: Interactor,
     pub owner: Bech32Address,
@@ -303,7 +306,7 @@ impl DelegateCallsInteract {
         println!("Nodes added successfully");
     }
 
-    pub async fn get_all_node_states(&mut self) -> String {
+    pub async fn get_all_node_states(&mut self) -> DelegationNodeStatesResult {
         let node_states = self
             .interactor
             .query()
@@ -314,8 +317,8 @@ impl DelegateCallsInteract {
             .run()
             .await;
 
-        println!("Node states: {}", node_states);
-        node_states.to_string()
+        println!("Node states: {node_states:?}");
+        node_states
     }
 
     pub async fn stake_nodes(&mut self, bls_keys: Vec<BLSKey>) {
@@ -367,7 +370,7 @@ impl DelegateCallsInteract {
             .query()
             .to(self.state.current_delegation_address())
             .typed(DelegationSCProxy)
-            .get_user_active_stake(&ManagedAddress::from_address(&self.owner.to_address()))
+            .get_user_active_stake(ManagedAddress::from_address(&self.owner.to_address()))
             .returns(ReturnsResultUnmanaged)
             .run()
             .await;
@@ -439,7 +442,10 @@ impl DelegateCallsInteract {
             .to(self.state.current_delegation_address())
             .gas(1000000u64 + bls_keys.len() as u64 * 6000000u64)
             .typed(DelegationSCProxy)
-            .unjail_nodes(MultiValueVec::from(bls_keys))
+            .unjail_nodes(
+                MultiValueVec::from(bls_keys),
+                BigUint::from(UNJAIL_PRICE_PER_NODE),
+            )
             .run()
             .await;
 

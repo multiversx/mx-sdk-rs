@@ -329,6 +329,11 @@ where
         tx.original_result()
     }
 
+    /// Updates the metadata of an NFT/SFT/MetaESDT. Requires the `ESDTRoleNFTUpdate` role.
+    ///
+    /// Any argument that is encoded as empty is left unchanged by the protocol. In particular:
+    /// - `royalties` of 0 is encoded as empty, so royalties cannot be set to 0 through this call;
+    /// - an empty `uris` list is sent as a single empty argument, which keeps the existing URIs.
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_metadata_update<
         T: TopEncode,
