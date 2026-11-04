@@ -17,6 +17,7 @@ const ESDT_ROLE_MODIFY_ROYALTIES: &str = "ESDTRoleModifyRoyalties";
 const ESDT_ROLE_MODIFY_CREATOR: &str = "ESDTRoleModifyCreator";
 const ESDT_ROLE_NFT_RECREATE: &str = "ESDTRoleNFTRecreate";
 const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
+const ESDT_ROLE_NFT_UPDATE: &str = "ESDTRoleNFTUpdate";
 
 /// An ESDT local role that can be granted to or revoked from an account for a specific token.
 ///
@@ -46,16 +47,18 @@ pub enum EsdtLocalRole {
     ModifyRoyalties,
     SetNewUri,
     Transfer,
+    /// Required by `ESDTMetaDataUpdate`. Not part of the Go VM `Role*` iota.
+    NftUpdate,
 }
 
 impl EsdtLocalRole {
     /// Returns the 1-based ordinal role ID used for `ManagedVecItem` payload encoding.
     ///
-    /// This is a sequential index (1..=12), **not** a bitflag value. The
+    /// This is a sequential index (1..=13), **not** a bitflag value. The
     /// corresponding bitflag in [`EsdtLocalRoleFlags`] is `1 << (id - 1)`, which
     /// aligns with the Go VM's `Role*` iota ordering in
-    /// `vmhost/vmhooks/eei_helpers.go`. `Transfer` (12) has no counterpart in
-    /// the current Go VM iota. This is the inverse of `From<u16>`.
+    /// `vmhost/vmhooks/eei_helpers.go`. `Transfer` (12) and `NftUpdate` (13) have no
+    /// counterpart in the current Go VM iota. This is the inverse of `From<u16>`.
     pub fn as_u16(&self) -> u16 {
         match self {
             Self::None => 0,
@@ -71,6 +74,7 @@ impl EsdtLocalRole {
             Self::ModifyRoyalties => 10,
             Self::SetNewUri => 11,
             Self::Transfer => 12,
+            Self::NftUpdate => 13,
         }
     }
 
@@ -100,6 +104,7 @@ impl EsdtLocalRole {
             Self::ModifyCreator => ESDT_ROLE_MODIFY_CREATOR,
             Self::SetNewUri => ESDT_ROLE_SET_NEW_URI,
             Self::Transfer => ESDT_ROLE_TRANSFER,
+            Self::NftUpdate => ESDT_ROLE_NFT_UPDATE,
         }
     }
 
@@ -121,13 +126,14 @@ impl EsdtLocalRole {
             Self::ModifyCreator => EsdtLocalRoleFlags::MODIFY_CREATOR,
             Self::SetNewUri => EsdtLocalRoleFlags::SET_NEW_URI,
             Self::Transfer => EsdtLocalRoleFlags::TRANSFER,
+            Self::NftUpdate => EsdtLocalRoleFlags::NFT_UPDATE,
         }
     }
 }
 
 // TODO: can be done with macros, but I didn't find a public library that does it and is no_std
 // we can implement it, it's easy
-const ALL_ROLES: [EsdtLocalRole; 12] = [
+const ALL_ROLES: [EsdtLocalRole; 13] = [
     EsdtLocalRole::Mint,
     EsdtLocalRole::Burn,
     EsdtLocalRole::NftCreate,
@@ -140,6 +146,7 @@ const ALL_ROLES: [EsdtLocalRole; 12] = [
     EsdtLocalRole::ModifyRoyalties,
     EsdtLocalRole::SetNewUri,
     EsdtLocalRole::Transfer,
+    EsdtLocalRole::NftUpdate,
 ];
 
 impl EsdtLocalRole {
@@ -169,6 +176,7 @@ impl From<u16> for EsdtLocalRole {
             10 => Self::ModifyRoyalties,
             11 => Self::SetNewUri,
             12 => Self::Transfer,
+            13 => Self::NftUpdate,
             _ => Self::None,
         }
     }
@@ -206,6 +214,8 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
             Self::SetNewUri
         } else if byte_slice == ESDT_ROLE_TRANSFER.as_bytes() {
             Self::Transfer
+        } else if byte_slice == ESDT_ROLE_NFT_UPDATE.as_bytes() {
+            Self::NftUpdate
         } else {
             Self::None
         }

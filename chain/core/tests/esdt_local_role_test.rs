@@ -17,6 +17,7 @@ const ROLE_TABLE: &[(EsdtLocalRole, u16, &str, EsdtLocalRoleFlags)] = &[
     (EsdtLocalRole::ModifyRoyalties,     10, "ESDTRoleModifyRoyalties",    EsdtLocalRoleFlags::MODIFY_ROYALTIES),
     (EsdtLocalRole::SetNewUri,           11, "ESDTRoleSetNewURI",          EsdtLocalRoleFlags::SET_NEW_URI),
     (EsdtLocalRole::Transfer,            12, "ESDTTransferRole",           EsdtLocalRoleFlags::TRANSFER),
+    (EsdtLocalRole::NftUpdate,           13, "ESDTRoleNFTUpdate",          EsdtLocalRoleFlags::NFT_UPDATE),
 ];
 
 #[test]
@@ -44,7 +45,7 @@ fn test_from_u16_round_trip() {
 #[test]
 fn test_from_u16_unknown_returns_none() {
     assert_eq!(EsdtLocalRole::from(0u16), EsdtLocalRole::None);
-    assert_eq!(EsdtLocalRole::from(13u16), EsdtLocalRole::None);
+    assert_eq!(EsdtLocalRole::from(14u16), EsdtLocalRole::None);
     assert_eq!(EsdtLocalRole::from(u16::MAX), EsdtLocalRole::None);
 }
 

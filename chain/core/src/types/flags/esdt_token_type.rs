@@ -39,9 +39,14 @@ impl EsdtTokenType {
         }
     }
 
+    /// Parses the token type name, as returned by the ESDT system SC (e.g. in `getTokenProperties`).
+    ///
+    /// The names correspond to `ESDTType.String()` in `mx-chain-core-go`.
     pub fn collection_from_string(token_type: &str) -> Self {
         match token_type {
-            "NonFungibleESDT" => EsdtTokenType::NonFungibleV2,
+            "FungibleESDT" => EsdtTokenType::Fungible,
+            "NonFungibleESDT" => EsdtTokenType::NonFungible,
+            "NonFungibleESDTv2" => EsdtTokenType::NonFungibleV2,
             "SemiFungibleESDT" => EsdtTokenType::SemiFungible,
             "MetaESDT" => EsdtTokenType::MetaFungible,
             "DynamicNonFungibleESDT" => EsdtTokenType::DynamicNFT,

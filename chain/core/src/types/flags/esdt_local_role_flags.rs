@@ -24,6 +24,7 @@ bitflags! {
     /// | `MODIFY_ROYALTIES`     | `RoleModifyRoyalties`    |  9 |
     /// | `SET_NEW_URI`          | `RoleSetNewURI`          | 10 |
     /// | `TRANSFER`             | *(not yet in Go VM)*     | 11 |
+    /// | `NFT_UPDATE`           | *(not in Go VM)*         | 12 |
     #[derive(PartialEq, Clone, Copy, Debug)]
     pub struct EsdtLocalRoleFlags: u64 {
         const NONE                  = 0b00000000_00000000;
@@ -40,6 +41,7 @@ bitflags! {
         const SET_NEW_URI           = 0b00000100_00000000;
         //TODO: check this flag after barnard
         const TRANSFER              = 0b00001000_00000000;
+        const NFT_UPDATE            = 0b00010000_00000000;
     }
 }
 
