@@ -12,9 +12,6 @@ use multiversx_sc_snippets::{
 };
 use serde_json::json;
 
-use super::system_tx_session::{
-    SystemTxSession, create_query_interactor, parse_address, print_json,
-};
 use crate::cli::{
     cli_args_tx_system::SystemTxCommonArgs,
     cli_args_tx_system_esdt::{
@@ -22,6 +19,10 @@ use crate::cli::{
         EsdtIssueCostArgs, EsdtIssuePropertiesArgs, EsdtNftAddressArgs, EsdtQueryArgs,
         EsdtRolesArgs, EsdtTokenAddressArgs, EsdtTokenQueryArgs, EsdtTokenTxArgs, EsdtTokenTypeArg,
     },
+};
+use crate::cmd::tx_cli::tx_cli_common::{
+    create_interactor, create_query_interactor, load_relayer_for_interactor, load_wallet,
+    parse_address,
 };
 
 /// Default gas limit for ESDT system SC operations (same as mxpy).
@@ -324,19 +325,33 @@ pub(super) async fn tx_system_esdt(args: &EsdtCliArgs) -> Result<()> {
 // Transactions
 // ---------------------------------------------------------------------------
 
-impl SystemTxSession {
-    /// Starts a transaction from the sender to the ESDT system SC, through the typed proxy.
-    fn esdt(&mut self) -> EsdtProxy<'_> {
-        let sender = self.sender.clone();
-        let relayer = self.relayer.clone();
-        let gas_limit = self.gas_limit;
-        self.interactor
-            .tx()
-            .from(sender)
-            .to(ESDTSystemSCAddress)
-            .gas(gas_limit)
-            .opt_relayer(relayer)
-            .typed(ESDTSystemSCProxy)
+/// Starts a transaction from `sender` to the ESDT system SC, through the typed proxy.
+fn esdt_proxy<'a>(
+    interactor: &'a mut Interactor,
+    sender: &Bech32Address,
+    relayer: Option<Bech32Address>,
+    gas_limit: u64,
+) -> EsdtProxy<'a> {
+    interactor
+        .tx()
+        .from(sender.clone())
+        .to(ESDTSystemSCAddress)
+        .gas(gas_limit)
+        .opt_relayer(relayer)
+        .typed(ESDTSystemSCProxy)
+}
+
+/// Resolves the issue cost: either explicitly given, or read from the ESDT system SC configuration.
+async fn resolve_issue_cost(
+    interactor: &mut Interactor,
+    issue_cost: &Option<RustBigUint>,
+) -> Result<BigUint<StaticApi>> {
+    match issue_cost {
+        Some(issue_cost) => Ok(biguint(issue_cost)),
+        None => {
+            let (_, issue_cost, _, _) = fetch_contract_config(interactor).await?;
+            Ok(issue_cost)
+        }
     }
 }
 
@@ -345,13 +360,33 @@ async fn esdt_tx<F>(common: &SystemTxCommonArgs, build: F) -> Result<()>
 where
     F: FnOnce(EsdtProxy<'_>) -> Transaction,
 {
-    let mut session = SystemTxSession::new(common, ESDT_SYSTEM_SC_GAS).await?;
-    let tx = build(session.esdt());
-    session.dispatch(tx).await
+    let tx_args = common.resolve_tx_args(ESDT_SYSTEM_SC_GAS);
+    let sender_wallet = load_wallet(&common.sender)?;
+
+    let mut interactor = create_interactor(&common.gateway, &tx_args).await?;
+    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &common.relayer).await?;
+
+    let proxy = esdt_proxy(
+        &mut interactor,
+        &sender_address,
+        relayer_address_opt,
+        tx_args.gas_limit,
+    );
+    let mut tx = build(proxy);
+    interactor.set_tx_nonce_update_sender(&mut tx).await;
+
+    interactor
+        .sign_and_dispatch(
+            tx,
+            tx_args.send,
+            tx_args.wait_result,
+            tx_args.outfile.as_deref(),
+        )
+        .await
 }
 
-/// Same as [`esdt_tx`], but also resolves the issue cost,
-/// either from the arguments or from the ESDT system SC configuration.
+/// Same as [`esdt_tx`], but also resolves the issue cost.
 async fn esdt_issue_tx<F>(
     common: &SystemTxCommonArgs,
     cost_args: &EsdtIssueCostArgs,
@@ -360,16 +395,33 @@ async fn esdt_issue_tx<F>(
 where
     F: FnOnce(EsdtProxy<'_>, BigUint<StaticApi>) -> Transaction,
 {
-    let mut session = SystemTxSession::new(common, ESDT_SYSTEM_SC_GAS).await?;
-    let issue_cost = match &cost_args.issue_cost {
-        Some(issue_cost) => biguint(issue_cost),
-        None => {
-            let (_, issue_cost, _, _) = fetch_contract_config(&mut session.interactor).await?;
-            issue_cost
-        }
-    };
-    let tx = build(session.esdt(), issue_cost);
-    session.dispatch(tx).await
+    let tx_args = common.resolve_tx_args(ESDT_SYSTEM_SC_GAS);
+    let sender_wallet = load_wallet(&common.sender)?;
+
+    let mut interactor = create_interactor(&common.gateway, &tx_args).await?;
+    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &common.relayer).await?;
+
+    let issue_cost = resolve_issue_cost(&mut interactor, &cost_args.issue_cost).await?;
+    let mut tx = build(
+        esdt_proxy(
+            &mut interactor,
+            &sender_address,
+            relayer_address_opt,
+            tx_args.gas_limit,
+        ),
+        issue_cost,
+    );
+    interactor.set_tx_nonce_update_sender(&mut tx).await;
+
+    interactor
+        .sign_and_dispatch(
+            tx,
+            tx_args.send,
+            tx_args.wait_result,
+            tx_args.outfile.as_deref(),
+        )
+        .await
 }
 
 /// Transaction with only a token identifier argument.
@@ -434,12 +486,16 @@ async fn query_contract_config(args: &EsdtQueryArgs) -> Result<()> {
     let (owner, issue_cost, min_name_length, max_name_length) =
         fetch_contract_config(&mut interactor).await?;
 
-    print_json(&json!({
-        "owner": owner.to_address().to_bech32(hrp).to_bech32_string(),
-        "issueCost": issue_cost.to_display().to_string(),
-        "minTokenNameLength": min_name_length,
-        "maxTokenNameLength": max_name_length,
-    }))
+    println!(
+        "{}",
+        Interactor::to_json_pretty(&json!({
+            "owner": owner.to_address().to_bech32(hrp).to_bech32_string(),
+            "issueCost": issue_cost.to_display().to_string(),
+            "minTokenNameLength": min_name_length,
+            "maxTokenNameLength": max_name_length,
+        }))?
+    );
+    Ok(())
 }
 
 async fn query_token_properties(args: &EsdtTokenQueryArgs) -> Result<()> {
@@ -455,26 +511,30 @@ async fn query_token_properties(args: &EsdtTokenQueryArgs) -> Result<()> {
         .await
         .map_err(|err| anyhow!("token properties query failed: {}", err.message))?;
 
-    print_json(&json!({
-        "name": p.token_name,
-        "type": format!("{:?}", p.token_type),
-        "owner": p.owner_address.to_bech32(hrp).to_bech32_string(),
-        "mintedValue": p.minted_value,
-        "burntValue": p.burnt_value,
-        "numDecimals": p.num_decimals,
-        "isPaused": p.is_paused,
-        "canUpgrade": p.can_upgrade,
-        "canMint": p.can_mint,
-        "canBurn": p.can_burn,
-        "canChangeOwner": p.can_change_owner,
-        "canPause": p.can_pause,
-        "canFreeze": p.can_freeze,
-        "canWipe": p.can_wipe,
-        "canAddSpecialRoles": p.can_add_special_roles,
-        "canTransferNFTCreateRole": p.can_transfer_nft_create_role,
-        "nftCreateStopped": p.nft_create_stopped,
-        "numWiped": p.num_wiped,
-    }))
+    println!(
+        "{}",
+        Interactor::to_json_pretty(&json!({
+            "name": p.token_name,
+            "type": format!("{:?}", p.token_type),
+            "owner": p.owner_address.to_bech32(hrp).to_bech32_string(),
+            "mintedValue": p.minted_value,
+            "burntValue": p.burnt_value,
+            "numDecimals": p.num_decimals,
+            "isPaused": p.is_paused,
+            "canUpgrade": p.can_upgrade,
+            "canMint": p.can_mint,
+            "canBurn": p.can_burn,
+            "canChangeOwner": p.can_change_owner,
+            "canPause": p.can_pause,
+            "canFreeze": p.can_freeze,
+            "canWipe": p.can_wipe,
+            "canAddSpecialRoles": p.can_add_special_roles,
+            "canTransferNFTCreateRole": p.can_transfer_nft_create_role,
+            "nftCreateStopped": p.nft_create_stopped,
+            "numWiped": p.num_wiped,
+        }))?
+    );
+    Ok(())
 }
 
 async fn query_special_roles(args: &EsdtTokenQueryArgs) -> Result<()> {
@@ -502,7 +562,8 @@ async fn query_special_roles(args: &EsdtTokenQueryArgs) -> Result<()> {
         })
         .collect();
 
-    print_json(&result)
+    println!("{}", Interactor::to_json_pretty(&result)?);
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------

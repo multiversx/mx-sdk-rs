@@ -56,8 +56,9 @@ Order: ESDT ✅, governance, delegation manager + delegation, validator.
 
 ESDT (`sc-meta tx system esdt`) is done: issue/register (classic, dynamic, set-all-roles), roles, pause/freeze/wipe,
 ownership, control-changes, dynamic conversions, plus `token-properties`, `special-roles` and `contract-config` queries.
-Implemented in `tx_cli_system/` via `SystemTxSession` (wallet, relayer, default gas, dispatch) and the typed
-`ESDTSystemSCProxy`; covered by `framework/meta/tests/cs_tx_system_esdt_test.rs` (in `cs-test-runner`).
+Implemented in `tx_cli_system/` with the typed `ESDTSystemSCProxy`, working directly with the interactor
+like the rest of `sc-meta tx` (helpers in `tx_cli_common.rs`); default gas per command via
+`SystemTxCommonArgs::resolve_tx_args`; covered by `framework/meta/tests/cs_tx_system_esdt_test.rs` (in `cs-test-runner`).
 The validator commands need a validator PEM loader and BLS signing in `sdk/core` (via `multiversx-bls`),
 alternatively raw `--bls-key`/`--signature` hex pairs.
 

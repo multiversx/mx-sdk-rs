@@ -51,20 +51,6 @@ pub struct SystemTxArgs {
     pub outfile: Option<PathBuf>,
 }
 
-impl SystemTxArgs {
-    /// Converts to the generic [`TxArgs`], with the gas limit resolved.
-    pub fn to_tx_args(&self, gas_limit: u64) -> TxArgs {
-        TxArgs {
-            gas_limit,
-            gas_price: self.gas_price,
-            nonce: self.nonce,
-            send: self.send,
-            wait_result: self.wait_result,
-            outfile: self.outfile.clone(),
-        }
-    }
-}
-
 /// Arguments shared by all system SC transactions.
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct SystemTxCommonArgs {
@@ -79,4 +65,32 @@ pub struct SystemTxCommonArgs {
 
     #[command(flatten)]
     pub tx: SystemTxArgs,
+}
+
+/// Extra gas added to the default gas limit for relayed (v3) transactions.
+pub const RELAYED_TX_EXTRA_GAS: u64 = 50_000;
+
+impl SystemTxCommonArgs {
+    /// Converts to the generic [`TxArgs`].
+    ///
+    /// If `--gas-limit` is not given, `default_gas_limit` is used,
+    /// increased with the relayed transaction extra cost when a relayer is set.
+    pub fn resolve_tx_args(&self, default_gas_limit: u64) -> TxArgs {
+        let gas_limit = self.tx.gas_limit.unwrap_or_else(|| {
+            if self.relayer.is_set() {
+                default_gas_limit + RELAYED_TX_EXTRA_GAS
+            } else {
+                default_gas_limit
+            }
+        });
+
+        TxArgs {
+            gas_limit,
+            gas_price: self.tx.gas_price,
+            nonce: self.tx.nonce,
+            send: self.tx.send,
+            wait_result: self.tx.wait_result,
+            outfile: self.tx.outfile.clone(),
+        }
+    }
 }

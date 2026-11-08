@@ -2,35 +2,26 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_chain_core::std::base64_encode;
-use multiversx_sc_snippets::imports::{Bech32Address, InteractorIntoSdkTransaction};
+use multiversx_sc_snippets::imports::InteractorIntoSdkTransaction;
 
 use crate::cli::cli_args_tx::NewArgs;
 use crate::cmd::tx_cli::tx_cli_common::{
-    create_interactor, load_relayer_for_interactor, load_wallet,
+    create_interactor, load_relayer_for_interactor, load_wallet, parse_address,
 };
 
 use super::parse_payments::parse_all_payment_args;
 
-pub async fn tx_new(args: &NewArgs) {
-    if let Err(e) = tx_new_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_new_inner(args: &NewArgs) -> Result<()> {
+pub async fn tx_new(args: &NewArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
-    let receiver = Bech32Address::try_from_bech32_string(args.receiver.clone())?;
+    let receiver = parse_address("--receiver", &args.receiver)?;
+    let payments = parse_all_payment_args(&args.payment)?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = create_interactor(&args.gateway, &args.tx).await?;
-    let sender_address = interactor
-        .register_wallet_bech32(sender_wallet.clone())
-        .await;
+    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
     let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
 
     // Build Transaction via unified Tx syntax (resembles interactor code).
-    let payments = parse_all_payment_args(&args.payment)?;
     let mut tx = interactor
         .tx()
         .from(&sender_address)

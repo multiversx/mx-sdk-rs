@@ -23,7 +23,7 @@ use tx_cli_system::tx_system;
 use tx_cli_upgrade::tx_upgrade;
 
 pub async fn tx_cli(args: &TxCliArgs) {
-    match &args.command {
+    let result = match &args.command {
         TxCliAction::Deploy(deploy_args) => tx_deploy(deploy_args).await,
         TxCliAction::Call(call_args) => tx_call(call_args).await,
         TxCliAction::Upgrade(upgrade_args) => tx_upgrade(upgrade_args).await,
@@ -33,5 +33,10 @@ pub async fn tx_cli(args: &TxCliArgs) {
         TxCliAction::Sign(sign_args) => tx_sign(sign_args).await,
         TxCliAction::Relay(relay_args) => tx_relay(relay_args).await,
         TxCliAction::System(system_args) => tx_system(system_args).await,
+    };
+
+    if let Err(e) = result {
+        eprintln!("Error: {e:#}");
+        std::process::exit(1);
     }
 }

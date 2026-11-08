@@ -1,37 +1,28 @@
 use anyhow::Result;
-use multiversx_sc_snippets::imports::{Bech32Address, InteractorIntoSdkTransaction};
+use multiversx_sc_snippets::imports::InteractorIntoSdkTransaction;
 
 use super::parse_payments::parse_all_payment_args;
 use super::tx_cli_common::{
-    build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
+    build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet, parse_address,
 };
 use crate::cli::cli_args_tx::CallArgs;
 
-pub async fn tx_call(args: &CallArgs) {
-    if let Err(e) = tx_call_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_call_inner(args: &CallArgs) -> Result<()> {
-    let sender_wallet = load_wallet(&args.sender)?;
-
-    // Create the interactor – fetches network config.
-    let mut interactor = create_interactor(&args.gateway, &args.tx).await?;
-    let sender_address = interactor.register_wallet(sender_wallet).await;
-    let sender_bech32 = sender_address.to_bech32(interactor.get_hrp());
-    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
-
-    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
-
-    // Build call transaction.
+pub async fn tx_call(args: &CallArgs) -> Result<()> {
+    let contract = parse_address("contract", &args.contract)?;
     let arg_buffer = build_arg_buffer(&args.arguments)?;
     let payments = parse_all_payment_args(&args.payment)?;
 
+    let sender_wallet = load_wallet(&args.sender)?;
+
+    // Create the interactor – this fetches the network config in the process.
+    let mut interactor = create_interactor(&args.gateway, &args.tx).await?;
+    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
+    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
+
+    // Build call transaction.
     let mut tx = interactor
         .tx()
-        .from(&sender_bech32)
+        .from(&sender_address)
         .to(&contract)
         .gas(args.tx.gas_limit)
         .payment(payments)
@@ -39,6 +30,7 @@ async fn tx_call_inner(args: &CallArgs) -> Result<()> {
         .arguments_raw(arg_buffer)
         .opt_relayer(relayer_address_opt)
         .into_sdk_transaction();
+
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
     interactor

@@ -51,6 +51,13 @@ pub struct RelayerArgs {
     pub relayer_keystore_password: Option<String>,
 }
 
+impl RelayerArgs {
+    /// True if a relayer was given, either as an address or as a wallet.
+    pub fn is_set(&self) -> bool {
+        self.relayer.is_some() || self.relayer_pem.is_some() || self.relayer_keyfile.is_some()
+    }
+}
+
 /// Load a wallet from a PEM file or JSON keystore.
 pub fn load_wallet(sender: &SenderArgs) -> Result<Wallet> {
     if let Some(pem) = &sender.pem {
