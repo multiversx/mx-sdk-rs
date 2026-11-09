@@ -29,6 +29,8 @@ jobs:
   framework-feature-tests:
     name: Framework Tests (${{ matrix.name }})
     runs-on: ubuntu-latest
+    # a static buffer deadlock would otherwise hang until the default 6h job timeout
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:

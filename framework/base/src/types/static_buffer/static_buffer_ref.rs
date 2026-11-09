@@ -21,17 +21,21 @@ where
         }
     }
 
+    /// Returns `None` if the static buffer is already locked, or is currently being accessed,
+    /// or if `len` exceeds its capacity. Never blocks.
     pub fn try_new_from_copy_bytes<F: FnOnce(&mut [u8])>(
         len: usize,
         copy_bytes: F,
     ) -> Option<Self> {
-        M::static_var_api_impl().with_lockable_static_buffer(|lsb| {
-            if lsb.try_lock_with_copy_bytes(len, copy_bytes) {
-                Some(StaticBufferRef::new())
-            } else {
-                None
-            }
-        })
+        M::static_var_api_impl()
+            .try_with_lockable_static_buffer(|lsb| {
+                if lsb.try_lock_with_copy_bytes(len, copy_bytes) {
+                    Some(StaticBufferRef::new())
+                } else {
+                    None
+                }
+            })
+            .flatten()
     }
 
     pub fn try_new(bytes: &[u8]) -> Option<Self> {

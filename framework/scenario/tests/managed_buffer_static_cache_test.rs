@@ -4,10 +4,10 @@
 //! All expected results are the same with or without the features,
 //! the CI runs this file with each combination.
 
-use multiversx_sc::codec::{DecodeError, NestedEncode, TopDecode, TopEncode};
+use multiversx_sc::codec::{DecodeError, NestedDecode, NestedEncode, TopDecode, TopEncode};
 use multiversx_sc::types::{
-    BigInt, BigUint, LockableStaticBuffer, ManagedBuffer, ManagedBufferBuilder, ManagedVec,
-    ManagedVecEncoded, Payment, StaticBufferRef,
+    BigInt, BigUint, LockableStaticBuffer, ManagedBuffer, ManagedBufferBuilder,
+    ManagedBufferNestedDecodeInput, ManagedVec, ManagedVecEncoded, Payment, StaticBufferRef,
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -247,4 +247,26 @@ fn check_encode_while_iterating(n: u64) {
 fn encode_while_iterating_test() {
     check_encode_while_iterating(SMALL);
     check_encode_while_iterating(LARGE);
+}
+
+/// Regression: the decode input tries to acquire the static buffer lazily, on first read.
+/// Inside `with_buffer_contents`, the static data is already being accessed,
+/// so the attempt must fail without blocking, and decoding must fall back to VM calls.
+#[test]
+fn decode_inside_with_buffer_contents_test() {
+    let source = ManagedBuffer::<StaticApi>::new_from_bytes(&[0, 0, 0, 42, 0, 0, 0, 7]);
+    let mut input = ManagedBufferNestedDecodeInput::new(source);
+    let other = ManagedBuffer::<StaticApi>::new_from_bytes(b"other");
+
+    let decoded = other.with_buffer_contents(|bytes| {
+        assert_eq!(bytes, b"other");
+        assert!(StaticBufferRef::<StaticApi>::try_new(b"").is_none());
+        u32::dep_decode(&mut input).unwrap()
+    });
+    assert_eq!(decoded, 42);
+
+    // outside the callback, decoding continues normally
+    assert_eq!(u32::dep_decode(&mut input).unwrap(), 7);
+    drop(input);
+    assert_static_buffer_free();
 }
