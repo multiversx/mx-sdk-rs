@@ -47,15 +47,35 @@ fn managed_vec_encoded_payment_test() {
     // top-decoding does not change the buffer
     let decoded =
         ManagedVecEncoded::<StaticApi, Payment<StaticApi>>::top_decode(encoded_vec).unwrap();
-    assert_eq!(decoded.as_raw_buffer(), mve.as_raw_buffer());
+    assert_eq!(decoded, mve);
 
     // conversions
     let from_vec: ManagedVecEncoded<StaticApi, Payment<StaticApi>> = vec.clone().into();
-    assert_eq!(from_vec.as_raw_buffer(), mve.as_raw_buffer());
+    assert_eq!(from_vec, mve);
     let back: ManagedVec<StaticApi, Payment<StaticApi>> = mve.clone().into();
     assert_eq!(back, vec);
 
     for (i, item) in mve.iter().enumerate() {
         assert_eq!(item, payment(i as u64));
     }
+}
+
+#[test]
+fn managed_vec_encoded_eq_debug_test() {
+    let mut a = ManagedVecEncoded::<StaticApi, u32>::new();
+    let mut b = ManagedVecEncoded::<StaticApi, u32>::new();
+    assert_eq!(a, b);
+    a.push(1);
+    assert_ne!(a, b);
+    b.push(1);
+    assert_eq!(a, b);
+    a.push(2);
+    b.push(3);
+    assert_ne!(a, b);
+
+    assert_eq!(format!("{a:?}"), "[1, 2]");
+    assert_eq!(
+        format!("{:?}", ManagedVecEncoded::<StaticApi, u32>::new()),
+        "[]"
+    );
 }

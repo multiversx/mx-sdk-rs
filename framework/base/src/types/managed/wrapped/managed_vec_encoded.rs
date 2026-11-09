@@ -25,8 +25,23 @@ use crate::{
 /// - `push` only encodes the new item and appends it;
 /// - items are decoded lazily, one by one, while iterating.
 ///
-/// It is useful for large lists that are mostly appended to, or iterated once,
-/// where decoding into a `ManagedVec` and re-encoding would cost a lot of gas.
+/// It is useful for large lists that are mostly appended to, or loaded and saved without
+/// being inspected, where decoding into a `ManagedVec` and re-encoding would cost a lot of gas.
+///
+/// ## Iteration cost
+///
+/// Iterating decodes the items with the regular nested decoder, so it costs about as much
+/// as decoding the whole list into a `ManagedVec`:
+/// - by default, every read is a VM call that is charged for the length of the entire buffer,
+///   so iterating over the whole list grows quadratically with its size;
+/// - with the `managed-buffer-preload` feature, the buffer is copied once into the static buffer
+///   (if it fits), and iteration becomes roughly linear. The static buffer then stays locked
+///   until the iterator is dropped, see [`ManagedVecEncodedIterator`].
+///
+/// ## Item types with empty encoding
+///
+/// Item types whose nested encoding can be empty (e.g. `()`) are not supported:
+/// `is_empty` is not reliable for them, and iterating never ends if the buffer is not empty.
 pub struct ManagedVecEncoded<M, T>
 where
     M: ManagedTypeApi,
@@ -98,6 +113,8 @@ where
     ///
     /// Works on a copy of the underlying buffer.
     /// Use `into_iter` on an owned value to avoid the copy.
+    ///
+    /// Never ends for item types with an empty nested encoding (e.g. `()`) and a non-empty buffer.
     pub fn iter(&self) -> ManagedVecEncodedIterator<M, T> {
         ManagedVecEncodedIterator::new(self.buffer.clone())
     }
@@ -122,9 +139,47 @@ where
     }
 }
 
+/// Compares the encoded bytes, without decoding.
+///
+/// Two lists with equal items are equal, as long as the items have a canonical encoding,
+/// which is the case for all framework types and derived implementations.
+impl<M, T> PartialEq for ManagedVecEncoded<M, T>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.buffer == other.buffer
+    }
+}
+
+impl<M, T> Eq for ManagedVecEncoded<M, T> where M: ManagedTypeApi {}
+
+/// Decodes and lists all the items.
+///
+/// Signals an error if the encoded data is invalid.
+impl<M, T> core::fmt::Debug for ManagedVecEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: NestedDecode + core::fmt::Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_list().entries(self.iter()).finish()
+    }
+}
+
 /// Decodes the items of a [`ManagedVecEncoded`] one by one.
 ///
 /// Signals an error if the encoded data is invalid.
+///
+/// Never ends for item types with an empty nested encoding (e.g. `()`) and a non-empty buffer,
+/// since decoding such an item does not advance the input.
+///
+/// With the `managed-buffer-preload` feature, the iterator holds the static buffer from its first
+/// read until it is dropped. While it is alive:
+/// - `ManagedBuffer::with_buffer_contents` / `with_buffer_contents_mut`, and the `ManagedVec`
+///   operations based on them, signal an error;
+/// - other decoders and the cached `ManagedBufferBuilder` fall back to their slower path.
 pub struct ManagedVecEncodedIterator<M, T>
 where
     M: ManagedTypeApi,
