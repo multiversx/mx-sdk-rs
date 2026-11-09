@@ -6,9 +6,9 @@
 //! Only active with the `managed-buffer-preload` feature.
 
 use crate::{
-    api::{ManagedTypeApi, quick_signal_error},
+    api::{ManagedBufferApiImpl, ManagedTypeApi, quick_signal_error},
     err_msg,
-    types::{ManagedBuffer, StaticBufferRef},
+    types::{ManagedBuffer, ManagedType, StaticBufferRef},
 };
 
 pub(crate) struct PreloadedManagedBuffer<M>
@@ -70,11 +70,20 @@ where
         self.try_load_static_cache_if_necessary();
         if let Some(static_cache) = &self.static_cache {
             let end_position = starting_position.checked_add(slice_len)?;
+            if end_position > self.buffer_len {
+                return None;
+            }
+
+            // The handle must be allocated before accessing the static buffer:
+            // on some APIs (e.g. StaticApi) both are guarded by the same lock.
+            let result = unsafe { ManagedBuffer::<M>::new_uninit() };
             static_cache.with_buffer_contents(|bytes| {
-                bytes
-                    .get(starting_position..end_position)
-                    .map(ManagedBuffer::new_from_bytes)
-            })
+                M::managed_type_impl().mb_overwrite(
+                    result.get_handle(),
+                    &bytes[starting_position..end_position],
+                );
+            });
+            Some(result)
         } else {
             self.managed_buffer.copy_slice(starting_position, slice_len)
         }
