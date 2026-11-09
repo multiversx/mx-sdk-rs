@@ -12,9 +12,9 @@ path = "src/large_vec_storage.rs"
 managed-buffer-preload = ["multiversx-sc/managed-buffer-preload"]
 
 [dependencies.multiversx-sc]
-version = "0.66.2"
+version = "0.66.3"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.2"
+version = "0.66.3"
 path = "../../../framework/scenario"

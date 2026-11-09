@@ -3216,7 +3216,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "getrandom 0.4.2",
  "multiversx-sc",
@@ -3236,7 +3236,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "bitflags 2.11.1",
  "generic-array 1.4.3",
@@ -3279,7 +3279,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -3290,7 +3290,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "anyhow",
  "base64",
@@ -3323,7 +3323,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "clap",
  "colored 3.1.1",
@@ -3344,14 +3344,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "colored 3.1.1",
  "hex",
@@ -3375,7 +3375,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "anyhow",
  "colored 3.1.1",
@@ -3394,7 +3394,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
 ]
@@ -3460,7 +3460,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
