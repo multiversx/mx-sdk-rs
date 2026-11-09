@@ -1,2 +1,5 @@
 [[proxy]]
 path = "src/adder_proxy.rs"
+
+[[proxy]]
+path = "../../parametric-tests/adder-pt/src/adder_proxy.rs"

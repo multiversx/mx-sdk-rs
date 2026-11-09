@@ -1,0 +1,20 @@
+[package]
+name = "callee"
+version = "0.0.0"
+authors = [ "you",]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/callee.rs"
+
+[dev-dependencies]
+num-bigint = "0.4.2"
+
+[dependencies.multiversx-sc]
+version = "0.66.2"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.66.2"
+path = "../../../framework/scenario"
