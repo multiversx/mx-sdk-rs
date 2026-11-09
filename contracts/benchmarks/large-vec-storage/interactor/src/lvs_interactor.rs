@@ -25,13 +25,7 @@ pub const VARIANTS: &[Variant] = &[
 ];
 
 /// Endpoints that only read storage, measured in this order.
-pub const READ_ENDPOINTS: &[&str] = &[
-    "noop",
-    "loadRaw",
-    "decodeDefault",
-    "iterSum",
-    "encodeOnly",
-];
+pub const READ_ENDPOINTS: &[&str] = &["noop", "loadRaw", "decodeDefault", "iterSum", "encodeOnly"];
 
 /// Mutates storage (measured via simulation, so state is not actually changed).
 pub const CLAIM_ENDPOINT: &str = "claimDefault";

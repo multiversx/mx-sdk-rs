@@ -34,7 +34,7 @@ pub trait LargeVecStorageBenchmark {
 
     /// Appends `count` entries to storage, with indices starting at `start`.
     ///
-    /// Appends the encoded entries to the raw stored bytes, without decoding what is already there.
+    /// Uses `ManagedVecEncoded`, which appends the encoded entries without decoding what is already there.
     /// Going through `entries().update(...)` would decode the existing value first, which
     /// runs out of gas in the default build above ~120 entries, so storage could not be grown further.
     /// Can be called repeatedly to build up large storage in chunks.
@@ -42,7 +42,7 @@ pub trait LargeVecStorageBenchmark {
     fn fill(&self, start: usize, count: usize) {
         let locked_id = TokenId::from("LKMEX-123456");
         let unlocked_id = TokenId::from("MEX-123456");
-        let mut buffer = self.raw_entries().get();
+        let mut entries = self.entries_encoded().get();
         for i in start..start + count {
             let amount = BigUint::from(1_000_000_000_000_000_000u64 + i as u64);
             let half_amount = NonZeroBigUint::new_or_panic(&amount / 2u32);
@@ -55,22 +55,20 @@ pub trait LargeVecStorageBenchmark {
                 ),
                 unlocked_tokens: Payment::new(unlocked_id.clone(), 0, half_amount),
             };
-            entry
-                .dep_encode(&mut buffer)
-                .unwrap_or_else(|e| sc_panic!(e));
+            entries.push(entry);
         }
-        self.raw_entries().set(buffer);
+        self.entries_encoded().set(entries);
     }
 
     #[endpoint]
     fn clear(&self) {
-        self.raw_entries().clear();
+        self.entries_encoded().clear();
     }
 
     /// Raw storage load only, no decoding.
     #[endpoint(loadRaw)]
     fn load_raw(&self) -> usize {
-        self.raw_entries().get().len()
+        self.entries_encoded().get().as_raw_buffer().len()
     }
 
     /// Framework decoder. Its cost depends on whether the contract is built with `managed-buffer-preload`.
@@ -118,5 +116,5 @@ pub trait LargeVecStorageBenchmark {
     fn entries(&self) -> SingleValueMapper<ManagedVec<UnstakePair<Self::Api>>>;
 
     #[storage_mapper("entries")]
-    fn raw_entries(&self) -> SingleValueMapper<ManagedBuffer>;
+    fn entries_encoded(&self) -> SingleValueMapper<ManagedVecEncoded<UnstakePair<Self::Api>>>;
 }

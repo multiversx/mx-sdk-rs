@@ -74,8 +74,9 @@ where
 
     /// Appends `count` entries to storage, with indices starting at `start`. 
     ///  
-    /// Encodes entries one by one and appends to the raw buffer, 
-    /// to avoid the (quadratic) cost of re-encoding a whole `ManagedVec`. 
+    /// Uses `ManagedVecEncoded`, which appends the encoded entries without decoding what is already there. 
+    /// Going through `entries().update(...)` would decode the existing value first, which 
+    /// runs out of gas in the default build above ~120 entries, so storage could not be grown further. 
     /// Can be called repeatedly to build up large storage in chunks. 
     pub fn fill<
         Arg0: ProxyArg<usize>,
