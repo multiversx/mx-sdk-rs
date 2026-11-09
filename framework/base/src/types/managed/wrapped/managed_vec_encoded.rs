@@ -172,6 +172,10 @@ where
 ///
 /// Signals an error if the encoded data is invalid.
 ///
+/// With the `managed-buffer-preload` feature, the iterator holds the static buffer for as long as it lives.
+/// Other decoding or encoding done during the iteration still works, but cannot use the static buffer,
+/// so it is more expensive.
+///
 /// Never ends for item types with an empty nested encoding (e.g. `()`) and a non-empty buffer,
 /// since decoding such an item does not advance the input.
 ///
