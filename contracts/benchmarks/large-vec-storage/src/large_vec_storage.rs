@@ -3,17 +3,13 @@
 //! Benchmarks decoding a large `ManagedVec` of structs from storage.
 //!
 //! Reproduces the storage pattern from mx-exchange-sc `token-unstake`
-//! (`SingleValueMapper<ManagedVec<UnstakePair>>`), and compares the default framework
-//! decoder against prototype decoders that preload the encoded bytes into wasm memory.
+//! (`SingleValueMapper<ManagedVec<UnstakePair>>`).
+//! Built twice (see `sc-config.toml`), with and without the `managed-buffer-preload` feature.
 
 pub mod large_vec_storage_proxy;
-pub mod preloaded_input;
 
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
-
-use multiversx_sc::codec::NestedDecodeInput;
-use preloaded_input::{PreloadedNestedDecodeInput, preload_bytes};
 
 pub const MAX_CLAIM: usize = 20;
 
@@ -75,30 +71,17 @@ pub trait LargeVecStorageBenchmark {
         self.raw_entries().get().len()
     }
 
-    /// Current framework decoder (one VM call per field).
+    /// Framework decoder. Its cost depends on whether the contract is built with `managed-buffer-preload`.
     #[endpoint(decodeDefault)]
     fn decode_default(&self) -> usize {
         self.entries().get().len()
     }
 
-    /// Mimics the pre-#1964 behaviour: fixed-size fields from wasm memory,
-    /// nested managed buffers via `mBufferCopyByteSlice`.
-    #[endpoint(decodePreloadedCopy)]
-    fn decode_preloaded_copy(&self) -> usize {
-        self.decode_preloaded::<false>().len()
-    }
-
-    /// Everything from wasm memory, nested managed buffers/big ints created from bytes.
-    #[endpoint(decodePreloadedBytes)]
-    fn decode_preloaded_bytes(&self) -> usize {
-        self.decode_preloaded::<true>().len()
-    }
-
-    /// Cheap decode, then iterates once over the ManagedVec.
-    /// Subtract `decodePreloadedBytes` to isolate iteration cost.
+    /// Decodes, then iterates once over the ManagedVec.
+    /// Subtract `decodeDefault` to isolate iteration cost.
     #[endpoint(iterSum)]
     fn iter_sum(&self) -> BigUint {
-        let entries = self.decode_preloaded::<true>();
+        let entries = self.entries().get();
         let mut sum = BigUint::zero();
         for entry in &entries {
             sum += &entry.unlocked_tokens.amount;
@@ -106,25 +89,14 @@ pub trait LargeVecStorageBenchmark {
         sum
     }
 
-    /// Cheap decode, then top-encodes into a ManagedBuffer (no storage write).
-    /// Subtract `decodePreloadedBytes` to isolate encoding cost.
+    /// Decodes, then top-encodes into a ManagedBuffer (no storage write).
+    /// Subtract `decodeDefault` to isolate encoding cost.
     #[endpoint(encodeOnly)]
     fn encode_only(&self) -> usize {
-        let entries = self.decode_preloaded::<true>();
+        let entries = self.entries().get();
         let mut buffer = ManagedBuffer::new();
         let _ = entries.top_encode(&mut buffer);
         buffer.len()
-    }
-
-    fn decode_preloaded<const FROM_BYTES: bool>(&self) -> ManagedVec<UnstakePair<Self::Api>> {
-        let raw = self.raw_entries().get();
-        let bytes = preload_bytes(&raw);
-        let mut input = PreloadedNestedDecodeInput::<Self::Api, FROM_BYTES>::new(&raw, bytes);
-        let mut result = ManagedVec::new();
-        while input.remaining_len() > 0 {
-            result.push(UnstakePair::dep_decode(&mut input).unwrap_or_else(|e| sc_panic!(e)));
-        }
-        result
     }
 
     /// Mirrors `claimUnlockedTokens` storage access: decode, remove up to 20 from front, re-encode.

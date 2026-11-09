@@ -112,7 +112,7 @@ where
             .original_result()
     }
 
-    /// Current framework decoder (one VM call per field). 
+    /// Framework decoder. Its cost depends on whether the contract is built with `managed-buffer-preload`. 
     pub fn decode_default(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
@@ -122,29 +122,8 @@ where
             .original_result()
     }
 
-    /// Mimics the pre-#1964 behaviour: fixed-size fields from wasm memory, 
-    /// nested managed buffers via `mBufferCopyByteSlice`. 
-    pub fn decode_preloaded_copy(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("decodePreloadedCopy")
-            .original_result()
-    }
-
-    /// Everything from wasm memory, nested managed buffers/big ints created from bytes. 
-    pub fn decode_preloaded_bytes(
-        self,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
-        self.wrapped_tx
-            .payment(NotPayable)
-            .raw_call("decodePreloadedBytes")
-            .original_result()
-    }
-
-    /// Cheap decode, then iterates once over the ManagedVec. 
-    /// Subtract `decodePreloadedBytes` to isolate iteration cost. 
+    /// Decodes, then iterates once over the ManagedVec. 
+    /// Subtract `decodeDefault` to isolate iteration cost. 
     pub fn iter_sum(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
@@ -154,8 +133,8 @@ where
             .original_result()
     }
 
-    /// Cheap decode, then top-encodes into a ManagedBuffer (no storage write). 
-    /// Subtract `decodePreloadedBytes` to isolate encoding cost. 
+    /// Decodes, then top-encodes into a ManagedBuffer (no storage write). 
+    /// Subtract `decodeDefault` to isolate encoding cost. 
     pub fn encode_only(
         self,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {

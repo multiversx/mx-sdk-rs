@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           10
+// Endpoints:                            8
 // Async Callback (empty):               1
-// Total number of exported functions:  12
+// Total number of exported functions:  10
 
 #![no_std]
 
@@ -23,8 +23,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         clear => clear
         loadRaw => load_raw
         decodeDefault => decode_default
-        decodePreloadedCopy => decode_preloaded_copy
-        decodePreloadedBytes => decode_preloaded_bytes
         iterSum => iter_sum
         encodeOnly => encode_only
         claimDefault => claim_default

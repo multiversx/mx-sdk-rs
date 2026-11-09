@@ -29,8 +29,6 @@ pub const READ_ENDPOINTS: &[&str] = &[
     "noop",
     "loadRaw",
     "decodeDefault",
-    "decodePreloadedCopy",
-    "decodePreloadedBytes",
     "iterSum",
     "encodeOnly",
 ];
