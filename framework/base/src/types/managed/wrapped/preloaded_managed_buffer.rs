@@ -78,10 +78,8 @@ where
             // on some APIs (e.g. StaticApi) both are guarded by the same lock.
             let result = unsafe { ManagedBuffer::<M>::new_uninit() };
             static_cache.with_buffer_contents(|bytes| {
-                M::managed_type_impl().mb_overwrite(
-                    result.get_handle(),
-                    &bytes[starting_position..end_position],
-                );
+                M::managed_type_impl()
+                    .mb_overwrite(result.get_handle(), &bytes[starting_position..end_position]);
             });
             Some(result)
         } else {
