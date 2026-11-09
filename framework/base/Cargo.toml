@@ -22,6 +22,7 @@ num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = []
 std = ["multiversx-chain-core/std"]
 managed-buffer-builder-cached = []
+managed-buffer-preload = []
 esdt-token-payment-legacy-decode = []
 contract-call-legacy = []
 small-int-bug = [] # can be used for testing the buggy mBufferFromSmallIntSigned VM hook

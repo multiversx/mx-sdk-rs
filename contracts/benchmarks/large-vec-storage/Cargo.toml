@@ -1,0 +1,20 @@
+[package]
+name = "large-vec-storage"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/large_vec_storage.rs"
+
+[features]
+managed-buffer-preload = ["multiversx-sc/managed-buffer-preload"]
+
+[dependencies.multiversx-sc]
+version = "0.66.2"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.66.2"
+path = "../../../framework/scenario"

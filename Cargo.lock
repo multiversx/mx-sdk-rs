@@ -2752,6 +2752,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "large-vec-storage"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "large-vec-storage-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "large-vec-storage",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "large-vec-storage-meta"
+version = "0.0.0"
+dependencies = [
+ "large-vec-storage",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

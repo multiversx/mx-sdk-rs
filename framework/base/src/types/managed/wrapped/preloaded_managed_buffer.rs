@@ -1,7 +1,12 @@
-#![allow(unused)]
+#![cfg_attr(not(feature = "managed-buffer-preload"), allow(unused))]
+
+//! Managed buffer wrapper that copies its contents into the static buffer on first read,
+//! so subsequent fixed-size reads are served from wasm memory instead of VM calls.
+//!
+//! Only active with the `managed-buffer-preload` feature.
 
 use crate::{
-    api::{InvalidSliceError, ManagedTypeApi, quick_signal_error},
+    api::{ManagedTypeApi, quick_signal_error},
     err_msg,
     types::{ManagedBuffer, StaticBufferRef},
 };
@@ -34,7 +39,7 @@ where
         }
 
         self.static_cache =
-            StaticBufferRef::try_new_from_copy_bytes(self.managed_buffer.len(), |dest_slice| {
+            StaticBufferRef::try_new_from_copy_bytes(self.buffer_len, |dest_slice| {
                 self.managed_buffer.load_slice(0, dest_slice);
             });
     }

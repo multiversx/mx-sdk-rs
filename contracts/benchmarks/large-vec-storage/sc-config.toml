@@ -1,0 +1,11 @@
+# default framework decoder: every nested decode read is a VM call
+[contracts.large-vec-storage]
+name = "large-vec-storage"
+
+# same code, built with the preloaded managed buffer decoder
+[contracts.large-vec-storage-preload]
+name = "large-vec-storage-preload"
+features = ["managed-buffer-preload"]
+
+[[proxy]]
+path = "src/large_vec_storage_proxy.rs"
