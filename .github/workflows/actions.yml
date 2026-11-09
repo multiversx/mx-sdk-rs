@@ -26,6 +26,29 @@ jobs:
       rust-toolchain: 1.96
       runs-on: ubuntu-latest
 
+  framework-feature-tests:
+    name: Framework Tests (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    # a static buffer deadlock would otherwise hang until the default 6h job timeout
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: feat:managed-buffer-preload
+            features: multiversx-sc/managed-buffer-preload
+          - name: feat:managed-buffer-builder-cached
+            features: multiversx-sc/managed-buffer-builder-cached
+          - name: feat:managed-buffer-preload+managed-buffer-builder-cached
+            features: multiversx-sc/managed-buffer-preload,multiversx-sc/managed-buffer-builder-cached
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.96
+      - name: Run framework scenario tests with the features enabled
+        run: cargo test -p multiversx-sc-scenario --features ${{ matrix.features }}
+
   setup:
     name: Setup Environment
     uses: multiversx/mx-sc-actions/.github/workflows/setup.yml@v6.0.1

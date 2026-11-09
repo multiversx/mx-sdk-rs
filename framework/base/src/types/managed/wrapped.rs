@@ -9,6 +9,7 @@ mod managed_option;
 mod managed_ref;
 mod managed_ref_mut;
 mod managed_vec;
+mod managed_vec_encoded;
 mod managed_vec_item;
 mod managed_vec_item_nested_tuple;
 mod managed_vec_item_payload;
@@ -38,6 +39,7 @@ pub use managed_option::ManagedOption;
 pub use managed_ref::ManagedRef;
 pub use managed_ref_mut::ManagedRefMut;
 pub use managed_vec::ManagedVec;
+pub use managed_vec_encoded::{ManagedVecEncoded, ManagedVecEncodedIterator};
 pub use managed_vec_item::{
     ManagedVecItem, managed_vec_item_read_from_payload_index,
     managed_vec_item_save_to_payload_index,

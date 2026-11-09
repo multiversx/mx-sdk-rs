@@ -20,6 +20,18 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         })
     }
 
+    fn try_with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(
+        &self,
+        f: F,
+    ) -> Option<R> {
+        VHB::try_with_static_data(|data| {
+            let mut lockable_static_buffer =
+                data.lockable_static_buffer_cell.try_borrow_mut().ok()?;
+            Some(f(&mut lockable_static_buffer))
+        })
+        .flatten()
+    }
+
     fn set_external_view_target_address_handle(&self, handle: RawHandle) {
         self.with_static_data(|data| {
             data.static_vars_cell
