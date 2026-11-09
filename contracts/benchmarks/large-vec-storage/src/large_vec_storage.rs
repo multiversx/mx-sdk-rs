@@ -19,8 +19,8 @@ pub const MAX_CLAIM: usize = 20;
 )]
 pub struct UnstakePair<M: ManagedTypeApi> {
     pub unlock_epoch: u64,
-    pub locked_tokens: EsdtTokenPayment<M>,
-    pub unlocked_tokens: EsdtTokenPayment<M>,
+    pub locked_tokens: Payment<M>,
+    pub unlocked_tokens: Payment<M>,
 }
 
 #[multiversx_sc::contract]
@@ -39,19 +39,20 @@ pub trait LargeVecStorageBenchmark {
     /// Can be called repeatedly to build up large storage in chunks.
     #[endpoint]
     fn fill(&self, start: usize, count: usize) {
-        let locked_id = EsdtTokenIdentifier::from("LKMEX-123456");
-        let unlocked_id = EsdtTokenIdentifier::from("MEX-123456");
+        let locked_id = TokenId::from("LKMEX-123456");
+        let unlocked_id = TokenId::from("MEX-123456");
         let mut buffer = self.raw_entries().get();
         for i in start..start + count {
             let amount = BigUint::from(1_000_000_000_000_000_000u64 + i as u64);
+            let half_amount = NonZeroBigUint::new_or_panic(&amount / 2u32);
             let entry = UnstakePair {
                 unlock_epoch: i as u64,
-                locked_tokens: EsdtTokenPayment::new(
+                locked_tokens: Payment::new(
                     locked_id.clone(),
                     1000 + i as u64,
-                    amount.clone(),
+                    NonZeroBigUint::new_or_panic(amount),
                 ),
-                unlocked_tokens: EsdtTokenPayment::new(unlocked_id.clone(), 0, amount / 2u32),
+                unlocked_tokens: Payment::new(unlocked_id.clone(), 0, half_amount),
             };
             entry
                 .dep_encode(&mut buffer)
@@ -84,7 +85,7 @@ pub trait LargeVecStorageBenchmark {
         let entries = self.entries().get();
         let mut sum = BigUint::zero();
         for entry in &entries {
-            sum += &entry.unlocked_tokens.amount;
+            sum += entry.unlocked_tokens.amount.as_big_uint();
         }
         sum
     }
