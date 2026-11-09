@@ -33,11 +33,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: managed-buffer-preload
+          - name: feat:managed-buffer-preload
             features: multiversx-sc/managed-buffer-preload
-          - name: managed-buffer-builder-cached
+          - name: feat:managed-buffer-builder-cached
             features: multiversx-sc/managed-buffer-builder-cached
-          - name: both
+          - name: feat:managed-buffer-preload+managed-buffer-builder-cached
             features: multiversx-sc/managed-buffer-preload,multiversx-sc/managed-buffer-builder-cached
     steps:
       - uses: actions/checkout@v5
