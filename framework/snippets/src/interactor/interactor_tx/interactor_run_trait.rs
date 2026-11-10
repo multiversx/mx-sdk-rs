@@ -68,7 +68,8 @@ pub trait InteractorSimulateGasAsync {
     /// Simulates the transaction on the gateway and returns the estimated gas units required.
     ///
     /// The returned future resolves to [`GasResult::GasUsed`] with the gas estimate,
-    /// or [`GasResult::OutOfGas`] if the simulated transaction runs out of gas.
+    /// [`GasResult::OutOfGas`] if the simulated transaction runs out of gas,
+    /// or [`GasResult::Failed`] with the error message if it fails for any other reason.
     /// No actual state changes are committed to the network.
     fn simulate_gas(self) -> impl std::future::Future<Output = GasResult>;
 }

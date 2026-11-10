@@ -1,4 +1,5 @@
 use colored::Colorize;
+use multiversx_sdk::chain_core::types::GasResult;
 
 pub(super) fn query_err_message(err: &anyhow::Error) {
     eprintln!(
@@ -30,10 +31,11 @@ pub(super) fn simulate_gas_deploy_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(super) fn simulate_gas_out_of_gas_err_message(tx_kind: &str) {
+/// Printed when the gas simulation completed, but did not produce a usable gas estimate.
+pub(super) fn simulate_gas_no_estimate_err_message(tx_kind: &str, gas_result: &GasResult) {
     eprintln!(
         "{}",
-        format!("Gas simulation for {tx_kind} failed: out of gas")
+        format!("Gas simulation for {tx_kind} did not produce an estimate: {gas_result}")
             .red()
             .bold()
     );

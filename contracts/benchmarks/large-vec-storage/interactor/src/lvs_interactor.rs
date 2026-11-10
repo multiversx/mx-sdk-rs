@@ -130,7 +130,7 @@ impl LargeVecStorageInteractor {
 
     /// Simulates a call to an endpoint with no arguments, via the gateway `transaction/cost` endpoint.
     ///
-    /// Returns the gas consumed, or `None` if the simulation failed (typically out of gas).
+    /// Returns the gas consumed, or `None` if the simulation ran out of gas or failed.
     ///
     /// Note: we cannot use `ReturnsGasUsed` on executed transactions, because no gas refund is issued
     /// on the chain simulator, so the reported `gasUsed` is always the gas limit.
@@ -150,6 +150,10 @@ impl LargeVecStorageInteractor {
             GasResult::GasUsed(gas) => Some(gas),
             GasResult::OutOfGas => {
                 println!("    {endpoint}: out of gas");
+                None
+            }
+            GasResult::Failed(message) => {
+                println!("    {endpoint} failed: {message}");
                 None
             }
         }

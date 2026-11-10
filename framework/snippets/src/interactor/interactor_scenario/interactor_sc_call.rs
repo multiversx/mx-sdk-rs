@@ -1,6 +1,8 @@
 use std::process;
 
-use super::error_message::{simulate_gas_out_of_gas_err_message, simulate_gas_sc_call_err_message};
+use super::error_message::{
+    simulate_gas_no_estimate_err_message, simulate_gas_sc_call_err_message,
+};
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
@@ -20,12 +22,9 @@ where
         let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
 
         if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
-            let Some(sim_gas) = self
-                .sc_call_simulate_transaction(&transaction)
-                .await
-                .gas_used()
-            else {
-                simulate_gas_out_of_gas_err_message("SC call");
+            let sim_result = self.sc_call_simulate_transaction(&transaction).await;
+            let Some(sim_gas) = sim_result.gas_used() else {
+                simulate_gas_no_estimate_err_message("SC call", &sim_result);
                 process::exit(1)
             };
             let gas = SimulateGas::adjust_simulated_gas(sim_gas);
