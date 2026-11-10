@@ -2776,6 +2776,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "large-vec-storage"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "large-vec-storage-interactor"
+version = "0.0.0"
+dependencies = [
+ "clap",
+ "large-vec-storage",
+ "multiversx-sc-snippets",
+ "serde",
+ "serial_test",
+ "tokio",
+ "toml",
+]
+
+[[package]]
+name = "large-vec-storage-meta"
+version = "0.0.0"
+dependencies = [
+ "large-vec-storage",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3258,7 +3287,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "getrandom 0.4.3",
  "multiversx-sc",
@@ -3278,7 +3307,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "bitflags 2.13.2",
  "generic-array 1.4.5",
@@ -3321,7 +3350,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -3332,7 +3361,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "anyhow",
  "bip39",
@@ -3368,7 +3397,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta-lib"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "anyhow",
  "clap",
@@ -3388,14 +3417,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "colored 3.1.1",
  "hex",
@@ -3419,7 +3448,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "anyhow",
  "colored 3.1.1",
@@ -3442,7 +3471,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
 ]
@@ -3507,7 +3536,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.66.2"
+version = "0.66.3"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -6030,6 +6059,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasm-opcode-counter"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "wasmparser 0.249.0",
+]
+
+[[package]]
 name = "wasmer"
 version = "6.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6179,6 +6216,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f17a5917c2ddd3819e84c661fae0d6ba29d7b9c1f0e96c708c65a9c4188e11"
 dependencies = [
  "bitflags 2.13.2",
+]
+
+[[package]]
+name = "wasmparser"
+version = "0.249.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30538cae9a794215f490b532df01c557e2e2bfac92569482554acd0992a102ea"
+dependencies = [
+ "bitflags 2.13.2",
+ "hashbrown 0.17.1",
+ "indexmap",
+ "semver",
+ "serde",
 ]
 
 [[package]]

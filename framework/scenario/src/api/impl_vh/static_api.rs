@@ -1,7 +1,7 @@
 use multiversx_chain_vm::host::vm_hooks::VMHooksDispatcher;
 use multiversx_chain_vm_executor::VMHooksEarlyExit;
 use multiversx_sc::types::Address;
-use std::sync::Mutex;
+use std::sync::{Mutex, TryLockError};
 
 use crate::{
     api::StaticApiHandle,
@@ -45,6 +45,17 @@ impl VMHooksApiBackend for StaticApiBackend {
         STATIC_API_STATIC_CELL.with(|data_mutex| {
             let data = data_mutex.lock().unwrap();
             f(&data)
+        })
+    }
+
+    fn try_with_static_data<R, F>(f: F) -> Option<R>
+    where
+        F: FnOnce(&StaticVarData) -> R,
+    {
+        STATIC_API_STATIC_CELL.with(|data_mutex| match data_mutex.try_lock() {
+            Ok(data) => Some(f(&data)),
+            Err(TryLockError::WouldBlock) => None,
+            Err(TryLockError::Poisoned(err)) => panic!("static data mutex poisoned: {err}"),
         })
     }
 

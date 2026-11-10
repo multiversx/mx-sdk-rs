@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-wegld-swap-sc"
-version = "0.66.2"
+version = "0.66.3"
 
 authors = [
     "Dorin Iancu <dorin.iancu@multiversx.com>",

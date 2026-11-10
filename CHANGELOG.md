@@ -58,6 +58,12 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 
+### [sc 0.66.3] - 2026-11-09
+- `managed-buffer-preload` feature: decoding from managed buffers via the static buffer, which greatly reduces the gas cost of decoding large values (e.g. long `ManagedVec`s in storage). Nested managed buffers and big ints are created directly from the cached bytes.
+- `ManagedVecEncoded`: a list that keeps its items encoded, with no-op storage load/save, `push`, a lazily decoding iterator, and conversions to/from `ManagedVec`.
+- Static buffer acquisition no longer blocks: if the static buffer is already being accessed, it falls back instead of waiting. Fixes a deadlock under `StaticApi` (e.g. decoding inside a `ManagedBuffer::with_buffer_contents` callback with `managed-buffer-preload` enabled).
+
+
 ### [sc 0.66.2, chain 0.23.1, sdk 0.16.1] - 2026-06-18
 - Fixed an issue in `ManagedVec` `slice` when running on the `DebugApi` environment;
 	- `ManagedVecItem` `requires_drop()` no longer depends on environment, only on the type;

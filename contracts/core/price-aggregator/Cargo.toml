@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-price-aggregator-sc"
-version = "0.66.2"
+version = "0.66.3"
 authors = [
     "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",
     "MultiversX <contact@multiversx.com>",

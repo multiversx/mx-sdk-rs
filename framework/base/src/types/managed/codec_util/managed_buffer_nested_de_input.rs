@@ -12,13 +12,25 @@ use crate::{
     },
 };
 
+#[cfg(feature = "managed-buffer-preload")]
+use crate::types::managed::preloaded_managed_buffer::PreloadedManagedBuffer;
+
+/// With `managed-buffer-preload`, the buffer contents are copied once into the static buffer,
+/// and fixed-size reads are served from wasm memory.
+#[cfg(feature = "managed-buffer-preload")]
+type DecodeInputBuffer<M> = PreloadedManagedBuffer<M>;
+
+/// By default, every read is a VM call on the managed buffer.
+#[cfg(not(feature = "managed-buffer-preload"))]
+type DecodeInputBuffer<M> = ManagedBuffer<M>;
+
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.
 pub struct ManagedBufferNestedDecodeInput<M>
 where
     M: ManagedTypeApi,
 {
-    buffer: ManagedBuffer<M>,
+    buffer: DecodeInputBuffer<M>,
     decode_index: usize,
     buffer_len: usize,
     _phantom: PhantomData<M>,
@@ -32,10 +44,21 @@ where
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
-        let buffer_len = managed_buffer.len();
+        #[cfg(feature = "managed-buffer-preload")]
+        let (buffer, buffer_len) = {
+            let buffer = PreloadedManagedBuffer::new(managed_buffer);
+            let buffer_len = buffer.buffer_len;
+            (buffer, buffer_len)
+        };
+
+        #[cfg(not(feature = "managed-buffer-preload"))]
+        let (buffer, buffer_len) = {
+            let buffer_len = managed_buffer.len();
+            (managed_buffer, buffer_len)
+        };
 
         ManagedBufferNestedDecodeInput {
-            buffer: managed_buffer,
+            buffer,
             decode_index: 0,
             buffer_len,
             _phantom: PhantomData,
