@@ -67,5 +67,7 @@ pub trait InteractorSimulateGasAsync {
     ///
     /// The returned future resolves to the gas estimate as a `u64`. No actual state changes
     /// are committed to the network.
+    ///
+    /// Resolves to `u64::MAX` if the simulated transaction runs out of gas.
     fn simulate_gas(self) -> impl std::future::Future<Output = u64>;
 }

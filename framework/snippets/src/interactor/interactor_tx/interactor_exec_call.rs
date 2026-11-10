@@ -110,13 +110,15 @@ where
     }
 }
 
-impl<'w, GatewayProxy, From, To, Payment, RH> InteractorSimulateGasAsync
-    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, (), FunctionCall<StaticApi>, RH>
+/// If a gas limit is set, it acts as an upper bound for the simulation.
+impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorSimulateGasAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
     fn simulate_gas(self) -> impl std::future::Future<Output = u64> {

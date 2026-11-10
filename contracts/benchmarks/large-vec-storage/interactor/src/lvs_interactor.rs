@@ -7,10 +7,7 @@ use clap::Parser;
 use large_vec_storage::large_vec_storage_proxy;
 pub use lvs_interactor_config::Config;
 
-use multiversx_sc_snippets::{
-    imports::*,
-    sdk::gateway::{GatewayAsyncService, GetAccountRequest, GetTxCost},
-};
+use multiversx_sc_snippets::imports::*;
 
 /// The two output contracts defined in `sc-config.toml`.
 pub const VARIANTS: &[Variant] = &[
@@ -139,40 +136,21 @@ impl LargeVecStorageInteractor {
     /// on the chain simulator, so the reported `gasUsed` is always the gas limit.
     /// The simulation does not change state.
     pub async fn measure(&mut self, sc: &Bech32Address, endpoint: &str) -> GasMeasurement {
-        let mut transaction = self
+        let gas = self
             .interactor
             .tx()
             .from(&self.owner_address)
             .to(sc)
             .gas(MAX_GAS)
             .raw_call(endpoint)
-            .into_sdk_transaction();
+            .simulate_gas()
+            .await;
 
-        let account = self
-            .interactor
-            .proxy()
-            .request(GetAccountRequest::new(&self.owner_address))
-            .await
-            .expect("failed to retrieve sender account");
-        transaction.nonce = account.nonce;
-
-        match self
-            .interactor
-            .proxy()
-            .request(GetTxCost(&transaction))
-            .await
-        {
-            Ok(cost) if cost.tx_gas_units > 0 && cost.return_message.is_empty() => {
-                Some(cost.tx_gas_units)
-            }
-            Ok(cost) => {
-                println!("    {endpoint} failed: {}", cost.return_message);
-                None
-            }
-            Err(err) => {
-                println!("    {endpoint} failed: {err}");
-                None
-            }
+        if gas == u64::MAX {
+            println!("    {endpoint}: out of gas");
+            None
+        } else {
+            Some(gas)
         }
     }
 

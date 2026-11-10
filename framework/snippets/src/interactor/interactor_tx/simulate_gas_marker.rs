@@ -46,6 +46,6 @@ impl SimulateGas {
 
     /// Add 10% to protect against noise.
     pub fn adjust_simulated_gas(gas: u64) -> u64 {
-        gas + gas / 10
+        gas.saturating_add(gas / 10)
     }
 }
