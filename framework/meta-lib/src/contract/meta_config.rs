@@ -114,7 +114,7 @@ impl MetaConfig {
     /// 3. build each wasm crate, and copy the outputs to the output directory  
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
-        adjust_target_dir_wasm(&mut build_args.target_dir_wasm);
+        adjust_target_dir_wasm(&mut build_args.cargo.target_dir_wasm);
 
         for contract_variant in &self.sc_config.contracts {
             contract_variant
@@ -125,7 +125,7 @@ impl MetaConfig {
 
     /// Runs `cargo check` in all wasm crates.
     pub fn check(&self, mut check_args: CheckArgs) {
-        adjust_target_dir_wasm(&mut check_args.target_dir_wasm);
+        adjust_target_dir_wasm(&mut check_args.cargo.target_dir_wasm);
 
         for contract_variant in &self.sc_config.contracts {
             contract_variant

@@ -12,7 +12,7 @@ use super::ContractVariant;
 use super::execute_command::{ExecuteCommandError, execute_spawn_command};
 use crate::{
     abi_json::ContractAbiJson,
-    cli::BuildArgs,
+    cli::{BuildArgs, WasmCargoArgs},
     ei::EIVersion,
     ei_check_json::EiCheckJson,
     mxsc_file_json::{MxscFileJson, save_mxsc_file_json},
@@ -63,8 +63,7 @@ impl ContractVariant {
     pub(super) fn compose_wasm_cargo_command(
         &self,
         subcommand: &str,
-        locked: bool,
-        target_dir_wasm: &Option<String>,
+        cargo_args: &WasmCargoArgs,
     ) -> Command {
         let mut command = Command::new("cargo");
         command
@@ -73,21 +72,23 @@ impl ContractVariant {
             .arg(format!("--target={}", self.settings.rustc_target))
             .arg("--release")
             .current_dir(self.wasm_crate_path());
-        if locked {
+        if cargo_args.locked {
             command.arg("--locked");
         }
-        if let Some(target_dir_wasm) = target_dir_wasm {
+        if cargo_args.frozen {
+            command.arg("--frozen");
+        }
+        if cargo_args.offline {
+            command.arg("--offline");
+        }
+        if let Some(target_dir_wasm) = &cargo_args.target_dir_wasm {
             command.args(["--target-dir", target_dir_wasm]);
         }
         command
     }
 
     fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
-        let mut command = self.compose_wasm_cargo_command(
-            "build",
-            build_args.locked,
-            &build_args.target_dir_wasm,
-        );
+        let mut command = self.compose_wasm_cargo_command("build", &build_args.cargo);
         let rustflags = self.compose_rustflags(build_args);
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);
@@ -142,7 +143,7 @@ impl ContractVariant {
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &Path) {
-        let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir_wasm);
+        let source_wasm_path = self.wasm_compilation_output_path(&build_args.cargo.target_dir_wasm);
         let output_wasm_path = output_path.join(self.wasm_output_name(build_args));
         print_copy_contract(
             &source_wasm_path.to_string_lossy(),

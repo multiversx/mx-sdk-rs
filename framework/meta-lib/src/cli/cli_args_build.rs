@@ -2,11 +2,58 @@ use clap::{ArgAction, Args};
 
 use super::CliArgsToRaw;
 
-#[derive(Clone, PartialEq, Eq, Debug, Args)]
-pub struct BuildArgs {
+// Arguments passed through to cargo when compiling the wasm crates.
+// Shared by `build` and `check`.
+//
+// Not a doc comment on purpose: clap would use it as the `long_about`
+// of every subcommand that flattens this struct.
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct WasmCargoArgs {
     /// Require that the Cargo.lock in the wasm crates is up to date.
     #[arg(long = "locked", verbatim_doc_comment)]
     pub locked: bool,
+
+    /// Require that the Cargo.lock in the wasm crates is up to date and do not access the network.
+    /// Equivalent to `--locked --offline`.
+    #[arg(long = "frozen", verbatim_doc_comment)]
+    pub frozen: bool,
+
+    /// Run without accessing the network.
+    #[arg(long = "offline", verbatim_doc_comment)]
+    pub offline: bool,
+
+    /// For the wasm crate, allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    /// Has alias `target-dir` for backwards compatibility.
+    #[arg(long = "target-dir-wasm", alias = "target-dir", verbatim_doc_comment)]
+    pub target_dir_wasm: Option<String>,
+}
+
+impl CliArgsToRaw for WasmCargoArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.locked {
+            raw.push("--locked".to_string());
+        }
+        if self.frozen {
+            raw.push("--frozen".to_string());
+        }
+        if self.offline {
+            raw.push("--offline".to_string());
+        }
+        if let Some(target_dir_wasm) = &self.target_dir_wasm {
+            // not using --target-dir-wasm, for backward compatibility
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir_wasm.clone());
+        }
+        raw
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct BuildArgs {
+    #[command(flatten)]
+    pub cargo: WasmCargoArgs,
 
     /// Adds debug symbols in the resulting WASM binary. Adds bloat, but helps with debugging. Do not use in production.
     #[arg(long = "wasm-symbols", verbatim_doc_comment)]
@@ -46,12 +93,6 @@ pub struct BuildArgs {
         action = ArgAction::SetFalse,
     )]
     pub extract_imports: bool,
-
-    /// For the wasm crate, allows specifying the target directory where the Rust compiler will build the intermediary files.
-    /// Sharing the same target directory can speed up building multiple contract crates at once.
-    /// Has alias `target-dir` for backwards compatibility.
-    #[arg(long = "target-dir-wasm", alias = "target-dir", verbatim_doc_comment)]
-    pub target_dir_wasm: Option<String>,
 
     /// Generate a twiggy top report after building.
     #[arg(long = "twiggy-top", verbatim_doc_comment)]
@@ -93,7 +134,7 @@ impl Default for BuildArgs {
     #[allow(deprecated)]
     fn default() -> Self {
         BuildArgs {
-            locked: false,
+            cargo: WasmCargoArgs::default(),
             wasm_symbols: false,
             wasm_name_override: None,
             wasm_name_suffix: None,
@@ -102,7 +143,6 @@ impl Default for BuildArgs {
             emit_mir: false,
             emit_llvm_ir: false,
             extract_imports: true,
-            target_dir_wasm: None,
             twiggy_top: false,
             twiggy_paths: false,
             twiggy_monos: false,
@@ -123,10 +163,7 @@ impl BuildArgs {
 
 impl CliArgsToRaw for BuildArgs {
     fn to_raw(&self) -> Vec<String> {
-        let mut raw = Vec::new();
-        if self.locked {
-            raw.push("--locked".to_string());
-        }
+        let mut raw = self.cargo.to_raw();
         if self.wasm_symbols {
             raw.push("--wasm-symbols".to_string());
         }
@@ -152,11 +189,6 @@ impl CliArgsToRaw for BuildArgs {
         }
         if !self.extract_imports {
             raw.push("--no-imports".to_string());
-        }
-        if let Some(target_dir_wasm) = &self.target_dir_wasm {
-            // not using --target-dir-wasm, for backward compatibility
-            raw.push("--target-dir".to_string());
-            raw.push(target_dir_wasm.clone());
         }
         if self.twiggy_top {
             raw.push("--twiggy-top".to_string());
@@ -212,7 +244,10 @@ impl BuildDbgArgs {
             wasm_opt: false,
             wat: true,
             extract_imports: false,
-            target_dir_wasm: self.target_dir_wasm,
+            cargo: WasmCargoArgs {
+                target_dir_wasm: self.target_dir_wasm,
+                ..Default::default()
+            },
             twiggy_top: self.twiggy_top,
             twiggy_paths: self.twiggy_paths,
             twiggy_monos: self.twiggy_monos,
@@ -282,41 +317,12 @@ impl CliArgsToRaw for TwiggyArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct CheckArgs {
-    /// Require that the Cargo.lock in the wasm crates is up to date.
-    #[arg(long = "locked", verbatim_doc_comment)]
-    pub locked: bool,
-
-    /// Require that the Cargo.lock in the wasm crates is up to date and do not access the network.
-    /// Equivalent to `--locked --offline`.
-    #[arg(long = "frozen", verbatim_doc_comment)]
-    pub frozen: bool,
-
-    /// Run without accessing the network.
-    #[arg(long = "offline", verbatim_doc_comment)]
-    pub offline: bool,
-
-    /// For the wasm crate, allows specifying the target directory where the Rust compiler will put the intermediary files.
-    /// Sharing the same target directory can speed up checking multiple contract crates at once.
-    #[arg(long = "target-dir-wasm", verbatim_doc_comment)]
-    pub target_dir_wasm: Option<String>,
+    #[command(flatten)]
+    pub cargo: WasmCargoArgs,
 }
 
 impl CliArgsToRaw for CheckArgs {
     fn to_raw(&self) -> Vec<String> {
-        let mut raw = Vec::new();
-        if self.locked {
-            raw.push("--locked".to_string());
-        }
-        if self.frozen {
-            raw.push("--frozen".to_string());
-        }
-        if self.offline {
-            raw.push("--offline".to_string());
-        }
-        if let Some(target_dir_wasm) = &self.target_dir_wasm {
-            raw.push("--target-dir-wasm".to_string());
-            raw.push(target_dir_wasm.clone());
-        }
-        raw
+        self.cargo.to_raw()
     }
 }

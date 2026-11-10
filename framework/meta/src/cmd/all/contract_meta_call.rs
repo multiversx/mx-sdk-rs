@@ -101,7 +101,7 @@ fn apply_target_dir_all_to_wasm(command: &mut ContractCliAction, meta_lib_args: 
     if let Some(target_dir_all) = &meta_lib_args.target_dir_all {
         match command {
             ContractCliAction::Build(build_args) => {
-                build_args.target_dir_wasm = Some(target_dir_all.clone());
+                build_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
             }
             ContractCliAction::BuildDbg(build_args) => {
                 build_args.target_dir_wasm = Some(target_dir_all.clone());
@@ -110,7 +110,7 @@ fn apply_target_dir_all_to_wasm(command: &mut ContractCliAction, meta_lib_args: 
                 build_args.target_dir_wasm = Some(target_dir_all.clone());
             }
             ContractCliAction::Check(check_args) => {
-                check_args.target_dir_wasm = Some(target_dir_all.clone());
+                check_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
             }
             _ => {}
         }
