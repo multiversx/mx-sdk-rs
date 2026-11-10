@@ -32,6 +32,9 @@ impl ContractVariant {
         if check_args.offline {
             command.arg("--offline");
         }
+        if let Some(target_dir_wasm) = &check_args.target_dir_wasm {
+            command.args(["--target-dir", target_dir_wasm]);
+        }
 
         let exit_status = command
             .spawn()

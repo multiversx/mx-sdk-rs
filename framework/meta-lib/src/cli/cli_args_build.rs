@@ -279,3 +279,44 @@ impl CliArgsToRaw for TwiggyArgs {
         raw
     }
 }
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct CheckArgs {
+    /// Require that the Cargo.lock in the wasm crates is up to date.
+    #[arg(long = "locked", verbatim_doc_comment)]
+    pub locked: bool,
+
+    /// Require that the Cargo.lock in the wasm crates is up to date and do not access the network.
+    /// Equivalent to `--locked --offline`.
+    #[arg(long = "frozen", verbatim_doc_comment)]
+    pub frozen: bool,
+
+    /// Run without accessing the network.
+    #[arg(long = "offline", verbatim_doc_comment)]
+    pub offline: bool,
+
+    /// For the wasm crate, allows specifying the target directory where the Rust compiler will put the intermediary files.
+    /// Sharing the same target directory can speed up checking multiple contract crates at once.
+    #[arg(long = "target-dir-wasm", verbatim_doc_comment)]
+    pub target_dir_wasm: Option<String>,
+}
+
+impl CliArgsToRaw for CheckArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.locked {
+            raw.push("--locked".to_string());
+        }
+        if self.frozen {
+            raw.push("--frozen".to_string());
+        }
+        if self.offline {
+            raw.push("--offline".to_string());
+        }
+        if let Some(target_dir_wasm) = &self.target_dir_wasm {
+            raw.push("--target-dir-wasm".to_string());
+            raw.push(target_dir_wasm.clone());
+        }
+        raw
+    }
+}

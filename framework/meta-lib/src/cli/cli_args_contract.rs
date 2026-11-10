@@ -1,6 +1,6 @@
 use clap::{ArgAction, Args, Parser, Subcommand};
 
-use super::{BuildArgs, BuildDbgArgs, CliArgsToRaw, TwiggyArgs};
+use super::{BuildArgs, BuildDbgArgs, CheckArgs, CliArgsToRaw, TwiggyArgs};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -117,38 +117,6 @@ impl CliArgsToRaw for ContractCliAction {
                 raw.push("proxy".to_string());
                 raw.append(&mut args.to_raw());
             }
-        }
-        raw
-    }
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct CheckArgs {
-    /// Require that the Cargo.lock in the wasm crates is up to date.
-    #[arg(long = "locked", verbatim_doc_comment)]
-    pub locked: bool,
-
-    /// Require that the Cargo.lock in the wasm crates is up to date and do not access the network.
-    /// Equivalent to `--locked --offline`.
-    #[arg(long = "frozen", verbatim_doc_comment)]
-    pub frozen: bool,
-
-    /// Run without accessing the network.
-    #[arg(long = "offline", verbatim_doc_comment)]
-    pub offline: bool,
-}
-
-impl CliArgsToRaw for CheckArgs {
-    fn to_raw(&self) -> Vec<String> {
-        let mut raw = Vec::new();
-        if self.locked {
-            raw.push("--locked".to_string());
-        }
-        if self.frozen {
-            raw.push("--frozen".to_string());
-        }
-        if self.offline {
-            raw.push("--offline".to_string());
         }
         raw
     }

@@ -402,6 +402,9 @@ impl AllArgs {
                 ContractCliAction::Twiggy(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
                 }
+                ContractCliAction::Check(check_args) => {
+                    check_args.target_dir_wasm = Some(target_dir_all.clone());
+                }
                 _ => {}
             }
         }

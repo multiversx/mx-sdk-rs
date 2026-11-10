@@ -109,6 +109,9 @@ fn apply_target_dir_all_to_wasm(command: &mut ContractCliAction, meta_lib_args: 
             ContractCliAction::Twiggy(build_args) => {
                 build_args.target_dir_wasm = Some(target_dir_all.clone());
             }
+            ContractCliAction::Check(check_args) => {
+                check_args.target_dir_wasm = Some(target_dir_all.clone());
+            }
             _ => {}
         }
     }
