@@ -128,7 +128,9 @@ impl MetaConfig {
         adjust_target_dir_wasm(&mut check_args.target_dir_wasm);
 
         for contract_variant in &self.sc_config.contracts {
-            contract_variant.cargo_check(&check_args);
+            contract_variant
+                .cargo_check(&check_args)
+                .unwrap_or_else(|err| panic!("{err}"));
         }
     }
 

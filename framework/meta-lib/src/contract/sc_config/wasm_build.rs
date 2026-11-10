@@ -57,20 +57,37 @@ impl ContractVariant {
         Ok(())
     }
 
-    fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
+    /// Composes a `cargo <subcommand>` invocation for the wasm crate, for the wasm target.
+    ///
+    /// Shared between `build` and `check`.
+    pub(super) fn compose_wasm_cargo_command(
+        &self,
+        subcommand: &str,
+        locked: bool,
+        target_dir_wasm: &Option<String>,
+    ) -> Command {
         let mut command = Command::new("cargo");
         command
             .arg(self.settings.rustc_version.to_cli_arg())
-            .arg("build")
+            .arg(subcommand)
             .arg(format!("--target={}", self.settings.rustc_target))
             .arg("--release")
             .current_dir(self.wasm_crate_path());
-        if build_args.locked {
+        if locked {
             command.arg("--locked");
         }
-        if let Some(target_dir_wasm) = &build_args.target_dir_wasm {
+        if let Some(target_dir_wasm) = target_dir_wasm {
             command.args(["--target-dir", target_dir_wasm]);
         }
+        command
+    }
+
+    fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
+        let mut command = self.compose_wasm_cargo_command(
+            "build",
+            build_args.locked,
+            &build_args.target_dir_wasm,
+        );
         let rustflags = self.compose_rustflags(build_args);
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);

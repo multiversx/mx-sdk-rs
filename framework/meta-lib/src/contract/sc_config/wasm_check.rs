@@ -1,37 +1,23 @@
-use std::process::Command;
-
 use super::ContractVariant;
+use super::execute_command::{ExecuteCommandError, execute_spawn_command};
 use crate::cli::CheckArgs;
 
 impl ContractVariant {
     /// Runs `cargo check` in the corresponding wasm crate, for the wasm target.
-    pub fn cargo_check(&self, check_args: &CheckArgs) {
-        let mut command = Command::new("cargo");
-        command
-            .arg(self.settings.rustc_version.to_cli_arg())
-            .arg("check")
-            .arg(format!("--target={}", self.settings.rustc_target))
-            .arg("--release")
-            .current_dir(self.wasm_crate_path());
-        if check_args.locked {
-            command.arg("--locked");
-        }
+    pub fn cargo_check(&self, check_args: &CheckArgs) -> Result<(), ExecuteCommandError> {
+        let mut command = self.compose_wasm_cargo_command(
+            "check",
+            check_args.locked,
+            &check_args.target_dir_wasm,
+        );
         if check_args.frozen {
             command.arg("--frozen");
         }
         if check_args.offline {
             command.arg("--offline");
         }
-        if let Some(target_dir_wasm) = &check_args.target_dir_wasm {
-            command.args(["--target-dir", target_dir_wasm]);
-        }
 
-        let exit_status = command
-            .spawn()
-            .expect("failed to spawn contract check process")
-            .wait()
-            .expect("contract check process was not running");
-
-        assert!(exit_status.success(), "contract check process failed");
+        execute_spawn_command(&mut command)?;
+        Ok(())
     }
 }
