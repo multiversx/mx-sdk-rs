@@ -55,6 +55,12 @@ pub enum ContractCliAction {
     )]
     Twiggy(TwiggyArgs),
 
+    #[command(
+        name = "check",
+        about = "Runs cargo check on the wasm crates, without building the contracts."
+    )]
+    Check(CheckArgs),
+
     #[command(about = "Clean the Rust project and the output folder.")]
     Clean,
 
@@ -93,6 +99,10 @@ impl CliArgsToRaw for ContractCliAction {
                 raw.push("twiggy".to_string());
                 raw.append(&mut args.to_raw());
             }
+            ContractCliAction::Check(args) => {
+                raw.push("check".to_string());
+                raw.append(&mut args.to_raw());
+            }
             ContractCliAction::Clean => {
                 raw.push("clean".to_string());
             }
@@ -107,6 +117,38 @@ impl CliArgsToRaw for ContractCliAction {
                 raw.push("proxy".to_string());
                 raw.append(&mut args.to_raw());
             }
+        }
+        raw
+    }
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct CheckArgs {
+    /// Require that the Cargo.lock in the wasm crates is up to date.
+    #[arg(long = "locked", verbatim_doc_comment)]
+    pub locked: bool,
+
+    /// Require that the Cargo.lock in the wasm crates is up to date and do not access the network.
+    /// Equivalent to `--locked --offline`.
+    #[arg(long = "frozen", verbatim_doc_comment)]
+    pub frozen: bool,
+
+    /// Run without accessing the network.
+    #[arg(long = "offline", verbatim_doc_comment)]
+    pub offline: bool,
+}
+
+impl CliArgsToRaw for CheckArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.locked {
+            raw.push("--locked".to_string());
+        }
+        if self.frozen {
+            raw.push("--frozen".to_string());
+        }
+        if self.offline {
+            raw.push("--offline".to_string());
         }
         raw
     }

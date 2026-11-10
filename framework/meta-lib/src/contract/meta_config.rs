@@ -7,7 +7,7 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{
     cargo_toml::{CargoTomlContents, WorkspaceDependencies},
-    cli::BuildArgs,
+    cli::{BuildArgs, CheckArgs},
     print_util::{print_removing_wasm_crate, print_workspace_target_dir},
     tools::{check_tools_installed, find_current_workspace},
 };
@@ -120,6 +120,13 @@ impl MetaConfig {
             contract_variant
                 .build_contract(&build_args, &self.output_dir)
                 .unwrap_or_else(|err| panic!("{err}"));
+        }
+    }
+
+    /// Runs `cargo check` in all wasm crates.
+    pub fn check(&self, check_args: &CheckArgs) {
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.cargo_check(check_args);
         }
     }
 
