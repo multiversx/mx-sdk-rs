@@ -21,7 +21,7 @@ use multiversx_sc_meta::{
 };
 use multiversx_sc_meta_lib::{
     cargo_toml::WorkspaceDependencies,
-    cli::{BuildArgs, ContractCliAction},
+    cli::{BuildArgs, ContractCliAction, WasmCargoArgs},
     tools::find_current_workspace,
 };
 
@@ -57,9 +57,12 @@ fn repro_build_local() {
         call_all_meta(&AllArgs {
             path: Some(contract_dir.to_str().unwrap().to_string()),
             command: ContractCliAction::Build(BuildArgs {
-                locked: false,
+                cargo: WasmCargoArgs {
+                    locked: false,
+                    target_dir_wasm: Some(target_dir_str.clone()),
+                    ..Default::default()
+                },
                 wasm_opt: false,
-                target_dir_wasm: Some(target_dir_str.clone()),
                 ..Default::default()
             }),
             meta_lib_args: MetaLibArgs {
@@ -124,9 +127,12 @@ fn repro_build_docker() {
         call_all_meta(&AllArgs {
             path: Some(contract_dir.to_str().unwrap().to_string()),
             command: ContractCliAction::Build(BuildArgs {
-                locked: false,
+                cargo: WasmCargoArgs {
+                    locked: false,
+                    target_dir_wasm: Some(target_dir_str.clone()),
+                    ..Default::default()
+                },
                 wasm_opt: false,
-                target_dir_wasm: Some(target_dir_str.clone()),
                 ..Default::default()
             }),
             meta_lib_args: MetaLibArgs {

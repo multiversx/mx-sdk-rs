@@ -1,6 +1,6 @@
 use clap::{ArgAction, Args, Parser, Subcommand};
 
-use super::{BuildArgs, BuildDbgArgs, CliArgsToRaw, TwiggyArgs};
+use super::{BuildArgs, BuildDbgArgs, CheckArgs, CliArgsToRaw, TwiggyArgs};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -55,6 +55,12 @@ pub enum ContractCliAction {
     )]
     Twiggy(TwiggyArgs),
 
+    #[command(
+        name = "check",
+        about = "Runs cargo check on the wasm crates, without building the contracts."
+    )]
+    Check(CheckArgs),
+
     #[command(about = "Clean the Rust project and the output folder.")]
     Clean,
 
@@ -91,6 +97,10 @@ impl CliArgsToRaw for ContractCliAction {
             }
             ContractCliAction::Twiggy(args) => {
                 raw.push("twiggy".to_string());
+                raw.append(&mut args.to_raw());
+            }
+            ContractCliAction::Check(args) => {
+                raw.push("check".to_string());
                 raw.append(&mut args.to_raw());
             }
             ContractCliAction::Clean => {
