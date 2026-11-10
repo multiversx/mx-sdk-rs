@@ -1,21 +1,11 @@
 use std::process::Command;
 
 use super::ContractVariant;
-use crate::{cli::CheckArgs, tools::install_wasm_target};
+use crate::cli::CheckArgs;
 
 impl ContractVariant {
     /// Runs `cargo check` in the corresponding wasm crate, for the wasm target.
     pub fn cargo_check(&self, check_args: &CheckArgs) {
-        if !install_wasm_target::is_target_installed(
-            &self.settings.rustc_version,
-            &self.settings.rustc_target,
-        ) {
-            install_wasm_target::install_target(
-                Some(&self.settings.rustc_version),
-                &self.settings.rustc_target,
-            );
-        }
-
         let mut command = Command::new("cargo");
         command
             .arg(self.settings.rustc_version.to_cli_arg())
