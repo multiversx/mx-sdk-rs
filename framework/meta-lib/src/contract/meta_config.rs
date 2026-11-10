@@ -114,7 +114,7 @@ impl MetaConfig {
     /// 3. build each wasm crate, and copy the outputs to the output directory  
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
-        adjust_target_dir_wasm(&mut build_args);
+        adjust_target_dir_wasm(&mut build_args.target_dir_wasm);
 
         for contract_variant in &self.sc_config.contracts {
             contract_variant
@@ -124,9 +124,11 @@ impl MetaConfig {
     }
 
     /// Runs `cargo check` in all wasm crates.
-    pub fn check(&self, check_args: &CheckArgs) {
+    pub fn check(&self, mut check_args: CheckArgs) {
+        adjust_target_dir_wasm(&mut check_args.target_dir_wasm);
+
         for contract_variant in &self.sc_config.contracts {
-            contract_variant.cargo_check(check_args);
+            contract_variant.cargo_check(&check_args);
         }
     }
 
@@ -190,15 +192,15 @@ impl MetaConfig {
     }
 }
 
-fn adjust_target_dir_wasm(build_args: &mut BuildArgs) {
-    if build_args.target_dir_wasm.is_some() {
+fn adjust_target_dir_wasm(target_dir_wasm: &mut Option<String>) {
+    if target_dir_wasm.is_some() {
         return;
     }
 
     if let Some(workspace) = find_current_workspace() {
         let target = workspace.join("target").canonicalize().unwrap();
         if let Some(target_str) = target.as_os_str().to_str() {
-            build_args.target_dir_wasm = Some(target_str.to_string());
+            *target_dir_wasm = Some(target_str.to_string());
             print_workspace_target_dir(target_str);
         }
     }
