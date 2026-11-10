@@ -57,5 +57,14 @@ pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     where
         F: FnOnce(&StaticVarData) -> R;
 
+    /// Same as `with_static_data`, but returns `None` instead of blocking,
+    /// if the static data is already being accessed on this thread.
+    fn try_with_static_data<R, F>(f: F) -> Option<R>
+    where
+        F: FnOnce(&StaticVarData) -> R,
+    {
+        Some(Self::with_static_data(f))
+    }
+
     fn backend_requires_managed_type_drop() -> bool;
 }

@@ -14,6 +14,18 @@ pub trait StaticVarApi {
 pub trait StaticVarApiImpl {
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(&self, f: F) -> R;
 
+    /// Same as `with_lockable_static_buffer`, but never blocks.
+    ///
+    /// Returns `None` if the static buffer is currently being accessed,
+    /// e.g. when called from within a `with_lockable_static_buffer` callback.
+    /// Only possible in debug mode, where the static data is guarded.
+    fn try_with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(
+        &self,
+        f: F,
+    ) -> Option<R> {
+        Some(self.with_lockable_static_buffer(f))
+    }
+
     fn set_external_view_target_address_handle(&self, handle: RawHandle);
 
     fn get_external_view_target_address_handle(&self) -> RawHandle;

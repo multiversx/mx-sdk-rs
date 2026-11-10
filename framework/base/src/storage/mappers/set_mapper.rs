@@ -58,8 +58,8 @@ const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 ///
 /// # Comparison with UnorderedSetMapper
 ///
-/// - **SetMapper**: Maintains insertion order, uses queue-based structure, slightly higher storage cost
-/// - **UnorderedSetMapper**: No ordering guarantees, uses vec-based structure, more compact storage
+/// - **SetMapper**: Maintains insertion order, uses queue-based structure, higher storage cost (3N + 1 entries)
+/// - **UnorderedSetMapper**: No ordering guarantees, uses vec-based structure, more compact storage (2N + 1 entries)
 ///
 /// # Use Cases
 ///
