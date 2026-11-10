@@ -156,7 +156,12 @@ impl LargeVecStorageInteractor {
             .expect("failed to retrieve sender account");
         transaction.nonce = account.nonce;
 
-        match self.interactor.proxy().request(GetTxCost(&transaction)).await {
+        match self
+            .interactor
+            .proxy()
+            .request(GetTxCost(&transaction))
+            .await
+        {
             Ok(cost) if cost.tx_gas_units > 0 && cost.return_message.is_empty() => {
                 Some(cost.tx_gas_units)
             }
