@@ -136,7 +136,7 @@ impl LargeVecStorageInteractor {
     /// on the chain simulator, so the reported `gasUsed` is always the gas limit.
     /// The simulation does not change state.
     pub async fn measure(&mut self, sc: &Bech32Address, endpoint: &str) -> GasMeasurement {
-        let gas = self
+        let gas_result = self
             .interactor
             .tx()
             .from(&self.owner_address)
@@ -146,11 +146,12 @@ impl LargeVecStorageInteractor {
             .simulate_gas()
             .await;
 
-        if gas == u64::MAX {
-            println!("    {endpoint}: out of gas");
-            None
-        } else {
-            Some(gas)
+        match gas_result {
+            GasResult::GasUsed(gas) => Some(gas),
+            GasResult::OutOfGas => {
+                println!("    {endpoint}: out of gas");
+                None
+            }
         }
     }
 

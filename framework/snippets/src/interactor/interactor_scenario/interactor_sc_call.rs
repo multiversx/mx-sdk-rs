@@ -1,12 +1,13 @@
 use std::process;
 
-use super::error_message::simulate_gas_sc_call_err_message;
+use super::error_message::{simulate_gas_out_of_gas_err_message, simulate_gas_sc_call_err_message};
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
 use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::chain_core::types::GasResult;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
 use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
 use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
@@ -19,7 +20,14 @@ where
         let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
 
         if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
-            let sim_gas = self.sc_call_simulate_transaction(&transaction).await;
+            let Some(sim_gas) = self
+                .sc_call_simulate_transaction(&transaction)
+                .await
+                .gas_used()
+            else {
+                simulate_gas_out_of_gas_err_message("SC call");
+                process::exit(1)
+            };
             let gas = SimulateGas::adjust_simulated_gas(sim_gas);
             sc_call_step.tx.gas_limit = gas.into();
             transaction.gas_limit = gas;
@@ -55,7 +63,7 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> u64 {
+    pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> GasResult {
         let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
         self.sc_call_simulate_transaction(&transaction).await
     }
@@ -69,13 +77,13 @@ where
         transaction
     }
 
-    async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
+    async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> GasResult {
         let result = self.proxy().request(SimulateTxRequest(transaction)).await;
 
         match result {
             Ok(gas) => {
-                println!("Gas simulation for the SC call: {gas} units.");
-                log::info!("Gas simulation for the SC call: {gas} units.");
+                println!("Gas simulation for the SC call: {gas}.");
+                log::info!("Gas simulation for the SC call: {gas}.");
                 gas
             }
             Err(err) => {

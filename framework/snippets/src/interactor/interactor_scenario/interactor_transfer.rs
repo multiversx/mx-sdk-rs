@@ -4,6 +4,7 @@ use super::error_message::simulate_gas_transfer_err_message;
 use crate::InteractorBase;
 use multiversx_sc_scenario::{scenario::ScenarioRunner, scenario_model::TransferStep};
 use multiversx_sdk::{
+    chain_core::types::GasResult,
     data::transaction::Transaction,
     gateway::{GatewayAsyncService, SimulateTxRequest},
     retrieve_tx_on_network,
@@ -32,13 +33,13 @@ where
         tx_hash
     }
 
-    pub async fn simulate_gas_transfer(&mut self, transfer_step: TransferStep) -> u64 {
+    pub async fn simulate_gas_transfer(&mut self, transfer_step: TransferStep) -> GasResult {
         let transaction = self.launch_transfer(&transfer_step).await;
 
         match self.proxy().request(SimulateTxRequest(&transaction)).await {
             Ok(gas) => {
-                println!("Gas simulation for the SC transfer: {gas} units.");
-                log::info!("Gas simulation for the SC transfer: {gas} units.");
+                println!("Gas simulation for the SC transfer: {gas}.");
+                log::info!("Gas simulation for the SC transfer: {gas}.");
                 gas
             }
             Err(err) => {

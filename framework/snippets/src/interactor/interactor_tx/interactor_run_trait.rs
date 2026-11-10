@@ -1,5 +1,7 @@
 use multiversx_sc_scenario::{ScenarioTxEnvData, imports::InterpreterContext};
-use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
+use multiversx_sdk::{
+    chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
+};
 
 use crate::InteractorBase;
 
@@ -65,9 +67,8 @@ pub trait InteractorIntoSdkTransaction {
 pub trait InteractorSimulateGasAsync {
     /// Simulates the transaction on the gateway and returns the estimated gas units required.
     ///
-    /// The returned future resolves to the gas estimate as a `u64`. No actual state changes
-    /// are committed to the network.
-    ///
-    /// Resolves to `u64::MAX` if the simulated transaction runs out of gas.
-    fn simulate_gas(self) -> impl std::future::Future<Output = u64>;
+    /// The returned future resolves to [`GasResult::GasUsed`] with the gas estimate,
+    /// or [`GasResult::OutOfGas`] if the simulated transaction runs out of gas.
+    /// No actual state changes are committed to the network.
+    fn simulate_gas(self) -> impl std::future::Future<Output = GasResult>;
 }

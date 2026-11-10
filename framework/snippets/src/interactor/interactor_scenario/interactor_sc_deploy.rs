@@ -1,6 +1,6 @@
 use std::process;
 
-use super::error_message::simulate_gas_deploy_err_message;
+use super::error_message::{simulate_gas_deploy_err_message, simulate_gas_out_of_gas_err_message};
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
     imports::Bech32Address,
@@ -8,6 +8,7 @@ use multiversx_sc_scenario::{
     scenario_model::{ScDeployStep, SetStateStep},
 };
 use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::chain_core::types::GasResult;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
 use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
 use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
@@ -56,7 +57,14 @@ where
         let mut transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
 
         if SimulateGas::is_mandos_simulate_gas_marker(&sc_deploy_step.tx.gas_limit) {
-            let sim_gas = self.sc_deploy_simulate_transaction(&transaction).await;
+            let Some(sim_gas) = self
+                .sc_deploy_simulate_transaction(&transaction)
+                .await
+                .gas_used()
+            else {
+                simulate_gas_out_of_gas_err_message("deploy");
+                process::exit(1)
+            };
             let gas = SimulateGas::adjust_simulated_gas(sim_gas);
             sc_deploy_step.tx.gas_limit = gas.into();
             transaction.gas_limit = gas;
@@ -102,13 +110,13 @@ where
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }
 
-    async fn sc_deploy_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
+    async fn sc_deploy_simulate_transaction(&mut self, transaction: &Transaction) -> GasResult {
         let gas_result = self.proxy().request(SimulateTxRequest(transaction)).await;
 
         match gas_result {
             Ok(gas) => {
-                println!("Gas simulation for the SC deploy: {gas} units.");
-                log::info!("Gas simulation for the SC deploy: {gas} units.");
+                println!("Gas simulation for the SC deploy: {gas}.");
+                log::info!("Gas simulation for the SC deploy: {gas}.");
                 gas
             }
             Err(err) => {
@@ -120,7 +128,7 @@ where
         }
     }
 
-    pub async fn sc_deploy_simulate(&mut self, sc_deploy_step: &ScDeployStep) -> u64 {
+    pub async fn sc_deploy_simulate(&mut self, sc_deploy_step: &ScDeployStep) -> GasResult {
         let transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
         self.sc_deploy_simulate_transaction(&transaction).await
     }

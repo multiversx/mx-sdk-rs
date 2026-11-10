@@ -11,7 +11,9 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::{ScCallStep, TxResponse},
 };
-use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
+use multiversx_sdk::{
+    chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
+};
 
 use crate::InteractorBase;
 
@@ -55,7 +57,7 @@ async fn simulate_gas_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
         FunctionCall<StaticApi>,
         RH,
     >,
-) -> u64
+) -> GasResult
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -121,7 +123,7 @@ where
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = GasResult> {
         simulate_gas_async_call(self)
     }
 }

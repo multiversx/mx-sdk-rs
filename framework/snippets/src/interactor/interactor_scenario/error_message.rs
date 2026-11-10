@@ -30,6 +30,15 @@ pub(super) fn simulate_gas_deploy_err_message(err: &anyhow::Error) {
     );
 }
 
+pub(super) fn simulate_gas_out_of_gas_err_message(tx_kind: &str) {
+    eprintln!(
+        "{}",
+        format!("Gas simulation for {tx_kind} failed: out of gas")
+            .red()
+            .bold()
+    );
+}
+
 pub(crate) fn simulate_gas_sc_call_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",

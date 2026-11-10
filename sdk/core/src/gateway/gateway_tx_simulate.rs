@@ -1,5 +1,6 @@
 use crate::data::transaction::{SimulateGasTransactionResponse, Transaction};
 use anyhow::anyhow;
+use multiversx_chain_core::types::GasResult;
 
 use super::{GatewayRequest, GatewayRequestType, TRANSACTION_COST_ENDPOINT};
 
@@ -12,7 +13,7 @@ const NOT_ENOUGH_GAS_MESSAGE: &str = "not enough gas";
 impl GatewayRequest for SimulateTxRequest<'_> {
     type Payload = Transaction;
     type DecodedJson = SimulateGasTransactionResponse;
-    type Result = u64;
+    type Result = GasResult;
 
     fn request_type(&self) -> GatewayRequestType {
         GatewayRequestType::Post
@@ -29,10 +30,9 @@ impl GatewayRequest for SimulateTxRequest<'_> {
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result> {
         match decoded.data {
             None => Err(anyhow!("{}", decoded.error)),
-            // the endpoint reports 0 gas units when running out of gas,
-            // `u64::MAX` signals that the transaction needs more gas than allowed
-            Some(b) if b.return_message.contains(NOT_ENOUGH_GAS_MESSAGE) => Ok(u64::MAX),
-            Some(b) => Ok(b.tx_gas_units),
+            // the endpoint reports 0 gas units when running out of gas
+            Some(b) if b.return_message.contains(NOT_ENOUGH_GAS_MESSAGE) => Ok(GasResult::OutOfGas),
+            Some(b) => Ok(GasResult::GasUsed(b.tx_gas_units)),
         }
     }
 }
