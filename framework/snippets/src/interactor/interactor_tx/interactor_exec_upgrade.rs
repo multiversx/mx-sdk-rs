@@ -11,7 +11,9 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::{StepWrapper, TxToStep, address_annotated, code_annotated},
     scenario_model::{ScDeployStep, TxResponse},
 };
-use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
+use multiversx_sdk::{
+    chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
+};
 
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
@@ -57,7 +59,7 @@ async fn simulate_gas_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, 
         UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) -> u64
+) -> GasResult
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -145,7 +147,7 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
     RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
 {
-    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = GasResult> {
         simulate_gas_async_upgrade(self)
     }
 }
