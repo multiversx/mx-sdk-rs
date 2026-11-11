@@ -8,6 +8,7 @@ mod sc_config_model;
 mod sc_config_proxy;
 mod sc_config_serde;
 mod wasm_build;
+mod wasm_check;
 mod wasm_clean;
 mod wasm_crate_gen;
 mod wasm_update;

@@ -337,7 +337,7 @@ where
     }
 
     /// Deprecated alias for [`clone_range`].
-    #[deprecated(since = "0.66.2", note = "Please use method `clone_range` instead.")]
+    #[deprecated(since = "0.66.3", note = "Please use method `clone_range` instead.")]
     pub fn slice(&self, start_index: usize, end_index: usize) -> Option<Self>
     where
         T: Clone,

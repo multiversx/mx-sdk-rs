@@ -3,7 +3,9 @@ use multiversx_sc_scenario::{
     scenario::tx_to_step::TxToStep,
     scenario_model::TransferStep,
 };
-use multiversx_sdk::{data::transaction::Transaction, gateway::GatewayAsyncService};
+use multiversx_sdk::{
+    chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
+};
 
 use crate::InteractorSimulateGasAsync;
 
@@ -14,7 +16,7 @@ use super::{
 
 async fn simulate_gas_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
-) -> u64
+) -> GasResult
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -86,7 +88,7 @@ where
     Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
-    fn simulate_gas(self) -> impl std::future::Future<Output = u64> {
+    fn simulate_gas(self) -> impl std::future::Future<Output = GasResult> {
         simulate_gas_async_transfer(self)
     }
 }

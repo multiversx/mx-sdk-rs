@@ -14,7 +14,7 @@ path = "src/main.rs"
 anyhow = "1.0"
 
 [dependencies.multiversx-sc-meta]
-version = "=0.66.2"
+version = "=0.66.3"
 path = "../../framework/meta"
 
 [dependencies.multiversx-sdk]
