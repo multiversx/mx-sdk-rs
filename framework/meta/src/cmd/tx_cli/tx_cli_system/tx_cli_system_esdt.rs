@@ -12,6 +12,7 @@ use multiversx_sc_snippets::{
 };
 use serde_json::json;
 
+use super::system_common::{biguint, system_proxy, system_tx};
 use crate::cli::{
     cli_args_tx_system::SystemTxCommonArgs,
     cli_args_tx_system_esdt::{
@@ -20,10 +21,7 @@ use crate::cli::{
         EsdtRolesArgs, EsdtTokenAddressArgs, EsdtTokenQueryArgs, EsdtTokenTxArgs, EsdtTokenTypeArg,
     },
 };
-use crate::cmd::tx_cli::tx_cli_common::{
-    create_interactor, create_query_interactor, load_relayer_for_interactor, load_wallet,
-    parse_address,
-};
+use crate::cmd::tx_cli::tx_cli_common::{create_query_interactor, parse_address};
 
 /// Default gas limit for ESDT system SC operations (same as mxpy).
 const ESDT_SYSTEM_SC_GAS: u64 = 60_000_000;
@@ -332,13 +330,14 @@ fn esdt_proxy<'a>(
     relayer: Option<Bech32Address>,
     gas_limit: u64,
 ) -> EsdtProxy<'a> {
-    interactor
-        .tx()
-        .from(sender.clone())
-        .to(ESDTSystemSCAddress)
-        .gas(gas_limit)
-        .opt_relayer(relayer)
-        .typed(ESDTSystemSCProxy)
+    system_proxy(
+        interactor,
+        sender,
+        ESDTSystemSCAddress,
+        relayer,
+        gas_limit,
+        ESDTSystemSCProxy,
+    )
 }
 
 /// Resolves the issue cost: either explicitly given, or read from the ESDT system SC configuration.
@@ -360,30 +359,14 @@ async fn esdt_tx<F>(common: &SystemTxCommonArgs, build: F) -> Result<()>
 where
     F: FnOnce(EsdtProxy<'_>) -> Transaction,
 {
-    let tx_args = common.resolve_tx_args(ESDT_SYSTEM_SC_GAS);
-    let sender_wallet = load_wallet(&common.sender)?;
-
-    let mut interactor = create_interactor(&common.gateway, &tx_args).await?;
-    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
-    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &common.relayer).await?;
-
-    let proxy = esdt_proxy(
-        &mut interactor,
-        &sender_address,
-        relayer_address_opt,
-        tx_args.gas_limit,
-    );
-    let mut tx = build(proxy);
-    interactor.set_tx_nonce_update_sender(&mut tx).await;
-
-    interactor
-        .sign_and_dispatch(
-            tx,
-            tx_args.send,
-            tx_args.wait_result,
-            tx_args.outfile.as_deref(),
-        )
-        .await
+    system_tx(
+        common,
+        ESDT_SYSTEM_SC_GAS,
+        async move |interactor, sender, relayer, gas_limit| {
+            Ok(build(esdt_proxy(interactor, &sender, relayer, gas_limit)))
+        },
+    )
+    .await
 }
 
 /// Same as [`esdt_tx`], but also resolves the issue cost.
@@ -395,33 +378,18 @@ async fn esdt_issue_tx<F>(
 where
     F: FnOnce(EsdtProxy<'_>, BigUint<StaticApi>) -> Transaction,
 {
-    let tx_args = common.resolve_tx_args(ESDT_SYSTEM_SC_GAS);
-    let sender_wallet = load_wallet(&common.sender)?;
-
-    let mut interactor = create_interactor(&common.gateway, &tx_args).await?;
-    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
-    let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &common.relayer).await?;
-
-    let issue_cost = resolve_issue_cost(&mut interactor, &cost_args.issue_cost).await?;
-    let mut tx = build(
-        esdt_proxy(
-            &mut interactor,
-            &sender_address,
-            relayer_address_opt,
-            tx_args.gas_limit,
-        ),
-        issue_cost,
-    );
-    interactor.set_tx_nonce_update_sender(&mut tx).await;
-
-    interactor
-        .sign_and_dispatch(
-            tx,
-            tx_args.send,
-            tx_args.wait_result,
-            tx_args.outfile.as_deref(),
-        )
-        .await
+    system_tx(
+        common,
+        ESDT_SYSTEM_SC_GAS,
+        async move |interactor, sender, relayer, gas_limit| {
+            let issue_cost = resolve_issue_cost(interactor, &cost_args.issue_cost).await?;
+            Ok(build(
+                esdt_proxy(interactor, &sender, relayer, gas_limit),
+                issue_cost,
+            ))
+        },
+    )
+    .await
 }
 
 /// Transaction with only a token identifier argument.
@@ -572,10 +540,6 @@ async fn query_special_roles(args: &EsdtTokenQueryArgs) -> Result<()> {
 
 fn token_id(token: &str) -> EsdtTokenIdentifier<StaticApi> {
     EsdtTokenIdentifier::from(token)
-}
-
-fn biguint(value: &RustBigUint) -> BigUint<StaticApi> {
-    BigUint::from_bytes_be(&value.to_bytes_be())
 }
 
 fn fungible_properties(p: &EsdtIssuePropertiesArgs) -> FungibleTokenProperties {

@@ -38,7 +38,9 @@ pub enum TxCliAction {
     )]
     Relay(RelayArgs),
 
-    #[command(about = "Interacts with the system smart contracts (ESDT, ...).")]
+    #[command(
+        about = "Interacts with the system smart contracts: ESDT, governance, delegation, validator."
+    )]
     System(SystemCliArgs),
 }
 

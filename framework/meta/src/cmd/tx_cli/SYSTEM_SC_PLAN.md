@@ -52,15 +52,35 @@ Conventions:
 - Queries need no wallet and print typed JSON.
 - Roles by name (`--roles LocalMint,NftCreate` or the full `ESDTRoleLocalMint` names).
 
-Order: ESDT ✅, governance, delegation manager + delegation, validator.
+Status: ESDT ✅, governance ✅, delegation manager + delegation ✅, validator ✅.
 
-ESDT (`sc-meta tx system esdt`) is done: issue/register (classic, dynamic, set-all-roles), roles, pause/freeze/wipe,
-ownership, control-changes, dynamic conversions, plus `token-properties`, `special-roles` and `contract-config` queries.
-Implemented in `tx_cli_system/` with the typed `ESDTSystemSCProxy`, working directly with the interactor
-like the rest of `sc-meta tx` (helpers in `tx_cli_common.rs`); default gas per command via
-`SystemTxCommonArgs::resolve_tx_args`; covered by `framework/meta/tests/cs_tx_system_esdt_test.rs` (in `cs-test-runner`).
-The validator commands need a validator PEM loader and BLS signing in `sdk/core` (via `multiversx-bls`),
-alternatively raw `--bls-key`/`--signature` hex pairs.
+- `esdt`: issue/register (classic, dynamic, set-all-roles), roles, pause/freeze/wipe, ownership, control-changes,
+  dynamic conversions; queries `token-properties`, `special-roles`, `contract-config`.
+- `governance`: propose (fee from `viewConfig`), vote, close, clear ended proposals, claim fees, change config;
+  queries `config`, `proposal`, `voting-power`, `delegated-vote-info`. `delegateVote` is SC-only, not exposed.
+- `delegation-manager`: create (min deposit from config), from validator, merge, claim/redelegate multi;
+  queries `contract-config`, `contract-addresses`.
+- `delegation <contract>`: owner settings, node management, whitelist/ownership, delegate/claim/redelegate/undelegate/withdraw;
+  queries `contract-config`, `metadata`, `node-states`, `totals`, `delegator`, `reward-data`, `whitelisted-for-merge`.
+- `validator`: stake (+ reward address), top-up, unstake/unbond (nodes, tokens), restake, unjail, reward address,
+  clean registered data; queries `total-staked`, `total-staked-top-up`, `unstaked-tokens`, `bls-keys-status`.
+
+Implementation (`tx_cli_system/`): typed system SC proxies, working directly with the interactor.
+`system_common.rs` has `system_proxy` (typed proxy from interactor/sender/relayer/gas, no CLI dependency)
+and `system_tx` (CLI glue: wallet, relayer, build via async closure, nonce, sign, dispatch).
+Default gas (no `--gas-limit`), like mxpy: operation cost + network min gas limit + gas per data byte × data length
+(+ 50,000 when relayed).
+
+BLS: `--bls-keys` (+ `--signatures` for stake/add-nodes) always work; `--validators-pem` signing needs the optional
+`bls` feature (`multiversx-sdk/bls`, forwarded by `multiversx-sc-meta/bls`), since `multiversx-bls` links prebuilt
+static libs and does not support Windows MSVC. Each key signs the staker address (sender for `stake`,
+delegation contract for `addNodes`), as verified by mx-chain-go.
+
+Tests: `cs_tx_system_esdt_test.rs` and `cs_tx_system_staking_test.rs` (both in `cs-test-runner`),
+`sdk/core/tests/validator_test.rs` (BLS signing, with `--features bls`).
+Not covered on the chain simulator: node activation (default config has node limit 0 — "number of nodes too high"),
+so stake-top-up, change-reward-address, BLS key status and node staking can't be exercised there; it also
+does not verify BLS signatures.
 
 ## Phase 2 — tests and interactor crates
 

@@ -14,8 +14,25 @@ const CHAIN_SIMULATOR_URL: &str = "http://localhost:8085";
 /// The issue cost in the default chain simulator config (0.05 EGLD).
 const ISSUE_COST: &str = "50000000000000000";
 
-/// The default gas limit of the ESDT system SC commands.
+/// The default gas cost of the ESDT system SC operations.
 const ESDT_DEFAULT_GAS: u64 = 60_000_000;
+
+/// Minimum gas limit and gas per data byte, in the chain simulator network config.
+const MIN_GAS_LIMIT: u64 = 50_000;
+const GAS_PER_DATA_BYTE: u64 = 1_500;
+
+/// Extra gas for relayed transactions.
+const RELAYED_TX_EXTRA_GAS: u64 = 50_000;
+
+/// The default gas limit, as computed by sc-meta: operation cost + minimum gas limit + data cost (+ relayed extra).
+fn expected_default_gas(outfile_json: &Value, operation_gas: u64, relayed: bool) -> u64 {
+    let data_len = outfile_json["emittedTransactionData"]
+        .as_str()
+        .unwrap()
+        .len() as u64;
+    let relayed_extra = if relayed { RELAYED_TX_EXTRA_GAS } else { 0 };
+    operation_gas + relayed_extra + MIN_GAS_LIMIT + GAS_PER_DATA_BYTE * data_len
+}
 
 struct EsdtTestContext<'a> {
     sc_meta_bin: &'a str,
@@ -152,7 +169,10 @@ async fn test_esdt_system_sc_cli() {
         ],
     );
     assert_eq!(issue["emittedTransaction"]["value"], ISSUE_COST);
-    assert_eq!(issue["emittedTransaction"]["gasLimit"], ESDT_DEFAULT_GAS);
+    assert_eq!(
+        issue["emittedTransaction"]["gasLimit"],
+        expected_default_gas(&issue, ESDT_DEFAULT_GAS, false)
+    );
     let token = token_id_from_log(&issue, "issue");
     assert!(token.starts_with("CLI-"));
 
@@ -208,7 +228,7 @@ async fn test_esdt_system_sc_cli() {
     );
     assert_eq!(
         pause["emittedTransaction"]["gasLimit"],
-        ESDT_DEFAULT_GAS + 50_000
+        expected_default_gas(&pause, ESDT_DEFAULT_GAS, true)
     );
     assert_eq!(ctx.token_properties(&token)["isPaused"], true);
 

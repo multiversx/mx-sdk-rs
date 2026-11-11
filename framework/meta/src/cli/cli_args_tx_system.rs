@@ -2,7 +2,10 @@ use clap::{Args, Subcommand};
 use std::path::PathBuf;
 
 use super::cli_args_tx::{GatewayArgs, RelayerArgs, SenderArgs, TxArgs};
+use super::cli_args_tx_system_delegation::{DelegationCliArgs, DelegationManagerCliArgs};
 use super::cli_args_tx_system_esdt::EsdtCliArgs;
+use super::cli_args_tx_system_governance::GovernanceCliArgs;
+use super::cli_args_tx_system_validator::ValidatorCliArgs;
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct SystemCliArgs {
@@ -16,6 +19,26 @@ pub enum SystemCliAction {
         about = "Interacts with the ESDT system smart contract: token issuance, roles and management."
     )]
     Esdt(EsdtCliArgs),
+
+    #[command(
+        about = "Interacts with the governance system smart contract: proposals, voting, configuration."
+    )]
+    Governance(GovernanceCliArgs),
+
+    #[command(
+        about = "Interacts with the delegation manager system smart contract: creating staking providers."
+    )]
+    DelegationManager(DelegationManagerCliArgs),
+
+    #[command(
+        about = "Interacts with a delegation contract (staking provider): delegating, rewards, node management."
+    )]
+    Delegation(DelegationCliArgs),
+
+    #[command(
+        about = "Interacts with the validator (staking) system smart contract: staking nodes, unstaking, unbonding."
+    )]
+    Validator(ValidatorCliArgs),
 }
 
 /// Transaction arguments for system SC calls.
@@ -93,4 +116,50 @@ impl SystemTxCommonArgs {
             outfile: self.tx.outfile.clone(),
         }
     }
+}
+
+/// Arguments for commands that need only BLS public keys.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct BlsKeysArgs {
+    /// BLS public keys (hex), comma-separated.
+    #[arg(
+        long,
+        value_delimiter = ',',
+        conflicts_with = "validators_pem",
+        required_unless_present = "validators_pem"
+    )]
+    pub bls_keys: Vec<String>,
+
+    /// Validators PEM file, with one or more BLS keys. Only the public keys are used.
+    #[arg(long)]
+    pub validators_pem: Option<PathBuf>,
+}
+
+/// Arguments for commands that register BLS keys, each with a signature of the staker address.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct BlsKeysSignaturesArgs {
+    /// Validators PEM file, with one or more BLS keys. sc-meta produces the signatures:
+    /// each BLS key signs the staker address (requires sc-meta built with the `bls` feature).
+    #[arg(
+        long,
+        conflicts_with_all = ["bls_keys", "signatures"],
+        required_unless_present = "bls_keys"
+    )]
+    pub validators_pem: Option<PathBuf>,
+
+    /// BLS public keys (hex), comma-separated. Requires --signatures.
+    #[arg(long, value_delimiter = ',', requires = "signatures")]
+    pub bls_keys: Vec<String>,
+
+    /// BLS signatures (hex), comma-separated, one for each key in --bls-keys.
+    /// Each BLS key must sign the staker address (32 bytes).
+    #[arg(long, value_delimiter = ',', requires = "bls_keys")]
+    pub signatures: Vec<String>,
+}
+
+/// Arguments for system SC queries.
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct SystemQueryArgs {
+    #[command(flatten)]
+    pub gateway: GatewayArgs,
 }

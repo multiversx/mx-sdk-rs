@@ -5,7 +5,10 @@ pub mod cli_args_sender;
 mod cli_args_standalone;
 pub mod cli_args_tx;
 pub mod cli_args_tx_system;
+pub mod cli_args_tx_system_delegation;
 pub mod cli_args_tx_system_esdt;
+pub mod cli_args_tx_system_governance;
+pub mod cli_args_tx_system_validator;
 mod cli_args_validate;
 mod cli_standalone_main;
 
