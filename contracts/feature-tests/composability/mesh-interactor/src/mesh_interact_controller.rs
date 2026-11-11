@@ -1,4 +1,4 @@
-use crate::call_tree_config::{CONFIG_FILE, InteractConfig};
+use crate::call_tree_config::InteractConfig;
 
 use multiversx_sc_snippets::imports::*;
 
@@ -11,14 +11,8 @@ pub struct ComposabilityInteract {
 
 impl ComposabilityInteract {
     pub async fn init() -> Self {
-        let config = InteractConfig::load_from_file(CONFIG_FILE);
-        let gateway_config = &config.gateway;
-        let mut interactor = Interactor::new(&gateway_config.uri)
-            .await
-            .use_chain_simulator(gateway_config.use_chain_simulator());
-        interactor.set_current_dir_from_workspace(
-            "contracts/feature-tests/composability/mesh-interactor",
-        );
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: InteractConfig = interactor.load_config_toml().await;
         let shard_wallet_addresses = [
             interactor
                 .register_wallet(test_wallets::for_shard(0u32.into()))
@@ -31,7 +25,7 @@ impl ComposabilityInteract {
                 .await,
         ];
         let forw_queue_code = BytesValue::interpret_from(
-            "mxsc:../mesh-node/output/mesh-node.mxsc.json",
+            format!("mxsc:{}", config.general.contract_path),
             &InterpreterContext::default(),
         );
 

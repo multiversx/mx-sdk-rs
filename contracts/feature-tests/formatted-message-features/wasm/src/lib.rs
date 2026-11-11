@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           19
+// Endpoints:                           20
 // Async Callback (empty):               1
-// Total number of exported functions:  21
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         dynamic_message_multiple => dynamic_message_multiple
         dynamic_message_ascii => dynamic_message_ascii
         decode_error_message => decode_error_message
+        panic_in_expression_position => panic_in_expression_position
         print_message => print_message
         print_message_hex => print_message_hex
         print_message_binary => print_message_binary

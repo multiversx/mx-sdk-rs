@@ -15,14 +15,13 @@ where
 {
     pub(crate) async fn recall_senders_nonce(&mut self, senders: HashSet<Address>) {
         for sender_address in &senders {
-            let nonce = self.recall_nonce(sender_address).await;
+            let nonce = self.resolve_tx_nonce(sender_address).await;
             let sender = self
                 .sender_map
                 .get_mut(sender_address)
                 .expect("sender not registered");
 
             sender.current_nonce = Some(nonce);
-            println!("sender's recalled nonce: {nonce}");
         }
     }
 
@@ -34,13 +33,13 @@ where
 
         for tx in &txs {
             let tx_hash = self
-                .proxy
+                .proxy()
                 .request(SendTxRequest(tx))
                 .await
                 .expect("failed to send transaction");
 
             println!("process tx hash: {tx_hash} with nonce: {}", tx.nonce);
-            futures.push(retrieve_tx_on_network(&self.proxy, tx_hash.clone()));
+            futures.push(retrieve_tx_on_network(self.proxy(), tx_hash.clone()));
         }
 
         self.generate_blocks(4).await.unwrap();
@@ -56,6 +55,9 @@ pub(crate) fn update_nonces_and_sign_tx(transaction: &mut Transaction, sender: &
     transaction.nonce = sender.current_nonce.unwrap();
     sender.current_nonce = Some(sender.current_nonce.unwrap() + 1);
 
-    let signature = sender.wallet.sign_tx(&*transaction);
-    transaction.signature = Some(hex::encode(signature));
+    let signature = sender
+        .wallet
+        .sign_tx(&*transaction)
+        .expect("failed to sign transaction");
+    transaction.signature = Some(signature);
 }

@@ -1,8 +1,10 @@
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+pub use super::cli_args_codehash::*;
 pub use super::cli_args_reproducible_builds::*;
 
+use crate::cli::cli_args_ledger::LedgerArgs;
 use crate::cli::cli_args_tx::TxCliArgs;
 use multiversx_sc_meta_lib::cli::{CliArgsToRaw, ContractCliAction};
 
@@ -43,7 +45,7 @@ pub enum StandaloneCliAction {
     #[command(
         about = "Calls the meta crates for all contracts under given path with the given arguments."
     )]
-    All(AllArgs),
+    All(Box<AllArgs>),
 
     #[command(
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
@@ -111,7 +113,13 @@ pub enum StandaloneCliAction {
         name = "tx",
         about = "Deploy, call, upgrade, query contracts or create/send/sign transactions."
     )]
-    Tx(TxCliArgs),
+    Tx(Box<TxCliArgs>),
+
+    #[command(
+        name = "ledger",
+        about = "Interact with a Ledger hardware wallet (list addresses, get app version)."
+    )]
+    Ledger(LedgerArgs),
 
     #[command(
         name = "data",
@@ -386,13 +394,16 @@ impl AllArgs {
             result.meta_lib_args.target_dir_meta = Some(target_dir_all.clone());
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
-                    build_args.target_dir_wasm = Some(target_dir_all.clone());
+                    build_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 ContractCliAction::BuildDbg(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 ContractCliAction::Twiggy(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
+                }
+                ContractCliAction::Check(check_args) => {
+                    check_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 _ => {}
             }

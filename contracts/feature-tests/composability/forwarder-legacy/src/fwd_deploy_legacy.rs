@@ -38,7 +38,7 @@ pub trait DeployContractModule {
     ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
         self.vault_proxy()
             .init(opt_arg)
-            .deploy_contract(code, CodeMetadata::DEFAULT)
+            .deploy_contract(code, CodeMetadata::EMPTY)
     }
 
     #[endpoint]
@@ -49,7 +49,7 @@ pub trait DeployContractModule {
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
         self.vault_proxy()
             .init(opt_arg)
-            .deploy_from_source(&source_address, CodeMetadata::DEFAULT)
+            .deploy_from_source(&source_address, CodeMetadata::EMPTY)
             .into()
     }
 }

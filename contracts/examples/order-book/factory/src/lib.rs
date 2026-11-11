@@ -33,7 +33,7 @@ pub trait Factory {
             .raw_deploy()
             .arguments_raw(arguments)
             .from_source(source)
-            .code_metadata(CodeMetadata::DEFAULT)
+            .code_metadata(CodeMetadata::EMPTY)
             .returns(ReturnsNewManagedAddress)
             .sync_call();
 

@@ -10,7 +10,7 @@ pub fn split_path_last(
 ) -> Option<(Punctuated<syn::PathSegment, PathSep>, syn::PathSegment)> {
     if path.segments.len() >= 2 {
         let mut leading_segments = path.segments.clone();
-        let last_segment = leading_segments.pop().unwrap().into_value();
+        let last_segment = leading_segments.pop().unwrap();
         Some((leading_segments, last_segment))
     } else {
         None

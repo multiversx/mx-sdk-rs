@@ -19,7 +19,8 @@ pub fn proxy_arg_gen(
             let mut bounds = syn::punctuated::Punctuated::new();
             bounds.push(syn::TypeParamBound::Trait(syn::TraitBound {
                 paren_token: None,
-                modifier: syn::TraitBoundModifier::None,
+                modifiers: syn::TraitBoundModifiers::default(),
+                maybe: None,
                 lifetimes: None,
                 path: equivalent_encode_path_gen(&arg.ty),
             }));
@@ -31,7 +32,6 @@ pub fn proxy_arg_gen(
                     ident: arg_type_generated_ident.clone(),
                     colon_token: Some(syn::token::Colon(proc_macro2::Span::call_site())),
                     bounds,
-                    eq_token: None,
                     default: None,
                 }));
             args_decl.push(quote! { #(#unprocessed_attributes)* #pat : #arg_type_generated_ident });

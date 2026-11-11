@@ -24,7 +24,7 @@ impl BlockchainState {
         for (address, account) in &self.accounts {
             write!(accounts_buf, "\n\t{} -> {account}", address_hex(address)).unwrap();
         }
-        println!("Accounts: {}", &accounts_buf);
+        println!("Accounts: {}", accounts_buf);
     }
 
     pub fn put_new_address(

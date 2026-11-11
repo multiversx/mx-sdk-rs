@@ -4,7 +4,7 @@ use num_traits::Zero;
 use super::AccountEsdt;
 use crate::{
     display_util::key_hex,
-    types::{Address, VMCodeMetadata},
+    types::{Address, CodeMetadata},
 };
 use std::{collections::HashMap, fmt, fmt::Write};
 
@@ -19,7 +19,7 @@ pub struct AccountData {
     pub storage: AccountStorage,
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
-    pub code_metadata: VMCodeMetadata,
+    pub code_metadata: CodeMetadata,
     pub contract_owner: Option<Address>,
     pub developer_rewards: BigUint,
 }
@@ -34,9 +34,21 @@ impl AccountData {
             storage: AccountStorage::default(),
             username: vec![],
             contract_path: None,
-            code_metadata: VMCodeMetadata::empty(),
+            code_metadata: CodeMetadata::empty(),
             contract_owner: None,
             developer_rewards: BigUint::zero(),
+        }
+    }
+
+    pub fn storage_get(&self, key: &[u8]) -> Vec<u8> {
+        self.storage.get(key).cloned().unwrap_or_default()
+    }
+
+    pub fn storage_set(&mut self, key: &[u8], value: &[u8]) {
+        if value.is_empty() {
+            self.storage.remove(key);
+        } else {
+            self.storage.insert(key.to_vec(), value.to_vec());
         }
     }
 }

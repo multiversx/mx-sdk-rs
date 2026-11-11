@@ -1,0 +1,139 @@
+use std::fmt::Display;
+
+use anyhow::{Result, anyhow};
+use multiversx_chain_core::std::crypto::ed25519;
+use serde::{
+    de::{Deserialize, Deserializer},
+    ser::{Serialize, Serializer},
+};
+
+use super::wallet_signature::WalletSignature;
+
+pub const PRIVATE_KEY_LENGTH: usize = 64;
+pub const SEED_LENGTH: usize = 32;
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct PrivateKey(pub(crate) ed25519::Ed25519SigningKey);
+
+impl PrivateKey {
+    /// Constructs a [`PrivateKey`] from a 32-byte ed25519 seed.
+    ///
+    /// The corresponding public (verifying) key is derived automatically.
+    /// This is the canonical representation used throughout the MultiversX SDK.
+    pub fn from_seed_bytes(bytes: &[u8; 32]) -> PrivateKey {
+        PrivateKey(ed25519::Ed25519SigningKey::from_seed(bytes))
+    }
+
+    /// Constructs a [`PrivateKey`] from a 64-byte keypair `[seed || public_key]`.
+    ///
+    /// Returns an error if the embedded public key does not match the seed.
+    pub fn from_keypair_bytes(bytes: &[u8; 64]) -> Result<PrivateKey> {
+        ed25519::Ed25519SigningKey::from_keypair_bytes(bytes)
+            .map(PrivateKey)
+            .map_err(|e| anyhow!("Invalid keypair bytes: {e}"))
+    }
+
+    /// Constructs a [`PrivateKey`] from a slice whose length determines the format:
+    /// - 32 bytes → treated as a seed (see [`from_seed_bytes`](Self::from_seed_bytes))
+    /// - 64 bytes → treated as a keypair (see [`from_keypair_bytes`](Self::from_keypair_bytes))
+    ///
+    /// Returns an error for any other length.
+    pub fn from_bytes(bytes: &[u8]) -> Result<PrivateKey> {
+        match bytes.len() {
+            SEED_LENGTH => {
+                let seed: &[u8; 32] = bytes
+                    .try_into()
+                    .map_err(|_| anyhow!("Invalid secret key length"))?;
+                Ok(PrivateKey::from_seed_bytes(seed))
+            }
+            PRIVATE_KEY_LENGTH => {
+                let keypair: &[u8; 64] = bytes
+                    .try_into()
+                    .map_err(|_| anyhow!("Invalid secret key length"))?;
+                PrivateKey::from_keypair_bytes(keypair)
+            }
+            _ => Err(anyhow!("Invalid secret key length")),
+        }
+    }
+
+    /// Decodes a hex string into a 32-byte seed and constructs a [`PrivateKey`].
+    ///
+    /// The input must be exactly 64 hex characters (32 bytes). Returns an error
+    /// if the string is not valid hex or does not decode to exactly 32 bytes.
+    pub fn from_seed_hex_str(pk: &str) -> Result<Self> {
+        let bytes = hex::decode(pk)?;
+        let seed: [u8; 32] = bytes
+            .try_into()
+            .map_err(|_| anyhow!("Invalid seed key length"))?;
+        Ok(PrivateKey::from_seed_bytes(&seed))
+    }
+
+    /// Decodes a hex string into a 64-byte keypair and constructs a [`PrivateKey`].
+    ///
+    /// The input must be exactly 128 hex characters (64 bytes). Returns an error
+    /// if the string is not valid hex, does not decode to exactly 64 bytes, or
+    /// the embedded public key does not match the seed.
+    pub fn from_keypair_hex_str(pk: &str) -> Result<Self> {
+        let bytes = hex::decode(pk)?;
+        let keypair: [u8; 64] = bytes
+            .try_into()
+            .map_err(|_| anyhow!("Invalid keypair key length"))?;
+        PrivateKey::from_keypair_bytes(&keypair)
+    }
+
+    /// Decodes a hex string and constructs a [`PrivateKey`], inferring the format
+    /// from the decoded length (32 bytes → seed, 64 bytes → keypair).
+    ///
+    /// Prefer [`from_seed_hex_str`](Self::from_seed_hex_str) or
+    /// [`from_keypair_hex_str`](Self::from_keypair_hex_str) when the format is known.
+    pub fn from_hex_str(pk: &str) -> Result<Self> {
+        let bytes = hex::decode(pk)?;
+        PrivateKey::from_bytes(bytes.as_slice())
+    }
+
+    /// Returns the full 64-byte keypair as `[seed (32 bytes) || public_key (32 bytes)]`.
+    pub fn to_bytes(&self) -> [u8; PRIVATE_KEY_LENGTH] {
+        self.0.to_keypair_bytes()
+    }
+
+    /// Returns the 32-byte seed encoded as a lowercase hex string (64 characters).
+    pub fn to_seed_hex(&self) -> String {
+        hex::encode(self.0.to_seed_bytes())
+    }
+
+    /// Signs `message` with this key and returns a [`WalletSignature`].
+    pub fn sign(&self, message: impl AsRef<[u8]>) -> WalletSignature {
+        WalletSignature::from(self.0.sign(message.as_ref()))
+    }
+}
+
+impl Display for PrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.to_seed_hex().fmt(f)
+    }
+}
+
+impl std::fmt::Debug for PrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PrivateKey({})", self)
+    }
+}
+
+impl Serialize for PrivateKey {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.to_seed_hex().as_str())
+    }
+}
+
+impl<'de> Deserialize<'de> for PrivateKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Ok(Self::from_hex_str(s.as_str()).unwrap())
+    }
+}

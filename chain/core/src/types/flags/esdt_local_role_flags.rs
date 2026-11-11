@@ -2,7 +2,29 @@ use super::EsdtLocalRole;
 use bitflags::bitflags;
 
 bitflags! {
-    #[derive(PartialEq, Clone, Copy)]
+    /// Bit-flag representation of ESDT local roles.
+    ///
+    /// Each flag corresponds to a `Role*` constant defined in the Go VM at
+    /// `vmhost/vmhooks/eei_helpers.go` (`mx-chain-vm-go`), where the same
+    /// values are produced via `1 << iota` starting from `RoleMint = 1`.
+    ///
+    /// Correspondence table (Rust flag → Go constant → bit):
+    ///
+    /// | Rust flag              | Go constant             | Bit |
+    /// |------------------------|--------------------------|----|
+    /// | `MINT`                 | `RoleMint`               |  0 |
+    /// | `BURN`                 | `RoleBurn`               |  1 |
+    /// | `NFT_CREATE`           | `RoleNFTCreate`          |  2 |
+    /// | `NFT_ADD_QUANTITY`     | `RoleNFTAddQuantity`     |  3 |
+    /// | `NFT_BURN`             | `RoleNFTBurn`            |  4 |
+    /// | `NFT_UPDATE_ATTRIBUTES`| `RoleNFTUpdateAttributes`|  5 |
+    /// | `NFT_ADD_URI`          | `RoleNFTAddURI`          |  6 |
+    /// | `NFT_RECREATE`         | `RoleNFTRecreate`        |  7 |
+    /// | `MODIFY_CREATOR`       | `RoleModifyCreator`      |  8 |
+    /// | `MODIFY_ROYALTIES`     | `RoleModifyRoyalties`    |  9 |
+    /// | `SET_NEW_URI`          | `RoleSetNewURI`          | 10 |
+    /// | `TRANSFER`             | *(not yet in Go VM)*     | 11 |
+    #[derive(PartialEq, Clone, Copy, Debug)]
     pub struct EsdtLocalRoleFlags: u64 {
         const NONE                  = 0b00000000_00000000;
         const MINT                  = 0b00000000_00000001;
@@ -22,10 +44,14 @@ bitflags! {
 }
 
 impl EsdtLocalRoleFlags {
+    /// Returns `true` if this flag set contains the bit corresponding to `role`.
     pub fn has_role(&self, role: &EsdtLocalRole) -> bool {
         *self & role.to_flag() != EsdtLocalRoleFlags::NONE
     }
 
+    /// Iterates over all [`EsdtLocalRole`] variants whose bit is set in this flag set.
+    ///
+    /// Roles are yielded in canonical numeric-ID order (see [`EsdtLocalRole::iter_all`]).
     pub fn iter_roles(&self) -> impl Iterator<Item = &EsdtLocalRole> {
         EsdtLocalRole::iter_all().filter(move |role| self.has_role(role))
     }

@@ -1,11 +1,10 @@
-use multiversx_chain_core::types::ReturnCode;
+use multiversx_chain_core::{std::base64_decode, types::ReturnCode};
 use multiversx_sdk::{
     data::transaction::{ApiTransactionResult, GetTransactionResponse},
     retrieve_tx_on_network::{
         extract_message_from_string_reason, find_code_and_message, parse_reason,
         replace_with_error_message,
     },
-    utils::base64_decode,
 };
 
 #[test]
@@ -869,7 +868,7 @@ fn replace_logs_reason_sc_panic_test() {
         serde_json::from_str::<ApiTransactionResult>(tx_str).unwrap();
     let expected_tx: ApiTransactionResult =
         serde_json::from_str::<ApiTransactionResult>(expected_tx_str).unwrap();
-    replace_with_error_message(&mut tx, &String::from_utf8(base64_decode("c3RvcmFnZSBkZWNvZGUgZXJyb3IgKGtleTogcG9vbENvbnRyYWN0AAAAAAAAAe+/vSk6IGlucHV0IHRvbyBzaG9ydA==")).unwrap());
+    replace_with_error_message(&mut tx, &String::from_utf8(base64_decode("c3RvcmFnZSBkZWNvZGUgZXJyb3IgKGtleTogcG9vbENvbnRyYWN0AAAAAAAAAe+/vSk6IGlucHV0IHRvbyBzaG9ydA==").unwrap()).unwrap());
     assert_eq!(
         expected_tx.logs.unwrap().events[0].topics,
         tx.logs.unwrap().events[0].topics

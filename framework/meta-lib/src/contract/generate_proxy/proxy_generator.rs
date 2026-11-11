@@ -456,7 +456,7 @@ where
         self.writeln("(");
         self.writeln("        self,");
         for (index, input) in inputs.iter().enumerate() {
-            self.writeln(format!("        {}: Arg{index},", &input.arg_name));
+            self.writeln(format!("        {}: Arg{index},", input.arg_name));
         }
         self.write("    ) ");
     }

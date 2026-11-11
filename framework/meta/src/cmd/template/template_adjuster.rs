@@ -1,9 +1,9 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::{ContractCreatorTarget, template_metadata::TemplateMetadata};
 use crate::cmd::upgrade::upgrade_common::{rename_files, replace_in_files};
 use convert_case::{Case, Casing};
-use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
+use multiversx_sc_meta_lib::cargo_toml::{CargoTomlContents, WorkspaceDependencies};
 use ruplacer::Query;
 use toml::value::Table;
 
@@ -16,8 +16,21 @@ pub struct TemplateAdjuster {
     pub target: ContractCreatorTarget,
     pub keep_paths: bool,
     pub new_author: Option<String>,
+    pub workspace_dependencies: WorkspaceDependencies,
 }
 impl TemplateAdjuster {
+    pub fn resolve_workspace_dependencies(&self) {
+        for cargo_toml_path in self.cargo_toml_paths() {
+            if !cargo_toml_path.exists() {
+                continue;
+            }
+
+            let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+            toml.resolve_workspace_dependencies(&self.workspace_dependencies);
+            toml.save_to_file(&cargo_toml_path);
+        }
+    }
+
     pub fn update_cargo_toml_files(&self) {
         let author_as_str = self
             .new_author
@@ -27,6 +40,23 @@ impl TemplateAdjuster {
         self.update_cargo_toml_meta();
         self.update_cargo_toml_wasm();
         self.update_cargo_toml_interact(author_as_str);
+    }
+
+    fn cargo_toml_paths(&self) -> Vec<PathBuf> {
+        let mut paths = vec![
+            self.target.contract_dir().join(CARGO_TOML),
+            self.target.contract_dir().join("meta").join(CARGO_TOML),
+            self.target.contract_dir().join("wasm").join(CARGO_TOML),
+        ];
+        if self.metadata.has_interactor {
+            paths.push(
+                self.target
+                    .contract_dir()
+                    .join("interactor")
+                    .join(CARGO_TOML),
+            );
+        }
+        paths
     }
 
     fn update_cargo_toml_root(&self, author: String) {
@@ -101,7 +131,6 @@ impl TemplateAdjuster {
         let old_snake = self.metadata.name.to_case(Case::Snake);
         let new_trait = self.target.new_name.to_case(Case::UpperCamel);
         let old_trait = &self.metadata.contract_trait;
-        let new_src_file = rs_file_name(&new_snake);
         let old_wasm = wasm_file_name(&self.metadata.name);
         let new_wasm = wasm_file_name(&self.target.new_name);
         let old_mxsc = mxsc_file_name(&self.metadata.name);
@@ -119,6 +148,10 @@ impl TemplateAdjuster {
             Query::simple(old_trait, &new_trait),
             Query::simple(&format!("{old_snake}::"), &format!("{new_snake}::")),
             Query::simple(&format!("{old_snake}_proxy"), &format!("{new_snake}_proxy")),
+            Query::simple(
+                &format!("{old_snake}_interactor"),
+                &format!("{new_snake}_interactor"),
+            ),
             Query::simple(
                 &as_path(&self.metadata.name),
                 &as_path(&self.target.new_name),
@@ -146,7 +179,15 @@ impl TemplateAdjuster {
                     &package_name_expr(&self.metadata.name),
                     &package_name_expr(&self.target.new_name),
                 ),
-                Query::simple(&self.metadata.src_file, &new_src_file),
+                Query::simple(&self.metadata.src_file, &rs_file_name(&new_snake)),
+                Query::simple(
+                    &format!("{old_snake}_interactor.rs"),
+                    &format!("{new_snake}_interactor.rs"),
+                ),
+                Query::simple(
+                    &format!("{old_snake}_interactor_main.rs"),
+                    &format!("{new_snake}_interactor_main.rs"),
+                ),
                 Query::simple(
                     &package_name_expr(&format!("{}-meta", self.metadata.name)),
                     &package_name_expr(&format!("{}-meta", self.target.new_name)),
@@ -158,6 +199,10 @@ impl TemplateAdjuster {
                 Query::simple(
                     &package_name_expr(&format!("{}-wasm", self.metadata.name)),
                     &package_name_expr(&format!("{}-wasm", self.target.new_name)),
+                ),
+                Query::simple(
+                    &package_name_expr(&format!("{}-interactor", self.metadata.name)),
+                    &package_name_expr(&format!("{}-interactor", self.target.new_name)),
                 ),
             ],
         );

@@ -92,14 +92,23 @@ fn preprocess_args(
     (preprocessed, post_processing)
 }
 
-/// Returns `true` if `--codehash` was requested and the contract's framework version is
-/// a plain semver version older than v0.66, meaning the contract meta crate does not
-/// support the `--codehash` flag and the hash must be computed by sc-meta instead.
+/// Returns `true` if the contract's framework dependency might not support the `--codehash`
+/// flag, meaning the hash must be computed by sc-meta instead.
 ///
-/// For non-semver references (path, git, etc.) the flag is forwarded as-is.
+/// - Plain semver versions older than v0.66 are known not to support it.
+/// - Git references (commit, branch, tag) cannot be cheaply mapped to a framework version,
+///   so the fallback is always used. The result is identical either way, since both sides
+///   compute the same Blake2b-256 hash of the `.wasm` file.
+///
+/// For other references (path, workspace, etc.) the flag is forwarded as-is.
 fn should_use_codehash_fallback(contract_crate: &RelevantDirectory) -> bool {
-    let DependencyReference::Version(version_req) = &contract_crate.version else {
-        return false;
-    };
-    version_req.semver < FIRST_VERSION_WITH_CODEHASH
+    match &contract_crate.version {
+        DependencyReference::Version(version_req) => {
+            version_req.semver < FIRST_VERSION_WITH_CODEHASH
+        }
+        DependencyReference::GitCommit(_)
+        | DependencyReference::GitBranch(_)
+        | DependencyReference::GitTag(_) => true,
+        _ => false,
+    }
 }

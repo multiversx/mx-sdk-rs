@@ -1,0 +1,11 @@
+[package]
+name = "greeter-meta"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies.greeter]
+path = ".."
+
+[dependencies.multiversx-sc-meta-lib]
+workspace = true

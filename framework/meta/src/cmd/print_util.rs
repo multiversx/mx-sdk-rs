@@ -43,6 +43,9 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
                 print!(" {}", version_string.red());
             };
         }
+        DependencyReference::Workspace => {
+            print!(" {}", "[workspace]".green());
+        }
         DependencyReference::GitCommit(git_reference) => {
             let git_string = format!(
                 "[git: {} rev: {}]",

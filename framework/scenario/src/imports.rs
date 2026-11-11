@@ -18,7 +18,7 @@ pub use crate::{
         model::{
             Account, AddressValue, BytesValue, CheckAccount, CheckStateStep, ScCallStep,
             ScDeployStep, ScQueryStep, Scenario, SetStateStep, TransferStep, TxESDT, TxExpect,
-            TypedResponse,
+            TxResponseStatus, TypedResponse,
         },
         run_vm::ExecutorConfig,
     },

@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use anyhow::anyhow;
 
-use crate::{gateway::ADD_KEYS, utils::base64_encode};
+use crate::gateway::ADD_KEYS;
+use multiversx_chain_core::std::base64_encode;
 
 use super::{
     GatewayRequest, GatewayRequestType, gateway_chain_simulator_blocks::GenerateBlocksResponse,

@@ -1,17 +1,10 @@
 use colored::Colorize;
+use multiversx_sdk::chain_core::types::GasResult;
 
 pub(super) fn query_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",
         "Query failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
-}
-
-pub(super) fn transfer_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Transfer failed: ".to_string().red().bold(),
         err.to_string().red().bold()
     );
 }
@@ -27,14 +20,6 @@ pub(super) fn simulate_gas_transfer_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(super) fn deploy_err_message(err: &anyhow::Error) {
-    eprintln!(
-        "{}{}",
-        "Deploy failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
-    );
-}
-
 pub(super) fn simulate_gas_deploy_err_message(err: &anyhow::Error) {
     eprintln!(
         "{}{}",
@@ -46,11 +31,13 @@ pub(super) fn simulate_gas_deploy_err_message(err: &anyhow::Error) {
     );
 }
 
-pub(crate) fn sc_call_err_message(err: &anyhow::Error) {
+/// Printed when the gas simulation completed, but did not produce a usable gas estimate.
+pub(super) fn simulate_gas_no_estimate_err_message(tx_kind: &str, gas_result: &GasResult) {
     eprintln!(
-        "{}{}",
-        "Call failed: ".to_string().red().bold(),
-        err.to_string().red().bold()
+        "{}",
+        format!("Gas simulation for {tx_kind} did not produce an estimate: {gas_result}")
+            .red()
+            .bold()
     );
 }
 

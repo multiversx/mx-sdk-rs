@@ -1,6 +1,6 @@
 use multiversx_sc::types::{
-    FunctionCall, RHListExec, Tx, TxEnv, TxEnvWithTxHash, TxFromSpecified, TxGas, TxPayment,
-    TxToSpecified,
+    FunctionCall, RHListExec, Tx, TxEnv, TxEnvWithRelayer, TxEnvWithTxHash, TxFromSpecified, TxGas,
+    TxPayment, TxToSpecified,
 };
 
 use crate::scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse};
@@ -10,7 +10,7 @@ use super::{StepWrapper, TxToStep, address_annotated, gas_annotated};
 impl<Env, From, To, Payment, Gas, RH> TxToStep<Env, RH>
     for Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
 where
-    Env: TxEnvWithTxHash<RHExpect = TxExpect>,
+    Env: TxEnvWithTxHash<RHExpect = TxExpect> + TxEnvWithRelayer,
     From: TxFromSpecified<Env>,
     To: TxToSpecified<Env>,
     Payment: TxPayment<Env>,
@@ -30,6 +30,10 @@ where
         );
         step.tx_id = self.env.take_tx_id();
         step.explicit_tx_hash = self.env.take_tx_hash();
+        step.tx.relayer = self
+            .env
+            .take_relayer_address()
+            .map(|a| address_annotated(&self.env, &a));
         step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {

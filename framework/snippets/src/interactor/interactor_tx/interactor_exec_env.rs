@@ -3,7 +3,8 @@ use multiversx_sc_scenario::{
     api::StaticApi,
     imports::TxId,
     multiversx_sc::types::{
-        H256, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv, TxEnvWithTxHash,
+        H256, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv, TxEnvWithRelayer,
+        TxEnvWithTxHash,
     },
     scenario_model::TxExpect,
 };
@@ -58,6 +59,19 @@ where
 {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
+    }
+}
+
+impl<GatewayProxy> TxEnvWithRelayer for InteractorEnvExec<'_, GatewayProxy>
+where
+    GatewayProxy: GatewayAsyncService,
+{
+    fn set_relayer_address(&mut self, relayer: ManagedAddress<Self::Api>) {
+        self.data.set_relayer_address(relayer);
+    }
+
+    fn take_relayer_address(&mut self) -> Option<ManagedAddress<Self::Api>> {
+        self.data.take_relayer_address()
     }
 }
 

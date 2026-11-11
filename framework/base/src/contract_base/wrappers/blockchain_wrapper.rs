@@ -165,7 +165,7 @@ where
             ManagedRefMut::<'static, A, ManagedBuffer<A>>::wrap_handle(mbuf_temp_1)
                 .load_to_byte_array(&mut buffer);
         }
-        CodeMetadata::from(buffer)
+        CodeMetadata::from_bytes_or_default(&buffer)
     }
 
     pub fn get_code_hash(&self, address: &ManagedAddress<A>) -> ManagedBuffer<A> {

@@ -79,6 +79,12 @@ fn test_is_valid_esdt_identifier() {
     // valid ticker only numbers
     assert!(TokenId::<StaticApi>::from("12345-6258d2").is_valid_esdt_identifier());
 
+    // valid identifier with max-length ticker (10 chars)
+    assert!(TokenId::<StaticApi>::from("EGLDRIDEFL-08d8ef").is_valid_esdt_identifier());
+
+    // valid identifier with number at end of max-length ticker
+    assert!(TokenId::<StaticApi>::from("EGLDRIDEF2-08d8ef").is_valid_esdt_identifier());
+
     // missing dash
     assert!(!TokenId::<StaticApi>::from("ALC6258d2").is_valid_esdt_identifier());
 
@@ -88,11 +94,34 @@ fn test_is_valid_esdt_identifier() {
     // lowercase ticker
     assert!(!TokenId::<StaticApi>::from("alc-6258d2").is_valid_esdt_identifier());
 
+    // lowercase char in ticker
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEFl-08d8ef").is_valid_esdt_identifier());
+
+    // special char in ticker
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEF*-08d8ef").is_valid_esdt_identifier());
+
     // uppercase random chars
     assert!(!TokenId::<StaticApi>::from("ALC-6258D2").is_valid_esdt_identifier());
 
+    // uppercase char in random part
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEFL-08d8eF").is_valid_esdt_identifier());
+
+    // special char in random part
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEFL-08d*ef").is_valid_esdt_identifier());
+
+    // non-hex lowercase letter in random part (g-z are not valid hex digits)
+    assert!(!TokenId::<StaticApi>::from("ABC-ghijkl").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALC-6258g2").is_valid_esdt_identifier());
+    assert!(!TokenId::<StaticApi>::from("ALC-zzzzzz").is_valid_esdt_identifier());
+
     // too many random chars
     assert!(!TokenId::<StaticApi>::from("ALC-6258d2ff").is_valid_esdt_identifier());
+
+    // too many random chars (7)
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEFL-08d8eff").is_valid_esdt_identifier());
+
+    // too few random chars (5)
+    assert!(!TokenId::<StaticApi>::from("EGLDRIDEFL-08d8e").is_valid_esdt_identifier());
 
     // ticker too short
     assert!(!TokenId::<StaticApi>::from("AL-6258d2").is_valid_esdt_identifier());

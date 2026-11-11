@@ -101,16 +101,16 @@ impl TxExpect {
         assert!(
             self.status.check(tx_response.tx_error.status.as_u64()),
             "{}result code mismatch. Want: {}. Have: {}. Message: {}",
-            &self.additional_error_message,
+            self.additional_error_message,
             self.status,
             tx_response.tx_error.status,
-            &tx_response.tx_error.message,
+            tx_response.tx_error.message,
         );
 
         assert!(
             self.out.check(&tx_response.out),
             "{}bad out value. Want: [{}]. Have: [{}]",
-            &self.additional_error_message,
+            self.additional_error_message,
             self.out_to_string(),
             result_values_to_string(&tx_response.out),
         );
@@ -118,9 +118,9 @@ impl TxExpect {
         assert!(
             self.message.check(tx_response.tx_error.message.as_str()),
             "{}result message mismatch. Want: {}. Have: {}.",
-            &self.additional_error_message,
-            &self.message,
-            &tx_response.tx_error.message,
+            self.additional_error_message,
+            self.message,
+            tx_response.tx_error.message,
         );
     }
 

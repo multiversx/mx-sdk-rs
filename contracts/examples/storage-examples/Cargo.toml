@@ -1,0 +1,15 @@
+[package]
+name = "storage-examples"
+version = "0.0.0"
+edition = "2024"
+publish = false
+authors = ["you"]
+
+[lib]
+path = "src/storage_examples.rs"
+
+[dependencies.multiversx-sc]
+workspace = true
+
+[dev-dependencies.multiversx-sc-scenario]
+workspace = true

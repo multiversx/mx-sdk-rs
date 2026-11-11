@@ -68,7 +68,7 @@ fn test_managed_vec_format_biguint() {
     let mut mv = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     mv.push(BigUint::from(1u32));
     mv.push(BigUint::from(2u32));
-    let s = format!("{:?}", &mv);
+    let s = format!("{:?}", mv);
     assert_eq!(
         "[BigUint { handle: -201, hex-value-be: \"01\" }, BigUint { handle: -202, hex-value-be: \"02\" }]",
         s
@@ -82,7 +82,7 @@ fn test_managed_vec_format_egld_or_esdt() {
     mv.push(EgldOrEsdtTokenIdentifier::esdt(EsdtTokenIdentifier::from(
         "MYTOKEN-5678",
     )));
-    let s = format!("{:?}", &mv);
+    let s = format!("{:?}", mv);
     assert_eq!(
         "[EgldOrEsdtTokenIdentifier::Egld, EgldOrEsdtTokenIdentifier::Esdt(\"MYTOKEN-5678\")]",
         s

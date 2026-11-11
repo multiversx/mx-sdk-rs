@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 /// Corresponds to [`MultipleTransactionsResponseData`](https://github.com/multiversx/mx-chain-proxy-go/blob/master/data/transaction.go) in mx-chain-proxy-go.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MultipleTransactionsResponseData {
-    #[serde(rename = "txsSent")]
+    #[serde(rename = "txsSent", default)]
     pub num_of_sent_txs: u64,
     #[serde(rename = "txsHashes")]
     pub txs_hashes: HashMap<u64, String>,

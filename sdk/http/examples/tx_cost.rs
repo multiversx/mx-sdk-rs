@@ -1,5 +1,6 @@
 use multiversx_sdk::{
-    chain_core::std::Bech32Address, data::transaction::Transaction, utils::base64_encode,
+    chain_core::std::{Bech32Address, base64_encode},
+    data::transaction::{Transaction, TransactionOptions, TransactionVersion},
 };
 use multiversx_sdk_http::{DEVNET_GATEWAY, GatewayHttpProxy};
 
@@ -16,11 +17,13 @@ async fn main() {
         ),
         data: Some(base64_encode("hello")),
         chain_id: "1".to_string(),
-        version: 1,
-        options: 0,
+        version: TransactionVersion::default(),
+        options: Some(TransactionOptions::default()),
         gas_limit: 0,
         gas_price: 0,
         signature: None,
+        relayer: None,
+        relayer_signature: None,
     };
 
     let blockchain = GatewayHttpProxy::new(DEVNET_GATEWAY.to_string());

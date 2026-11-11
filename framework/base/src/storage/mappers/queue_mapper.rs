@@ -508,10 +508,7 @@ where
             // check that the node IDs are unique
             forwards.sort_unstable();
             forwards.dedup();
-            if forwards.len() != info.len as usize {
-                return false;
-            }
-            true
+            forwards.len() == info.len as usize
         }
     }
 }

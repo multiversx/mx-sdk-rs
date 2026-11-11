@@ -530,7 +530,7 @@ fn blackbox_deploy_and_upgrade_from_source() {
     let action_id = state.propose_sc_deploy_from_source(
         0u64,
         ADDER_ADDRESS,
-        CodeMetadata::all(),
+        CodeMetadata::default(),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     );
     state.sign(action_id);
@@ -576,7 +576,7 @@ fn blackbox_deploy_and_upgrade_from_source() {
         ADDER_ADDRESS,
         0u64,
         factorial_address,
-        CodeMetadata::all(),
+        CodeMetadata::default(),
         MultiValueVec::new(),
     );
     state.sign(action_id);

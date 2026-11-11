@@ -14,7 +14,7 @@ pub(crate) fn write_interact_struct_impl(file: &mut File, abi: &ContractAbi, cra
     let proxy = format!("{}::{}Proxy", proxy_file_name, abi.name);
 
     let wasm_output_file_path_expr =
-        format!("\"mxsc:{}\"", &wasm_output_file_path.to_string_lossy());
+        format!("\"mxsc:{}\"", wasm_output_file_path.to_string_lossy());
 
     writeln!(
         file,

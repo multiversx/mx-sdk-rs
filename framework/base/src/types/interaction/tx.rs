@@ -12,9 +12,9 @@ use super::{
     AnnotatedValue, Code, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
     ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
     TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
-    TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
-    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxTo, TxToSpecified,
-    UpgradeCall,
+    TxEnvMockDeployAddress, TxEnvWithRelayer, TxEnvWithTxHash, TxFrom, TxFromSourceValue,
+    TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
+    TxResultHandler, TxTo, TxToSpecified, UpgradeCall,
 };
 
 /// Universal representation of a blockchain transaction.
@@ -991,5 +991,44 @@ where
     {
         self.env.set_tx_hash(H256::from(tx_hash));
         self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnvWithRelayer,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the relayer address for a relayed v3 transaction.
+    ///
+    /// The relayer pays the gas fees. After the sender signs the transaction,
+    /// the relayer must also sign it (adding `relayerSignature`) before broadcasting.
+    pub fn relayer<A>(mut self, relayer: A) -> Self
+    where
+        A: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        let relayer_addr = relayer.into_value(&self.env);
+        self.env.set_relayer_address(relayer_addr);
+        self
+    }
+
+    /// Optionally sets the relayer address for a relayed v3 transaction.
+    ///
+    /// The relayer pays the gas fees. After the sender signs the transaction,
+    /// the relayer must also sign it (adding `relayerSignature`) before broadcasting.
+    pub fn opt_relayer<A>(self, relayer: Option<A>) -> Self
+    where
+        A: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        if let Some(relayer) = relayer {
+            self.relayer(relayer)
+        } else {
+            self
+        }
     }
 }

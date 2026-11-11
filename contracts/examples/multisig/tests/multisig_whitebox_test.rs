@@ -626,7 +626,7 @@ fn whitebox_deploy_and_upgrade_from_source() {
         ActionRaw::SCDeployFromSource {
             amount: 0u64.into(),
             source: ADDER_ADDRESS.to_address(),
-            code_metadata: CodeMetadata::all(),
+            code_metadata: CodeMetadata::default(),
             arguments: vec![BoxedBytes::from(&[5u8][..])],
         },
         None,
@@ -683,7 +683,7 @@ fn whitebox_deploy_and_upgrade_from_source() {
         ActionRaw::SCUpgradeFromSource {
             source: FACTORIAL_ADDRESS.to_address(),
             amount: 0u64.into(),
-            code_metadata: CodeMetadata::all(),
+            code_metadata: CodeMetadata::default(),
             arguments: Vec::new(),
             sc_address: ADDER_ADDRESS.to_address(),
         },

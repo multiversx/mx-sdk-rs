@@ -104,7 +104,7 @@ impl EsdtInstances {
 impl fmt::Display for EsdtInstances {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut instance_buf = String::new();
-        for (_, value) in self.0.iter() {
+        for value in self.0.values() {
             let creator_encoded = if let Some(creator) = &value.metadata.creator {
                 hex::encode(creator)
             } else {

@@ -9,5 +9,6 @@ files_include = [
     "tests",
     "Cargo.toml",
     "multiversx.json",
+    "README.md",
     "wasm/Cargo.lock",
 ]

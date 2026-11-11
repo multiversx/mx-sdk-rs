@@ -13,5 +13,5 @@ path = "src/main.rs"
 path = "src/lib.rs"
 
 [dependencies]
-convert_case = "0.11"
+convert_case = "0.12"
 multiversx-chain-vm = { path = "../../chain/vm" }

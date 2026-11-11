@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
 
-use crate::utils::base64_decode;
+use multiversx_chain_core::std::base64_decode;
 
 #[derive(Serialize_repr, Deserialize_repr, Debug, Clone)]
 #[repr(u8)]
@@ -107,7 +107,10 @@ impl VMOutputApi {
     }
 
     pub fn return_data_base64_decode(&self) -> Vec<Vec<u8>> {
-        self.return_data().iter().map(base64_decode).collect()
+        self.return_data()
+            .iter()
+            .map(|d| base64_decode(d).expect("invalid base64 in return data"))
+            .collect()
     }
 
     pub fn is_ok(&self) -> bool {

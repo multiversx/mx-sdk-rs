@@ -12,14 +12,12 @@ path = "src/lib.rs"
 version = "0.0.0"
 path = "../common/kitty"
 
-[dependencies.kitty-ownership]
+[dev-dependencies.kitty-ownership]
 version = "0.0.0"
 path = "../kitty-ownership"
 
 [dependencies.multiversx-sc]
-version = "0.66.3"
-path = "../../../../framework/base"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.3"
-path = "../../../../framework/scenario"
+workspace = true

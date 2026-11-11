@@ -20,7 +20,7 @@ pub use crate::{
 };
 
 #[cfg(feature = "std")]
-pub use multiversx_chain_core::std::Bech32Address;
+pub use multiversx_chain_core::std::{Bech32Address, Bech32Hrp};
 
 pub use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,

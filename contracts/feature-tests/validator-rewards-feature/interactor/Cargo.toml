@@ -1,0 +1,31 @@
+[package]
+name = "validator-rewards-interactor"
+version = "0.0.0"
+authors = ["MultiversX <contact@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "validator-rewards-interactor"
+path = "src/validator_rewards_interactor_main.rs"
+
+[lib]
+path = "src/validator_rewards_interactor.rs"
+
+[dependencies.validator-rewards-feature]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+workspace = true
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "1.0"
+tokio = { version = "1.24" }
+
+[dev-dependencies]
+serial_test = "3.2"
+
+[features]
+chain-simulator-tests = []
