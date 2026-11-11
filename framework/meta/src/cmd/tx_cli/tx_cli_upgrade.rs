@@ -10,14 +10,7 @@ use super::tx_cli_common::{
 };
 use crate::cli::cli_args_tx::UpgradeArgs;
 
-pub async fn tx_upgrade(args: &UpgradeArgs) {
-    if let Err(e) = tx_upgrade_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
+pub async fn tx_upgrade(args: &UpgradeArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config.

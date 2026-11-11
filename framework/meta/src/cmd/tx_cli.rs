@@ -21,6 +21,13 @@ use tx_cli_sign::tx_sign;
 use tx_cli_upgrade::tx_upgrade;
 
 pub async fn tx_cli(args: &TxCliArgs) {
+    if let Err(e) = tx_cli_dispatch(args).await {
+        eprintln!("Error: {e:#}");
+        std::process::exit(1);
+    }
+}
+
+async fn tx_cli_dispatch(args: &TxCliArgs) -> anyhow::Result<()> {
     match &args.command {
         TxCliAction::Deploy(deploy_args) => tx_deploy(deploy_args).await,
         TxCliAction::Call(call_args) => tx_call(call_args).await,

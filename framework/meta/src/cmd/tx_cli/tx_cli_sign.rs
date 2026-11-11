@@ -5,14 +5,7 @@ use multiversx_sc_snippets::{Interactor, TxOutputFile};
 use super::tx_cli_common::{load_relayer_wallet, load_transaction_from_file, load_wallet};
 use crate::cli::cli_args_tx::SignArgs;
 
-pub async fn tx_sign(args: &SignArgs) {
-    if let Err(e) = tx_sign_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
+pub async fn tx_sign(args: &SignArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
     let mut tx = load_transaction_from_file(&args.infile)?;
 

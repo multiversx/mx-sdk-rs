@@ -7,14 +7,7 @@ use super::tx_cli_common::{
 };
 use crate::cli::cli_args_tx::CallArgs;
 
-pub async fn tx_call(args: &CallArgs) {
-    if let Err(e) = tx_call_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_call_inner(args: &CallArgs) -> Result<()> {
+pub async fn tx_call(args: &CallArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – fetches network config.
