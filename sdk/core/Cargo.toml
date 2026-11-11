@@ -17,6 +17,8 @@ keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [features]
 ledger = ["dep:ledger-transport-hid", "dep:ledger-apdu"]
+# BLS signing for validator keys (not supported on Windows MSVC)
+bls = ["dep:multiversx-bls"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
@@ -44,3 +46,7 @@ ledger-apdu          = { version = "0.11", optional = true }
 version = "=0.23.1"
 features = ["std"]
 path = "../../chain/core"
+
+[dependencies.multiversx-bls]
+version = "0.2.1"
+optional = true

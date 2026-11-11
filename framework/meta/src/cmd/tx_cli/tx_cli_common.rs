@@ -50,6 +50,19 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
     Ok(arg_buffer)
 }
 
+/// Parses a bech32 address given as a CLI argument.
+pub(super) fn parse_address(arg_name: &str, address: &str) -> Result<Bech32Address> {
+    Bech32Address::try_from_bech32_string(address.to_string())
+        .map_err(|e| anyhow!("invalid {arg_name} address {address}: {e}"))
+}
+
+/// Create an interactor connected to `gateway`, for queries. No wallet required.
+pub(super) async fn create_query_interactor(gateway: &GatewayArgs) -> Result<Interactor> {
+    let interactor = Interactor::empty().with_connection(&gateway.proxy).await;
+    validate_chain_id(&interactor, gateway)?;
+    Ok(interactor)
+}
+
 /// Create an interactor connected to `gateway`, with chain-simulator mode auto-detected,
 /// the explicit nonce override from `tx` applied, the gas price override applied, and
 /// the chain ID validated against `gateway.chain` (if given).
@@ -84,10 +97,7 @@ pub async fn load_relayer_for_interactor(
     let explicit_address = relayer_args
         .relayer
         .as_ref()
-        .map(|address| {
-            Bech32Address::try_from_bech32_string(address.clone())
-                .map_err(|e| anyhow!("invalid --relayer address: {e}"))
-        })
+        .map(|address| parse_address("--relayer", address))
         .transpose()?;
 
     let Some(wallet) = load_relayer_wallet(relayer_args)? else {

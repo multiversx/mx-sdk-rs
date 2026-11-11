@@ -43,11 +43,11 @@ pub struct ProposeArgs {
 
     /// Start vote epoch
     #[arg(short = 's', long = "start-epoch")]
-    pub start_vote_epoch: usize,
+    pub start_vote_epoch: u64,
 
     /// End vote epoch
     #[arg(short = 'e', long = "end-epoch")]
-    pub end_vote_epoch: usize,
+    pub end_vote_epoch: u64,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -65,7 +65,7 @@ pub struct VoteArgs {
 
     /// Proposal nonce
     #[arg(short = 'n')]
-    pub nonce: usize,
+    pub nonce: u64,
 
     /// Vote can be "yes", "no", "abstain" or "veto"
     #[arg(short = 'v')]
@@ -105,15 +105,11 @@ pub struct StakeArgs {
     #[arg(short = 'f')]
     pub from: String,
 
-    /// Maximum number of staked nodes
-    #[arg(short = 'm', long = "max-nodes")]
-    pub maximum_staked_nodes: usize,
-
-    /// BLS key of the node to stake
+    /// BLS key of the node to stake, in hex format
     #[arg(short = 'k', long = "bls-key")]
     pub bls_key: String,
 
-    /// Bls signature of the node
+    /// BLS signature of the sender address, in hex format
     #[arg(short = 's', long = "bls-signature")]
     pub bls_signature: String,
 

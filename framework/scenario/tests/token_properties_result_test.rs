@@ -45,6 +45,8 @@ fn multi_decode_from_api_response() {
         Bech32Address::from(token_properties.owner_address).to_bech32_str()
             == "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"
     );
+    assert_eq!(token_properties.minted_value, "0");
+    assert_eq!(token_properties.burnt_value, "0");
     assert!(token_properties.num_decimals == 18usize);
     assert!(!token_properties.is_paused);
     assert!(token_properties.can_upgrade);
