@@ -8,5 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 docker build \
   --platform linux/amd64 \
   -f "$SCRIPT_DIR/Dockerfile" \
-  -t multiversx/sdk-rust-contract-builder:v12.0.0-alpha \
+  -t multiversx/sdk-rust-contract-builder:v12.0.0 \
   "$SCRIPT_DIR"
+
+# docker push multiversx/sdk-rust-contract-builder:v12.0.0-alpha
