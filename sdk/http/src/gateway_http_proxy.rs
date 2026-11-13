@@ -1,5 +1,4 @@
 mod http_account;
-mod http_api;
 mod http_block;
 mod http_chain_simulator;
 mod http_network;
@@ -9,7 +8,10 @@ use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest, GatewayReques
 use reqwest::Method;
 use std::time::Duration;
 
-/// Allows communication with the MultiversX gateway API.
+/// Allows communication with the MultiversX gateway, or with the MultiversX API.
+///
+/// It talks to a single service, given by its URL: a gateway (e.g. `MAINNET_GATEWAY`), for the gateway
+/// requests, or an API (e.g. `MAINNET_API`), for the `Api*` requests. Use one proxy per service.
 #[derive(Clone, Debug)]
 pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
@@ -32,7 +34,7 @@ impl GatewayHttpProxy {
         }
     }
 
-    /// Performs a request to the gateway.
+    /// Performs a request to the service the proxy was created for (gateway or API).
     /// Can be either GET or POST, depending on the argument.
     pub async fn http_request<G>(&self, request: G) -> anyhow::Result<G::Result>
     where

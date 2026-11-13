@@ -119,7 +119,14 @@ impl Display for GatewayRequestType {
     }
 }
 
-/// Models requests to the gateway.
+/// Models requests to the gateway, or to the MultiversX API.
+///
+/// Both services are HTTP + JSON, so the same trait covers them:
+/// - gateway requests decode the gateway's `{data, error, code}` wrapper and unwrap it in `process_json`;
+/// - API requests (the `Api*` types) decode the API's plain JSON response directly.
+///
+/// The request does not know which service it targets: it must be sent through a proxy created with
+/// the matching URL (e.g. `MAINNET_GATEWAY` or `MAINNET_API`).
 pub trait GatewayRequest {
     type Payload: serde::ser::Serialize + ?Sized;
 
@@ -138,6 +145,7 @@ pub trait GatewayRequest {
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result>;
 }
 
+/// Sends [`GatewayRequest`]s to a gateway, or to the MultiversX API, depending on the URI it was created from.
 pub trait GatewayAsyncService {
     /// Keeps track of elapsed time.
     type Instant;
