@@ -15,6 +15,7 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
+use crate::TxDispatchSettings;
 use crate::{InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
@@ -127,6 +128,19 @@ where
             .env
             .world
             .tx_call_to_blockchain_tx(&step_wrapper.step.tx)
+    }
+
+    async fn run_with_settings(self, settings: &TxDispatchSettings) -> anyhow::Result<()> {
+        let step_wrapper = self.tx_to_step();
+        let tx = step_wrapper
+            .env
+            .world
+            .tx_call_to_blockchain_tx(&step_wrapper.step.tx);
+        step_wrapper
+            .env
+            .world
+            .set_nonce_sign_and_dispatch(tx, settings)
+            .await
     }
 }
 

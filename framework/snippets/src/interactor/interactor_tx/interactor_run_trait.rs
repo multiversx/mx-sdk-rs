@@ -3,7 +3,7 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::InteractorBase;
+use crate::{InteractorBase, TxDispatchSettings};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -61,6 +61,14 @@ pub trait InteractorIntoSdkTransaction {
     ///
     /// Useful for inspecting or signing the transaction externally before submission.
     fn into_sdk_transaction(self) -> Transaction;
+
+    /// Variant of `run` that does not wait for a result, but instead converts the transaction
+    /// to an SDK transaction, sets its nonce, signs it, and then saves and/or broadcasts it,
+    /// as dictated by `settings`.
+    fn run_with_settings(
+        self,
+        settings: &TxDispatchSettings,
+    ) -> impl std::future::Future<Output = anyhow::Result<()>>;
 }
 
 /// Trait for interactor steps that support gas estimation via a gateway simulation endpoint.

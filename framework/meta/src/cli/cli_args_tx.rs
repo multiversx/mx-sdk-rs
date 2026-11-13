@@ -1,4 +1,5 @@
 use clap::{Args, Subcommand};
+use multiversx_sc_snippets::TxDispatchSettings;
 use std::path::PathBuf;
 
 pub use super::cli_args_sender::{RelayerArgs, SenderArgs};
@@ -79,6 +80,16 @@ pub struct TxArgs {
     /// Path to write the signed tx JSON to. Defaults to stdout when --send is not set.
     #[arg(long)]
     pub outfile: Option<PathBuf>,
+}
+
+impl TxArgs {
+    pub fn dispatch_settings(&self) -> TxDispatchSettings {
+        TxDispatchSettings {
+            send: self.send,
+            wait_result: self.wait_result,
+            outfile: self.outfile.clone(),
+        }
+    }
 }
 
 /// Payment arguments: EGLD value and optional ESDT token transfers.

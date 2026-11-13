@@ -4,7 +4,21 @@ use multiversx_sdk::gateway::GatewayAsyncService;
 use serde::Serialize;
 
 use super::{ExplorerUrl, TxOutputFile};
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+/// Settings for what happens to a transaction after it is built:
+/// whether it is broadcast, whether to wait for the result, and where the output goes.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct TxDispatchSettings {
+    /// Broadcast the transaction to the network. Otherwise it is only saved/printed.
+    pub send: bool,
+
+    /// Wait for the transaction result. Only meaningful together with `send`.
+    pub wait_result: bool,
+
+    /// File to write the output to. Defaults to stdout when `None`.
+    pub outfile: Option<PathBuf>,
+}
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -97,22 +111,31 @@ where
         output_with_hash.save_output(outfile)
     }
 
-    /// Sign `transaction`, then write / print / broadcast it according to the supplied flags.
+    /// Sign `transaction`, then write / print / broadcast it according to `settings`.
     pub async fn sign_and_dispatch(
         &self,
         mut transaction: Transaction,
-        send: bool,
-        wait_result: bool,
-        outfile: Option<&Path>,
+        settings: &TxDispatchSettings,
     ) -> anyhow::Result<()> {
         self.sign_tx(&mut transaction);
         let output = TxOutputFile::from_transaction(transaction)?;
 
-        if send {
-            self.broadcast_and_save(output, outfile, wait_result).await
+        if settings.send {
+            self.broadcast_and_save(output, settings.outfile.as_deref(), settings.wait_result)
+                .await
         } else {
-            output.save_output(outfile)
+            output.save_output(settings.outfile.as_deref())
         }
+    }
+
+    /// Sets the nonce of `transaction` (updating the sender), then signs and dispatches it.
+    pub async fn set_nonce_sign_and_dispatch(
+        &mut self,
+        mut transaction: Transaction,
+        settings: &TxDispatchSettings,
+    ) -> anyhow::Result<()> {
+        self.set_tx_nonce_update_sender(&mut transaction).await;
+        self.sign_and_dispatch(transaction, settings).await
     }
 }
 

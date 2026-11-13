@@ -22,7 +22,7 @@ pub async fn tx_call(args: &CallArgs) -> Result<()> {
     let arg_buffer = build_arg_buffer(&args.arguments)?;
     let payments = parse_all_payment_args(&args.payment)?;
 
-    let mut tx = interactor
+    interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
@@ -31,15 +31,6 @@ pub async fn tx_call(args: &CallArgs) -> Result<()> {
         .raw_call(args.function.as_str())
         .arguments_raw(arg_buffer)
         .opt_relayer(relayer_address_opt)
-        .into_sdk_transaction();
-    interactor.set_tx_nonce_update_sender(&mut tx).await;
-
-    interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
+        .run_with_settings(&args.tx.dispatch_settings())
         .await
 }

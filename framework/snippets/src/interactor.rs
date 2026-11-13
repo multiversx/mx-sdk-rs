@@ -11,6 +11,7 @@ mod tx_output_file;
 pub use explorer_url::ExplorerUrl;
 pub use interactor_base::*;
 pub use interactor_chain_simulator::*;
+pub use interactor_dispatch::TxDispatchSettings;
 pub use interactor_dns::*;
 pub use interactor_sender::*;
 pub use interactor_tx::*;

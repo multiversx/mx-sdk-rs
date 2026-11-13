@@ -41,12 +41,7 @@ pub async fn tx_new(args: &NewArgs) -> Result<()> {
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
     interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
+        .sign_and_dispatch(tx, &args.tx.dispatch_settings())
         .await
 }
 

@@ -53,11 +53,6 @@ pub async fn tx_deploy(args: &DeployArgs) -> Result<()> {
     }
 
     interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
+        .sign_and_dispatch(tx, &args.tx.dispatch_settings())
         .await
 }
