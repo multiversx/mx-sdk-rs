@@ -200,14 +200,14 @@ Handlers can still panic when the data they extract is missing or can't be decod
 ## Plan
 
 1. **Error types.** ✅ Add `DispatchError`, `TxInterrupted` and `ResultHandlerError` in `framework/snippets` (`interactor_dispatch_error.rs`), plus `TxOutputTarget` (`interactor_dispatch.rs`), which `TxInterrupted` needs.
-2. **Settings on the interactor.** (reshape and `Default` ✅, interactor field pending)
+2. **Settings on the interactor.** ✅
    - Reshape `TxDispatchSettings` so that `send: Option<TxSendSettings>` carries `wait_result`.
    - Rename `outfile` to `output: TxOutputTarget`.
    - Update `dispatch_settings()` in `cli_args_tx.rs`. clap already rejects `--wait-result` without `--send` (`requires = "send"`), so the mappings are direct:
      - `send` = `send.then_some(TxSendSettings { wait_result })`;
      - `output` = `TxOutputTarget::file_or_stdout(outfile)`: `File(path)` if `--outfile` is given, `Stdout` otherwise, even when sending. That is today's CLI behaviour, and mxpy's.
    - The CLI flag stays `--outfile`, matching mxpy.
-   - Add a `dispatch_settings` field to `InteractorBase`, defaulting to send and wait.
+   - Add a `dispatch_settings` field to `InteractorBase`, defaulting to send and wait, with a `with_dispatch_settings` builder. Nothing reads it until step 4.
 3. **Expectation check.** Add a non-panicking counterpart of `check_tx_output` that works on `TxExpect` and `TxResponse`, so the VM and the interactor share the comparison logic.
 4. **Unified pipeline for SC calls.** Rewrite `sc_call` as a fallible pipeline, add `dispatch()` for calls, and redefine `run()` on top of it.
    - Testbed: `system_sc_interact.rs` and the chain-simulator tests.
