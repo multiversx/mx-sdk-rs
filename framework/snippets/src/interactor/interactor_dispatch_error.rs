@@ -1,6 +1,6 @@
 use std::fmt;
 
-use multiversx_sc_scenario::scenario_model::TxResponseStatus;
+use multiversx_sc_scenario::scenario_model::{TxExpectMismatch, TxResponseStatus};
 use multiversx_sdk::chain_core::types::GasResult;
 
 use super::TxOutputTarget;
@@ -114,28 +114,23 @@ impl fmt::Display for TxInterrupted {
 /// A result handler rejected the transaction response.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ResultHandlerError {
-    /// An explicit expectation (`ExpectError`, `ExpectStatus`, `ExpectMessage`, ...) was not met.
-    ExpectationMismatch {
-        /// What was checked: "status", "message", "out", "logs", ...
-        field: &'static str,
-        expected: String,
-        actual: String,
-    },
+    /// An explicit expectation (`ExpectError`, `ExpectStatus`, `ExpectMessage`, `ExpectValue`, ...)
+    /// was not met.
+    ExpectationMismatch(TxExpectMismatch),
 }
 
 impl fmt::Display for ResultHandlerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ResultHandlerError::ExpectationMismatch {
-                field,
-                expected,
-                actual,
-            } => write!(
-                f,
-                "transaction {field} mismatch: expected {expected}, got {actual}"
-            ),
+            ResultHandlerError::ExpectationMismatch(mismatch) => mismatch.fmt(f),
         }
     }
 }
 
-impl std::error::Error for ResultHandlerError {}
+impl std::error::Error for ResultHandlerError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            ResultHandlerError::ExpectationMismatch(mismatch) => Some(mismatch),
+        }
+    }
+}

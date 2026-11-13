@@ -32,23 +32,28 @@ let token_id = interactor
 - `run()` (`InteractorRunAsync`) goes through `sc_call` / `sc_deploy` / `transfer` in `interactor_scenario/`: sign, optionally simulate gas, broadcast, wait, `parse_tx_response`, then the result handlers.
 - `run_with_settings(&TxDispatchSettings)` (`InteractorIntoSdkTransaction`) goes through `set_nonce_sign_and_dispatch` / `broadcast_and_save` in `interactor_dispatch.rs`. It returns `anyhow::Result<()>` and discards the result handlers, even when it waited for the result.
 
-### The default expectation is not enforced on the network
+### The expectation is checked by accident, and panics
 
 - `tx_to_step` folds the handlers' `item_preprocessing` into `step.expect`, starting from `TxExpect::ok()` (status 0).
-  - `ExpectError` overrides the expected status and message.
-  - `ReturnsHandledOrError` sets both to `*`.
-- The in-memory VM enforces it: `run_vm/sc_call.rs` and `sc_deploy.rs` call `check_tx_output`.
-- The interactor never checks `step.expect`. `save_response` only uses it to build trace expectations.
+  - `ExpectError` / `ExpectStatus` / `ExpectMessage` / `ExpectValue` override status, message or out.
+  - `ReturnsHandledOrError` sets status and message to `*`.
+- The in-memory VM enforces it: `run_vm/sc_call.rs`, `sc_deploy.rs` and `sc_query.rs` call `check_tx_output`.
+- The interactor (SC calls and deploys) also enforces it, but only as a side effect of trace building:
+  - `save_response` calls `TxExpect::update_from_response`;
+  - when `build_from_response` is set (it is, for every expectation built from `TxExpect::ok()`), that function checks status, out and message, then replaces the expectation with the actual response, for the trace.
+  - Logs are not checked there.
+- Interactor transfers do not call `save_response`, so nothing is checked for them.
 
-What happens when a transaction fails on chain:
+What happens when a transaction fails on chain (calls and deploys):
 
 | Handlers | Today |
 |---|---|
-| none | No error: `run()` returns normally |
-| `ReturnsResult` / `ReturnsResultAs` / `ReturnsResultUnmanaged` | Panic: "ReturnsResult expects that transaction is successful" |
-| `ReturnsNewTokenIdentifier`, `ReturnsNewAddress`, … | Panic with a misleading message ("missing returned token identifier") |
-| `ExpectError(code, msg)` | Nothing is asserted, so a failure with another code, or a success, goes unnoticed |
+| none | Panic: "result code mismatch" |
+| `ReturnsResult`, `ReturnsNewTokenIdentifier`, … | The same panic, before the handler runs |
+| `ExpectError(code, msg)` | Checked: panics if the tx succeeds, or fails differently |
 | `ReturnsHandledOrError` | Correct: `Err(TxResponseStatus)` |
+
+So the semantics are already right. What's wrong is that every mismatch is a panic, and that the check is hidden inside trace building.
 
 ### Process exits and panics on the network path
 
@@ -192,8 +197,8 @@ Handlers can still panic when the data they extract is missing or can't be decod
 
 ## Behaviour changes (release notes)
 
-- `run()` now panics when a transaction fails on chain and no handler takes care of the failure. Previously it carried on silently when there were no handlers.
-- `ExpectError` / `ExpectStatus` / `ExpectMessage` are now enforced on real networks, not just in the in-memory VM.
+- Expectation mismatch messages have a new, common format, shared between the VM and interactors.
+- Interactor transfers are now checked against their expectation (previously not checked at all).
 - Gateway failures panic with a message (via `run()`) or are returned (via `dispatch()`) instead of calling `process::exit(1)`.
 - `run_with_settings` is replaced by `dispatch()` plus `interactor.dispatch_settings`.
 
@@ -208,7 +213,11 @@ Handlers can still panic when the data they extract is missing or can't be decod
      - `output` = `TxOutputTarget::file_or_stdout(outfile)`: `File(path)` if `--outfile` is given, `Stdout` otherwise, even when sending. That is today's CLI behaviour, and mxpy's.
    - The CLI flag stays `--outfile`, matching mxpy.
    - Add a `dispatch_settings` field to `InteractorBase`, defaulting to send and wait, with a `with_dispatch_settings` builder. Nothing reads it until step 4.
-3. **Expectation check.** Add a non-panicking counterpart of `check_tx_output` that works on `TxExpect` and `TxResponse`, so the VM and the interactor share the comparison logic.
+3. **Expectation check.** ✅
+   - `TxExpect::check_response(&TxResponse) -> Result<(), TxExpectMismatch>` in `multiversx-sc-scenario` (`tx_expect_check.rs`), checking status, out, message and logs.
+   - The VM's `check_tx_output` converts its `TxResult` (all logs, including the ESDT transfer log) and calls it, panicking with the tx id. The old `run_vm/errors.rs` helpers are gone.
+   - `update_from_response` (trace building) calls it too, panicking as before. In step 4 the interactor checks explicitly instead, so trace building no longer has to.
+   - `ResultHandlerError::ExpectationMismatch` wraps `TxExpectMismatch`.
 4. **Unified pipeline for SC calls.** Rewrite `sc_call` as a fallible pipeline, add `dispatch()` for calls, and redefine `run()` on top of it.
    - Testbed: `system_sc_interact.rs` and the chain-simulator tests.
 5. **Deploy, upgrade, transfer.** Do the same, removing `run_with_settings`.

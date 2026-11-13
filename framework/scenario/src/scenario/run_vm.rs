@@ -1,5 +1,4 @@
 mod check_state;
-mod errors;
 mod executor_config;
 pub mod sc_call;
 pub mod sc_deploy;
