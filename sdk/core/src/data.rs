@@ -1,5 +1,6 @@
 pub mod account;
 pub mod account_storage;
+pub mod api;
 pub mod esdt;
 pub mod hyperblock;
 pub mod network_config;

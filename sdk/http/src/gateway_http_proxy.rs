@@ -8,7 +8,10 @@ use multiversx_sdk::gateway::{GatewayAsyncService, GatewayRequest, GatewayReques
 use reqwest::Method;
 use std::time::Duration;
 
-/// Allows communication with the MultiversX gateway API.
+/// Allows communication with the MultiversX gateway, or with the MultiversX API.
+///
+/// It talks to a single service, given by its URL: a gateway (e.g. `MAINNET_GATEWAY`), for the gateway
+/// requests, or an API (e.g. `MAINNET_API`), for the `Api*` requests. Use one proxy per service.
 #[derive(Clone, Debug)]
 pub struct GatewayHttpProxy {
     pub(crate) proxy_uri: String,
@@ -31,7 +34,7 @@ impl GatewayHttpProxy {
         }
     }
 
-    /// Performs a request to the gateway.
+    /// Performs a request to the service the proxy was created for (gateway or API).
     /// Can be either GET or POST, depending on the argument.
     pub async fn http_request<G>(&self, request: G) -> anyhow::Result<G::Result>
     where
@@ -49,10 +52,15 @@ impl GatewayHttpProxy {
 
         let http_request = request_builder.build()?;
         let http_response = self.client.execute(http_request).await?;
+        let status = http_response.status();
         let http_response_text = http_response.text().await?;
         log::trace!("{method} response: {http_response_text}");
 
-        let decoded = serde_json::from_str::<G::DecodedJson>(&http_response_text)?;
+        let decoded =
+            serde_json::from_str::<G::DecodedJson>(&http_response_text).map_err(|err| {
+                let snippet: String = http_response_text.chars().take(200).collect();
+                anyhow::anyhow!("{err} (HTTP {status}, response: {snippet:?})")
+            })?;
 
         request.process_json(decoded)
     }
