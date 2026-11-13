@@ -1,5 +1,5 @@
 use clap::{Args, Subcommand};
-use multiversx_sc_snippets::TxDispatchSettings;
+use multiversx_sc_snippets::{TxDispatchSettings, TxOutputTarget, TxSendSettings};
 use std::path::PathBuf;
 
 pub use super::cli_args_sender::{RelayerArgs, SenderArgs};
@@ -77,7 +77,7 @@ pub struct TxArgs {
     #[arg(long, default_value = "false", requires = "send")]
     pub wait_result: bool,
 
-    /// Path to write the signed tx JSON to. Defaults to stdout when --send is not set.
+    /// Path to write the signed tx JSON to. Defaults to stdout.
     #[arg(long)]
     pub outfile: Option<PathBuf>,
 }
@@ -85,9 +85,10 @@ pub struct TxArgs {
 impl TxArgs {
     pub fn dispatch_settings(&self) -> TxDispatchSettings {
         TxDispatchSettings {
-            send: self.send,
-            wait_result: self.wait_result,
-            outfile: self.outfile.clone(),
+            output: TxOutputTarget::file_or_stdout(self.outfile.clone()),
+            send: self.send.then_some(TxSendSettings {
+                wait_result: self.wait_result,
+            }),
         }
     }
 }

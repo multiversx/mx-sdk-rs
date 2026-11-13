@@ -3,22 +3,7 @@ use anyhow::Context;
 use multiversx_sdk::gateway::GatewayAsyncService;
 use serde::Serialize;
 
-use super::{ExplorerUrl, TxOutputFile};
-use std::path::{Path, PathBuf};
-
-/// Settings for what happens to a transaction after it is built:
-/// whether it is broadcast, whether to wait for the result, and where the output goes.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
-pub struct TxDispatchSettings {
-    /// Broadcast the transaction to the network. Otherwise it is only saved/printed.
-    pub send: bool,
-
-    /// Wait for the transaction result. Only meaningful together with `send`.
-    pub wait_result: bool,
-
-    /// File to write the output to. Defaults to stdout when `None`.
-    pub outfile: Option<PathBuf>,
-}
+use super::{ExplorerUrl, TxDispatchSettings, TxOutputFile, TxOutputTarget};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -72,7 +57,7 @@ where
     pub async fn broadcast_and_save(
         &self,
         output: TxOutputFile,
-        outfile: Option<&Path>,
+        target: &TxOutputTarget,
         wait_result: bool,
     ) -> anyhow::Result<()> {
         if output.emitted_transaction.signature.is_none() {
@@ -108,7 +93,7 @@ where
             output_with_hash.transaction_on_network = Some(tx_on_network);
         }
 
-        output_with_hash.save_output(outfile)
+        output_with_hash.save_output(target)
     }
 
     /// Sign `transaction`, then write / print / broadcast it according to `settings`.
@@ -120,11 +105,12 @@ where
         self.sign_tx(&mut transaction);
         let output = TxOutputFile::from_transaction(transaction)?;
 
-        if settings.send {
-            self.broadcast_and_save(output, settings.outfile.as_deref(), settings.wait_result)
-                .await
-        } else {
-            output.save_output(settings.outfile.as_deref())
+        match &settings.send {
+            Some(send) => {
+                self.broadcast_and_save(output, &settings.output, send.wait_result)
+                    .await
+            }
+            None => output.save_output(&settings.output),
         }
     }
 

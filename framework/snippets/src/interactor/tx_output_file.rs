@@ -7,7 +7,8 @@ use multiversx_sdk::{
     data::transaction::{ApiTransactionResult, Transaction},
 };
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+
+use super::TxOutputTarget;
 
 /// mxpy-compatible output format for a signed transaction.
 ///
@@ -56,15 +57,16 @@ impl TxOutputFile {
         })
     }
 
-    /// Write this output to `outfile`, or print to stdout when no outfile is given.
-    pub fn save_output(&self, outfile: Option<&Path>) -> Result<()> {
-        let json = to_json_pretty(self)?;
-        if let Some(path) = outfile {
-            std::fs::write(path, &json)
-                .with_context(|| format!("failed to write to {}", path.display()))?;
-            println!("Transaction saved to {}", path.display());
-        } else {
-            println!("{json}");
+    /// Write this output to a file, print it to stdout, or do nothing, according to `target`.
+    pub fn save_output(&self, target: &TxOutputTarget) -> Result<()> {
+        match target {
+            TxOutputTarget::NotWritten => {}
+            TxOutputTarget::Stdout => println!("{}", to_json_pretty(self)?),
+            TxOutputTarget::File(path) => {
+                std::fs::write(path, to_json_pretty(self)?)
+                    .with_context(|| format!("failed to write to {}", path.display()))?;
+                println!("Transaction saved to {}", path.display());
+            }
         }
         Ok(())
     }

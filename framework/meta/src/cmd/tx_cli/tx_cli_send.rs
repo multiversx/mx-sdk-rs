@@ -1,5 +1,5 @@
 use anyhow::Result;
-use multiversx_sc_snippets::{Interactor, TxOutputFile};
+use multiversx_sc_snippets::{Interactor, TxOutputFile, TxOutputTarget};
 
 use super::tx_cli_common::load_transaction_from_file;
 use crate::cli::cli_args_tx::SendArgs;
@@ -13,6 +13,10 @@ pub async fn tx_send(args: &SendArgs) -> Result<()> {
         .await
         .use_chain_simulator_auto();
     interactor
-        .broadcast_and_save(output, args.outfile.as_deref(), args.wait_result)
+        .broadcast_and_save(
+            output,
+            &TxOutputTarget::file_or_stdout(args.outfile.clone()),
+            args.wait_result,
+        )
         .await
 }
