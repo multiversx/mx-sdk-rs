@@ -1,3 +1,7 @@
+mod api_account;
+mod api_contracts;
+mod api_events;
+mod api_tx;
 mod gateway_account;
 mod gateway_account_esdt_roles;
 mod gateway_account_esdt_tokens;
@@ -22,6 +26,10 @@ mod gateway_tx_vmquery;
 
 use std::fmt::Display;
 
+pub use api_account::{ApiGetAccountRequest, ApiGetUpgradesRequest};
+pub use api_contracts::{ApiCountContractsRequest, ApiListContractsRequest, ApiSortOrder};
+pub use api_events::ApiGetEventsRequest;
+pub use api_tx::{ApiGetTxRequest, ApiListTransactionsRequest};
 pub use gateway_account::GetAccountRequest;
 pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
 pub use gateway_account_esdt_tokens::GetAccountEsdtTokensRequest;
@@ -44,12 +52,21 @@ pub use gateway_tx_simulate::SimulateTxRequest;
 pub use gateway_tx_status::GetTxStatus;
 pub use gateway_tx_vmquery::VMQueryRequest;
 
+pub const MAINNET_API: &str = "https://api.multiversx.com";
+pub const TESTNET_API: &str = "https://testnet-api.multiversx.com";
+pub const DEVNET_API: &str = "https://devnet-api.multiversx.com";
+
 pub const MAINNET_GATEWAY: &str = "https://gateway.multiversx.com";
 pub const TESTNET_GATEWAY: &str = "https://testnet-gateway.multiversx.com";
 pub const DEVNET_GATEWAY: &str = "https://devnet-gateway.multiversx.com";
 
 // MetachainShardId will be used to identify a shard ID as metachain
 pub const METACHAIN_SHARD_ID: u32 = 0xFFFFFFFF;
+
+// MultiversX API (not gateway) endpoints
+const API_ACCOUNTS_ENDPOINT: &str = "accounts";
+const API_TRANSACTIONS_ENDPOINT: &str = "transactions";
+const API_EVENTS_ENDPOINT: &str = "events";
 
 const ACCOUNT_ENDPOINT: &str = "address";
 const KEYS_ENDPOINT: &str = "keys";
@@ -75,6 +92,15 @@ const GENERATE_BLOCKS_UNTIL_EPOCH_REACHED_ENDPOINT: &str =
 const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 const ADD_KEYS: &str = "simulator/add-keys";
+
+/// Percent-encodes the characters of a base64 string (e.g. an API pagination cursor)
+/// that are not allowed in a query value.
+pub(crate) fn encode_base64_query_value(value: &str) -> String {
+    value
+        .replace('+', "%2B")
+        .replace('/', "%2F")
+        .replace('=', "%3D")
+}
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum GatewayRequestType {

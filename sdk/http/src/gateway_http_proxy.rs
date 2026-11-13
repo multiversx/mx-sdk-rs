@@ -1,4 +1,5 @@
 mod http_account;
+mod http_api;
 mod http_block;
 mod http_chain_simulator;
 mod http_network;
@@ -49,10 +50,15 @@ impl GatewayHttpProxy {
 
         let http_request = request_builder.build()?;
         let http_response = self.client.execute(http_request).await?;
+        let status = http_response.status();
         let http_response_text = http_response.text().await?;
         log::trace!("{method} response: {http_response_text}");
 
-        let decoded = serde_json::from_str::<G::DecodedJson>(&http_response_text)?;
+        let decoded =
+            serde_json::from_str::<G::DecodedJson>(&http_response_text).map_err(|err| {
+                let snippet: String = http_response_text.chars().take(200).collect();
+                anyhow::anyhow!("{err} (HTTP {status}, response: {snippet:?})")
+            })?;
 
         request.process_json(decoded)
     }
