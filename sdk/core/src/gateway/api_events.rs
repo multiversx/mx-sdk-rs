@@ -12,6 +12,9 @@ pub struct ApiGetEventsRequest<'a> {
 
     /// Cursor (base64) from the last event of the previous page; `None` for the first page.
     pub search_after: Option<String>,
+
+    /// Only events after this timestamp (seconds), e.g. to fetch what is new since an earlier run.
+    pub after: Option<u64>,
 }
 
 impl<'a> ApiGetEventsRequest<'a> {
@@ -20,7 +23,14 @@ impl<'a> ApiGetEventsRequest<'a> {
             identifier,
             size,
             search_after,
+            after: None,
         }
+    }
+
+    /// Only events after this timestamp (seconds).
+    pub fn after(mut self, timestamp: u64) -> Self {
+        self.after = Some(timestamp);
+        self
     }
 }
 
@@ -38,6 +48,9 @@ impl GatewayRequest for ApiGetEventsRequest<'_> {
             "{API_EVENTS_ENDPOINT}?identifier={}&size={}",
             self.identifier, self.size
         );
+        if let Some(after) = self.after {
+            endpoint += &format!("&after={after}");
+        }
         if let Some(search_after) = &self.search_after {
             endpoint += "&searchAfter=";
             endpoint += &encode_base64_query_value(search_after);
