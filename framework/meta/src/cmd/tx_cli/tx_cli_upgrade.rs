@@ -2,22 +2,18 @@ use std::fs;
 
 use anyhow::{Context, Result};
 use multiversx_sc_scenario::imports::NotPayable;
-use multiversx_sc_snippets::imports::{Bech32Address, BytesValue, InteractorIntoSdkTransaction};
+use multiversx_sc_snippets::imports::{
+    Bech32Address, BytesValue, InteractorDispatchAsync, ReturnsRawResult,
+};
 
 use super::parse_code_metadata::parse_code_metadata;
 use super::tx_cli_common::{
     build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
+    report_dispatch_result,
 };
 use crate::cli::cli_args_tx::UpgradeArgs;
 
-pub async fn tx_upgrade(args: &UpgradeArgs) {
-    if let Err(e) = tx_upgrade_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
+pub async fn tx_upgrade(args: &UpgradeArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config.
@@ -37,7 +33,7 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
 
     // Build upgrade transaction — same layout as deploy but sent to the existing contract address.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
-    let mut tx = interactor
+    let result = interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
@@ -48,15 +44,9 @@ async fn tx_upgrade_inner(args: &UpgradeArgs) -> Result<()> {
         .code_metadata(code_metadata)
         .arguments_raw(arg_buffer)
         .opt_relayer(relayer_address_opt)
-        .into_sdk_transaction();
-    interactor.set_tx_nonce_update_sender(&mut tx).await;
+        .returns(ReturnsRawResult)
+        .dispatch()
+        .await;
 
-    interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
-        .await
+    report_dispatch_result(result)
 }

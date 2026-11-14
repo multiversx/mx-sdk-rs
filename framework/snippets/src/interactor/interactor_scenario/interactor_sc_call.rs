@@ -1,54 +1,47 @@
 use std::process;
 
-use super::error_message::{
-    simulate_gas_no_estimate_err_message, simulate_gas_sc_call_err_message,
-};
-use crate::{InteractorBase, SimulateGas, network_response};
+use super::error_message::simulate_gas_sc_call_err_message;
+use crate::{DispatchError, InteractorBase, interactor::interactor_dispatch::check_tx_expect};
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
 use multiversx_sdk::chain_core::std::base64_encode;
 use multiversx_sdk::chain_core::types::GasResult;
+use multiversx_sdk::data::transaction::Transaction;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
-use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
-use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
     GatewayProxy: GatewayAsyncService,
 {
+    /// Dispatches the SC call according to `self.dispatch_settings`, panics on any error.
     pub async fn sc_call(&mut self, sc_call_step: &mut ScCallStep) {
+        if let Err(err) = self.sc_call_dispatch(sc_call_step).await {
+            panic!("SC call: {err}");
+        }
+    }
+
+    /// Signs the SC call, then writes and/or sends it, according to `self.dispatch_settings`.
+    ///
+    /// If the result is awaited, it is checked against the step expectation,
+    /// then saved in the step, for the result handlers to process.
+    pub async fn sc_call_dispatch(
+        &mut self,
+        sc_call_step: &mut ScCallStep,
+    ) -> Result<(), DispatchError> {
         let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+        self.apply_simulated_gas(&mut transaction, &mut sc_call_step.tx.gas_limit, "SC call")
+            .await?;
 
-        if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
-            let sim_result = self.sc_call_simulate_transaction(&transaction).await;
-            let Some(sim_gas) = sim_result.gas_used() else {
-                simulate_gas_no_estimate_err_message("SC call", &sim_result);
-                process::exit(1)
-            };
-            let gas = SimulateGas::adjust_simulated_gas(sim_gas);
-            sc_call_step.tx.gas_limit = gas.into();
-            transaction.gas_limit = gas;
-
-            // sign again, because gas changed
-            self.sign_tx(&mut transaction);
+        if self.dispatch_settings.send.is_some() {
+            self.pre_runners.run_sc_call_step(sc_call_step);
         }
 
-        self.pre_runners.run_sc_call_step(sc_call_step);
-
-        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "sc call").await else {
-            process::exit(1)
-        };
-
-        self.generate_blocks_until_tx_processed(&tx_hash)
-            .await
-            .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash)
-            .await
-            .expect("failed to fetch transaction result");
-
-        sc_call_step.save_response(network_response::parse_tx_response(tx, return_code));
+        let tx_response = self.dispatch_signed_tx(&transaction, "sc call").await?;
+        check_tx_expect(sc_call_step.expect.as_ref(), &tx_response)?;
+        sc_call_step.save_response(tx_response);
 
         if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
         {
@@ -60,6 +53,7 @@ where
         }
 
         self.post_runners.run_sc_call_step(sc_call_step);
+        Ok(())
     }
 
     pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> GasResult {
@@ -77,9 +71,7 @@ where
     }
 
     async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> GasResult {
-        let result = self.proxy().request(SimulateTxRequest(transaction)).await;
-
-        match result {
+        match self.request_simulate_gas(transaction).await {
             Ok(gas) => {
                 println!("Gas simulation for the SC call: {gas}.");
                 log::info!("Gas simulation for the SC call: {gas}.");

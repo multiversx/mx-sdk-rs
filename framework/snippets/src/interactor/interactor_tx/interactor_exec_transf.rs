@@ -7,11 +7,11 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::InteractorSimulateGasAsync;
+use crate::{DispatchError, InteractorSimulateGasAsync};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
-    InteractorRunAsync,
+    InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
+    InteractorPrepareAsync, InteractorRunAsync,
 };
 
 async fn simulate_gas_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
@@ -32,9 +32,10 @@ where
         .await
 }
 
-async fn run_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
+async fn dispatch_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     tx: Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>,
-) where
+) -> Result<(), DispatchError>
+where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
     To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -42,7 +43,12 @@ async fn run_async_transfer<'w, GatewayProxy, From, To, Payment, Gas>(
     Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
 {
     let step_wrapper = tx.tx_to_step();
-    step_wrapper.env.world.transfer(step_wrapper.step).await;
+    step_wrapper
+        .env
+        .world
+        .transfer_dispatch(&step_wrapper.step)
+        .await?;
+    Ok(())
 }
 
 impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorRunAsync
@@ -56,8 +62,26 @@ where
 {
     type Result = ();
 
-    fn run(self) -> impl std::future::Future<Output = Self::Result> {
-        run_async_transfer(self)
+    async fn run(self) -> Self::Result {
+        dispatch_async_transfer(self)
+            .await
+            .unwrap_or_else(|err| panic!("transfer: {err}"))
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas> InteractorDispatchAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, (), ()>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+{
+    type Result = ();
+
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>> {
+        dispatch_async_transfer(self)
     }
 }
 

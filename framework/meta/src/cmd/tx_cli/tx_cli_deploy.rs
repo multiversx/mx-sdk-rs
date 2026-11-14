@@ -10,14 +10,7 @@ use super::tx_cli_common::{
 };
 use crate::cli::cli_args_tx::DeployArgs;
 
-pub async fn tx_deploy(args: &DeployArgs) {
-    if let Err(e) = tx_deploy_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
+pub async fn tx_deploy(args: &DeployArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config in the process.
@@ -60,11 +53,6 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
     }
 
     interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
+        .sign_and_dispatch(tx, &args.tx.dispatch_settings())
         .await
 }

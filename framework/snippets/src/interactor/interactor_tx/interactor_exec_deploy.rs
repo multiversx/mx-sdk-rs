@@ -14,15 +14,15 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::{InteractorBase, InteractorSimulateGasAsync};
+use crate::{DispatchError, InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
-    InteractorRunAsync,
+    InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
+    InteractorPrepareAsync, InteractorRunAsync,
 };
 
 #[allow(clippy::type_complexity)]
-async fn run_async_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
+async fn dispatch_async_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -32,7 +32,7 @@ async fn run_async_deploy<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH>(
         DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+) -> Result<<RH::ListReturns as NestedTupleFlatten>::Unpacked, DispatchError>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -46,9 +46,9 @@ where
     step_wrapper
         .env
         .world
-        .sc_deploy(&mut step_wrapper.step)
-        .await;
-    step_wrapper.process_result()
+        .sc_deploy_dispatch(&mut step_wrapper.step)
+        .await?;
+    Ok(step_wrapper.process_result())
 }
 
 #[allow(clippy::type_complexity)]
@@ -100,8 +100,36 @@ where
 {
     type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run(self) -> impl std::future::Future<Output = Self::Result> {
-        run_async_deploy(self)
+    async fn run(self) -> Self::Result {
+        dispatch_async_deploy(self)
+            .await
+            .unwrap_or_else(|err| panic!("SC deploy: {err}"))
+    }
+}
+
+impl<'w, GatewayProxy, From, Payment, Gas, CodeValue, RH> InteractorDispatchAsync
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>> {
+        dispatch_async_deploy(self)
     }
 }
 
