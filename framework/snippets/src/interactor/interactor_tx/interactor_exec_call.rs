@@ -15,15 +15,15 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::InteractorBase;
 use crate::TxDispatchSettings;
+use crate::{DispatchError, InteractorBase, interactor::interactor_dispatch::print_tx_results};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
-    InteractorRunAsync, InteractorSimulateGasAsync,
+    InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
+    InteractorPrepareAsync, InteractorRunAsync, InteractorSimulateGasAsync,
 };
 
-async fn run_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+async fn dispatch_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -33,7 +33,7 @@ async fn run_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
         FunctionCall<StaticApi>,
         RH,
     >,
-) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+) -> Result<<RH::ListReturns as NestedTupleFlatten>::Unpacked, DispatchError>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -44,8 +44,12 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     let mut step_wrapper = tx.tx_to_step();
-    step_wrapper.env.world.sc_call(&mut step_wrapper.step).await;
-    step_wrapper.process_result()
+    step_wrapper
+        .env
+        .world
+        .sc_call_dispatch(&mut step_wrapper.step)
+        .await?;
+    Ok(step_wrapper.process_result())
 }
 
 async fn simulate_gas_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
@@ -88,8 +92,28 @@ where
 {
     type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run(self) -> impl std::future::Future<Output = Self::Result> {
-        run_async_call(self)
+    async fn run(self) -> Self::Result {
+        dispatch_async_call(self)
+            .await
+            .unwrap_or_else(|err| panic!("SC call: {err}"))
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorDispatchAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>> {
+        dispatch_async_call(self)
     }
 }
 
@@ -112,17 +136,27 @@ where
             .tx_call_to_blockchain_tx(&step_wrapper.step.tx)
     }
 
+    /// Temporarily replaces the interactor dispatch settings.
+    /// A failed tx is reported, but is not an error, the same as for the other tx kinds.
     async fn run_with_settings(self, settings: &TxDispatchSettings) -> anyhow::Result<()> {
-        let step_wrapper = self.tx_to_step();
-        let tx = step_wrapper
-            .env
-            .world
-            .tx_call_to_blockchain_tx(&step_wrapper.step.tx);
-        step_wrapper
-            .env
-            .world
-            .set_nonce_sign_and_dispatch(tx, settings)
-            .await
+        let mut step_wrapper = self.tx_to_step();
+        let world = &mut step_wrapper.env.world;
+        let previous_settings = std::mem::replace(&mut world.dispatch_settings, settings.clone());
+        let result = world.sc_call_dispatch(&mut step_wrapper.step).await;
+        world.dispatch_settings = previous_settings;
+
+        match result {
+            Ok(()) => {
+                print_tx_results(step_wrapper.step.response());
+                Ok(())
+            }
+            Err(DispatchError::Interrupted(_)) => Ok(()),
+            Err(DispatchError::TxFailed(status)) => {
+                println!("Transaction failed: {status}");
+                Ok(())
+            }
+            Err(err) => Err(err.into()),
+        }
     }
 }
 

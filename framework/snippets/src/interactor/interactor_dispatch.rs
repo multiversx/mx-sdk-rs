@@ -3,7 +3,12 @@ use anyhow::Context;
 use multiversx_sdk::gateway::GatewayAsyncService;
 use serde::Serialize;
 
-use super::{ExplorerUrl, TxDispatchSettings, TxOutputFile, TxOutputTarget};
+use multiversx_sc_scenario::scenario_model::{Checkable, TxExpect, TxResponse};
+
+use super::{
+    DispatchError, ExplorerUrl, ResultHandlerError, TxDispatchSettings, TxOutputFile,
+    TxOutputTarget,
+};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -93,7 +98,7 @@ where
             output_with_hash.transaction_on_network = Some(tx_on_network);
         }
 
-        output_with_hash.save_output(target)
+        Ok(output_with_hash.save_output(target)?)
     }
 
     /// Sign `transaction`, then write / print / broadcast it according to `settings`.
@@ -110,7 +115,7 @@ where
                 self.broadcast_and_save(output, &settings.output, send.wait_result)
                     .await
             }
-            None => output.save_output(&settings.output),
+            None => Ok(output.save_output(&settings.output)?),
         }
     }
 
@@ -135,7 +140,7 @@ fn to_json_pretty<T: Serialize>(value: &T) -> anyhow::Result<String> {
     String::from_utf8(buf).context("non-UTF8 in serialized JSON")
 }
 
-fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_model::TxResponse) {
+pub(crate) fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_model::TxResponse) {
     if tx_response.tx_error.is_success() {
         println!("Transaction successful.");
     } else {
@@ -144,4 +149,29 @@ fn print_tx_results(tx_response: &multiversx_sc_scenario::scenario_model::TxResp
     for (index, result) in tx_response.out.iter().enumerate() {
         println!("Result[{index}]: 0x{}", hex::encode(result));
     }
+}
+
+/// Checks the response of an executed transaction against the step expectation.
+///
+/// - Tx failed while success was expected (the default): [`DispatchError::TxFailed`].
+/// - Any other mismatch, e.g. `ExpectError` but the tx succeeded:
+///   [`ResultHandlerError::ExpectationMismatch`](crate::ResultHandlerError::ExpectationMismatch).
+pub(crate) fn check_tx_expect(
+    expect: Option<&TxExpect>,
+    tx_response: &TxResponse,
+) -> Result<(), DispatchError> {
+    let Some(expect) = expect else {
+        return Ok(());
+    };
+
+    let Err(mismatch) = expect.check_response(tx_response) else {
+        return Ok(());
+    };
+
+    // status rejected, but success would have been accepted: success was expected
+    if mismatch.field == "status" && expect.status.check(0u64) {
+        return Err(DispatchError::TxFailed(tx_response.tx_error.clone()));
+    }
+
+    Err(ResultHandlerError::ExpectationMismatch(mismatch).into())
 }

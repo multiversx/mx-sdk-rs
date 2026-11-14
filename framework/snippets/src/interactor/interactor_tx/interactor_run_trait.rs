@@ -3,7 +3,7 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::{InteractorBase, TxDispatchSettings};
+use crate::{DispatchError, InteractorBase, TxDispatchSettings};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -51,6 +51,19 @@ pub trait InteractorRunAsync {
     /// Returns a future that resolves to [`Self::Result`] once the transaction has been
     /// confirmed and the response has been decoded.
     fn run(self) -> impl std::future::Future<Output = Self::Result>;
+}
+
+/// Trait for interactor transactions that can be dispatched: signed, then written and/or sent,
+/// according to the interactor's [`dispatch_settings`](InteractorBase::dispatch_settings).
+pub trait InteractorDispatchAsync {
+    /// The value produced by the result handlers, once the transaction was executed.
+    type Result;
+
+    /// Dispatches the transaction, returning the handled result, or an error.
+    ///
+    /// Returns [`DispatchError::Interrupted`] if, according to the dispatch settings,
+    /// the transaction was only written, or sent without waiting for its result.
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>>;
 }
 
 /// Trait for interactor steps that can be converted into a plain SDK [`Transaction`].

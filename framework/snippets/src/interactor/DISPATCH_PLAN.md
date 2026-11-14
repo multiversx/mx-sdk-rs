@@ -218,8 +218,15 @@ Handlers can still panic when the data they extract is missing or can't be decod
    - The VM's `check_tx_output` converts its `TxResult` (all logs, including the ESDT transfer log) and calls it, panicking with the tx id. The old `run_vm/errors.rs` helpers are gone.
    - `update_from_response` (trace building) calls it too, panicking as before. In step 4 the interactor checks explicitly instead, so trace building no longer has to.
    - `ResultHandlerError::ExpectationMismatch` wraps `TxExpectMismatch`.
-4. **Unified pipeline for SC calls.** Rewrite `sc_call` as a fallible pipeline, add `dispatch()` for calls, and redefine `run()` on top of it.
-   - Testbed: `system_sc_interact.rs` and the chain-simulator tests.
+4. **Unified pipeline for SC calls.** ✅
+   - `InteractorBase::sc_call_dispatch(&mut ScCallStep) -> Result<(), DispatchError>` follows `self.dispatch_settings`. `sc_call` calls it and panics on error.
+   - Pre-runners only run when the tx is sent. Post-runners only run once there is a response.
+   - `check_tx_expect` (in `interactor_dispatch.rs`) does the classification: the tx failed while success was expected → `TxFailed`; any other mismatch → `ResultHandler`. It runs before `save_response`, so the panicking check inside trace building no longer fires.
+   - New trait `InteractorDispatchAsync::dispatch()`, implemented for calls. `run()` for calls is `dispatch()` plus a panic.
+   - Upgrades go through `sc_call` too, so their `run()` already uses the pipeline; their `dispatch()` comes in step 5.
+   - `run_with_settings` for calls is reimplemented on top of the pipeline: it swaps the interactor settings temporarily. To keep the CLI's behaviour, a failed tx is printed rather than returned as an error. Step 7 replaces it.
+   - `TxOutputFile::save_output` / `write_output` now return `std::io::Result`, feeding `DispatchError::Io`.
+   - Testbed: the chain-simulator suite (`cs-test-runner`).
 5. **Deploy, upgrade, transfer.** Do the same, removing `run_with_settings`.
 6. **Remove `process::exit` / `unwrap` from the network path**, including `retrieve_tx_on_network` and `generate_blocks_until_tx_processed`.
 7. **`sc-meta tx` CLI.** Switch it to `interactor.dispatch_settings` and `dispatch()`. Have the top-level error handler treat `Interrupted` as success.
