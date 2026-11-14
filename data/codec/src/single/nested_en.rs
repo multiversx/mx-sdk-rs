@@ -18,13 +18,7 @@ pub trait NestedEncode: Sized {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
-        H: EncodeErrorHandler,
-    {
-        match self.dep_encode(dest) {
-            Ok(()) => Ok(()),
-            Err(e) => Err(h.handle_error(e)),
-        }
-    }
+        H: EncodeErrorHandler;
 
     /// Allows the framework to do monomorphisation of special cases where the data is of type `u8`.
     ///

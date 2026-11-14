@@ -51,7 +51,14 @@ pub trait FormattedMessageFeatures {
         sc_panic!(DecodeError::UNSUPPORTED_OPERATION,);
     }
 
-    /// TODO: figure out a way to test this.
+    /// `sc_panic!` used as a tail expression, without a trailing semicolon.
+    #[endpoint]
+    fn panic_in_expression_position(&self, msg: ManagedBuffer) {
+        if !msg.is_empty() {
+            sc_panic!(msg)
+        }
+    }
+
     #[endpoint]
     fn print_message(&self, x: i32) {
         sc_print!("Printing x: {}", x,);

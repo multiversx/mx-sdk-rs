@@ -1,22 +1,49 @@
 mod payable_interactor_cli;
-mod payable_interactor_config;
-mod payable_interactor_state;
 
 use clap::Parser;
-use payable_features::payable_features_proxy;
-pub use payable_interactor_config::Config;
-use payable_interactor_state::State;
-
 use multiversx_sc_snippets::imports::*;
+use payable_features::payable_features_proxy;
+use serde::{Deserialize, Serialize};
+
+/// Payable Features Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+    }
+}
+
+/// Payable Features Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub payable_features_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the payable features contract
+    pub fn current_payable_features_address(&self) -> &Bech32Address {
+        self.payable_features_address
+            .as_ref()
+            .expect("no known payable features contract, deploy first")
+    }
+}
 
 const CODE_PATH: MxscPath = MxscPath::new("../output/payable-features.mxsc.json");
 
 pub async fn payable_features_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut payable_interact = PayableInteract::new(config).await;
+    let mut payable_interact = PayableInteract::new().await;
 
     let cli = payable_interactor_cli::InteractCli::parse();
     match &cli.command {
@@ -37,38 +64,28 @@ pub async fn payable_features_cli() {
 
 pub struct PayableInteract {
     pub interactor: Interactor,
-    pub sc_owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
-    pub state: State,
+    pub config: Config,
+    pub state: AutoSave<State>,
 }
 
 impl PayableInteract {
-    pub async fn new(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator());
-
-        interactor
-            .set_current_dir_from_workspace("contracts/feature-tests/payable-features/interactor");
-
-        let sc_owner_address = interactor.register_wallet(test_wallets::heidi()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::ivan()).await;
-
-        interactor.generate_blocks(30u64).await.unwrap();
-
-        PayableInteract {
+    pub async fn new() -> Self {
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
+        let state = interactor.load_state::<State>();
+        Self {
             interactor,
-            sc_owner_address: sc_owner_address.into(),
-            wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            config,
+            state,
         }
     }
 
     pub async fn deploy(&mut self) {
+        let owner_address = self.config.owner.address();
         let new_address = self
             .interactor
             .tx()
-            .from(&self.sc_owner_address.clone())
+            .from(&owner_address.clone())
             .gas(30_000_000)
             .typed(payable_features_proxy::PayableFeaturesProxy)
             .init()
@@ -79,7 +96,7 @@ impl PayableInteract {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_payable_features_address(new_address);
+        self.state.payable_features_address = Some(new_address);
     }
 
     pub async fn check_multi_transfer_only_egld_transfer(&mut self) {
@@ -89,7 +106,7 @@ impl PayableInteract {
         let result = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_payable_features_address())
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)
@@ -110,7 +127,7 @@ impl PayableInteract {
         let result = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_payable_features_address())
             .gas(6_000_000u64)
             .typed(payable_features_proxy::PayableFeaturesProxy)

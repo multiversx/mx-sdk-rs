@@ -2,8 +2,8 @@ use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
         Code, FunctionCall, ManagedAddress, ManagedBuffer, NotPayable, RHListExec, Tx,
-        TxBaseWithEnv, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas,
-        TxId, TxPayment, TxToSpecified, UpgradeCall, heap::H256,
+        TxBaseWithEnv, TxEnv, TxEnvMockDeployAddress, TxEnvWithRelayer, TxEnvWithTxHash,
+        TxFromSpecified, TxGas, TxId, TxPayment, TxToSpecified, UpgradeCall, heap::H256,
     },
 };
 
@@ -112,6 +112,16 @@ where
         let mut step_wrapper = self.tx_to_step();
         step_wrapper.env.world.sc_call(&mut step_wrapper.step);
         step_wrapper.process_result()
+    }
+}
+
+impl TxEnvWithRelayer for ScenarioEnvExec<'_> {
+    fn set_relayer_address(&mut self, relayer: ManagedAddress<Self::Api>) {
+        self.data.set_relayer_address(relayer);
+    }
+
+    fn take_relayer_address(&mut self) -> Option<ManagedAddress<Self::Api>> {
+        self.data.take_relayer_address()
     }
 }
 

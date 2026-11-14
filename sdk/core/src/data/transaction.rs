@@ -7,10 +7,12 @@ mod get_transaction_response;
 mod log_data;
 mod multiple_transactions;
 mod simulate_gas;
+mod transaction_options;
 mod transaction_process_status;
 mod transaction_request;
 mod transaction_response_data;
 mod transaction_status;
+mod transaction_version;
 mod tx_cost;
 
 pub use api_logs::ApiLogs;
@@ -22,10 +24,12 @@ pub use get_transaction_response::{GetTransactionResponse, GetTransactionRespons
 pub use log_data::LogData;
 pub use multiple_transactions::{MultipleTransactionsResponseData, ResponseMultipleTransactions};
 pub use simulate_gas::{SimulateGasTransactionData, SimulateGasTransactionResponse};
+pub use transaction_options::TransactionOptions;
 pub use transaction_process_status::{ProcessStatusResponse, TransactionProcessStatus};
 pub use transaction_request::Transaction;
 pub use transaction_response_data::{ResponseTransaction, TransactionResponseData};
 pub use transaction_status::{ResponseTxStatus, TransactionStatus};
+pub use transaction_version::{MIN_VERSION_FOR_OPTIONS, TransactionVersion};
 pub use tx_cost::{ResponseTxCost, TxCostResponseData};
 
 #[deprecated(

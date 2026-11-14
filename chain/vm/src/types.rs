@@ -1,5 +1,5 @@
 pub use crate::chain_core::types::Address;
-pub use crate::chain_core::types::CodeMetadata as VMCodeMetadata;
+pub use crate::chain_core::types::CodeMetadata;
 pub use crate::chain_core::types::EsdtLocalRole;
 pub use crate::chain_core::types::EsdtLocalRoleFlags;
 pub use crate::chain_core::types::H256;

@@ -1,9 +1,11 @@
-call_tree_path = "layouts/async_v1_c1_smin_pay.toml"
-
-[gateway]
-uri = "https://testnet-gateway.multiversx.com/"
+[connection]
+gateway_uri = "https://testnet-gateway.multiversx.com/"
 chain_type = "real"
 
-# [gateway]
-# uri = "https://gateway.battleofnodes.com"
+# [connection]
+# gateway_uri = "https://gateway.battleofnodes.com"
 # chain_type = "real"
+
+[general]
+contract_path = "../mesh-node/output/mesh-node.mxsc.json"
+call_tree_path = "layouts/async_v1_c1_smin_pay.toml"

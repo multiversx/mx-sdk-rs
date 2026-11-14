@@ -5,7 +5,7 @@ mod esdt_token_type;
 mod return_code;
 mod token_type;
 
-pub use code_metadata::CodeMetadata;
+pub use code_metadata::{CodeMetadata, CodeMetadataError};
 pub use esdt_local_role::EsdtLocalRole;
 pub use esdt_local_role_flags::EsdtLocalRoleFlags;
 pub use esdt_token_type::EsdtTokenType;

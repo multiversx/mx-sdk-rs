@@ -1,0 +1,15 @@
+[package]
+name = "validator-rewards-feature"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2024"
+publish = false
+
+[lib]
+path = "src/validator_rewards_feature.rs"
+
+[dependencies.multiversx-sc]
+workspace = true
+
+[dev-dependencies.multiversx-sc-scenario]
+workspace = true

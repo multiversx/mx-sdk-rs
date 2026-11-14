@@ -37,6 +37,7 @@ fn sanitize_field_type_path(field_type: &syn::Type) -> syn::Type {
             modified_path.ident = syn::Ident::new(BITFLAGS_PRIMITIVE, modified_path.ident.span());
 
             return syn::Type::Path(syn::TypePath {
+                attrs: p.attrs.clone(),
                 qself: p.qself.clone(),
                 path,
             });

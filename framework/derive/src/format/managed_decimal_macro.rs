@@ -30,6 +30,7 @@ fn typenum_type(decimals: usize, span: proc_macro2::Span) -> syn::Type {
         arguments: syn::PathArguments::None,
     });
     syn::Type::Path(syn::TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: syn::Path {
             leading_colon: None,

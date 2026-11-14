@@ -1,4 +1,6 @@
-use multiversx_sc::types::{Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified};
+use multiversx_sc::types::{
+    Tx, TxEnv, TxEnvWithRelayer, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+};
 
 use crate::{imports::TxESDT, scenario_model::TransferStep};
 
@@ -6,7 +8,7 @@ use super::{StepWrapper, TxToStep, address_annotated, gas_annotated};
 
 impl<Env, From, To, Payment, Gas> TxToStep<Env, ()> for Tx<Env, From, To, Payment, Gas, (), ()>
 where
-    Env: TxEnv,
+    Env: TxEnv + TxEnvWithRelayer,
     From: TxFromSpecified<Env>,
     To: TxToSpecified<Env>,
     Payment: TxPayment<Env>,
@@ -14,8 +16,12 @@ where
 {
     type Step = TransferStep;
 
-    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, ()> {
-        let step = tx_to_transfer_step(&self.env, self.from, self.to, self.payment, self.gas);
+    fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, ()> {
+        let mut step = tx_to_transfer_step(&self.env, self.from, self.to, self.payment, self.gas);
+        step.tx.relayer = self
+            .env
+            .take_relayer_address()
+            .map(|a| address_annotated(&self.env, &a));
 
         StepWrapper {
             env: self.env,

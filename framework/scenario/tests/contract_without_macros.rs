@@ -350,12 +350,7 @@ mod sample_adder {
                     self.call_add();
                     true
                 }
-                other => {
-                    if super::module_1::EndpointWrappers::call(self, fn_name) {
-                        return true;
-                    }
-                    false
-                }
+                other => super::module_1::EndpointWrappers::call(self, fn_name),
             }
         }
         fn callback_selector(

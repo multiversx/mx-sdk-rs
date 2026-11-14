@@ -19,7 +19,6 @@ async fn main() {
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;
-    multisig_interact.register_wallets().await;
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -76,7 +75,6 @@ async fn main() {
 
 struct MultisigInteract {
     interactor: Interactor,
-    wallet_address: Bech32Address,
     collection_token_identifier: String,
     multisig_code: BytesValue,
     config: Config,
@@ -85,36 +83,20 @@ struct MultisigInteract {
 
 impl MultisigInteract {
     async fn init() -> Self {
-        let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator())
-            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
-            .await;
-        interactor.set_current_dir_from_workspace("contracts/examples/multisig/interact");
-        let wallet_address = interactor.register_wallet(test_wallets::mike()).await;
+        let mut interactor = Interactor::empty().with_current_dir(env!("CARGO_MANIFEST_DIR"));
+        let config: Config = interactor.load_config_toml().await;
+        let interactor = interactor.with_tracer(INTERACTOR_SCENARIO_TRACE_PATH).await;
         let multisig_code = BytesValue::interpret_from(
-            "mxsc:../output/multisig.mxsc.json",
+            format!("mxsc:{}", config.general.contract_path),
             &InterpreterContext::default(),
         );
 
         Self {
             interactor,
-            wallet_address: wallet_address.into(),
             collection_token_identifier: String::new(),
             multisig_code,
             config,
             state: State::load_state(),
-        }
-    }
-
-    async fn register_wallets(&mut self) {
-        let carol = test_wallets::carol();
-        let dan = test_wallets::dan();
-        let eve = test_wallets::eve();
-
-        for wallet in &[carol, dan, eve] {
-            self.interactor.register_wallet(*wallet).await;
         }
     }
 
@@ -137,15 +119,16 @@ impl MultisigInteract {
 
         let board = self.board();
 
-        let quorum = self.config.quorum;
+        let quorum = self.config.general.quorum;
         let new_address = self
             .interactor
             .tx()
             .id("deploy multisig")
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .typed(multisig_proxy::MultisigProxy)
             .init(quorum, board)
             .code(&self.multisig_code)
+            .code_metadata(CodeMetadata::PAYABLE)
             .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewBech32Address)
             .run()
@@ -165,11 +148,11 @@ impl MultisigInteract {
         println!("deploying {count} contracts...");
 
         let board = self.board();
-        let quorum = Config::load_config().quorum;
+        let quorum = self.config.general.quorum;
         let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..*count {
             buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
+                tx.from(self.config.wallet.address())
                     .typed(multisig_proxy::MultisigProxy)
                     .init(quorum, board.clone())
                     .code(&self.multisig_code)
@@ -185,25 +168,23 @@ impl MultisigInteract {
         }
     }
 
-    fn board(&mut self) -> MultiValueVec<Address> {
-        let carol = test_wallets::carol();
-        let dan = test_wallets::dan();
-        let eve = test_wallets::eve();
-
-        MultiValueVec::from([
-            self.wallet_address.to_address(),
-            carol.to_address(),
-            dan.to_address(),
-            eve.to_address(),
-        ])
+    fn board(&self) -> MultiValueVec<Address> {
+        MultiValueVec::from(
+            self.config
+                .board
+                .iter()
+                .map(|w| w.wallet().to_address())
+                .collect::<Vec<_>>(),
+        )
     }
 
     async fn feed_contract_egld(&mut self) {
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
-            .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
+            .egld(50_000_000_000_000_000u64) // 0,05 or 5 * 10^16
+            .gas(50_000)
             .run()
             .await;
     }
@@ -216,7 +197,7 @@ impl MultisigInteract {
 
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(gas_expr)
             .typed(multisig_proxy::MultisigProxy)
@@ -239,12 +220,11 @@ impl MultisigInteract {
 
         self.sign(&actions_no_quorum_reached).await;
 
-        let from = &self.wallet_address;
         let mut buffer = self.interactor.homogenous_call_buffer();
         let multisig_address = self.state.current_multisig_address();
         for action_id in action_ids {
             buffer.push_tx(|tx| {
-                tx.from(from)
+                tx.from(self.config.wallet.address())
                     .to(multisig_address)
                     .gas(gas_expr)
                     .typed(multisig_proxy::MultisigProxy)
@@ -334,7 +314,7 @@ impl MultisigInteract {
         let dns_address = dns_address_for_name(name);
         self.interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("30,000,000"))
             .typed(multisig_proxy::MultisigProxy)

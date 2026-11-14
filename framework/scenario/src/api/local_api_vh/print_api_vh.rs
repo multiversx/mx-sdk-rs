@@ -39,7 +39,7 @@ impl<VHB: VMHooksApiBackend> PrintApiImpl for VMHooksApi<VHB> {
     fn print_buffer(&self, buffer: Self::Buffer) {
         let bytes = buffer.into_managed_buffer().to_boxed_bytes();
         let s = String::from_utf8_lossy(bytes.as_slice());
-        println!("{:?}", &s);
+        println!("{:?}", s);
         PRINTED_MESSAGES.with(|cell| cell.borrow_mut().push(s.into_owned()));
     }
 }
