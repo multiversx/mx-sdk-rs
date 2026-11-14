@@ -1,18 +1,12 @@
 use anyhow::{Result, anyhow};
-use multiversx_chain_core::std::Bech32Address;
 use multiversx_sc_snippets::{Interactor, TxOutputFile};
 
-use super::tx_cli_common::{load_relayer_wallet, load_transaction_from_file, load_wallet};
+use super::tx_cli_common::{
+    load_relayer_wallet, load_transaction_from_file, load_wallet, parse_address,
+};
 use crate::cli::cli_args_tx::SignArgs;
 
-pub async fn tx_sign(args: &SignArgs) {
-    if let Err(e) = tx_sign_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
+pub async fn tx_sign(args: &SignArgs) -> Result<()> {
     let wallet = load_wallet(&args.sender)?;
     let mut tx = load_transaction_from_file(&args.infile)?;
 
@@ -31,9 +25,7 @@ async fn tx_sign_inner(args: &SignArgs) -> Result<()> {
     }
 
     if let Some(relayer_str) = &args.relayer.relayer {
-        let relayer_addr = Bech32Address::try_from_bech32_string(relayer_str.clone())
-            .map_err(|e| anyhow!("invalid --relayer address: {e}"))?;
-        tx.relayer = Some(relayer_addr);
+        tx.relayer = Some(parse_address("--relayer", relayer_str)?);
     }
 
     let sig = wallet.sign_tx(&tx)?;

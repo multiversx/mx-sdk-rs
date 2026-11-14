@@ -215,7 +215,7 @@ where
                 .argument(&token_ticker)
                 .argument(&token_type_name);
 
-        if token_type != EsdtTokenType::DynamicNFT {
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
             contract_call = contract_call.argument(&num_decimals);
         }
 
@@ -254,7 +254,7 @@ where
         contract_call.proxy_arg(token_ticker);
         contract_call.proxy_arg(&token_type_name);
 
-        if token_type != EsdtTokenType::DynamicNFT {
+        if token_type != EsdtTokenType::DynamicNFT && token_type != EsdtTokenType::DynamicSFT {
             contract_call.proxy_arg(&num_decimals);
         }
 

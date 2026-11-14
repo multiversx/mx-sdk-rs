@@ -74,7 +74,6 @@ async fn cs_governance_run_tests() {
     governance_interactor
         .stake(
             governance_interactor.owner.clone(),
-            1,
             vec![(validator_1.public_key, BLSSignature::dummy("signed1"))],
             30_000_000_000_000_000_000_000u128,
         )
@@ -83,7 +82,6 @@ async fn cs_governance_run_tests() {
     governance_interactor
         .stake(
             governance_interactor.user1.clone(),
-            1,
             vec![(validator_2.public_key, BLSSignature::dummy("signed2"))],
             40_000_000_000_000_000_000_000u128,
         )

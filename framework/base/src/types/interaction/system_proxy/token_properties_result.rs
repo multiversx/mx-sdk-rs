@@ -1,32 +1,25 @@
 use alloc::string::String;
 use multiversx_chain_core::types::{Address, EsdtTokenType};
-use multiversx_sc_codec::{
-    DecodeErrorHandler, TopDecodeInput, TopDecodeMulti, TopDecodeMultiInput,
-};
+use multiversx_sc_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput};
 
-const MAX_BUFFER_SIZE: usize = 62;
-
-const PREFIXES: &[&[u8]] = &[
-    b"NumDecimals-",
-    b"IsPaused-",
-    b"CanUpgrade-",
-    b"CanMint-",
-    b"CanBurn-",
-    b"CanChangeOwner-",
-    b"CanPause-",
-    b"CanFreeze-",
-    b"CanWipe-",
-    b"CanAddSpecialRoles-",
-    b"CanTransferNFTCreateRole-",
-    b"NFTCreateStopped-",
-    b"NumWiped-",
-];
-
+/// The decoded result of the `getTokenProperties` view of the ESDT system SC.
+///
+/// The system SC returns, in order:
+/// - token name,
+/// - token type name (e.g. `FungibleESDT`, `DynamicNonFungibleESDT`),
+/// - owner address,
+/// - minted value (base 10 string),
+/// - burnt value (base 10 string),
+/// - a list of `Name-value` properties (e.g. `NumDecimals-18`, `IsPaused-false`).
 #[derive(Debug, Clone)]
 pub struct TokenPropertiesResult {
     pub token_name: String,
     pub token_type: EsdtTokenType,
     pub owner_address: Address,
+    /// Total minted value, as a base 10 string.
+    pub minted_value: String,
+    /// Total burnt value, as a base 10 string.
+    pub burnt_value: String,
     pub num_decimals: usize,
     pub is_paused: bool,
     pub can_upgrade: bool,
@@ -43,37 +36,49 @@ pub struct TokenPropertiesResult {
 }
 
 impl TokenPropertiesResult {
-    fn fetch_struct_field(&mut self, input: &[u8]) {
-        let is_true = |value: &[u8]| value == b"true";
+    fn fetch_struct_field(&mut self, input: &str) {
+        let Some((name, value)) = input.split_once('-') else {
+            return;
+        };
+        let is_true = value == "true";
 
-        if let Some((prefix, value)) = PREFIXES
-            .iter()
-            .find_map(|&prefix| input.strip_prefix(prefix).map(|value| (prefix, value)))
-        {
-            match prefix {
-                b"NumDecimals-" => self.num_decimals = parse_usize(value),
-                b"IsPaused-" => self.is_paused = is_true(value),
-                b"CanUpgrade-" => self.can_upgrade = is_true(value),
-                b"CanMint-" => self.can_mint = is_true(value),
-                b"CanBurn-" => self.can_burn = is_true(value),
-                b"CanChangeOwner-" => self.can_change_owner = is_true(value),
-                b"CanPause-" => self.can_pause = is_true(value),
-                b"CanFreeze-" => self.can_freeze = is_true(value),
-                b"CanWipe-" => self.can_wipe = is_true(value),
-                b"CanAddSpecialRoles-" => self.can_add_special_roles = is_true(value),
-                b"CanTransferNFTCreateRole-" => self.can_transfer_nft_create_role = is_true(value),
-                b"NFTCreateStopped-" => self.nft_create_stopped = is_true(value),
-                b"NumWiped-" => self.num_wiped = parse_usize(value),
-                _ => {}
-            }
+        match name {
+            "NumDecimals" => self.num_decimals = parse_usize(value),
+            "IsPaused" => self.is_paused = is_true,
+            "CanUpgrade" => self.can_upgrade = is_true,
+            "CanMint" => self.can_mint = is_true,
+            "CanBurn" => self.can_burn = is_true,
+            "CanChangeOwner" => self.can_change_owner = is_true,
+            "CanPause" => self.can_pause = is_true,
+            "CanFreeze" => self.can_freeze = is_true,
+            "CanWipe" => self.can_wipe = is_true,
+            "CanAddSpecialRoles" => self.can_add_special_roles = is_true,
+            "CanTransferNFTCreateRole" => self.can_transfer_nft_create_role = is_true,
+            "NFTCreateStopped" => self.nft_create_stopped = is_true,
+            "NumWiped" => self.num_wiped = parse_usize(value),
+            _ => {}
         }
     }
+}
 
-    fn default() -> Self {
-        TokenPropertiesResult {
-            token_name: String::new(),
-            token_type: EsdtTokenType::Invalid,
-            owner_address: Address::zero(),
+impl TopDecodeMulti for TokenPropertiesResult {
+    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeMultiInput,
+        H: DecodeErrorHandler,
+    {
+        let token_name = String::multi_decode_or_handle_err(input, h)?;
+        let token_type_name = String::multi_decode_or_handle_err(input, h)?;
+        let owner_address = Address::multi_decode_or_handle_err(input, h)?;
+        let minted_value = String::multi_decode_or_handle_err(input, h)?;
+        let burnt_value = String::multi_decode_or_handle_err(input, h)?;
+
+        let mut token_properties = TokenPropertiesResult {
+            token_name,
+            token_type: EsdtTokenType::collection_from_string(token_type_name.as_str()),
+            owner_address,
+            minted_value,
+            burnt_value,
             num_decimals: 0,
             is_paused: false,
             can_upgrade: false,
@@ -87,36 +92,17 @@ impl TokenPropertiesResult {
             can_transfer_nft_create_role: false,
             nft_create_stopped: false,
             num_wiped: 0,
-        }
-    }
-}
+        };
 
-impl TopDecodeMulti for TokenPropertiesResult {
-    fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
-    where
-        I: TopDecodeMultiInput,
-        H: DecodeErrorHandler,
-    {
-        let mut token_properties = TokenPropertiesResult::default();
-
-        token_properties.token_name = String::multi_decode_or_handle_err(input, h)?;
-        let token_type = String::multi_decode_or_handle_err(input, h)?;
-        token_properties.token_type = EsdtTokenType::collection_from_string(token_type.as_str());
-        token_properties.owner_address = Address::multi_decode_or_handle_err(input, h)?;
         while input.has_next() {
-            let value = input.next_value_input(h)?;
-            let mut buffer = [0u8; MAX_BUFFER_SIZE];
-            let len = value.into_max_size_buffer_align_right(&mut buffer, h)?;
-            token_properties.fetch_struct_field(&buffer[MAX_BUFFER_SIZE - len..]);
+            let property = String::multi_decode_or_handle_err(input, h)?;
+            token_properties.fetch_struct_field(property.as_str());
         }
 
         Ok(token_properties)
     }
 }
 
-fn parse_usize(input: &[u8]) -> usize {
-    core::str::from_utf8(input)
-        .ok()
-        .and_then(|s| s.parse::<usize>().ok())
-        .unwrap_or(0)
+fn parse_usize(input: &str) -> usize {
+    input.parse::<usize>().unwrap_or(0)
 }

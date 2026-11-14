@@ -3458,6 +3458,7 @@ dependencies = [
  "ledger-apdu",
  "ledger-transport-hid",
  "log",
+ "multiversx-bls",
  "multiversx-chain-core",
  "pbkdf2",
  "pem",

@@ -10,21 +10,12 @@ use super::tx_cli_common::{
 };
 use crate::cli::cli_args_tx::DeployArgs;
 
-pub async fn tx_deploy(args: &DeployArgs) {
-    if let Err(e) = tx_deploy_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
+pub async fn tx_deploy(args: &DeployArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
 
     // Create the interactor – this fetches the network config in the process.
     let mut interactor = create_interactor(&args.gateway, &args.tx).await?;
-    let sender_address = interactor
-        .register_wallet_bech32(sender_wallet.clone())
-        .await;
+    let sender_address = interactor.register_wallet_bech32(sender_wallet).await;
     let relayer_address_opt = load_relayer_for_interactor(&mut interactor, &args.relayer).await?;
 
     // Read bytecode file and wrap in BytesValue so it implements TxCodeValue.
@@ -37,7 +28,8 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
 
     // Build deploy transaction.
     let arg_buffer = build_arg_buffer(&args.arguments)?;
-    let tx_builder = interactor
+
+    let mut tx = interactor
         .tx()
         .from(&sender_address)
         .gas(args.tx.gas_limit)
@@ -46,9 +38,9 @@ async fn tx_deploy_inner(args: &DeployArgs) -> Result<()> {
         .code(code)
         .code_metadata(code_metadata)
         .arguments_raw(arg_buffer)
-        .opt_relayer(relayer_address_opt);
+        .opt_relayer(relayer_address_opt)
+        .into_sdk_transaction();
 
-    let mut tx = tx_builder.into_sdk_transaction();
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
     let contract_address = compute_new_address_bech32(&tx.sender, tx.nonce);

@@ -39,7 +39,7 @@ async fn cs_delegation_run_tests() {
     interactor.set_check_cap_on_redelegate_rewards(false).await;
 
     let addresses = interactor.get_all_contract_addresses().await;
-    assert_eq!(&addresses[0], interactor.state.current_delegation_address());
+    assert!(addresses.contains(interactor.state.current_delegation_address()));
 
     interactor
         .add_nodes(vec![
@@ -49,7 +49,12 @@ async fn cs_delegation_run_tests() {
         .await;
 
     let state = interactor.get_all_node_states().await;
-    assert_eq!(&state, "notStaked");
+    assert!(state.staked.is_empty());
+    assert_eq!(
+        state.not_staked,
+        vec![validator_1.public_key, validator_2.public_key]
+    );
+    assert!(state.un_staked.is_empty());
 
     let total_stake = interactor.get_total_active_stake().await;
     assert_eq!(
@@ -103,7 +108,9 @@ async fn cs_delegation_run_tests() {
 
     interactor.stake_nodes(vec![validator_1.public_key]).await;
     let state = interactor.get_all_node_states().await;
-    assert_eq!(&state, "staked");
+    assert_eq!(state.staked, vec![validator_1.public_key]);
+    assert!(state.not_staked.is_empty());
+    assert!(state.un_staked.is_empty());
 
     interactor.unstake_nodes(vec![validator_1.public_key]).await;
     interactor

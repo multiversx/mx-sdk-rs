@@ -1,22 +1,15 @@
 use anyhow::{Context, Result, anyhow};
 use multiversx_sc_snippets::{
     hex,
-    imports::{Bech32Address, GatewayHttpProxy, Interactor},
+    imports::{GatewayHttpProxy, Interactor},
     sdk::data::vm::VMQueryInput,
 };
 
-use super::tx_cli_common::build_arg_buffer;
+use super::tx_cli_common::{build_arg_buffer, parse_address};
 use crate::cli::cli_args_tx::QueryArgs;
 
-pub async fn tx_query(args: &QueryArgs) {
-    if let Err(e) = tx_query_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_query_inner(args: &QueryArgs) -> Result<()> {
-    let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
+pub async fn tx_query(args: &QueryArgs) -> Result<()> {
+    let contract = parse_address("contract", &args.contract)?;
 
     // Encode arguments as hex strings (the gateway expects hex, no "0x" prefix).
     let arg_buffer = build_arg_buffer(&args.arguments)?;

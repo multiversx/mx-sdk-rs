@@ -27,6 +27,8 @@ chain-simulator-tests = []
 repro-build-test = []
 install-debugger-test = []
 ledger = ["multiversx-sdk/ledger"]
+# BLS signing with validator PEM files (not supported on Windows MSVC)
+bls = ["multiversx-sdk/bls"]
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
