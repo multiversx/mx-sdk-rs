@@ -1,13 +1,17 @@
-use crate::{InteractorBase, sdk::data::transaction::Transaction};
+use crate::{InteractorBase, SimulateGas, network_response, sdk::data::transaction::Transaction};
 use anyhow::Context;
-use multiversx_sdk::gateway::GatewayAsyncService;
+use multiversx_sdk::{
+    chain_core::types::GasResult,
+    gateway::{GatewayAsyncService, SimulateTxRequest},
+    retrieve_tx_on_network,
+};
 use serde::Serialize;
 
-use multiversx_sc_scenario::scenario_model::{Checkable, TxExpect, TxResponse};
+use multiversx_sc_scenario::scenario_model::{Checkable, TxExpect, TxResponse, U64Value};
 
 use super::{
-    DispatchError, ExplorerUrl, ResultHandlerError, TxDispatchSettings, TxOutputFile,
-    TxOutputTarget,
+    DispatchError, ExplorerUrl, ResultHandlerError, TxDispatchSettings, TxInterrupted,
+    TxOutputFile, TxOutputTarget,
 };
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
@@ -119,14 +123,99 @@ where
         }
     }
 
-    /// Sets the nonce of `transaction` (updating the sender), then signs and dispatches it.
-    pub async fn set_nonce_sign_and_dispatch(
-        &mut self,
-        mut transaction: Transaction,
-        settings: &TxDispatchSettings,
-    ) -> anyhow::Result<()> {
-        self.set_tx_nonce_update_sender(&mut transaction).await;
-        self.sign_and_dispatch(transaction, settings).await
+    pub(crate) async fn request_simulate_gas(
+        &self,
+        transaction: &Transaction,
+    ) -> anyhow::Result<GasResult> {
+        self.proxy().request(SimulateTxRequest(transaction)).await
+    }
+
+    /// If `gas_limit` is the simulate-gas marker, replaces it with the simulated gas
+    /// (in both the step and the transaction), then signs the transaction again.
+    pub(crate) async fn apply_simulated_gas(
+        &self,
+        transaction: &mut Transaction,
+        gas_limit: &mut U64Value,
+        info: &str,
+    ) -> Result<(), DispatchError> {
+        if !SimulateGas::is_mandos_simulate_gas_marker(gas_limit) {
+            return Ok(());
+        }
+
+        let sim_result = self
+            .request_simulate_gas(transaction)
+            .await
+            .map_err(DispatchError::Gateway)?;
+        println!("Gas simulation for the {info}: {sim_result}.");
+        let Some(sim_gas) = sim_result.gas_used() else {
+            return Err(DispatchError::Simulate(sim_result));
+        };
+        let gas = SimulateGas::adjust_simulated_gas(sim_gas);
+        *gas_limit = gas.into();
+        transaction.gas_limit = gas;
+
+        // sign again, because gas changed
+        self.sign_tx(transaction);
+        Ok(())
+    }
+
+    /// Writes and/or sends a signed transaction, according to `self.dispatch_settings`.
+    ///
+    /// Returns the response once the transaction is executed,
+    /// or [`DispatchError::Interrupted`] if it was not sent, or its result was not awaited.
+    ///
+    /// The response is not checked: that is up to the caller, who knows the expectation.
+    pub(crate) async fn dispatch_signed_tx(
+        &self,
+        transaction: &Transaction,
+        info: &str,
+    ) -> Result<TxResponse, DispatchError> {
+        let settings = &self.dispatch_settings;
+        let mut output =
+            TxOutputFile::from_transaction(transaction.clone()).map_err(std::io::Error::other)?;
+
+        let Some(send) = &settings.send else {
+            output.save_output(&settings.output)?;
+            return Err(TxInterrupted {
+                output: settings.output.clone(),
+                tx_hash: None,
+            }
+            .into());
+        };
+
+        // the signed tx is kept, even if broadcasting fails
+        if matches!(settings.output, TxOutputTarget::File(_)) {
+            output.write_output(&settings.output)?;
+        }
+
+        let tx_hash = self
+            .broadcast_transaction(transaction, info)
+            .await
+            .map_err(DispatchError::Gateway)?;
+        output.emitted_transaction_hash = tx_hash.clone();
+
+        if !send.wait_result {
+            output.save_output(&settings.output)?;
+            return Err(TxInterrupted {
+                output: settings.output.clone(),
+                tx_hash: Some(tx_hash),
+            }
+            .into());
+        }
+
+        self.generate_blocks_until_tx_processed(&tx_hash)
+            .await
+            .map_err(DispatchError::Gateway)?;
+        let (tx_on_network, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash)
+            .await
+            .map_err(DispatchError::Gateway)?;
+        output.transaction_on_network = Some(tx_on_network.clone());
+        output.save_output(&settings.output)?;
+
+        Ok(network_response::parse_tx_response(
+            tx_on_network,
+            return_code,
+        ))
     }
 }
 

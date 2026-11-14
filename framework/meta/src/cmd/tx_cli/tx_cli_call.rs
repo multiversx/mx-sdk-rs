@@ -1,9 +1,10 @@
 use anyhow::Result;
-use multiversx_sc_snippets::imports::{Bech32Address, InteractorIntoSdkTransaction};
+use multiversx_sc_snippets::imports::{Bech32Address, InteractorDispatchAsync, ReturnsRawResult};
 
 use super::parse_payments::parse_all_payment_args;
 use super::tx_cli_common::{
     build_arg_buffer, create_interactor, load_relayer_for_interactor, load_wallet,
+    report_dispatch_result,
 };
 use crate::cli::cli_args_tx::CallArgs;
 
@@ -22,7 +23,7 @@ pub async fn tx_call(args: &CallArgs) -> Result<()> {
     let arg_buffer = build_arg_buffer(&args.arguments)?;
     let payments = parse_all_payment_args(&args.payment)?;
 
-    interactor
+    let result = interactor
         .tx()
         .from(&sender_bech32)
         .to(&contract)
@@ -31,6 +32,9 @@ pub async fn tx_call(args: &CallArgs) -> Result<()> {
         .raw_call(args.function.as_str())
         .arguments_raw(arg_buffer)
         .opt_relayer(relayer_address_opt)
-        .run_with_settings(&args.tx.dispatch_settings())
-        .await
+        .returns(ReturnsRawResult)
+        .dispatch()
+        .await;
+
+    report_dispatch_result(result)
 }

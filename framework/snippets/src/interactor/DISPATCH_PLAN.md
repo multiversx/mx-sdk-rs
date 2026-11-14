@@ -227,7 +227,22 @@ Handlers can still panic when the data they extract is missing or can't be decod
    - `run_with_settings` for calls is reimplemented on top of the pipeline: it swaps the interactor settings temporarily. To keep the CLI's behaviour, a failed tx is printed rather than returned as an error. Step 7 replaces it.
    - `TxOutputFile::save_output` / `write_output` now return `std::io::Result`, feeding `DispatchError::Io`.
    - Testbed: the chain-simulator suite (`cs-test-runner`).
-5. **Deploy, upgrade, transfer.** Do the same, removing `run_with_settings`.
+5. **Deploy, upgrade, transfer.** ✅
+   - The shared part of the pipeline moved to `interactor_dispatch.rs`:
+     - `apply_simulated_gas` (simulate if the marker is set, re-sign);
+     - `dispatch_signed_tx` (write, send, wait, retrieve; returns the unchecked `TxResponse`, or `Interrupted`).
+   - `sc_call_dispatch`, `sc_deploy_dispatch` and `transfer_dispatch` are each: sign, `apply_simulated_gas`, pre-runners (only if sending), `dispatch_signed_tx`, `check_tx_expect`, save the response, post-runners. `sc_call` / `sc_deploy` / `transfer` call them and panic.
+   - A deploy whose failure was accepted by a result handler has no new address: the address print and set-state step are skipped, instead of panicking on `unwrap`.
+   - Transfers have no expectation, so they are checked against `TxExpect::ok()`. Their pre-runners no longer run during `simulate_gas()`.
+   - `InteractorDispatchAsync` is implemented for deploy, upgrade and transfer. Their `run()` is `dispatch()` plus a panic.
+   - `run_with_settings` and `set_nonce_sign_and_dispatch` are gone. `InteractorIntoSdkTransaction` only has `into_sdk_transaction`.
+   - CLI, ahead of step 7:
+     - `create_interactor` sets `interactor.dispatch_settings` from the args.
+     - `tx call` and `tx upgrade` use `.returns(ReturnsRawResult).dispatch()`, then `report_dispatch_result`. That prints the results; a failed tx and an interrupt are not errors.
+     - `tx deploy` and `tx new` still go through `sign_and_dispatch`.
+   - Checking transfers exposed two chain-simulator tests that had been sending invalid transfers silently:
+     - basic-features sent a fungible token with nonce 1 ("new NFT data on sender");
+     - in the system-SC interactor, `other_wallet_address` had become the same wallet as the sender ("can not transfer to self"). It is `mike` again.
 6. **Remove `process::exit` / `unwrap` from the network path**, including `retrieve_tx_on_network` and `generate_blocks_until_tx_processed`.
 7. **`sc-meta tx` CLI.** Switch it to `interactor.dispatch_settings` and `dispatch()`. Have the top-level error handler treat `Interrupted` as success.
 8. **Tests.** On the chain simulator:

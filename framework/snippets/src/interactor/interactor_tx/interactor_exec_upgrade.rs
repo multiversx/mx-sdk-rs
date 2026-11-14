@@ -15,16 +15,15 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::TxDispatchSettings;
-use crate::{InteractorBase, InteractorSimulateGasAsync};
+use crate::{DispatchError, InteractorBase, InteractorSimulateGasAsync};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
-    InteractorRunAsync,
+    InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
+    InteractorPrepareAsync, InteractorRunAsync,
 };
 
 #[allow(clippy::type_complexity)]
-async fn run_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
+async fn dispatch_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -34,7 +33,7 @@ async fn run_async_upgrade<'w, GatewayProxy, From, To, Gas, CodeValue, RH>(
         UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
         RH,
     >,
-) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+) -> Result<<RH::ListReturns as NestedTupleFlatten>::Unpacked, DispatchError>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -45,8 +44,12 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     let mut step_wrapper = tx.tx_to_step();
-    step_wrapper.env.world.sc_call(&mut step_wrapper.step).await;
-    step_wrapper.process_result()
+    step_wrapper
+        .env
+        .world
+        .sc_call_dispatch(&mut step_wrapper.step)
+        .await?;
+    Ok(step_wrapper.process_result())
 }
 
 #[allow(clippy::type_complexity)]
@@ -98,8 +101,36 @@ where
 {
     type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run(self) -> impl std::future::Future<Output = Self::Result> {
-        run_async_upgrade(self)
+    async fn run(self) -> Self::Result {
+        dispatch_async_upgrade(self)
+            .await
+            .unwrap_or_else(|err| panic!("SC upgrade: {err}"))
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Gas, CodeValue, RH> InteractorDispatchAsync
+    for Tx<
+        InteractorEnvExec<'w, GatewayProxy>,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        UpgradeCall<InteractorEnvExec<'w, GatewayProxy>, Code<CodeValue>>,
+        RH,
+    >
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>> {
+        dispatch_async_upgrade(self)
     }
 }
 
@@ -128,19 +159,6 @@ where
             .env
             .world
             .tx_call_to_blockchain_tx(&step_wrapper.step.tx)
-    }
-
-    async fn run_with_settings(self, settings: &TxDispatchSettings) -> anyhow::Result<()> {
-        let step_wrapper = self.tx_to_step();
-        let tx = step_wrapper
-            .env
-            .world
-            .tx_call_to_blockchain_tx(&step_wrapper.step.tx);
-        step_wrapper
-            .env
-            .world
-            .set_nonce_sign_and_dispatch(tx, settings)
-            .await
     }
 }
 

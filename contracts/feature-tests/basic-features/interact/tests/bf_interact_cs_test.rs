@@ -108,7 +108,7 @@ async fn send_esdt_to_non_existent_address_test() {
         .tx()
         .from(&registered_wallet_address)
         .to(&not_registered_wallet_address)
-        .payment(Payment::try_new(token, 1, 10u16).unwrap())
+        .payment(Payment::try_new(token, 0, 10u16).unwrap())
         .run()
         .await;
 }

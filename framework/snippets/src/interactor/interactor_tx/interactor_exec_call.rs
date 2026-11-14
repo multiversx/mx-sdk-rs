@@ -15,8 +15,7 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::TxDispatchSettings;
-use crate::{DispatchError, InteractorBase, interactor::interactor_dispatch::print_tx_results};
+use crate::{DispatchError, InteractorBase};
 
 use super::{
     InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
@@ -134,29 +133,6 @@ where
             .env
             .world
             .tx_call_to_blockchain_tx(&step_wrapper.step.tx)
-    }
-
-    /// Temporarily replaces the interactor dispatch settings.
-    /// A failed tx is reported, but is not an error, the same as for the other tx kinds.
-    async fn run_with_settings(self, settings: &TxDispatchSettings) -> anyhow::Result<()> {
-        let mut step_wrapper = self.tx_to_step();
-        let world = &mut step_wrapper.env.world;
-        let previous_settings = std::mem::replace(&mut world.dispatch_settings, settings.clone());
-        let result = world.sc_call_dispatch(&mut step_wrapper.step).await;
-        world.dispatch_settings = previous_settings;
-
-        match result {
-            Ok(()) => {
-                print_tx_results(step_wrapper.step.response());
-                Ok(())
-            }
-            Err(DispatchError::Interrupted(_)) => Ok(()),
-            Err(DispatchError::TxFailed(status)) => {
-                println!("Transaction failed: {status}");
-                Ok(())
-            }
-            Err(err) => Err(err.into()),
-        }
     }
 }
 

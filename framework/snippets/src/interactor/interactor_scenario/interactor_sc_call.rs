@@ -1,19 +1,16 @@
 use std::process;
 
 use super::error_message::simulate_gas_sc_call_err_message;
-use crate::{
-    DispatchError, InteractorBase, SimulateGas, TxInterrupted, TxOutputFile, TxOutputTarget,
-    interactor::interactor_dispatch::check_tx_expect, network_response,
-};
+use crate::{DispatchError, InteractorBase, interactor::interactor_dispatch::check_tx_expect};
 use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
 use multiversx_sdk::chain_core::std::base64_encode;
 use multiversx_sdk::chain_core::types::GasResult;
+use multiversx_sdk::data::transaction::Transaction;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
-use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
-use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -35,69 +32,14 @@ where
         sc_call_step: &mut ScCallStep,
     ) -> Result<(), DispatchError> {
         let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
+        self.apply_simulated_gas(&mut transaction, &mut sc_call_step.tx.gas_limit, "SC call")
+            .await?;
 
-        if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
-            let sim_result = self
-                .request_simulate_gas(&transaction)
-                .await
-                .map_err(DispatchError::Gateway)?;
-            println!("Gas simulation for the SC call: {sim_result}.");
-            let Some(sim_gas) = sim_result.gas_used() else {
-                return Err(DispatchError::Simulate(sim_result));
-            };
-            let gas = SimulateGas::adjust_simulated_gas(sim_gas);
-            sc_call_step.tx.gas_limit = gas.into();
-            transaction.gas_limit = gas;
-
-            // sign again, because gas changed
-            self.sign_tx(&mut transaction);
+        if self.dispatch_settings.send.is_some() {
+            self.pre_runners.run_sc_call_step(sc_call_step);
         }
 
-        let settings = self.dispatch_settings.clone();
-        let mut output =
-            TxOutputFile::from_transaction(transaction.clone()).map_err(std::io::Error::other)?;
-
-        let Some(send) = &settings.send else {
-            output.save_output(&settings.output)?;
-            return Err(TxInterrupted {
-                output: settings.output,
-                tx_hash: None,
-            }
-            .into());
-        };
-
-        // the signed tx is kept, even if broadcasting fails
-        if matches!(settings.output, TxOutputTarget::File(_)) {
-            output.write_output(&settings.output)?;
-        }
-
-        self.pre_runners.run_sc_call_step(sc_call_step);
-
-        let tx_hash = self
-            .broadcast_transaction(&transaction, "sc call")
-            .await
-            .map_err(DispatchError::Gateway)?;
-        output.emitted_transaction_hash = tx_hash.clone();
-
-        if !send.wait_result {
-            output.save_output(&settings.output)?;
-            return Err(TxInterrupted {
-                output: settings.output,
-                tx_hash: Some(tx_hash),
-            }
-            .into());
-        }
-
-        self.generate_blocks_until_tx_processed(&tx_hash)
-            .await
-            .map_err(DispatchError::Gateway)?;
-        let (tx_on_network, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash)
-            .await
-            .map_err(DispatchError::Gateway)?;
-        output.transaction_on_network = Some(tx_on_network.clone());
-        output.save_output(&settings.output)?;
-
-        let tx_response = network_response::parse_tx_response(tx_on_network, return_code);
+        let tx_response = self.dispatch_signed_tx(&transaction, "sc call").await?;
         check_tx_expect(sc_call_step.expect.as_ref(), &tx_response)?;
         sc_call_step.save_response(tx_response);
 
@@ -142,10 +84,6 @@ where
                 process::exit(1)
             }
         }
-    }
-
-    async fn request_simulate_gas(&self, transaction: &Transaction) -> anyhow::Result<GasResult> {
-        self.proxy().request(SimulateTxRequest(transaction)).await
     }
 
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {

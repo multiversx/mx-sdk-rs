@@ -1,7 +1,7 @@
 use std::process;
 
-use super::error_message::{simulate_gas_deploy_err_message, simulate_gas_no_estimate_err_message};
-use crate::{InteractorBase, SimulateGas, network_response};
+use super::error_message::simulate_gas_deploy_err_message;
+use crate::{DispatchError, InteractorBase, interactor::interactor_dispatch::check_tx_expect};
 use multiversx_sc_scenario::{
     imports::Bech32Address,
     mandos_system::ScenarioRunner,
@@ -9,9 +9,9 @@ use multiversx_sc_scenario::{
 };
 use multiversx_sdk::chain_core::std::base64_encode;
 use multiversx_sdk::chain_core::types::GasResult;
+use multiversx_sdk::data::transaction::Transaction;
 use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
-use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
-use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
+use multiversx_sdk::gateway::GatewayAsyncService;
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -53,64 +53,61 @@ where
         transaction
     }
 
+    /// Dispatches the SC deploy according to `self.dispatch_settings`, panics on any error.
     pub async fn sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) {
+        if let Err(err) = self.sc_deploy_dispatch(sc_deploy_step).await {
+            panic!("SC deploy: {err}");
+        }
+    }
+
+    /// Signs the SC deploy, then writes and/or sends it, according to `self.dispatch_settings`.
+    ///
+    /// If the result is awaited, it is checked against the step expectation,
+    /// then saved in the step, for the result handlers to process.
+    pub async fn sc_deploy_dispatch(
+        &mut self,
+        sc_deploy_step: &mut ScDeployStep,
+    ) -> Result<(), DispatchError> {
         let mut transaction = self.sc_deploy_to_blockchain_signed_tx(sc_deploy_step).await;
+        self.apply_simulated_gas(
+            &mut transaction,
+            &mut sc_deploy_step.tx.gas_limit,
+            "SC deploy",
+        )
+        .await?;
 
-        if SimulateGas::is_mandos_simulate_gas_marker(&sc_deploy_step.tx.gas_limit) {
-            let sim_result = self.sc_deploy_simulate_transaction(&transaction).await;
-            let Some(sim_gas) = sim_result.gas_used() else {
-                simulate_gas_no_estimate_err_message("deploy", &sim_result);
-                process::exit(1)
-            };
-            let gas = SimulateGas::adjust_simulated_gas(sim_gas);
-            sc_deploy_step.tx.gas_limit = gas.into();
-            transaction.gas_limit = gas;
-
-            // sign again, because gas changed
-            self.sign_tx(&mut transaction);
+        if self.dispatch_settings.send.is_some() {
+            self.pre_runners.run_sc_deploy_step(sc_deploy_step);
         }
 
-        self.pre_runners.run_sc_deploy_step(sc_deploy_step);
+        let tx_response = self.dispatch_signed_tx(&transaction, "sc deploy").await?;
+        check_tx_expect(sc_deploy_step.expect.as_ref(), &tx_response)?;
+        sc_deploy_step.save_response(tx_response);
 
-        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "sc deploy").await else {
-            process::exit(1)
-        };
+        // missing if the deploy failed, and a result handler accepted that
+        if let Some(new_address) = sc_deploy_step.response().new_deployed_address.clone() {
+            let new_address_bech32 = Bech32Address::encode_address(self.get_hrp(), new_address);
+            if let Some(ex) = &self.explorer_url {
+                println!("new contract: {}", ex.address_url(&new_address_bech32));
+            } else {
+                println!("new contract address: {new_address_bech32}");
+            }
 
-        self.generate_blocks_until_tx_processed(&tx_hash)
-            .await
-            .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash.clone())
-            .await
-            .expect("failed to fetch transaction result");
-
-        let addr = sc_deploy_step.tx.from.clone();
-        let nonce = tx.nonce;
-        sc_deploy_step.save_response(network_response::parse_tx_response(tx, return_code));
-
-        let new_address = sc_deploy_step
-            .response()
-            .new_deployed_address
-            .clone()
-            .unwrap();
-        let new_address_bech32 = Bech32Address::encode_address(self.get_hrp(), new_address);
-
-        let set_state_step = SetStateStep::new().new_address(addr, nonce, &new_address_bech32);
-
-        if let Some(ex) = &self.explorer_url {
-            println!("new contract: {}", ex.address_url(&new_address_bech32));
-        } else {
-            println!("new contract address: {new_address_bech32}");
+            let set_state_step = SetStateStep::new().new_address(
+                sc_deploy_step.tx.from.clone(),
+                transaction.nonce,
+                &new_address_bech32,
+            );
+            self.pre_runners.run_set_state_step(&set_state_step);
+            self.post_runners.run_set_state_step(&set_state_step);
         }
-        self.pre_runners.run_set_state_step(&set_state_step);
-        self.post_runners.run_set_state_step(&set_state_step);
 
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
+        Ok(())
     }
 
     async fn sc_deploy_simulate_transaction(&mut self, transaction: &Transaction) -> GasResult {
-        let gas_result = self.proxy().request(SimulateTxRequest(transaction)).await;
-
-        match gas_result {
+        match self.request_simulate_gas(transaction).await {
             Ok(gas) => {
                 println!("Gas simulation for the SC deploy: {gas}.");
                 log::info!("Gas simulation for the SC deploy: {gas}.");
