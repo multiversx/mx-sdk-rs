@@ -8,14 +8,7 @@ use multiversx_sc_snippets::{
 use super::tx_cli_common::build_arg_buffer;
 use crate::cli::cli_args_tx::QueryArgs;
 
-pub async fn tx_query(args: &QueryArgs) {
-    if let Err(e) = tx_query_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_query_inner(args: &QueryArgs) -> Result<()> {
+pub async fn tx_query(args: &QueryArgs) -> Result<()> {
     let contract = Bech32Address::try_from_bech32_string(args.contract.clone())?;
 
     // Encode arguments as hex strings (the gateway expects hex, no "0x" prefix).

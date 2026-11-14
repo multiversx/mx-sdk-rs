@@ -4,8 +4,8 @@ use anyhow::{Context, Result, anyhow};
 use multiversx_sc::imports::Bech32Address;
 use multiversx_sc_snippets::{
     imports::{
-        BytesValue, Interactor, InterpretableFrom, InterpreterContext, ManagedArgBuffer,
-        ManagedBuffer, StaticApi,
+        BytesValue, DispatchError, Interactor, InterpretableFrom, InterpreterContext,
+        ManagedArgBuffer, ManagedBuffer, ManagedVec, StaticApi,
     },
     sdk::data::transaction::Transaction,
 };
@@ -51,13 +51,14 @@ pub fn build_arg_buffer(arguments: &[String]) -> Result<ManagedArgBuffer<StaticA
 }
 
 /// Create an interactor connected to `gateway`, with chain-simulator mode auto-detected,
-/// the explicit nonce override from `tx` applied, the gas price override applied, and
+/// the dispatch settings, nonce override and gas price override from `tx` applied, and
 /// the chain ID validated against `gateway.chain` (if given).
 pub(super) async fn create_interactor(gateway: &GatewayArgs, tx: &TxArgs) -> Result<Interactor> {
     let mut interactor = Interactor::empty()
         .with_connection(&gateway.proxy)
         .await
-        .use_chain_simulator_auto();
+        .use_chain_simulator_auto()
+        .with_dispatch_settings(tx.dispatch_settings());
     interactor.override_next_tx_nonce = tx.nonce;
     apply_gas_price(&mut interactor, tx);
     validate_chain_id(&interactor, gateway)?;
@@ -75,6 +76,30 @@ fn validate_chain_id(interactor: &Interactor, gateway_args: &GatewayArgs) -> Res
         interactor.validate_chain_id(chain_id)?;
     }
     Ok(())
+}
+
+/// Reports the outcome of a `dispatch()`.
+///
+/// Neither a failed transaction nor an interrupt (tx only written, or not awaited) is an error:
+/// the transaction was dispatched as requested.
+pub(super) fn report_dispatch_result(
+    result: Result<ManagedVec<StaticApi, ManagedBuffer<StaticApi>>, DispatchError>,
+) -> Result<()> {
+    match result {
+        Ok(results) => {
+            println!("Transaction successful.");
+            for (index, result) in results.iter().enumerate() {
+                println!("Result[{index}]: 0x{}", hex::encode(result.to_vec()));
+            }
+            Ok(())
+        }
+        Err(DispatchError::Interrupted(_)) => Ok(()),
+        Err(DispatchError::TxFailed(status)) => {
+            println!("Transaction failed: {status}");
+            Ok(())
+        }
+        Err(err) => Err(err.into()),
+    }
 }
 
 pub async fn load_relayer_for_interactor(

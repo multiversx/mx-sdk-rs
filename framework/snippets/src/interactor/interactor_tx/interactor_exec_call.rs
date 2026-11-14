@@ -15,14 +15,14 @@ use multiversx_sdk::{
     chain_core::types::GasResult, data::transaction::Transaction, gateway::GatewayAsyncService,
 };
 
-use crate::InteractorBase;
+use crate::{DispatchError, InteractorBase};
 
 use super::{
-    InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction, InteractorPrepareAsync,
-    InteractorRunAsync, InteractorSimulateGasAsync,
+    InteractorDispatchAsync, InteractorEnvExec, InteractorExecStep, InteractorIntoSdkTransaction,
+    InteractorPrepareAsync, InteractorRunAsync, InteractorSimulateGasAsync,
 };
 
-async fn run_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
+async fn dispatch_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
     tx: Tx<
         InteractorEnvExec<'w, GatewayProxy>,
         From,
@@ -32,7 +32,7 @@ async fn run_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
         FunctionCall<StaticApi>,
         RH,
     >,
-) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+) -> Result<<RH::ListReturns as NestedTupleFlatten>::Unpacked, DispatchError>
 where
     GatewayProxy: GatewayAsyncService,
     From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
@@ -43,8 +43,12 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     let mut step_wrapper = tx.tx_to_step();
-    step_wrapper.env.world.sc_call(&mut step_wrapper.step).await;
-    step_wrapper.process_result()
+    step_wrapper
+        .env
+        .world
+        .sc_call_dispatch(&mut step_wrapper.step)
+        .await?;
+    Ok(step_wrapper.process_result())
 }
 
 async fn simulate_gas_async_call<'w, GatewayProxy, From, To, Payment, Gas, RH>(
@@ -87,8 +91,28 @@ where
 {
     type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run(self) -> impl std::future::Future<Output = Self::Result> {
-        run_async_call(self)
+    async fn run(self) -> Self::Result {
+        dispatch_async_call(self)
+            .await
+            .unwrap_or_else(|err| panic!("SC call: {err}"))
+    }
+}
+
+impl<'w, GatewayProxy, From, To, Payment, Gas, RH> InteractorDispatchAsync
+    for Tx<InteractorEnvExec<'w, GatewayProxy>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    GatewayProxy: GatewayAsyncService,
+    From: TxFromSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    To: TxToSpecified<InteractorEnvExec<'w, GatewayProxy>>,
+    Payment: TxPayment<InteractorEnvExec<'w, GatewayProxy>>,
+    Gas: TxGas<InteractorEnvExec<'w, GatewayProxy>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w, GatewayProxy>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Result = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn dispatch(self) -> impl std::future::Future<Output = Result<Self::Result, DispatchError>> {
+        dispatch_async_call(self)
     }
 }
 

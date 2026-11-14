@@ -11,14 +11,7 @@ use crate::cmd::tx_cli::tx_cli_common::{
 
 use super::parse_payments::parse_all_payment_args;
 
-pub async fn tx_new(args: &NewArgs) {
-    if let Err(e) = tx_new_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_new_inner(args: &NewArgs) -> Result<()> {
+pub async fn tx_new(args: &NewArgs) -> Result<()> {
     let sender_wallet = load_wallet(&args.sender)?;
     let receiver = Bech32Address::try_from_bech32_string(args.receiver.clone())?;
 
@@ -48,12 +41,7 @@ async fn tx_new_inner(args: &NewArgs) -> Result<()> {
     interactor.set_tx_nonce_update_sender(&mut tx).await;
 
     interactor
-        .sign_and_dispatch(
-            tx,
-            args.tx.send,
-            args.tx.wait_result,
-            args.tx.outfile.as_deref(),
-        )
+        .sign_and_dispatch(tx, &args.tx.dispatch_settings())
         .await
 }
 
