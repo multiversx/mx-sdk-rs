@@ -1,3 +1,7 @@
+mod api_account;
+mod api_contracts;
+mod api_events;
+mod api_tx;
 mod gateway_account;
 mod gateway_account_esdt_roles;
 mod gateway_account_esdt_tokens;
@@ -22,6 +26,10 @@ mod gateway_tx_vmquery;
 
 use std::fmt::Display;
 
+pub use api_account::{ApiGetAccountRequest, ApiGetUpgradesRequest};
+pub use api_contracts::{ApiCountContractsRequest, ApiListContractsRequest, ApiSortOrder};
+pub use api_events::ApiGetEventsRequest;
+pub use api_tx::{ApiGetTxRequest, ApiListTransactionsRequest};
 pub use gateway_account::GetAccountRequest;
 pub use gateway_account_esdt_roles::GetAccountEsdtRolesRequest;
 pub use gateway_account_esdt_tokens::GetAccountEsdtTokensRequest;
@@ -44,12 +52,21 @@ pub use gateway_tx_simulate::SimulateTxRequest;
 pub use gateway_tx_status::GetTxStatus;
 pub use gateway_tx_vmquery::VMQueryRequest;
 
+pub const MAINNET_API: &str = "https://api.multiversx.com";
+pub const TESTNET_API: &str = "https://testnet-api.multiversx.com";
+pub const DEVNET_API: &str = "https://devnet-api.multiversx.com";
+
 pub const MAINNET_GATEWAY: &str = "https://gateway.multiversx.com";
 pub const TESTNET_GATEWAY: &str = "https://testnet-gateway.multiversx.com";
 pub const DEVNET_GATEWAY: &str = "https://devnet-gateway.multiversx.com";
 
 // MetachainShardId will be used to identify a shard ID as metachain
 pub const METACHAIN_SHARD_ID: u32 = 0xFFFFFFFF;
+
+// MultiversX API (not gateway) endpoints
+const API_ACCOUNTS_ENDPOINT: &str = "accounts";
+const API_TRANSACTIONS_ENDPOINT: &str = "transactions";
+const API_EVENTS_ENDPOINT: &str = "events";
 
 const ACCOUNT_ENDPOINT: &str = "address";
 const KEYS_ENDPOINT: &str = "keys";
@@ -76,6 +93,15 @@ const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 const ADD_KEYS: &str = "simulator/add-keys";
 
+/// Percent-encodes the characters of a base64 string (e.g. an API pagination cursor)
+/// that are not allowed in a query value.
+pub(crate) fn encode_base64_query_value(value: &str) -> String {
+    value
+        .replace('+', "%2B")
+        .replace('/', "%2F")
+        .replace('=', "%3D")
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum GatewayRequestType {
     Get,
@@ -93,7 +119,14 @@ impl Display for GatewayRequestType {
     }
 }
 
-/// Models requests to the gateway.
+/// Models requests to the gateway, or to the MultiversX API.
+///
+/// Both services are HTTP + JSON, so the same trait covers them:
+/// - gateway requests decode the gateway's `{data, error, code}` wrapper and unwrap it in `process_json`;
+/// - API requests (the `Api*` types) decode the API's plain JSON response directly.
+///
+/// The request does not know which service it targets: it must be sent through a proxy created with
+/// the matching URL (e.g. `MAINNET_GATEWAY` or `MAINNET_API`).
 pub trait GatewayRequest {
     type Payload: serde::ser::Serialize + ?Sized;
 
@@ -112,6 +145,7 @@ pub trait GatewayRequest {
     fn process_json(&self, decoded: Self::DecodedJson) -> anyhow::Result<Self::Result>;
 }
 
+/// Sends [`GatewayRequest`]s to a gateway, or to the MultiversX API, depending on the URI it was created from.
 pub trait GatewayAsyncService {
     /// Keeps track of elapsed time.
     type Instant;
