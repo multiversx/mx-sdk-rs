@@ -315,11 +315,9 @@ only when maintaining lemmas).
 **Functional gaps**
 
 - Argument types limited to `BigUint`, `u32`, `u64`.
-- The framework declares 12 test hooks; the K model has 14. `setESDTRole` and `checkESDTRole` are
-  missing from `test_api_node.rs` and the signature list.
+- ~~`setESDTRole` and `checkESDTRole` missing from the framework~~ added.
 - `adder-pt/sc-config.toml` uses `ei = "ignore"` with a TODO for a proper parametric-test EI option.
-- `multisig-pt` and `testapi-pt` still carry a legacy `foundry.json` in the old `contract_paths`
-  format.
+- ~~Legacy `foundry.json` files~~ removed.
 - Loops over symbolic bounds need hand-written invariants; there is no user-facing way to supply
   them in the `kasmer` flow.
 - Two lemma files are specific to particular contracts, a sign that new contracts will tend to
