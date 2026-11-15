@@ -21,4 +21,6 @@ pub const TEST_API_HOOK_SIGNATURES: &[VmHookSignature] = &[
     VmHookSignature::new("setBlockTimestamp", &[ValType::I64], None),
     VmHookSignature::new("setExternalBalance", &[ValType::I32, ValType::I32], None),
     VmHookSignature::new("setESDTExternalBalance", &[ValType::I32, ValType::I32, ValType::I32], None),
+    VmHookSignature::new("setESDTRole", &[ValType::I32, ValType::I32, ValType::I32, ValType::I32], None),
+    VmHookSignature::new("checkESDTRole", &[ValType::I32, ValType::I32, ValType::I32], Some(ValType::I32)),
 ];

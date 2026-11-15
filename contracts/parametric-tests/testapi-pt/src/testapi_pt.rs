@@ -12,6 +12,7 @@ pub trait TestTestapi {
 
         self.test_set_balance(&alice);
         self.test_set_esdt_balance(&alice);
+        self.test_set_esdt_role(&alice);
         self.test_set_timestamp();
         self.test_set_get_storage(&alice);
     }
@@ -46,6 +47,37 @@ pub trait TestTestapi {
         require!(
             value == actual,
             "Actual esdt balance does not match the given value"
+        );
+    }
+
+    fn test_set_esdt_role(&self, addr: &ManagedAddress) {
+        // Given
+        let token = TokenIdentifier::from("MY_ESDT_TOKEN");
+        require!(
+            !self.test_raw().check_esdt_role(addr, &token, EsdtLocalRole::Mint),
+            "Role present before it was set"
+        );
+
+        // When
+        self.test_raw().set_esdt_role(addr, &token, EsdtLocalRole::Mint, true);
+
+        // Expect
+        require!(
+            self.test_raw().check_esdt_role(addr, &token, EsdtLocalRole::Mint),
+            "Role missing after it was set"
+        );
+        require!(
+            !self.test_raw().check_esdt_role(addr, &token, EsdtLocalRole::Burn),
+            "Unrelated role present"
+        );
+
+        // When
+        self.test_raw().set_esdt_role(addr, &token, EsdtLocalRole::Mint, false);
+
+        // Expect
+        require!(
+            !self.test_raw().check_esdt_role(addr, &token, EsdtLocalRole::Mint),
+            "Role present after it was removed"
         );
     }
 
