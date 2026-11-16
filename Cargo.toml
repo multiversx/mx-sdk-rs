@@ -209,6 +209,8 @@ members = [
 
   "contracts/parametric-tests/adder-pt",
   "contracts/parametric-tests/adder-pt/meta",
+  "contracts/parametric-tests/adder-pt-fail",
+  "contracts/parametric-tests/adder-pt-fail/meta",
   "contracts/parametric-tests/addercaller",
   "contracts/parametric-tests/addercaller/meta",
   "contracts/parametric-tests/callee",

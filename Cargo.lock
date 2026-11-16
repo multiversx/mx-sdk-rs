@@ -55,6 +55,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "adder-pt-fail"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "adder-pt-fail-meta"
+version = "0.0.0"
+dependencies = [
+ "adder-pt-fail",
+ "multiversx-sc-meta-lib",
+]
+
+[[package]]
 name = "adder-pt-meta"
 version = "0.0.0"
 dependencies = [

@@ -101,4 +101,29 @@ pub trait TestApiImpl: HandleTypeInfo + ErrorApi {
     ) {
         Self::error_api_impl().signal_error(TEST_API_ERROR_MSG.as_bytes());
     }
+
+    /// Gives or takes away a local role of an account for a token.
+    ///
+    /// `role` is the number given by `EsdtLocalRole::as_u16`.
+    fn set_esdt_role(
+        &self,
+        address: Self::ManagedBufferHandle,
+        token_id: Self::ManagedBufferHandle,
+        role: u32,
+        set: bool,
+    ) {
+        Self::error_api_impl().signal_error(TEST_API_ERROR_MSG.as_bytes());
+    }
+
+    /// Checks whether an account has a local role for a token.
+    ///
+    /// `role` is the number given by `EsdtLocalRole::as_u16`.
+    fn check_esdt_role(
+        &self,
+        address: Self::ManagedBufferHandle,
+        token_id: Self::ManagedBufferHandle,
+        role: u32,
+    ) -> bool {
+        Self::error_api_impl().signal_error(TEST_API_ERROR_MSG.as_bytes());
+    }
 }

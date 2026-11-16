@@ -3,7 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     api::{TestApi, TestApiImpl},
     types::{
-        BigUint, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, TokenIdentifier,
+        BigUint, EsdtLocalRole, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType,
+        TokenIdentifier,
     },
 };
 
@@ -125,5 +126,35 @@ where
             token_id.get_handle(),
             value.get_handle(),
         );
+    }
+
+    /// Gives (`set == true`) or takes away a local role of an account for a token.
+    pub fn set_esdt_role(
+        self,
+        address: &ManagedAddress<A>,
+        token_id: &TokenIdentifier<A>,
+        role: EsdtLocalRole,
+        set: bool,
+    ) {
+        A::test_api_impl().set_esdt_role(
+            address.get_handle(),
+            token_id.get_handle(),
+            role.as_u16() as u32,
+            set,
+        );
+    }
+
+    /// Checks whether an account has a local role for a token.
+    pub fn check_esdt_role(
+        self,
+        address: &ManagedAddress<A>,
+        token_id: &TokenIdentifier<A>,
+        role: EsdtLocalRole,
+    ) -> bool {
+        A::test_api_impl().check_esdt_role(
+            address.get_handle(),
+            token_id.get_handle(),
+            role.as_u16() as u32,
+        )
     }
 }

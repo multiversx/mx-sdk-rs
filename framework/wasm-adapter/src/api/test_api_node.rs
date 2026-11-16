@@ -32,6 +32,10 @@ unsafe extern "C" {
     fn setExternalBalance(addressHandle: i32, valueHandle: i32);
 
     fn setESDTExternalBalance(addressHandle: i32, tokenIdHandle: i32, valueHandle: i32);
+
+    fn setESDTRole(addressHandle: i32, tokenIdHandle: i32, role: i32, set: i32);
+
+    fn checkESDTRole(addressHandle: i32, tokenIdHandle: i32, role: i32) -> i32;
 }
 
 impl TestApi for VmApiImpl {
@@ -167,5 +171,26 @@ impl TestApiImpl for VmApiImpl {
         unsafe {
             setESDTExternalBalance(address, token_id, value);
         }
+    }
+
+    fn set_esdt_role(
+        &self,
+        address: Self::ManagedBufferHandle,
+        token_id: Self::ManagedBufferHandle,
+        role: u32,
+        set: bool,
+    ) {
+        unsafe {
+            setESDTRole(address, token_id, role as i32, set as i32);
+        }
+    }
+
+    fn check_esdt_role(
+        &self,
+        address: Self::ManagedBufferHandle,
+        token_id: Self::ManagedBufferHandle,
+        role: u32,
+    ) -> bool {
+        unsafe { checkESDTRole(address, token_id, role as i32) != 0 }
     }
 }
