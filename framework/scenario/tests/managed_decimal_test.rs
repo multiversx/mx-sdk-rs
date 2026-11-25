@@ -743,3 +743,39 @@ fn test_managed_decimal_nth_root() {
 fn test_managed_decimal_nth_root_zero_k() {
     let _ = md4(40000).nth_root(0);
 }
+
+#[test]
+pub fn test_managed_decimal_cmp_different_scales() {
+    use multiversx_sc::types::ManagedDecimalSigned;
+    use multiversx_sc::types::BigInt;
+
+    // 1.5 (1 decimal) vs 1.25 (2 decimals), both operand orders
+    let a: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(15u64), 1usize);
+    let b: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(125u64), 2usize);
+    assert!(a > b);
+    assert!(b < a);
+    assert!(a >= b);
+    assert!(b <= a);
+
+    // left has more decimals: 1.50 vs 1.4
+    let c: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(150u64), 2usize);
+    let d: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(14u64), 1usize);
+    assert!(c > d);
+    assert!(d < c);
+
+    // signed
+    let sa: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(-125i64), 2usize);
+    let sb: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(-14i64), 1usize);
+    assert!(sa > sb);
+    assert!(sb < sa);
+    let sc: ManagedDecimalSigned<StaticApi, NumDecimals> =
+        ManagedDecimalSigned::from_raw_units(BigInt::from(1i64), 3usize);
+    assert!(sc > sb);
+    assert!(sb < sc);
+}
