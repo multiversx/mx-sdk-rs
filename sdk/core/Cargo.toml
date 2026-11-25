@@ -32,6 +32,7 @@ pbkdf2 = { version = "0.13", default-features = false }
 zeroize = "1.4"
 itertools = "0.15"
 pem = "4.0"
+percent-encoding = "2.3"
 log = "0.4"
 scrypt = { version = "0.12", default-features = false }
 aes = "0.9"
