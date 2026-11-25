@@ -1,0 +1,69 @@
+{
+    "name": "addercaller",
+    "comment": "add then check",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "100000",
+                    "esdt": {
+                        "str:MYESDT": "200"
+                    }
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:adder"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy adder",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../../myadder/output/adder.wasm",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "call adder: insufficient EGLD balance",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:adder",
+                "function": "add",
+                "value": "1000000",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "7",
+                "message": "*",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

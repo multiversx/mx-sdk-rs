@@ -98,7 +98,7 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
             Query::simple("elrond_codec", "codec"),
             Query::simple(
                 "elrond_wasm_debug::meta::perform",
-                "multiversx_sc_meta::cli_main",
+                "multiversx_sc_meta_lib::cli_main",
             ),
             Query::simple(
                 "elrond_wasm_debug::mandos_go",

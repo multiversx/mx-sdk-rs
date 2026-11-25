@@ -73,3 +73,34 @@ where
     FromSourceValue: TxFromSourceValue<Env>,
 {
 }
+
+#[diagnostic::on_unimplemented(
+    message = "Type `{Self}` cannot be used as code path (does not implement `TxCodePathValue<{Env}>`)",
+    label = "not a valid smart contract code path",
+    note = "there are multiple ways to specify SC code path, but `{Self}` is not one of them"
+)]
+pub trait TxCodePathValue<Env>: AnnotatedValue<Env, ManagedBuffer<Env::Api>>
+where
+    Env: TxEnv,
+{
+}
+
+impl<Env> TxCodePathValue<Env> for ManagedBuffer<Env::Api> where Env: TxEnv {}
+impl<Env> TxCodePathValue<Env> for &ManagedBuffer<Env::Api> where Env: TxEnv {}
+
+/// Contains code for a deploy or upgrade.
+pub struct CodePath<CodePathValue>(pub CodePathValue);
+
+impl<Env, CodePathValue> TxCodeSource<Env> for CodePath<CodePathValue>
+where
+    Env: TxEnv,
+    CodePathValue: TxCodePathValue<Env>,
+{
+}
+
+impl<Env, CodePathValue> TxCodeSourceSpecified<Env> for CodePath<CodePathValue>
+where
+    Env: TxEnv,
+    CodePathValue: TxCodePathValue<Env>,
+{
+}
