@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use multiversx_sdk::{
     chain_core::{
         std::{base64_decode, new_address::compute_new_address_bech32},
@@ -7,7 +7,8 @@ use multiversx_sdk::{
     data::transaction::{ApiTransactionResult, Transaction},
 };
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+
+use super::TxOutputTarget;
 
 /// mxpy-compatible output format for a signed transaction.
 ///
@@ -56,15 +57,27 @@ impl TxOutputFile {
         })
     }
 
-    /// Write this output to `outfile`, or print to stdout when no outfile is given.
-    pub fn save_output(&self, outfile: Option<&Path>) -> Result<()> {
-        let json = to_json_pretty(self)?;
-        if let Some(path) = outfile {
-            std::fs::write(path, &json)
-                .with_context(|| format!("failed to write to {}", path.display()))?;
+    /// Write this output to a file, print it to stdout, or do nothing, according to `target`.
+    ///
+    /// Also prints a confirmation when written to a file.
+    pub fn save_output(&self, target: &TxOutputTarget) -> std::io::Result<()> {
+        self.write_output(target)?;
+        if let TxOutputTarget::File(path) = target {
             println!("Transaction saved to {}", path.display());
-        } else {
-            println!("{json}");
+        }
+        Ok(())
+    }
+
+    /// Same as [`Self::save_output`], but without the confirmation message.
+    pub fn write_output(&self, target: &TxOutputTarget) -> std::io::Result<()> {
+        match target {
+            TxOutputTarget::NotWritten => {}
+            TxOutputTarget::Stdout => println!("{}", to_json_pretty(self)?),
+            TxOutputTarget::File(path) => {
+                std::fs::write(path, to_json_pretty(self)?).map_err(|err| {
+                    std::io::Error::new(err.kind(), format!("{}: {err}", path.display()))
+                })?
+            }
         }
         Ok(())
     }
@@ -79,14 +92,13 @@ fn tx_opt_deploy_new_address(tx: &Transaction) -> Option<String> {
     }
 }
 
-fn to_json_pretty<T: Serialize>(value: &T) -> Result<String> {
+/// Serialize to JSON with 4-space indentation (matching mxpy output).
+fn to_json_pretty<T: Serialize>(value: &T) -> std::io::Result<String> {
     let mut buf = Vec::new();
     let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
     let mut serializer = serde_json::Serializer::with_formatter(&mut buf, formatter);
-    value
-        .serialize(&mut serializer)
-        .context("failed to serialize transaction")?;
-    String::from_utf8(buf).context("non-UTF8 in serialized JSON")
+    value.serialize(&mut serializer)?;
+    String::from_utf8(buf).map_err(std::io::Error::other)
 }
 
 #[cfg(test)]

@@ -20,7 +20,7 @@ use std::{
 };
 
 use crate::{
-    Sender,
+    Sender, TxDispatchSettings,
     account_tool::retrieve_account_as_scenario_set_state,
     config::{InteractorConfig, load_toml_config},
 };
@@ -93,6 +93,13 @@ where
     /// which overrides the nonce for a single transaction.
     pub override_next_tx_nonce: Option<u64>,
 
+    /// What happens to transactions after they are built and signed:
+    /// where they are written, whether they are broadcast, and whether to wait for results.
+    ///
+    /// Applies to all transactions, but not to queries, which always run.
+    /// Defaults to sending and waiting for the result, without writing any output.
+    pub dispatch_settings: TxDispatchSettings,
+
     /// All wallets registered as transaction signers, keyed by their on-chain
     /// address.  Populated by [`Self::register_wallet`].
     pub sender_map: HashMap<Address, Sender>,
@@ -131,6 +138,7 @@ where
             current_dir: PathBuf::default(),
             gas_price: 0,
             override_next_tx_nonce: None,
+            dispatch_settings: TxDispatchSettings::default(),
             explorer_url: None,
         }
     }
@@ -143,6 +151,12 @@ where
     /// Initializes the interactor current directory.
     pub fn with_current_dir<P: Into<PathBuf>>(mut self, current_dir: P) -> Self {
         self.current_dir = current_dir.into();
+        self
+    }
+
+    /// Sets the dispatch settings used for all subsequent transactions.
+    pub fn with_dispatch_settings(mut self, dispatch_settings: TxDispatchSettings) -> Self {
+        self.dispatch_settings = dispatch_settings;
         self
     }
 

@@ -5,9 +5,7 @@ use crate::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::TxExpectRaw,
     },
-    scenario_model::Checkable,
 };
-use multiversx_chain_vm::host::context::result_values_to_string;
 use multiversx_sc::chain_core::types::ReturnCode;
 
 #[derive(Debug, Clone)]
@@ -97,36 +95,11 @@ impl TxExpect {
         self
     }
 
-    fn check_response(&self, tx_response: &TxResponse) {
-        assert!(
-            self.status.check(tx_response.tx_error.status.as_u64()),
-            "{}result code mismatch. Want: {}. Have: {}. Message: {}",
-            self.additional_error_message,
-            self.status,
-            tx_response.tx_error.status,
-            tx_response.tx_error.message,
-        );
-
-        assert!(
-            self.out.check(&tx_response.out),
-            "{}bad out value. Want: [{}]. Have: [{}]",
-            self.additional_error_message,
-            self.out_to_string(),
-            result_values_to_string(&tx_response.out),
-        );
-
-        assert!(
-            self.message.check(tx_response.tx_error.message.as_str()),
-            "{}result message mismatch. Want: {}. Have: {}.",
-            self.additional_error_message,
-            self.message,
-            tx_response.tx_error.message,
-        );
-    }
-
     pub(crate) fn update_from_response(&mut self, tx_response: &TxResponse) {
         if self.build_from_response {
-            self.check_response(tx_response);
+            if let Err(mismatch) = self.check_response(tx_response) {
+                panic!("{}{mismatch}", self.additional_error_message);
+            }
             *self = tx_response.to_expect();
         }
     }
