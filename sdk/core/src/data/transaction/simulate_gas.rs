@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct SimulateGasTransactionData {
     pub tx_gas_units: u64,
+    /// Non-empty when the simulated transaction fails (e.g. "not enough gas").
+    #[serde(default)]
+    pub return_message: String,
 }
 
 /// Simplified response envelope for the `/transaction/cost` endpoint when only gas units are needed.

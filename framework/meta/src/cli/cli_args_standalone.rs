@@ -394,13 +394,16 @@ impl AllArgs {
             result.meta_lib_args.target_dir_meta = Some(target_dir_all.clone());
             match &mut result.command {
                 ContractCliAction::Build(build_args) => {
-                    build_args.target_dir_wasm = Some(target_dir_all.clone());
+                    build_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 ContractCliAction::BuildDbg(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 ContractCliAction::Twiggy(build_args) => {
                     build_args.target_dir_wasm = Some(target_dir_all.clone());
+                }
+                ContractCliAction::Check(check_args) => {
+                    check_args.cargo.target_dir_wasm = Some(target_dir_all.clone());
                 }
                 _ => {}
             }
