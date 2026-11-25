@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::cmd::rust_encode::{sanitize_identifier, string_literal};
+
 /// Grouping for generated constants. Variants are ordered by desired output order.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ConstGroup {
@@ -43,22 +45,37 @@ pub struct ConstState {
 }
 
 impl ConstState {
-    /// Registers a new constant declaration.
+    /// Registers a new constant declaration, and returns its name.
+    ///
+    /// Different values can result in the same base name, in which case a numeric suffix
+    /// is added, so that no declaration overwrites another.
     fn add_const(
         &mut self,
-        name: String,
+        base_name: String,
         const_group: ConstGroup,
         const_type: String,
         initialization: String,
-    ) {
+    ) -> String {
+        let mut name = base_name.clone();
+        let mut suffix = 1;
+        while let Some(existing) = self.const_map.get(&name) {
+            if existing.const_type == const_type && existing.initialization == initialization {
+                return name;
+            }
+            suffix += 1;
+            name = format!("{base_name}_{suffix}");
+        }
+
         self.const_map.insert(
-            name,
+            name.clone(),
             ConstData {
                 const_group,
                 const_type,
                 initialization,
             },
         );
+
+        name
     }
 
     /// Renders all registered constants, sorted by group, then by type name, then by const name.
@@ -81,13 +98,15 @@ impl ConstState {
         buf
     }
 
+    /// Converts arbitrary text to a valid upper-case constant name.
+    fn to_const_name(text: &str) -> String {
+        sanitize_identifier(&text.to_uppercase())
+    }
+
     /// Converts an address name to an upper-case constant name.
     /// Example: "my-address" -> "MY_ADDRESS_ADDRESS"
     fn address_to_const_name(name: &str) -> String {
-        format!(
-            "{}_ADDRESS",
-            name.to_uppercase().replace(['-', '.', ' '], "_")
-        )
+        Self::to_const_name(&format!("{name}_ADDRESS"))
     }
 
     /// Derives a constant name from a code path expression.
@@ -98,12 +117,9 @@ impl ConstState {
             .unwrap_or(code_path_expr);
         let filename = path_str.rsplit('/').next().unwrap_or(path_str);
 
-        let contract_name = filename
-            .strip_suffix(".mxsc.json")
-            .unwrap_or(filename)
-            .replace('-', "_");
+        let contract_name = filename.strip_suffix(".mxsc.json").unwrap_or(filename);
 
-        format!("{}_CODE_PATH", contract_name.to_uppercase())
+        Self::to_const_name(&format!("{contract_name}_CODE_PATH"))
     }
 
     /// Formats a code path expression, generating a constant if needed.
@@ -119,11 +135,11 @@ impl ConstState {
             .unwrap_or(code_path_expr);
         let path_value = path_value.strip_prefix("../").unwrap_or(path_value);
 
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            const_name,
             ConstGroup::CodePath,
             "MxscPath".to_string(),
-            format!("MxscPath::new(\"{}\")", path_value),
+            format!("MxscPath::new({})", string_literal(path_value)),
         );
 
         self.code_path_map
@@ -138,13 +154,11 @@ impl ConstState {
             return const_name.clone();
         }
 
-        let const_name = name.to_uppercase().replace('-', "_");
-
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            Self::to_const_name(name),
             ConstGroup::TokenId,
             "TestTokenId".to_string(),
-            format!("TestTokenId::new(\"{}\")", name),
+            format!("TestTokenId::new({})", string_literal(name)),
         );
 
         self.token_id_map
@@ -162,8 +176,8 @@ impl ConstState {
         self.h256_counter += 1;
         let const_name = format!("H256_{}", self.h256_counter);
 
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            const_name,
             ConstGroup::Hash,
             "H256".to_string(),
             format!("H256::from_hex(\"{}\")", hex_str),
@@ -186,8 +200,8 @@ impl ConstState {
         *counter += 1;
         let const_name = format!("HEX_{size}_{counter:02}");
 
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            const_name,
             ConstGroup::ByteArray,
             format!("[u8; {}]", size),
             format!("hex!(\"{}\")", hex_str),
@@ -206,7 +220,7 @@ impl ConstState {
             addr,
             name,
             "TestAddress",
-            &format!("TestAddress::new(\"{}\")", name),
+            &format!("TestAddress::new({})", string_literal(name)),
         )
     }
 
@@ -217,7 +231,7 @@ impl ConstState {
             addr,
             name,
             "TestSCAddress",
-            &format!("TestSCAddress::new(\"{}\")", name),
+            &format!("TestSCAddress::new({})", string_literal(name)),
         )
     }
 
@@ -233,10 +247,8 @@ impl ConstState {
             return const_name.clone();
         }
 
-        let const_name = Self::address_to_const_name(name);
-
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            Self::address_to_const_name(name),
             ConstGroup::Address,
             const_type.to_string(),
             initialization.to_string(),
@@ -257,11 +269,11 @@ impl ConstState {
         self.hex_address_counter += 1;
         let const_name = format!("ADDRESS_HEX_{}", self.hex_address_counter);
 
-        self.add_const(
-            const_name.clone(),
+        let const_name = self.add_const(
+            const_name,
             ConstGroup::Address,
             "Address".to_string(),
-            format!("Address::from_hex(\"{}\")", hex),
+            format!("Address::from_hex({})", string_literal(hex)),
         );
 
         self.hex_address_map

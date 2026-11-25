@@ -61,3 +61,6 @@ tags
 
 # Python scripts
 **/__pycache__/**
+
+# Graphify graph
+graphify-out/

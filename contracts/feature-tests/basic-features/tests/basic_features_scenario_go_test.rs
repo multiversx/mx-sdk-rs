@@ -226,6 +226,11 @@ fn echo_tuple_into_multiresult_go() {
 }
 
 #[test]
+fn echo_u_128_go() {
+    world().run("scenarios/echo_u128.scen.json");
+}
+
+#[test]
 fn echo_u_64_go() {
     world().run("scenarios/echo_u64.scen.json");
 }
