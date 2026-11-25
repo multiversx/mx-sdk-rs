@@ -5,7 +5,7 @@ use super::{num_format, test_generator::TestGenerator};
 impl TestGenerator {
     pub(super) fn generate_set_state(&mut self, set_state: &SetStateStep) {
         if let Some(comment_text) = &set_state.comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         // Generate current block info

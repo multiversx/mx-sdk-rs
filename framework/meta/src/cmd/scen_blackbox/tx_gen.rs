@@ -4,20 +4,21 @@ use multiversx_sc_scenario::scenario::model::{
 use multiversx_sc_scenario::scenario_format::serde_raw::ValueSubTree;
 
 use super::test_generator::TestGenerator;
+use crate::cmd::rust_encode::{is_identifier, string_literal};
 
 impl TestGenerator {
     pub(super) fn generate_sc_deploy(&mut self, sc_deploy: &ScDeployStep) {
         let tx = &sc_deploy.tx;
 
         if let Some(comment_text) = &sc_deploy.comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         self.step_writeln("    world");
         self.step_writeln("        .tx()");
 
         if let Some(id_val) = &sc_deploy.tx_id {
-            self.step_writeln(format!("        .id(\"{}\")", id_val));
+            self.step_writeln(format!("        .id({})", string_literal(id_val)));
         }
 
         let from_addr = self.format_address_value(&tx.from);
@@ -61,14 +62,14 @@ impl TestGenerator {
         let tx = &sc_call.tx;
 
         if let Some(comment_text) = &sc_call.comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         self.step_writeln("    world");
         self.step_writeln("        .tx()");
 
         if let Some(id_val) = &sc_call.tx_id {
-            self.step_writeln(format!("        .id(\"{}\")", id_val));
+            self.step_writeln(format!("        .id({})", string_literal(id_val)));
         }
 
         let from_addr = self.format_address_value(&tx.from);
@@ -85,7 +86,7 @@ impl TestGenerator {
         // Map the endpoint name from scenario to Rust method name
         let inputs = self.abi.find_endpoint_inputs(&tx.function);
         let formatted_args = self.format_inputs(&tx.arguments, inputs.as_deref());
-        let rust_method_name = self.abi.find_endpoint_rust_name(&tx.function);
+        let rust_method_name = self.rust_method_name(&tx.function);
         self.step_writeln(format!(".{}({})", rust_method_name, formatted_args));
         self.step_write("        ");
 
@@ -104,14 +105,14 @@ impl TestGenerator {
         let expect = sc_query.expect.as_ref();
 
         if let Some(comment_text) = &sc_query.comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         self.step_writeln("    world");
         self.step_writeln("        .query()");
 
         if let Some(id_val) = &sc_query.tx_id {
-            self.step_writeln(format!("        .id(\"{}\")", id_val));
+            self.step_writeln(format!("        .id({})", string_literal(id_val)));
         }
 
         let to_addr = self.format_address_value(&tx.to);
@@ -125,7 +126,7 @@ impl TestGenerator {
         // Map the endpoint name from scenario to Rust method name
         let inputs = self.abi.find_endpoint_inputs(&tx.function);
         let formatted_args = self.format_inputs(&tx.arguments, inputs.as_deref());
-        let rust_method_name = self.abi.find_endpoint_rust_name(&tx.function);
+        let rust_method_name = self.rust_method_name(&tx.function);
         self.step_writeln(format!(".{}({})", rust_method_name, formatted_args));
         self.step_write("        ");
 
@@ -133,6 +134,19 @@ impl TestGenerator {
 
         self.step_writeln(".run();");
         self.step_writeln("");
+    }
+
+    /// The name of the proxy method corresponding to a scenario endpoint name.
+    ///
+    /// Panics if it cannot be used as a method name in the generated code.
+    /// This can happen if the endpoint is missing from the ABI, or if the ABI is malformed.
+    fn rust_method_name(&self, endpoint_name: &str) -> String {
+        let rust_name = self.abi.find_endpoint_rust_name(endpoint_name);
+        assert!(
+            is_identifier(&rust_name),
+            "cannot generate call to endpoint {endpoint_name:?}: {rust_name:?} is not a valid Rust method name"
+        );
+        rust_name
     }
 
     /// Generates `.payment(...)` calls for EGLD and ESDT transfers.
@@ -212,9 +226,9 @@ impl TestGenerator {
                     _ => String::new(),
                 };
                 self.step_writeln(format!(
-                    ".with_result(ExpectError({}, \"{}\"))",
+                    ".with_result(ExpectError({}, {}))",
                     status_code,
-                    Self::escape_string(&message)
+                    string_literal(&message)
                 ));
             }
             CheckValue::Star => {
