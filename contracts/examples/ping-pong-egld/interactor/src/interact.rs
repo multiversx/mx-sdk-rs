@@ -1,24 +1,51 @@
 mod interact_cli;
-mod interact_config;
-mod interact_state;
 
-use crate::interact_state::State;
 use clap::Parser;
-pub use interact_config::Config;
-use ping_pong_egld::proxy::{self, ContractState, UserStatus};
-
 use multiversx_sc_snippets::imports::*;
+use ping_pong_egld::proxy::{self, ContractState, UserStatus};
+use serde::{Deserialize, Serialize};
 
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
+/// Ping Pong Interact configuration
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    pub connection: ConnectionConfig,
+    pub owner: WalletConfig,
+    pub wallet: WalletConfig,
+}
+
+impl InteractorConfig for Config {
+    fn connection(&self) -> &ConnectionConfig {
+        &self.connection
+    }
+
+    fn register_wallets(&self) -> Vec<Wallet> {
+        vec![self.owner.wallet().clone(), self.wallet.wallet().clone()]
+    }
+}
+
+/// Ping Pong Interact state
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct State {
+    pub ping_pong_egld_address: Option<Bech32Address>,
+}
+
+impl State {
+    /// Returns the ping pong contract
+    pub fn current_ping_pong_egld_address(&self) -> &Bech32Address {
+        self.ping_pong_egld_address
+            .as_ref()
+            .expect("no known ping pong contract, deploy first")
+    }
+}
+
+pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 const PING_PONG_CODE: MxscPath = MxscPath::new("../output/ping-pong-egld.mxsc.json");
 
 pub async fn ping_pong_egld_cli() {
     env_logger::init();
 
-    let config = Config::load_config();
-
-    let mut interact = PingPongEgldInteract::init(config).await;
+    let mut interact = PingPongEgldInteract::new().await;
 
     let cli = interact_cli::InteractCli::parse();
     match &cli.command {
@@ -43,18 +70,25 @@ pub async fn ping_pong_egld_cli() {
                 .await
         }
         Some(interact_cli::InteractCliCommand::Ping(args)) => {
-            let sender = interact.ping_pong_owner_address.clone();
-            interact
-                .ping(args.cost.unwrap_or_default(), None, &sender)
-                .await
+            let sender = interact.config.owner.address();
+            match interact.ping(&sender, args.cost.unwrap_or_default()).await {
+                Ok(_) => println!("Ping successful!"),
+                Err(err) => println!("Ping failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::Pong) => {
-            let sender = interact.ping_pong_owner_address.clone();
-            interact.pong(None, &sender).await;
+            let sender = interact.config.owner.address();
+            match interact.pong(&sender).await {
+                Ok(_) => println!("Pong successful!"),
+                Err(err) => println!("Pong failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::PongAll) => {
-            let sender = interact.ping_pong_owner_address.clone();
-            interact.pong_all(None, &sender).await;
+            let sender = interact.config.owner.address();
+            match interact.pong_all(&sender).await {
+                Ok(_) => println!("Pong All successful!"),
+                Err(err) => println!("Pong All failed with message: {}", err.message),
+            }
         }
         Some(interact_cli::InteractCliCommand::GetUserAddresses) => {
             let user_addresses = interact.get_user_addresses().await;
@@ -111,40 +145,31 @@ pub async fn ping_pong_egld_cli() {
 
 pub struct PingPongEgldInteract {
     pub interactor: Interactor,
-    pub ping_pong_owner_address: Bech32Address,
-    pub wallet_address: Bech32Address,
-    pub state: State,
+    pub config: Config,
+    pub state: AutoSave<State>,
 }
 
 impl PingPongEgldInteract {
-    pub async fn init(config: Config) -> Self {
-        let mut interactor = Interactor::new(config.gateway_uri())
-            .await
-            .use_chain_simulator(config.use_chain_simulator())
+    pub async fn new() -> Self {
+        let mut interactor = Interactor::empty()
+            .with_current_dir(env!("CARGO_MANIFEST_DIR"))
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-
-        interactor.set_current_dir_from_workspace("contracts/examples/ping-pong-egld/interactor");
-        let ping_pong_owner_address = interactor.register_wallet(test_wallets::eve()).await;
-        let wallet_address = interactor.register_wallet(test_wallets::mallory()).await;
-
-        // generate blocks until ESDTSystemSCAddress is enabled
-        interactor.generate_blocks_until_all_activations().await;
-
+        let config: Config = interactor.load_config_toml().await;
+        let state = interactor.load_state::<State>();
         Self {
             interactor,
-            ping_pong_owner_address: ping_pong_owner_address.into(),
-            wallet_address: wallet_address.into(),
-            state: State::load_state(),
+            config,
+            state,
         }
     }
 
     pub async fn set_state(&mut self) {
-        println!("wallet address: {}", self.wallet_address);
-        self.interactor
-            .retrieve_account(&self.ping_pong_owner_address)
-            .await;
-        self.interactor.retrieve_account(&self.wallet_address).await;
+        let owner_address = self.config.owner.address();
+        let wallet_address = self.config.wallet.address();
+        println!("wallet address: {}", wallet_address);
+        self.interactor.retrieve_account(&owner_address).await;
+        self.interactor.retrieve_account(&wallet_address).await;
     }
 
     pub async fn deploy(
@@ -156,10 +181,11 @@ impl PingPongEgldInteract {
     ) -> (u64, String) {
         self.set_state().await;
 
+        let owner_address = self.config.owner.address();
         let (new_address, status, message) = self
             .interactor
             .tx()
-            .from(&self.ping_pong_owner_address)
+            .from(&owner_address)
             .gas(30_000_000u64)
             .typed(proxy::PingPongEgldProxy)
             .init(ping_amount, duration, opt_activation_timestamp, max_funds)
@@ -171,7 +197,7 @@ impl PingPongEgldInteract {
             .await;
 
         println!("new address: {new_address}");
-        self.state.set_ping_pong_egld_address(new_address);
+        self.state.ping_pong_egld_address = Some(new_address);
 
         (status, message)
     }
@@ -187,7 +213,7 @@ impl PingPongEgldInteract {
             .interactor
             .tx()
             .to(self.state.current_ping_pong_egld_address())
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .gas(30_000_000u64)
             .typed(proxy::PingPongEgldProxy)
             .upgrade(ping_amount, duration, opt_activation_timestamp, max_funds)
@@ -199,7 +225,11 @@ impl PingPongEgldInteract {
         println!("Result: {response:?}");
     }
 
-    pub async fn ping(&mut self, egld_amount: u64, message: Option<&str>, sender: &Bech32Address) {
+    pub async fn ping(
+        &mut self,
+        sender: &Bech32Address,
+        egld_amount: u64,
+    ) -> Result<(), TxResponseStatus> {
         let _data: IgnoreValue = IgnoreValue;
 
         let response = self
@@ -215,16 +245,15 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Ping successful!"),
-            Err(err) => {
-                println!("Ping failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Ping failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
-    pub async fn pong(&mut self, message: Option<&str>, sender: &Bech32Address) {
+    pub async fn pong(&mut self, sender: &Bech32Address) -> Result<(), TxResponseStatus> {
         let response = self
             .interactor
             .tx()
@@ -237,16 +266,15 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Pong successful!"),
-            Err(err) => {
-                println!("Pong failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Pong failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
-    pub async fn pong_all(&mut self, message: Option<String>, sender: &Bech32Address) {
+    pub async fn pong_all(&mut self, sender: &Bech32Address) -> Result<(), TxResponseStatus> {
         let response = self
             .interactor
             .tx()
@@ -259,13 +287,12 @@ impl PingPongEgldInteract {
             .run()
             .await;
 
-        match response {
+        match &response {
             Ok(_) => println!("Pong All successful!"),
-            Err(err) => {
-                println!("Pong All failed with message: {}", err.message);
-                assert_eq!(message.unwrap_or_default(), err.message);
-            }
+            Err(err) => println!("Pong All failed with message: {}", err.message),
         }
+
+        response.map(|_| ())
     }
 
     pub async fn get_user_addresses(&mut self) -> Vec<String> {

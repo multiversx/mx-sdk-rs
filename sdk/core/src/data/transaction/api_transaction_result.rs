@@ -44,6 +44,10 @@ pub struct ApiTransactionResult {
     #[serde(default)]
     pub timestamp: u64,
     pub data: Option<String>,
+
+    /// For smart contract results (type `unsigned`): the hash of the transaction that started it all.
+    #[serde(default)]
+    pub original_transaction_hash: Option<String>,
     pub status: String,
     pub hyperblock_nonce: Option<u64>,
     pub hyperblock_hash: Option<String>,

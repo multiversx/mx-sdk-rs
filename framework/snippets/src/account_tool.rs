@@ -92,7 +92,7 @@ fn set_account(
     account_state.username = Some(format!("str:{}", account.username.as_str()).into());
     account_state.storage = convert_storage(account_storage);
 
-    for (_, esdt_balance) in account_esdt.iter() {
+    for esdt_balance in account_esdt.values() {
         let token_id_expr = format!("str:{}", esdt_balance.token_identifier);
         account_state =
             account_state.esdt_balance(token_id_expr.as_str(), esdt_balance.balance.as_str());

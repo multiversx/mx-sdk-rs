@@ -229,7 +229,7 @@ fn file_contains_proxy_path(file_path: &PathBuf, proxy_name: &str) -> std::io::R
     let file_content = fs::read_to_string(file_path)?;
 
     let proxy_path = Path::new("interactor").join("src").join(proxy_name);
-    let proxy_entry = format!("path = \"{}\"", &proxy_path.to_string_lossy());
+    let proxy_entry = format!("path = \"{}\"", proxy_path.to_string_lossy());
 
     Ok(file_content.contains(&proxy_entry))
 }

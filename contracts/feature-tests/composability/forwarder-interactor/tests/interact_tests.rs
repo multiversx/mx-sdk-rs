@@ -1,4 +1,4 @@
-use forwarder_interact::{Color, Config, ContractInteract};
+use forwarder_interact::{Color, ContractInteract};
 use multiversx_sc_snippets::imports::*;
 
 const ISSUE_COST: u64 = 50000000000000000u64;
@@ -9,7 +9,7 @@ const ISSUE_COST: u64 = 50000000000000000u64;
 #[tokio::test]
 #[ignore = "run on demand, relies on real blockchain state"]
 async fn deploy_test_forwarder() {
-    let mut interactor = ContractInteract::new(Config::new(), None).await;
+    let mut interactor = ContractInteract::new(None).await;
 
     interactor.deploy().await;
 }
@@ -17,7 +17,7 @@ async fn deploy_test_forwarder() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn builtin_func_tokens_test() {
-    let mut interact = ContractInteract::new(Config::new(), None).await;
+    let mut interact = ContractInteract::new(None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -172,7 +172,7 @@ async fn builtin_func_tokens_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn change_to_dynamic_test() {
-    let mut interact = ContractInteract::new(Config::new(), None).await;
+    let mut interact = ContractInteract::new(None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -226,7 +226,7 @@ async fn change_to_dynamic_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn update_token_test() {
-    let mut interact = ContractInteract::new(Config::new(), None).await;
+    let mut interact = ContractInteract::new(None).await;
 
     // deploy forwarder
     interact.deploy().await;
@@ -252,12 +252,12 @@ async fn update_token_test() {
 #[tokio::test]
 #[ignore = "run on demand"]
 async fn modify_creator() {
-    let mut interact = ContractInteract::new(Config::new(), None).await;
+    let mut interact = ContractInteract::new(None).await;
 
     // deploy forwarder
     interact.deploy().await;
 
-    let wallet_address = interact.wallet_address.clone();
+    let wallet_address = interact.wallet_address.to_address();
     let sc_address = interact.state.current_address().clone();
 
     // issue dynamic NFT

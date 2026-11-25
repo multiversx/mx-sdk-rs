@@ -42,7 +42,7 @@ fn validate_endpoint_var_args_number(endpoint_abi: &EndpointAbi) -> Result<(), S
     if num_var_args > 1usize && !endpoint_abi.allow_multiple_var_args {
         return Err(format!(
             "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
-            &endpoint_abi.rust_method_name
+            endpoint_abi.rust_method_name
         ));
     }
 
@@ -57,7 +57,7 @@ fn validate_endpoint_var_args_order(endpoint_abi: &EndpointAbi) -> Result<(), St
         } else if var_args_encountered {
             return Err(format!(
                 "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
-                &endpoint_abi.rust_method_name
+                endpoint_abi.rust_method_name
             ));
         }
     }
@@ -91,7 +91,7 @@ mod tests {
         assert_eq!(
             Err(format!(
                 "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
-                &endpoint_def.rust_method_name
+                endpoint_def.rust_method_name
             )),
             validate_endpoint_var_args_number(&endpoint_def)
         );
@@ -119,7 +119,7 @@ mod tests {
         assert_eq!(
             Err(format!(
                 "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
-                &endpoint_def.rust_method_name
+                endpoint_def.rust_method_name
             )),
             validate_endpoint_var_args_order(&endpoint_def)
         );

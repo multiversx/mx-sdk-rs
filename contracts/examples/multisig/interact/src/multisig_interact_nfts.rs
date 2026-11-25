@@ -36,7 +36,7 @@ impl MultisigInteract {
         let action_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
@@ -68,7 +68,7 @@ impl MultisigInteract {
         let new_token_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
@@ -88,7 +88,7 @@ impl MultisigInteract {
         let action_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
@@ -118,7 +118,7 @@ impl MultisigInteract {
         let new_token_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
@@ -139,7 +139,7 @@ impl MultisigInteract {
         let action_id = self
             .interactor
             .tx()
-            .from(&self.wallet_address)
+            .from(self.config.wallet.address())
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
@@ -179,7 +179,7 @@ impl MultisigInteract {
             );
 
             buffer.push_tx(|tx| {
-                tx.from(&self.wallet_address)
+                tx.from(self.config.wallet.address())
                     .to(multisig_address)
                     .gas(10_000_000u64)
                     .typed(multisig_proxy::MultisigProxy)

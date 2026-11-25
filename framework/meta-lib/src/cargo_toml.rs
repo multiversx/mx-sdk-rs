@@ -2,6 +2,7 @@ mod cargo_toml_contents;
 mod cargo_toml_deps;
 mod cargo_toml_deps_raw;
 mod version_req;
+mod workspace_dependencies;
 
 pub use cargo_toml_contents::{
     CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES, CargoTomlContents,
@@ -10,3 +11,4 @@ pub use cargo_toml_contents::{
 pub use cargo_toml_deps::{DependencyReference, GitCommitReference};
 pub use cargo_toml_deps_raw::DependencyRawValue;
 pub use version_req::VersionReq;
+pub use workspace_dependencies::WorkspaceDependencies;

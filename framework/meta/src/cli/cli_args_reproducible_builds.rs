@@ -1,5 +1,6 @@
 use clap::{Args, Subcommand};
 
+use super::cli_args_codehash::CodehashArgs;
 use super::cli_args_sender::SenderArgs;
 use super::cli_args_standalone::LocalDepsArgs;
 
@@ -76,6 +77,12 @@ pub enum ReproducibleBuildCliAction {
         about = "Generates a Markdown release-notes fragment from an artifacts.json produced by a previous build."
     )]
     ReleaseNotes(ReleaseNotesArgs),
+
+    #[command(
+        name = "codehash",
+        about = "Generates, prints or verifies code hashes of .wasm files."
+    )]
+    Codehash(CodehashArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

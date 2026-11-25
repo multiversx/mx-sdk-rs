@@ -38,3 +38,10 @@ pub trait TxEnvWithTxHash: TxEnv {
     /// Retrieves current tx hash, while resetting it in self.
     fn take_tx_hash(&mut self) -> Option<H256>;
 }
+
+pub trait TxEnvWithRelayer: TxEnv {
+    fn set_relayer_address(&mut self, relayer: ManagedAddress<Self::Api>);
+
+    /// Retrieves the relayer address, while resetting it in self.
+    fn take_relayer_address(&mut self) -> Option<ManagedAddress<Self::Api>>;
+}

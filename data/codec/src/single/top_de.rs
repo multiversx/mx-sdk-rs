@@ -33,13 +33,7 @@ pub trait TopDecode: Sized {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
-        H: DecodeErrorHandler,
-    {
-        match Self::top_decode(input) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(h.handle_error(e)),
-        }
-    }
+        H: DecodeErrorHandler;
 
     /// Allows types to provide optimized implementations for their boxed version.
     /// Especially designed for byte arrays that can be transmuted directly from the input sometimes.

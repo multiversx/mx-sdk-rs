@@ -1,18 +1,26 @@
+[connection]
 chain_type = 'real'
 gateway_uri = 'https://gateway.battleofnodes.com'
+
+[general]
+contract_path = 'forwarder-blind-bon.wasm'
 wegld_address = 'erd1qqqqqqqqqqqqqpgqmuk0q2saj0mgutxm4teywre6dl8wqf58xamqdrukln'
 pair_address = 'erd1qqqqqqqqqqqqqpgqeel2kumf0r8ffyhth7pqdujjat9nx0862jpsg2pqaq'
 wegld_token_id = 'WEGLD-bd4d79'
 usdc_token_id = 'USDC-c76f1f'
 
-# Optional: list of PEM file paths, one per wallet to use.
-# Relative paths are resolved from the workspace root.
+# Optional: list of wallets, one per entry.
 # If absent or empty, all operations are skipped with a warning.
-wallet_pem_paths = [
-    '../../../../../sdk/core/src/test_wallets/s0phie.pem',
-    '../../../../../sdk/core/src/test_wallets/s1mon.pem',
-    '../../../../../sdk/core/src/test_wallets/s2onja.pem',
-]
+# Provide exactly one of: test_wallet, pem, or keyfile per entry.
+
+[[wallets]]
+test_wallet = 's0phie'
+
+[[wallets]]
+test_wallet = 's1mon'
+
+[[wallets]]
+test_wallet = 's2onja'
 
 contract_addresses = [
     "erd1qqqqqqqqqqqqqpgqwlqhw27xz6j2cqh8w8v53l5fdulfu4rqqqqqdt5qat",

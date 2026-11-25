@@ -10,7 +10,7 @@ pub async fn get_network_status() -> Result<NetworkStatus, String> {
 
     let response = contract_interact
         .interactor
-        .proxy
+        .proxy()
         .request(NetworkStatusRequest::new(shard))
         .await;
 

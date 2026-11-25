@@ -1,19 +1,18 @@
 use std::process;
 
-use super::error_message::{sc_call_err_message, simulate_gas_sc_call_err_message};
+use super::error_message::{
+    simulate_gas_no_estimate_err_message, simulate_gas_sc_call_err_message,
+};
 use crate::{InteractorBase, SimulateGas, network_response};
 use multiversx_sc_scenario::{
-    imports::Bech32Address,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall},
 };
-use multiversx_sdk::{
-    data::transaction::Transaction, gateway::SimulateTxRequest, utils::base64_encode,
-};
-use multiversx_sdk::{
-    gateway::{GatewayAsyncService, SendTxRequest},
-    retrieve_tx_on_network,
-};
+use multiversx_sdk::chain_core::std::base64_encode;
+use multiversx_sdk::chain_core::types::GasResult;
+use multiversx_sdk::data::transaction::{TransactionOptions, TransactionVersion};
+use multiversx_sdk::{data::transaction::Transaction, gateway::SimulateTxRequest};
+use multiversx_sdk::{gateway::GatewayAsyncService, retrieve_tx_on_network};
 
 impl<GatewayProxy> InteractorBase<GatewayProxy>
 where
@@ -23,24 +22,29 @@ where
         let mut transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
 
         if SimulateGas::is_mandos_simulate_gas_marker(&sc_call_step.tx.gas_limit) {
-            let sim_gas = self.sc_call_simulate_transaction(&transaction).await;
+            let sim_result = self.sc_call_simulate_transaction(&transaction).await;
+            let Some(sim_gas) = sim_result.gas_used() else {
+                simulate_gas_no_estimate_err_message("SC call", &sim_result);
+                process::exit(1)
+            };
             let gas = SimulateGas::adjust_simulated_gas(sim_gas);
             sc_call_step.tx.gas_limit = gas.into();
             transaction.gas_limit = gas;
 
             // sign again, because gas changed
-            let sender_address = &sc_call_step.tx.from.value;
-            self.sign_tx(sender_address, &mut transaction);
+            self.sign_tx(&mut transaction);
         }
 
         self.pre_runners.run_sc_call_step(sc_call_step);
 
-        let tx_hash = self.launch_sc_call(&transaction).await;
+        let Ok(tx_hash) = self.broadcast_transaction(&transaction, "sc call").await else {
+            process::exit(1)
+        };
 
         self.generate_blocks_until_tx_processed(&tx_hash)
             .await
             .unwrap();
-        let (tx, return_code) = retrieve_tx_on_network(&self.proxy, tx_hash)
+        let (tx, return_code) = retrieve_tx_on_network(self.proxy(), tx_hash)
             .await
             .expect("failed to fetch transaction result");
 
@@ -58,50 +62,27 @@ where
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> u64 {
+    pub async fn sc_call_simulate(&mut self, sc_call_step: &ScCallStep) -> GasResult {
         let transaction = self.tx_call_to_blockchain_signed_tx(sc_call_step).await;
         self.sc_call_simulate_transaction(&transaction).await
     }
 
     async fn tx_call_to_blockchain_signed_tx(&mut self, sc_call_step: &ScCallStep) -> Transaction {
-        let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-        self.set_tx_nonce_update_sender(sender_address, &mut transaction)
-            .await;
-        self.sign_tx(sender_address, &mut transaction);
+        // Set relayer field before signing — it is included in the signing bytes.
+        self.set_tx_nonce_update_sender(&mut transaction).await;
+        self.sign_tx(&mut transaction);
 
         transaction
     }
 
-    async fn launch_sc_call(&mut self, transaction: &Transaction) -> String {
-        let tx_hash = self.proxy.request(SendTxRequest(transaction)).await;
-
-        match tx_hash {
-            Ok(tx_hash) => {
-                log::info!("sc call tx hash: {tx_hash}");
-                if let Some(ex) = &self.explorer_url {
-                    println!("sc call: {}", ex.tx_url(&tx_hash));
-                } else {
-                    println!("sc call tx hash: {tx_hash}");
-                }
-                tx_hash
-            }
-            Err(err) => {
-                println!("sc call error: {err}");
-                log::error!("sc call error: {err}");
-                sc_call_err_message(&err);
-                process::exit(1)
-            }
-        }
-    }
-
-    async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> u64 {
-        let result = self.proxy.request(SimulateTxRequest(transaction)).await;
+    async fn sc_call_simulate_transaction(&mut self, transaction: &Transaction) -> GasResult {
+        let result = self.proxy().request(SimulateTxRequest(transaction)).await;
 
         match result {
             Ok(gas) => {
-                println!("Gas simulation for the SC call: {gas} units.");
-                log::info!("Gas simulation for the SC call: {gas} units.");
+                println!("Gas simulation for the SC call: {gas}.");
+                log::info!("Gas simulation for the SC call: {gas}.");
                 gas
             }
             Err(err) => {
@@ -126,15 +107,20 @@ where
         Transaction {
             nonce: 0,
             value: normalized.egld_value.value.to_string(),
-            sender: Bech32Address::encode_address(hrp, normalized.from.to_address()),
-            receiver: Bech32Address::encode_address(hrp, normalized.to.to_address()),
+            sender: normalized.from.to_address().to_bech32(hrp),
+            receiver: normalized.to.to_address().to_bech32(hrp),
             gas_price: self.gas_price,
             gas_limit: normalized.gas_limit.value,
             data,
             signature: None,
-            chain_id: self.network_config.chain_id.clone(),
-            version: self.network_config.min_transaction_version,
-            options: 0,
+            chain_id: self.network_config().chain_id.clone(),
+            version: TransactionVersion::V2,
+            options: Some(TransactionOptions::SIGN_WITH_HASH),
+            relayer: normalized
+                .relayer
+                .as_ref()
+                .map(|a| a.to_address().to_bech32(hrp)),
+            relayer_signature: None,
         }
     }
 }

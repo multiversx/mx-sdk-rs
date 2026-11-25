@@ -9,14 +9,7 @@ publish = false
 path = "src/mesh_node.rs"
 
 [dependencies.multiversx-sc]
-version = "0.66.3"
-path = "../../../../framework/base"
-
-[dependencies.multiversx-sc-wasm-adapter]
-version = "0.66.3"
-path = "../../../../framework/wasm-adapter"
-optional = true
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.3"
-path = "../../../../framework/scenario"
+workspace = true

@@ -100,3 +100,25 @@ fn test_queue_clear() {
     assert_eq!(queue.len(), 0);
     assert!(queue.is_empty());
 }
+
+#[test]
+fn test_queue_clear_no_info_leak() {
+    SingleTxApi::clear_global();
+
+    let mut queue = create_queue();
+    queue.push_back(1u64);
+    queue.push_back(2u64);
+    queue.push_back(3u64);
+    queue.clear();
+
+    // After clearing, the ".info" storage slot must be fully deleted (not merely
+    // reset to a default-encoded value), so no residual key should remain.
+    let info_key = b"my_queue.info".to_vec();
+    let no_residual = SingleTxApi::with_global_default_account(|account| {
+        account.storage_get(&info_key).is_empty()
+    });
+    assert!(
+        no_residual,
+        "QueueMapper::clear() left a residual '.info' storage slot"
+    );
+}

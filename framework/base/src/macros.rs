@@ -68,7 +68,7 @@ macro_rules! sc_panic {
         multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
     ($msg:expr $(,)?) => {
-        multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
+        multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg)
     };
 }
 

@@ -1,6 +1,6 @@
 use multiversx_sc::types::{
-    Code, NotPayable, RHListExec, Tx, TxCodeValue, TxEnv, TxFromSpecified, TxGas, TxToSpecified,
-    UpgradeCall,
+    Code, NotPayable, RHListExec, Tx, TxCodeValue, TxEnv, TxEnvWithRelayer, TxFromSpecified, TxGas,
+    TxToSpecified, UpgradeCall,
 };
 
 use crate::{
@@ -13,7 +13,7 @@ use super::{StepWrapper, TxToStep, address_annotated, code_annotated, gas_annota
 impl<Env, From, To, Gas, RH, CodeValue> TxToStep<Env, RH>
     for Tx<Env, From, To, NotPayable, Gas, UpgradeCall<Env, Code<CodeValue>>, RH>
 where
-    Env: TxEnv<RHExpect = TxExpect>,
+    Env: TxEnv<RHExpect = TxExpect> + TxEnvWithRelayer,
     From: TxFromSpecified<Env>,
     To: TxToSpecified<Env>,
     Gas: TxGas<Env>,
@@ -22,9 +22,13 @@ where
 {
     type Step = ScCallStep;
 
-    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
+    fn tx_to_step(mut self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step =
             tx_to_sc_call_upgrade_step(&self.env, self.from, self.to, self.gas, self.data);
+        step.tx.relayer = self
+            .env
+            .take_relayer_address()
+            .map(|a| address_annotated(&self.env, &a));
         step.expect = Some(self.result_handler.list_preprocessing());
 
         StepWrapper {

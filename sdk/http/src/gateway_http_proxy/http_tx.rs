@@ -4,7 +4,8 @@ use multiversx_sdk::{
     data::{
         network_config::NetworkConfig,
         transaction::{
-            ApiTransactionResult, ArgCreateTransaction, Transaction, TxCostResponseData,
+            ApiTransactionResult, ArgCreateTransaction, Transaction, TransactionOptions,
+            TransactionVersion, TxCostResponseData,
         },
         vm::{VMQueryInput, VmValuesResponseData},
     },
@@ -52,10 +53,10 @@ impl GatewayHttpProxy {
         network_configs: &NetworkConfig,
     ) -> Result<ArgCreateTransaction> {
         let account = self
-            .get_account(&address.to_bech32(&network_configs.address_hrp))
+            .get_account(&address.to_bech32(network_configs.address_hrp))
             .await?;
 
-        let address_bech32 = address.to_bech32(&network_configs.address_hrp);
+        let address_bech32 = address.to_bech32(network_configs.address_hrp);
 
         Ok(ArgCreateTransaction {
             nonce: account.nonce,
@@ -67,8 +68,8 @@ impl GatewayHttpProxy {
             data: None,
             signature: "".to_string(),
             chain_id: network_configs.chain_id.clone(),
-            version: network_configs.min_transaction_version,
-            options: 0,
+            version: TransactionVersion::default(),
+            options: Some(TransactionOptions::default()),
             available_balance: account.balance,
         })
     }

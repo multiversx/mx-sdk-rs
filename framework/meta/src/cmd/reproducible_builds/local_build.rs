@@ -5,7 +5,7 @@ use std::{
 };
 
 use multiversx_sc_meta_lib::cargo_toml::CargoTomlContents;
-use multiversx_sc_meta_lib::cli::{BuildArgs, ContractCliAction};
+use multiversx_sc_meta_lib::cli::{BuildArgs, ContractCliAction, WasmCargoArgs};
 use multiversx_sc_meta_lib::tools::generate_codehashes_in_output;
 
 use crate::cli::{AllArgs, MetaLibArgs, ReproducibleBuildLocalBuildArgs};
@@ -169,9 +169,12 @@ fn run_local_build(cfg: LocalBuildConfig) {
     let target_dir_str = cargo_target_dir.to_string_lossy().into_owned();
     let all_args = AllArgs {
         command: ContractCliAction::Build(BuildArgs {
-            locked: true,
+            cargo: WasmCargoArgs {
+                locked: true,
+                target_dir_wasm: Some(target_dir_str.clone()),
+                ..Default::default()
+            },
             wasm_opt: !cfg.no_wasm_opt,
-            target_dir_wasm: Some(target_dir_str.clone()),
             ..Default::default()
         }),
         meta_lib_args: MetaLibArgs {

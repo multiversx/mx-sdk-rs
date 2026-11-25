@@ -16,6 +16,7 @@ pub struct TxTransfer {
     pub esdt_value: Vec<TxESDT>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+    pub relayer: Option<AddressValue>,
 }
 
 impl InterpretableFrom<TxTransferRaw> for TxTransfer {
@@ -31,6 +32,7 @@ impl InterpretableFrom<TxTransferRaw> for TxTransfer {
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit.unwrap_or_default(), context),
             gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
+            relayer: None,
         }
     }
 }
@@ -65,6 +67,7 @@ impl TxTransfer {
             arguments: Vec::new(),
             gas_limit: self.gas_limit.clone(),
             gas_price: self.gas_price.clone(),
+            relayer: self.relayer.clone(),
         }
     }
 }

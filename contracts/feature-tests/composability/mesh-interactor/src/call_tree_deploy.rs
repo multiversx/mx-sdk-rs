@@ -44,7 +44,7 @@ impl ComposabilityInteract {
             let code_metadata = if contract.payable.unwrap_or(false) {
                 CodeMetadata::PAYABLE
             } else {
-                CodeMetadata::DEFAULT
+                CodeMetadata::EMPTY
             };
             buffer.push_tx(|tx| {
                 tx.from(wallet)

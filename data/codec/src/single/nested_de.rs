@@ -17,13 +17,7 @@ pub trait NestedDecode: Sized {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
-        H: DecodeErrorHandler,
-    {
-        match Self::dep_decode(input) {
-            Ok(v) => Ok(v),
-            Err(e) => Err(h.handle_error(e)),
-        }
-    }
+        H: DecodeErrorHandler;
 
     /// Allows the framework to do monomorphisation of special cases where the data is of type `u8`.
     ///

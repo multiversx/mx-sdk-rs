@@ -96,7 +96,7 @@ pub trait ProxyTestFirst {
             .typed(message_me_proxy::MessageMeProxy)
             .message_me(
                 0x01,
-                &BigUint::from(2u32),
+                BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &HARDCODED_ADDRESS,
             )
@@ -111,7 +111,7 @@ pub trait ProxyTestFirst {
             .typed(message_me_proxy::MessageMeProxy)
             .message_me(
                 0x01,
-                &BigUint::from(2u32),
+                BigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &HARDCODED_ADDRESS,
             )

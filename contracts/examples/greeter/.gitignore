@@ -1,0 +1,5 @@
+# Build artifacts — regenerate with `sc-meta all build`.
+target/
+output/
+
+# Keep Cargo.lock and wasm/Cargo.lock tracked (reproducible builds)

@@ -1,0 +1,201 @@
+{
+    "name": "validator rewards: cumulated, claimed and unclaimed",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:validator-rewards": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "owner": "address:owner",
+                    "code": "mxsc:../output/validator-rewards-feature.mxsc.json"
+                },
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:other": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "no rewards yet",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getCumulatedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claim with nothing to claim fails",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "claimRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:no rewards to claim"
+            }
+        },
+        {
+            "step": "validatorReward",
+            "id": "first reward",
+            "tx": {
+                "to": "sc:validator-rewards",
+                "egldValue": "100,000,000"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "cumulated after first reward",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getCumulatedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "100,000,000" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "unclaimed after first reward",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getUnclaimedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "100,000,000" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "only the owner can claim",
+            "tx": {
+                "from": "address:other",
+                "to": "sc:validator-rewards",
+                "function": "claimRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Endpoint can only be called by owner"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claim",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "claimRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "100,000,000" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:validator-rewards": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:claimedRewards": "100,000,000",
+                        "str:ELRONDreward": "100,000,000"
+                    },
+                    "owner": "address:owner",
+                    "code": "*"
+                },
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "100,000,000"
+                },
+                "address:other": {
+                    "nonce": "*",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "cumulated is not reduced by the claim",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getCumulatedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "100,000,000" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "validatorReward",
+            "id": "second reward",
+            "tx": {
+                "to": "sc:validator-rewards",
+                "egldValue": "300"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "unclaimed is only the second reward",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getUnclaimedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "300" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "cumulated is the sum",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:validator-rewards",
+                "function": "getCumulatedRewards",
+                "arguments": [],
+                "gasLimit": "50,000,000"
+            },
+            "expect": {
+                "out": [ "100,000,300" ],
+                "status": "0"
+            }
+        }
+    ]
+}

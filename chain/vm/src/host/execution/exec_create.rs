@@ -2,14 +2,14 @@ use crate::{
     blockchain::state::BlockchainStateRef,
     host::context::{BlockchainUpdate, TxCache, TxContext, TxInput, TxResult},
     host::runtime::{RuntimeInstanceCallLambda, RuntimeRef},
-    types::{Address, VMCodeMetadata},
+    types::{Address, CodeMetadata},
 };
 
 /// Executes deploy transaction and commits changes back to the underlying blockchain state.
 pub fn commit_deploy<F>(
     tx_input: TxInput,
     contract_path: &[u8],
-    code_metadata: VMCodeMetadata,
+    code_metadata: CodeMetadata,
     state: &mut BlockchainStateRef,
     runtime: &RuntimeRef,
     f: F,
@@ -47,7 +47,7 @@ where
 pub fn execute_deploy<F>(
     mut tx_input: TxInput,
     contract_path: Vec<u8>,
-    code_metadata: VMCodeMetadata,
+    code_metadata: CodeMetadata,
     tx_cache: TxCache,
     runtime: &RuntimeRef,
     f: F,

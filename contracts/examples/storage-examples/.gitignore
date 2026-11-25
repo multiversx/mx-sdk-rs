@@ -1,0 +1,4 @@
+# Build artifacts — regenerate with `sc-meta all build`. Same convention
+# this Cookbook's TypeScript recipes use for node_modules/ and dist/.
+target/
+output/

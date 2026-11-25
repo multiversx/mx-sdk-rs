@@ -14,8 +14,14 @@ const IVAN_PEM: &str = include_str!("test_wallets/ivan.pem");
 const JUDY_PEM: &str = include_str!("test_wallets/judy.pem");
 const MALLORY_PEM: &str = include_str!("test_wallets/mallory.pem");
 const MIKE_PEM: &str = include_str!("test_wallets/mike.pem");
+const SOCRATES_PEM: &str = include_str!("test_wallets/s0crates.pem");
+const SOPHOCLES_PEM: &str = include_str!("test_wallets/s0phocles.pem");
 const SOPHIE_PEM: &str = include_str!("test_wallets/s0phie.pem");
+const SILVIA_PEM: &str = include_str!("test_wallets/s1lvia.pem");
+const SIOBHAN_PEM: &str = include_str!("test_wallets/s1obhan.pem");
 const SIMON_PEM: &str = include_str!("test_wallets/s1mon.pem");
+const SZIDONIA_PEM: &str = include_str!("test_wallets/s2idonia.pem");
+const SZILARD_PEM: &str = include_str!("test_wallets/s2ilard.pem");
 const SZONJA_PEM: &str = include_str!("test_wallets/s2onja.pem");
 
 const WALLETS: &[(&str, &str)] = &[
@@ -31,76 +37,102 @@ const WALLETS: &[(&str, &str)] = &[
     ("judy", JUDY_PEM),
     ("mallory", MALLORY_PEM),
     ("mike", MIKE_PEM),
+    ("s0crates", SOCRATES_PEM),
+    ("socrates", SOCRATES_PEM),
+    ("s0phocles", SOPHOCLES_PEM),
+    ("sophocles", SOPHOCLES_PEM),
     ("sophie", SOPHIE_PEM),
     ("s0phie", SOPHIE_PEM),
+    ("siobhan", SIOBHAN_PEM),
+    ("s1obhan", SIOBHAN_PEM),
+    ("silvia", SILVIA_PEM),
+    ("s1lvia", SILVIA_PEM),
     ("simon", SIMON_PEM),
     ("s1mon", SIMON_PEM),
+    ("szidonia", SZIDONIA_PEM),
+    ("s2idonia", SZIDONIA_PEM),
+    ("szilard", SZILARD_PEM),
+    ("s2ilard", SZILARD_PEM),
     ("szonja", SZONJA_PEM),
     ("s2onja", SZONJA_PEM),
 ];
 
-fn test_wallet(pem_file_contents: &str) -> Wallet {
-    Wallet::from_pem_file_contents(pem_file_contents.to_string()).unwrap()
-}
-
 /// Test wallet. Do not use on mainnet.
 pub fn alice() -> Wallet {
-    test_wallet(ALICE_PEM)
+    Wallet::new_test_wallet("alice", ALICE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn bob() -> Wallet {
-    test_wallet(BOB_PEM)
+    Wallet::new_test_wallet("bob", BOB_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn carol() -> Wallet {
-    test_wallet(CAROL_PEM)
+    Wallet::new_test_wallet("carol", CAROL_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn dan() -> Wallet {
-    test_wallet(DAN_PEM)
+    Wallet::new_test_wallet("dan", DAN_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn eve() -> Wallet {
-    test_wallet(EVE_PEM)
+    Wallet::new_test_wallet("eve", EVE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn frank() -> Wallet {
-    test_wallet(FRANK_PEM)
+    Wallet::new_test_wallet("frank", FRANK_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn grace() -> Wallet {
-    test_wallet(GRACE_PEM)
+    Wallet::new_test_wallet("grace", GRACE_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn heidi() -> Wallet {
-    test_wallet(HEIDI_PEM)
+    Wallet::new_test_wallet("heidi", HEIDI_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn ivan() -> Wallet {
-    test_wallet(IVAN_PEM)
+    Wallet::new_test_wallet("ivan", IVAN_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn judy() -> Wallet {
-    test_wallet(JUDY_PEM)
+    Wallet::new_test_wallet("judy", JUDY_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn mallory() -> Wallet {
-    test_wallet(MALLORY_PEM)
+    Wallet::new_test_wallet("mallory", MALLORY_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
 pub fn mike() -> Wallet {
-    test_wallet(MIKE_PEM)
+    Wallet::new_test_wallet("mike", MIKE_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Socrates' wallet will always be in shard 0.
+///
+/// Address: 0x3d55ffd949781d5f0b5eaf57a3f0797d1db2d76a759ae6df7e335302b7d90000
+pub fn socrates() -> Wallet {
+    Wallet::new_test_wallet("socrates", SOCRATES_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Sophocles' wallet will always be in shard 0.
+///
+/// Address: 0x35e2358aa3191bcedf6eddf6e14f138765b38a704647ed691130703852620000
+pub fn sophocles() -> Wallet {
+    Wallet::new_test_wallet("sophocles", SOPHOCLES_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -109,7 +141,25 @@ pub fn mike() -> Wallet {
 ///
 /// Address: 0x14af28ce7d79117f689228b1af89d16e8b0c16a3d36062a2b6eeb8fbab6c0000
 pub fn sophie() -> Wallet {
-    test_wallet(SOPHIE_PEM)
+    Wallet::new_test_wallet("sophie", SOPHIE_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Siobhan's wallet will always be in shard 1.
+///
+/// Address: 0xe624b62f5dcad961ceaf9ce23e56db72377ea8a8dcc7065b73089778522d0001
+pub fn siobhan() -> Wallet {
+    Wallet::new_test_wallet("siobhan", SIOBHAN_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Silvia's wallet will always be in shard 1.
+///
+/// Address: 0x7bbaef4fae6aa454929e0038bf01da4907e7814609db6e46c9990b5ae9d30001
+pub fn silvia() -> Wallet {
+    Wallet::new_test_wallet("silvia", SILVIA_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -118,7 +168,25 @@ pub fn sophie() -> Wallet {
 ///
 /// Address: 0x4b9ab2524a7d15416fb78d4d88249dc30272bd6ee1b8a07d4342c33a40a00001
 pub fn simon() -> Wallet {
-    test_wallet(SIMON_PEM)
+    Wallet::new_test_wallet("simon", SIMON_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Szidonia's wallet will always be in shard 2.
+///
+/// Address: 0x99337fe8455f5798fc548037c1ceea4d95d8f89ca468663877719f7d31eb0002
+pub fn szidonia() -> Wallet {
+    Wallet::new_test_wallet("szidonia", SZIDONIA_PEM)
+}
+
+/// Test wallet. Do not use on mainnet.
+///
+/// Szilárd's wallet will always be in shard 2.
+///
+/// Address: 0xf7a7c49bb4d2f63fd82ca0859f2e01c13f320a79c0962dfdc43fcb621cde0002
+pub fn szilard() -> Wallet {
+    Wallet::new_test_wallet("szilard", SZILARD_PEM)
 }
 
 /// Test wallet. Do not use on mainnet.
@@ -127,7 +195,7 @@ pub fn simon() -> Wallet {
 ///
 /// Address: 0x5ea3f378aaaa9f51cef76093b62e1041c90b415016dfa49760d7a846a8d90002
 pub fn szonja() -> Wallet {
-    test_wallet(SZONJA_PEM)
+    Wallet::new_test_wallet("szonja", SZONJA_PEM)
 }
 
 /// Test wallets. Do not use on mainnet.
@@ -141,6 +209,16 @@ pub fn for_shard(shard_id: ShardId) -> Wallet {
         2 => szonja(),
         _ => panic!("No test wallet for shard id {shard_id_num}"),
     }
+}
+
+/// Returns the wallet for the named test wallet, or `None` if the name is unknown.
+///
+/// For the list of valid names see [`valid_names()`].
+pub fn by_name(name: &str) -> Option<Wallet> {
+    WALLETS
+        .iter()
+        .find(|(n, _)| *n == name)
+        .map(|(static_name, pem)| Wallet::new_test_wallet(static_name, pem))
 }
 
 pub fn valid_names() -> Vec<&'static str> {

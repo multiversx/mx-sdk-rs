@@ -8,13 +8,8 @@ publish = false
 [lib]
 path = "src/recursive_caller.rs"
 
-[dependencies.vault]
-path = "../vault"
-
 [dependencies.multiversx-sc]
-version = "0.66.3"
-path = "../../../../framework/base"
+workspace = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.66.3"
-path = "../../../../framework/scenario"
+workspace = true
