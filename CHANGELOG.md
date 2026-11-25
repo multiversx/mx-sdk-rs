@@ -57,6 +57,12 @@ And crate group being released requires all crate groups downstream to be releas
 
 ## Version history
 
+### [unreleased]
+- Bugfixes:
+	- `ManagedDecimal` and `ManagedDecimalSigned` cmp bugfix;
+	- `u128` TopEncode/TopDecode bugfix;
+	- `sc-meta scen-blackbox` and `sc-meta test-gen`: text from scenario files, ABIs and file names is now escaped or sanitized in the generated Rust code, preventing code injection;
+
 
 ### [sc 0.66.3] - 2026-11-09
 - `managed-buffer-preload` feature: decoding from managed buffers via the static buffer, which greatly reduces the gas cost of decoding large values (e.g. long `ManagedVec`s in storage). Nested managed buffers and big ints are created directly from the cached bytes.

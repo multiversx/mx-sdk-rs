@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          676
+// Endpoints:                          677
 // Async Callback:                       1
-// Total number of exported functions: 678
+// Total number of exported functions: 679
 
 #![no_std]
 
@@ -390,6 +390,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         verify_bls_signature_share => verify_bls_signature_share
         verify_bls_aggregated_signature => verify_bls_aggregated_signature
         echo_u64 => echo_u64
+        echo_u128 => echo_u128
         echo_i64 => echo_i64
         echo_i32 => echo_i32
         echo_u32 => echo_u32

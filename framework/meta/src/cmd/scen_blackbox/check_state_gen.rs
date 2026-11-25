@@ -3,11 +3,12 @@ use multiversx_sc_scenario::scenario::model::{
 };
 
 use super::test_generator::TestGenerator;
+use crate::cmd::rust_encode::string_literal;
 
 impl TestGenerator {
     pub(super) fn generate_check_state(&mut self, comment: Option<&str>, accounts: &CheckAccounts) {
         if let Some(comment_text) = comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         for (address_key, account) in &accounts.accounts {
@@ -24,9 +25,9 @@ impl TestGenerator {
                     for (key, value) in &storage_details.storages {
                         let value_str = Self::format_check_value_for_storage(value);
                         self.step_writeln(format!(
-                            "        .check_storage(\"{}\", \"{}\")",
-                            Self::escape_string(&key.original),
-                            Self::escape_string(&value_str),
+                            "        .check_storage({}, {})",
+                            string_literal(&key.original),
+                            string_literal(&value_str),
                         ));
                     }
 

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 
 use super::const_state::ConstState;
 use super::scenario_loader::ScenarioFile;
+use crate::cmd::rust_encode::line_comment_text;
 
 const WORLD_FN_TODO: &str = "fn world() -> ScenarioWorld {
     todo!()
@@ -50,6 +51,11 @@ impl TestGenerator {
     /// Writes text to the step buffer without a newline
     pub(super) fn step_write(&mut self, text: impl AsRef<str>) {
         self.step_buffer.push_str(text.as_ref());
+    }
+
+    /// Writes a comment line inside a function body.
+    pub(super) fn step_comment(&mut self, text: &str) {
+        self.step_writeln(format!("    // {}", line_comment_text(text)));
     }
 
     /// Generates the combined test content, storing it in `output`.
@@ -102,7 +108,7 @@ impl TestGenerator {
 
         // Write scenario comment if available
         if let Some(comment) = &scenario.comment {
-            self.step_writeln(format!("// {}", comment));
+            self.step_writeln(format!("// {}", line_comment_text(comment)));
         }
 
         if scenario_file.generate_test {

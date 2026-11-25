@@ -1,18 +1,19 @@
 use multiversx_sc_scenario::num_bigint::{BigInt, BigUint};
 
 /// Formats an unsigned numeric value from big-endian bytes.
-/// Uses BigUint for parsing; emits `u64` suffix if it fits, `u128` otherwise.
+/// Uses BigUint for parsing. Keeps the suffix of a primitive unsigned `abi_type`,
+/// otherwise emits `u64` suffix if it fits, `u128` otherwise.
 pub fn format_unsigned(bytes: &[u8], abi_type: &str) -> String {
     let val = BigUint::from_bytes_be(bytes);
     let suffix = match abi_type {
-        "BigUint" => {
+        "u8" | "u16" | "u32" | "u64" | "usize" => abi_type,
+        _ => {
             if val <= BigUint::from(u64::MAX) {
                 "u64"
             } else {
                 "u128"
             }
         }
-        other => other,
     };
     let digits = val.to_string();
     let formatted = insert_digit_separators(&digits);
@@ -20,18 +21,19 @@ pub fn format_unsigned(bytes: &[u8], abi_type: &str) -> String {
 }
 
 /// Formats a signed numeric value from big-endian two's complement bytes.
-/// Uses BigInt for parsing; emits `i64` suffix if it fits, `i128` otherwise.
+/// Uses BigInt for parsing. Keeps the suffix of a primitive signed `abi_type`,
+/// otherwise emits `i64` suffix if it fits, `i128` otherwise.
 pub fn format_signed(bytes: &[u8], abi_type: &str) -> String {
     let val = BigInt::from_signed_bytes_be(bytes);
     let suffix = match abi_type {
-        "BigInt" => {
+        "i8" | "i16" | "i32" | "i64" | "isize" => abi_type,
+        _ => {
             if val >= BigInt::from(i64::MIN) && val <= BigInt::from(i64::MAX) {
                 "i64"
             } else {
                 "i128"
             }
         }
-        other => other,
     };
     let digits = val.to_string();
     let formatted = insert_digit_separators(&digits);
