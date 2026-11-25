@@ -1,6 +1,6 @@
 use crate::data::api::ApiAccountListItem;
 
-use super::{API_ACCOUNTS_ENDPOINT, GatewayRequest, GatewayRequestType, encode_base64_query_value};
+use super::{API_ACCOUNTS_ENDPOINT, GatewayRequest, GatewayRequestType, encode_query_value};
 
 /// Sort order for API listings, by timestamp.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -79,7 +79,7 @@ impl GatewayRequest for ApiListContractsRequest {
         );
         if let Some(search_after) = &self.search_after {
             endpoint += "&searchAfter=";
-            endpoint += &encode_base64_query_value(search_after);
+            endpoint += &encode_query_value(search_after);
         }
         endpoint
     }

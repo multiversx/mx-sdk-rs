@@ -24,6 +24,7 @@ mod gateway_tx_simulate;
 mod gateway_tx_status;
 mod gateway_tx_vmquery;
 
+use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, utf8_percent_encode};
 use std::fmt::Display;
 
 pub use api_account::{ApiGetAccountRequest, ApiGetUpgradesRequest};
@@ -93,13 +94,17 @@ const SET_STATE_ENDPOINT: &str = "simulator/set-state";
 const SET_STATE_OVERWRITE_ENDPOINT: &str = "simulator/set-state-overwrite";
 const ADD_KEYS: &str = "simulator/add-keys";
 
-/// Percent-encodes the characters of a base64 string (e.g. an API pagination cursor)
-/// that are not allowed in a query value.
-pub(crate) fn encode_base64_query_value(value: &str) -> String {
-    value
-        .replace('+', "%2B")
-        .replace('/', "%2F")
-        .replace('=', "%3D")
+/// Everything except the URL "unreserved" characters (RFC 3986).
+const QUERY_VALUE_ENCODE_SET: &AsciiSet = &NON_ALPHANUMERIC
+    .remove(b'-')
+    .remove(b'.')
+    .remove(b'_')
+    .remove(b'~');
+
+/// Percent-encodes an arbitrary string for use as a query parameter value,
+/// so that the server receives it exactly as supplied.
+pub(crate) fn encode_query_value(value: &str) -> String {
+    utf8_percent_encode(value, QUERY_VALUE_ENCODE_SET).to_string()
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -164,4 +169,39 @@ pub trait GatewayAsyncService {
     fn now(&self) -> Self::Instant;
 
     fn elapsed_seconds(&self, instant: &Self::Instant) -> f32;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn encode_query_value_test() {
+        assert_eq!(encode_query_value("SCDeploy-._~"), "SCDeploy-._~");
+        assert_eq!(encode_query_value("custom+event"), "custom%2Bevent");
+        assert_eq!(
+            encode_query_value("a b#c&d=e%f?g/h"),
+            "a%20b%23c%26d%3De%25f%3Fg%2Fh"
+        );
+        assert_eq!(encode_query_value("é"), "%C3%A9");
+    }
+
+    #[test]
+    fn api_query_values_are_encoded_test() {
+        let events = ApiGetEventsRequest::new("custom+event#1", 10, Some("a+/=".to_owned()));
+        assert_eq!(
+            events.get_endpoint(),
+            "events?identifier=custom%2Bevent%231&size=10&searchAfter=a%2B%2F%3D"
+        );
+
+        let transactions = ApiListTransactionsRequest::new(10, ApiSortOrder::Asc, None)
+            .receiver("a&b")
+            .function("c+d")
+            .status("e#f");
+        assert!(
+            transactions
+                .get_endpoint()
+                .ends_with("&size=10&receiver=a%26b&function=c%2Bd&status=e%23f")
+        );
+    }
 }

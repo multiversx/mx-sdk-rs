@@ -1,8 +1,7 @@
 use crate::data::api::{ApiTransaction, ApiTransactionListItem};
 
 use super::{
-    API_TRANSACTIONS_ENDPOINT, ApiSortOrder, GatewayRequest, GatewayRequestType,
-    encode_base64_query_value,
+    API_TRANSACTIONS_ENDPOINT, ApiSortOrder, GatewayRequest, GatewayRequestType, encode_query_value,
 };
 
 /// Retrieves a transaction from the MultiversX API, with status, timestamp and data.
@@ -138,12 +137,12 @@ impl GatewayRequest for ApiListTransactionsRequest {
             ("status", &self.status),
         ] {
             if let Some(value) = value {
-                endpoint += &format!("&{name}={value}");
+                endpoint += &format!("&{name}={}", encode_query_value(value));
             }
         }
         if let Some(search_after) = &self.search_after {
             endpoint += "&searchAfter=";
-            endpoint += &encode_base64_query_value(search_after);
+            endpoint += &encode_query_value(search_after);
         }
         endpoint
     }

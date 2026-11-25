@@ -1,6 +1,6 @@
 use crate::data::api::ApiEvent;
 
-use super::{API_EVENTS_ENDPOINT, GatewayRequest, GatewayRequestType, encode_base64_query_value};
+use super::{API_EVENTS_ENDPOINT, GatewayRequest, GatewayRequestType, encode_query_value};
 
 /// Retrieves a page of events with a given identifier (e.g. `SCDeploy`, `SCUpgrade`) from the
 /// MultiversX API, across the whole network, newest first.
@@ -46,14 +46,15 @@ impl GatewayRequest for ApiGetEventsRequest<'_> {
     fn get_endpoint(&self) -> String {
         let mut endpoint = format!(
             "{API_EVENTS_ENDPOINT}?identifier={}&size={}",
-            self.identifier, self.size
+            encode_query_value(self.identifier),
+            self.size
         );
         if let Some(after) = self.after {
             endpoint += &format!("&after={after}");
         }
         if let Some(search_after) = &self.search_after {
             endpoint += "&searchAfter=";
-            endpoint += &encode_base64_query_value(search_after);
+            endpoint += &encode_query_value(search_after);
         }
         endpoint
     }

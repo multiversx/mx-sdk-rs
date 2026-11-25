@@ -3463,6 +3463,7 @@ dependencies = [
  "multiversx-chain-core",
  "pbkdf2",
  "pem",
+ "percent-encoding",
  "scrypt",
  "serde",
  "serde_json",
