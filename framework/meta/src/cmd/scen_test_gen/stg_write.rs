@@ -1,6 +1,7 @@
 use convert_case::{Case, Casing};
 
 use super::stg_section::ScenarioTestFn;
+use crate::cmd::rust_encode::{sanitize_identifier, string_literal};
 
 pub type WriteTestFn = fn(&str, bool) -> String;
 
@@ -29,9 +30,14 @@ fn insert_ghost_accounts_snippet(insert_ghost_accounts: bool) -> &'static str {
 }
 
 fn scenario_name_to_fn_name(scenario_file_name: &str) -> String {
-    scenario_file_name
+    let snake_case = scenario_file_name
         .replace(['/', '\\'], "_")
-        .to_case(Case::Snake)
+        .to_case(Case::Snake);
+    sanitize_identifier(&snake_case)
+}
+
+fn scenario_path_literal(scenario_file_name: &str) -> String {
+    string_literal(&format!("scenarios/{scenario_file_name}.scen.json"))
 }
 
 pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) -> String {
@@ -39,10 +45,10 @@ pub fn format_test_fn_rs(scenario_file_name: &str, insert_ghost_accounts: bool) 
     format!(
         "
 fn {}_rs() {{
-    world(){ghost}.run(\"scenarios/{}.scen.json\");
+    world(){ghost}.run({});
 }}",
         scenario_name_to_fn_name(scenario_file_name),
-        scenario_file_name,
+        scenario_path_literal(scenario_file_name),
     )
 }
 
@@ -51,10 +57,10 @@ pub fn format_test_fn_go(scenario_file_name: &str, insert_ghost_accounts: bool) 
     format!(
         "
 fn {}_go() {{
-    world(){ghost}.run(\"scenarios/{}.scen.json\");
+    world(){ghost}.run({});
 }}",
         scenario_name_to_fn_name(scenario_file_name),
-        scenario_file_name,
+        scenario_path_literal(scenario_file_name),
     )
 }
 

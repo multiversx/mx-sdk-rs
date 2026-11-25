@@ -61,6 +61,7 @@ And crate group being released requires all crate groups downstream to be releas
 - Bugfixes:
 	- `ManagedDecimal` and `ManagedDecimalSigned` cmp bugfix;
 	- `u128` TopEncode/TopDecode bugfix;
+	- `sc-meta scen-blackbox` and `sc-meta test-gen`: text from scenario files, ABIs and file names is now escaped or sanitized in the generated Rust code, preventing code injection;
 
 
 ### [sc 0.66.3] - 2026-11-09

@@ -36,7 +36,7 @@ pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
         } else if uncomm_line.starts_with(SHOULD_PANIC_ANNOTATION_PREFIX) {
             should_panic_line = Some(uncomm_line.to_string());
         } else if let Some(scenario_file_name) = find_scenario_name(uncomm_line) {
-            opt_scenario_file_name = Some(scenario_file_name.to_string());
+            opt_scenario_file_name = Some(unescape_literal(scenario_file_name));
         }
     }
 
@@ -79,9 +79,61 @@ fn find_scenario_name(s: &str) -> Option<&str> {
     None
 }
 
+/// Reverses the escaping of a string literal's contents.
+///
+/// Escape sequences which are not recognized are left unchanged.
+fn unescape_literal(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut rest = s;
+    while let Some(index) = rest.find('\\') {
+        result.push_str(&rest[..index]);
+        rest = &rest[index..];
+        let (c, len) = parse_escape(rest).unwrap_or(('\\', 1));
+        result.push(c);
+        rest = &rest[len..];
+    }
+    result.push_str(rest);
+    result
+}
+
+/// Parses the escape sequence at the start of `s`, returning the character and its length.
+fn parse_escape(s: &str) -> Option<(char, usize)> {
+    let c = match s.get(1..2)? {
+        "n" => '\n',
+        "r" => '\r',
+        "t" => '\t',
+        "0" => '\0',
+        "\\" => '\\',
+        "\"" => '"',
+        "'" => '\'',
+        "u" => {
+            let (hex, _) = s.strip_prefix("\\u{")?.split_once('}')?;
+            let c = char::from_u32(u32::from_str_radix(hex, 16).ok()?)?;
+            return Some((c, hex.len() + 4));
+        }
+        _ => return None,
+    };
+    Some((c, 2))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_unescape_literal() {
+        for name in [
+            "plain/name",
+            "quote\"back\\slash",
+            "new\nline\r\t\0",
+            "bidi\u{202E}",
+            "ünïcode '",
+        ] {
+            let literal = format!("{name:?}");
+            assert_eq!(unescape_literal(&literal[1..literal.len() - 1]), name);
+        }
+        assert_eq!(unescape_literal(r"a\qb\"), r"a\qb\");
+    }
 
     #[test]
     fn test_find_scenario_name() {

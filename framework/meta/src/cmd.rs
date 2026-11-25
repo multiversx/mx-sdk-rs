@@ -8,6 +8,7 @@ pub mod install;
 pub mod print_util;
 pub mod reproducible_builds;
 pub mod retrieve_address;
+mod rust_encode;
 pub mod scen_blackbox;
 pub mod scen_test_gen;
 pub mod template;
