@@ -58,7 +58,9 @@ And crate group being released requires all crate groups downstream to be releas
 ## Version history
 
 ### [unreleased]
-- Fixed `PartialOrd` for `ManagedDecimal` and `ManagedDecimalSigned`: when the left operand had more decimals than the right one, the ordering was inverted (`<`, `<=`, `>`, `>=` gave wrong results, and `math::linear_interpolation` range checks with them). `PartialEq` was not affected.
+- Bugfixes:
+	- `ManagedDecimal` and `ManagedDecimalSigned` cmp bugfix;
+	- `u128` TopEncode/TopDecode bugfix;
 
 
 ### [sc 0.66.3] - 2026-11-09

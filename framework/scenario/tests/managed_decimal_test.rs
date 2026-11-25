@@ -746,8 +746,8 @@ fn test_managed_decimal_nth_root_zero_k() {
 
 #[test]
 pub fn test_managed_decimal_cmp_different_scales() {
-    use multiversx_sc::types::ManagedDecimalSigned;
     use multiversx_sc::types::BigInt;
+    use multiversx_sc::types::ManagedDecimalSigned;
 
     // 1.5 (1 decimal) vs 1.25 (2 decimals), both operand orders
     let a: ManagedDecimal<StaticApi, NumDecimals> =
