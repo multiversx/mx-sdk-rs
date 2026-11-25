@@ -2,6 +2,8 @@ use multiversx_sc_scenario::scenario::model::Scenario;
 use multiversx_sc_scenario::scenario::parse_scenario;
 use std::{fs, path::Path};
 
+use crate::cmd::rust_encode::sanitize_identifier;
+
 /// Represents a parsed scenario file
 pub struct ScenarioFile {
     pub file_name: String,
@@ -92,9 +94,9 @@ fn load_scenario_file(path: &Path, generate_test: bool) -> Option<ScenarioFile> 
 }
 
 /// Converts a scenario file stem to a valid Rust identifier.
-/// Replaces `-` and `.` with `_`.
+/// Replaces `-`, `.` and any other unsupported characters with `_`.
 pub fn scenario_to_function_name(scenario_name: &str) -> String {
-    scenario_name.replace(['-', '.'], "_")
+    sanitize_identifier(scenario_name)
 }
 
 #[cfg(test)]

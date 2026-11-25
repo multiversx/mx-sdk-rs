@@ -42,7 +42,7 @@ impl TestGenerator {
 
     fn generate_external_steps(&mut self, path: &str, comment: Option<&str>) {
         if let Some(comment_text) = comment {
-            self.step_writeln(format!("    // {}", comment_text));
+            self.step_comment(comment_text);
         }
 
         let file_stem = std::path::Path::new(path)

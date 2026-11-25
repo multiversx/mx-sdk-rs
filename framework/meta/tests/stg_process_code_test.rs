@@ -61,3 +61,16 @@ fn process_code_go_2() {
 fn process_new_code_go() {
     check_transformation("", ["test1"], GO_TEST_1);
 }
+
+#[test]
+/// Names which need escaping must not be escaped again when the file is regenerated.
+fn process_code_go_unusual_names_stable() {
+    let names = ["quote\"d", "new\nline", "ünïcode"];
+    let first = process_code(
+        "",
+        &names.iter().map(|s| s.to_string()).collect(),
+        format_test_fn_go,
+        DEFAULT_SETUP_GO,
+    );
+    check_transformation(&first, names, &first);
+}

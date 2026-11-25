@@ -12,6 +12,11 @@ pub trait EchoTypes {
     }
 
     #[endpoint]
+    fn echo_u128(&self, i: u128) -> u128 {
+        i
+    }
+
+    #[endpoint]
     fn echo_i64(&self, i: i64) -> i64 {
         i
     }

@@ -4,6 +4,7 @@ use multiversx_sc_scenario::scenario::model::{AddressValue, BytesKey, BytesValue
 use multiversx_sc_scenario::scenario_format::serde_raw::ValueSubTree;
 
 use super::{num_format, parse_abi::parse_abi_type, test_generator::TestGenerator};
+use crate::cmd::rust_encode::{block_comment_text, string_literal};
 
 /// A wrapper around a slice of `BytesValue` for sequential consumption during argument formatting.
 pub struct BytesValueMultiInput<'a>(pub &'a [BytesValue]);
@@ -59,7 +60,7 @@ impl TestGenerator {
         while !input.is_empty() {
             let arg = input.next_item();
 
-            result.push_str(&format!("/* {} */", arg.original.to_concatenated_string()));
+            result.push_str(&Self::format_arg_comment(arg));
         }
 
         result
@@ -107,7 +108,7 @@ impl TestGenerator {
         // Any remaining values without ABI info — emit as comments
         while !input.is_empty() {
             let arg = input.next_item();
-            parts.push(format!("/* {} */", arg.original.to_concatenated_string()));
+            parts.push(Self::format_arg_comment(arg));
         }
 
         let n = parts.len();
@@ -116,6 +117,12 @@ impl TestGenerator {
         } else {
             format!("MultiValue{}::new({})", n, parts.join(", "))
         }
+    }
+
+    /// Formats a raw argument as an inline block comment.
+    fn format_arg_comment(arg: &BytesValue) -> String {
+        let raw = arg.original.to_concatenated_string();
+        format!("/* {} */", block_comment_text(&raw))
     }
 
     /// Formats an argument value based on ABI type info, consuming items from `input`.
@@ -269,7 +276,7 @@ impl TestGenerator {
             self.consts.get_or_create_hex_address(clean)
         } else {
             // Raw address - wrap in ScenarioValueRaw
-            format!("ScenarioValueRaw::new(\"{}\")", clean)
+            format!("ScenarioValueRaw::new({})", string_literal(clean))
         }
     }
 
@@ -286,7 +293,7 @@ impl TestGenerator {
     pub(super) fn format_unknown_value(value: &ValueSubTree) -> String {
         match value {
             ValueSubTree::Str(s) => {
-                format!("ScenarioValueRaw::new(\"{}\")", Self::escape_string(s))
+                format!("ScenarioValueRaw::new({})", string_literal(s))
             }
             _ => {
                 format!(
@@ -300,10 +307,7 @@ impl TestGenerator {
     fn format_value_subtree(value: &ValueSubTree) -> String {
         match value {
             ValueSubTree::Str(s) => {
-                format!(
-                    "ValueSubTree::Str(\"{}\".to_string())",
-                    Self::escape_string(s)
-                )
+                format!("ValueSubTree::Str({}.to_string())", string_literal(s))
             }
             ValueSubTree::List(items) => {
                 if items.is_empty() {
@@ -322,8 +326,8 @@ impl TestGenerator {
                         .iter()
                         .map(|(k, v)| {
                             format!(
-                                "(\"{}\".to_string(), {})",
-                                Self::escape_string(k),
+                                "({}.to_string(), {})",
+                                string_literal(k),
                                 Self::format_value_subtree(v)
                             )
                         })
@@ -349,10 +353,6 @@ impl TestGenerator {
                 strs.join("|")
             }
         }
-    }
-
-    pub(super) fn escape_string(s: &str) -> String {
-        s.chars().flat_map(char::escape_default).collect()
     }
 
     // -------------------------------------------------------------------------

@@ -48,7 +48,7 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialOrd<ManagedDecimal<M,
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
                 let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
-                Some((&other.data * scaling_factor).cmp(&self.data))
+                Some(self.data.cmp(&(&other.data * scaling_factor)))
             }
         }
     }
