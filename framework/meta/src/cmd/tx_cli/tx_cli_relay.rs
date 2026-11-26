@@ -4,14 +4,7 @@ use multiversx_sc_snippets::{Interactor, TxOutputFile};
 use super::tx_cli_common::{load_relayer_wallet, load_transaction_from_file};
 use crate::cli::cli_args_tx::RelayArgs;
 
-pub async fn tx_relay(args: &RelayArgs) {
-    if let Err(e) = tx_relay_inner(args).await {
-        eprintln!("Error: {e:#}");
-        std::process::exit(1);
-    }
-}
-
-async fn tx_relay_inner(args: &RelayArgs) -> Result<()> {
+pub async fn tx_relay(args: &RelayArgs) -> Result<()> {
     let relayer_wallet = load_relayer_wallet(&args.relayer)?.ok_or_else(|| {
         anyhow!("a relayer wallet is required: use --relayer-pem or --relayer-keyfile")
     })?;

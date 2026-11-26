@@ -56,17 +56,14 @@ pub async fn governance_sc_interact_cli() {
                 .await;
         }
         Some(governance_sc_interact_cli::InteractCliCommand::Stake(args)) => {
-            let bls_key = BLSKey::from_vec(args.bls_key.into_bytes());
-            let bls_signature = BLSSignature::from_vec(args.bls_signature.into_bytes());
-            let bls_keys_signatures = vec![(
-                bls_key.expect("not BLSKey format"),
-                bls_signature.expect("not BLSSignature format"),
-            )];
+            let bls_key = BLSKey::parse_hex(&args.bls_key).expect("invalid BLS key hex");
+            let bls_signature =
+                BLSSignature::parse_hex(&args.bls_signature).expect("invalid BLS signature hex");
+            let bls_keys_signatures = vec![(bls_key, bls_signature)];
 
             interactor
                 .stake(
                     Bech32Address::from_bech32_string(args.from),
-                    args.maximum_staked_nodes,
                     bls_keys_signatures,
                     args.amount,
                 )
@@ -118,7 +115,7 @@ impl GovernanceCallsInteract {
         let _set_state_response = self.interactor.set_state(vec_state).await;
     }
 
-    pub async fn view_config(&mut self) {
+    pub async fn view_config(&mut self) -> GovernanceConfigResult {
         let result = self
             .interactor
             .query()
@@ -130,18 +127,26 @@ impl GovernanceCallsInteract {
             .await;
 
         println!("view config: {:#?}", result);
+        result
     }
 
     pub async fn proposal(
         &mut self,
         sender: &Address,
         commit_hash: &str,
-        start_vote_epoch: usize,
-        end_vote_epoch: usize,
+        start_vote_epoch: u64,
+        end_vote_epoch: u64,
     ) {
         println!(
             "proposing hash: {commit_hash}, start epoch: {start_vote_epoch}, end epoch: {end_vote_epoch}"
         );
+
+        let proposal_fee: u128 = self
+            .view_config()
+            .await
+            .proposal_fee
+            .parse()
+            .expect("invalid proposal fee");
 
         let logs = self
             .interactor
@@ -149,7 +154,7 @@ impl GovernanceCallsInteract {
             .from(sender)
             .to(GovernanceSystemSCAddress)
             .typed(GovernanceSCProxy)
-            .proposal(commit_hash, start_vote_epoch, end_vote_epoch)
+            .proposal(commit_hash, start_vote_epoch, end_vote_epoch, proposal_fee)
             .gas(60_000_000u64)
             .returns(ReturnsLogs)
             .run()
@@ -195,17 +200,17 @@ impl GovernanceCallsInteract {
             Bech32Address::from(result.issuer_address).to_bech32_expr(),
             result.start_vote_epoch,
             result.end_vote_epoch,
-            result.quorum_stake,
-            result.yes,
-            result.no,
-            result.veto,
-            result.abstain,
+            result.quorum_stake.to_display(),
+            result.yes.to_display(),
+            result.no.to_display(),
+            result.veto.to_display(),
+            result.abstain.to_display(),
             result.closed,
             result.passed
         );
     }
 
-    pub async fn vote(&mut self, sender: &Bech32Address, nonce: usize, vote_type: &str) {
+    pub async fn vote(&mut self, sender: &Bech32Address, nonce: u64, vote_type: &str) {
         self.interactor
             .tx()
             .from(sender)
@@ -253,7 +258,6 @@ impl GovernanceCallsInteract {
     pub async fn stake(
         &mut self,
         sender: Bech32Address,
-        maximum_staked_nodes: usize,
         bls_keys_signatures: Vec<(BLSKey, BLSSignature)>,
         amount: u128,
     ) {
@@ -271,11 +275,7 @@ impl GovernanceCallsInteract {
             .from(sender)
             .to(ValidatorSystemSCAddress)
             .typed(ValidatorSCProxy)
-            .stake(
-                maximum_staked_nodes,
-                managed_bls_keys_signatures,
-                total_amount,
-            )
+            .stake(managed_bls_keys_signatures, total_amount)
             .gas(60_000_000u64)
             .run()
             .await;

@@ -8,6 +8,7 @@ mod tx_cli_query;
 mod tx_cli_relay;
 mod tx_cli_send;
 mod tx_cli_sign;
+mod tx_cli_system;
 mod tx_cli_upgrade;
 
 use crate::cli::cli_args_tx::{TxCliAction, TxCliArgs};
@@ -18,10 +19,11 @@ use tx_cli_query::tx_query;
 use tx_cli_relay::tx_relay;
 use tx_cli_send::tx_send;
 use tx_cli_sign::tx_sign;
+use tx_cli_system::tx_system;
 use tx_cli_upgrade::tx_upgrade;
 
 pub async fn tx_cli(args: &TxCliArgs) {
-    match &args.command {
+    let result = match &args.command {
         TxCliAction::Deploy(deploy_args) => tx_deploy(deploy_args).await,
         TxCliAction::Call(call_args) => tx_call(call_args).await,
         TxCliAction::Upgrade(upgrade_args) => tx_upgrade(upgrade_args).await,
@@ -30,5 +32,11 @@ pub async fn tx_cli(args: &TxCliArgs) {
         TxCliAction::Send(send_args) => tx_send(send_args).await,
         TxCliAction::Sign(sign_args) => tx_sign(sign_args).await,
         TxCliAction::Relay(relay_args) => tx_relay(relay_args).await,
+        TxCliAction::System(system_args) => tx_system(system_args).await,
+    };
+
+    if let Err(e) = result {
+        eprintln!("Error: {e:#}");
+        std::process::exit(1);
     }
 }

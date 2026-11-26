@@ -5,6 +5,9 @@ use multiversx_sc_codec::{DecodeErrorHandler, TopDecodeMulti, TopDecodeMultiInpu
 
 use crate::{api::ManagedTypeApi, types::BigUint};
 
+/// The decoded result of the `viewProposal` view of the governance system SC.
+///
+/// Stake and vote amounts are expressed in EGLD atto-units.
 #[derive(Debug, Clone)]
 pub struct ProposalViewResult<M: ManagedTypeApi> {
     pub proposal_cost: BigUint<M>,
@@ -13,11 +16,11 @@ pub struct ProposalViewResult<M: ManagedTypeApi> {
     pub issuer_address: Address,
     pub start_vote_epoch: u64,
     pub end_vote_epoch: u64,
-    pub quorum_stake: u64,
-    pub yes: u64,
-    pub no: u64,
-    pub veto: u64,
-    pub abstain: u64,
+    pub quorum_stake: BigUint<M>,
+    pub yes: BigUint<M>,
+    pub no: BigUint<M>,
+    pub veto: BigUint<M>,
+    pub abstain: BigUint<M>,
     pub closed: bool,
     pub passed: bool,
 }
@@ -39,11 +42,11 @@ where
         let issuer_address = Address::multi_decode_or_handle_err(input, h)?;
         let start_vote_epoch = u64::multi_decode_or_handle_err(input, h)?;
         let end_vote_epoch = u64::multi_decode_or_handle_err(input, h)?;
-        let quorum_stake = u64::multi_decode_or_handle_err(input, h)?;
-        let yes = u64::multi_decode_or_handle_err(input, h)?;
-        let no = u64::multi_decode_or_handle_err(input, h)?;
-        let veto = u64::multi_decode_or_handle_err(input, h)?;
-        let abstain = u64::multi_decode_or_handle_err(input, h)?;
+        let quorum_stake = BigUint::multi_decode_or_handle_err(input, h)?;
+        let yes = BigUint::multi_decode_or_handle_err(input, h)?;
+        let no = BigUint::multi_decode_or_handle_err(input, h)?;
+        let veto = BigUint::multi_decode_or_handle_err(input, h)?;
+        let abstain = BigUint::multi_decode_or_handle_err(input, h)?;
         let closed = String::multi_decode_or_handle_err(input, h)?;
         let passed = String::multi_decode_or_handle_err(input, h)?;
         Ok(ProposalViewResult {

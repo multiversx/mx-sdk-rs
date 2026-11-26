@@ -1,11 +1,12 @@
 use super::{TokenPropertiesResult, token_properties::*};
 
 use crate::{
-    api::CallTypeApi,
+    api::{CallTypeApi, quick_signal_error},
+    codec::multi_types::MultiValue4,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenIdentifier, EsdtTokenType, FunctionCall,
-        ManagedAddress, ManagedBuffer, NotPayable, OriginalResultMarker, ProxyArg, Tx, TxEnv,
-        TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
+        ManagedAddress, ManagedBuffer, MultiValueEncoded, NotPayable, OriginalResultMarker,
+        ProxyArg, Tx, TxEnv, TxFrom, TxGas, TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 
@@ -56,6 +57,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[allow(clippy::type_complexity)]
 impl<Env, From, To, Gas> ESDTSystemSCProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -218,7 +220,9 @@ where
             | EsdtTokenType::DynamicNFT => "NFT",
             EsdtTokenType::SemiFungible | EsdtTokenType::DynamicSFT => "SFT",
             EsdtTokenType::MetaFungible | EsdtTokenType::DynamicMeta => "META",
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::Invalid => {
+                quick_signal_error::<Env::Api>("invalid token type for issue_and_set_all_roles")
+            }
         };
 
         let endpoint = match token_type {
@@ -230,7 +234,7 @@ where
             EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
                 REGISTER_AND_SET_ALL_ROLES_DYNAMIC_ESDT_ENDPOINT_NAME
             }
-            EsdtTokenType::Invalid => "",
+            EsdtTokenType::Invalid => unreachable!(),
         };
 
         let mut tx = self
@@ -248,7 +252,10 @@ where
         tx.original_result()
     }
 
-    /// Issues dynamic ESDT tokens
+    /// Issues dynamic ESDT tokens.
+    ///
+    /// Only accepts `DynamicNFT`, `DynamicSFT` and `DynamicMeta`.
+    /// `num_decimals` is only sent for `DynamicMeta`.
     pub fn issue_dynamic<
         Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
         Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
@@ -260,23 +267,16 @@ where
         token_type: EsdtTokenType,
         num_decimals: usize,
     ) -> IssueCall<Env, From, To, Gas> {
-        let endpoint_name = match token_type {
-            EsdtTokenType::DynamicNFT | EsdtTokenType::DynamicSFT | EsdtTokenType::DynamicMeta => {
-                REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME
-            }
-            _ => "",
-        };
-
         let token_type_name = match token_type {
             EsdtTokenType::DynamicNFT => "NFT",
             EsdtTokenType::DynamicSFT => "SFT",
             EsdtTokenType::DynamicMeta => "META",
-            _ => "",
+            _ => quick_signal_error::<Env::Api>("issue_dynamic only accepts dynamic token types"),
         };
 
         let mut tx = self
             .wrapped_tx
-            .raw_call(endpoint_name)
+            .raw_call(REGISTER_DYNAMIC_ESDT_ENDPOINT_NAME)
             .egld(issue_cost)
             .argument(&token_display_name)
             .argument(&token_ticker)
@@ -308,7 +308,7 @@ where
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::SemiFungible => ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::MetaFungible => REGISTER_META_ESDT_ENDPOINT_NAME,
-            _ => "",
+            _ => quick_signal_error::<Env::Api>("invalid token type for issue"),
         };
 
         let mut tx = self
@@ -350,6 +350,12 @@ where
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to mint more fungible ESDT tokens.
     /// It will fail if the SC is not the owner of the token.
+    ///
+    /// Global mint is disabled on all current networks, use `ESDTLocalMint` instead.
+    #[deprecated(
+        since = "0.67.0",
+        note = "global mint is disabled in the ESDT system SC, use the ESDTLocalMint builtin function instead"
+    )]
     pub fn mint<
         Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
@@ -368,6 +374,12 @@ where
 
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to burn fungible ESDT tokens owned by the SC.
+    ///
+    /// Global burn is disabled on all current networks, use `ESDTLocalBurn` instead.
+    #[deprecated(
+        since = "0.67.0",
+        note = "global burn is disabled in the ESDT system SC, use the ESDTLocalBurn builtin function instead"
+    )]
     pub fn burn<
         Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<BigUint<Env::Api>>,
@@ -572,10 +584,19 @@ where
     }
 
     /// This function can be called to retrieve the special roles of a specific token.
+    ///
+    /// Returns one entry per address, formatted as `<bech32 address>:<role1>,<role2>,...`.
     pub fn get_special_roles<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
-    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+    ) -> TxTypedCall<
+        Env,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>,
+    > {
         let tx = self
             .wrapped_tx
             .payment(NotPayable)
@@ -633,11 +654,12 @@ where
     pub fn transfer_nft_create_role<
         Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>,
         Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
         old_creator: Arg1,
-        new_creator: Arg1,
+        new_creator: Arg2,
     ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
             .payment(NotPayable)
@@ -648,6 +670,9 @@ where
             .original_result()
     }
 
+    /// Changes token properties.
+    ///
+    /// At least one property must be set. `canMint` and `canBurn` are only accepted for fungible tokens.
     pub fn control_changes<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
         self,
         token_identifier: Arg0,
@@ -696,6 +721,109 @@ where
             .payment(NotPayable)
             .raw_call("getTokenProperties")
             .argument(&token_id)
+            .original_result()
+    }
+
+    /// Permanently disables creating new NFTs/SFTs in a collection.
+    pub fn stop_nft_create<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("stopNFTCreate")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Allows the NFT create role to be held by addresses in multiple shards.
+    ///
+    /// Only works for tokens that were issued with `canCreateMultiShard`.
+    pub fn change_to_multi_shard_create<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("changeToMultiShardCreate")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Allows all addresses to burn the token (grants `ESDTRoleBurnForAll`).
+    pub fn set_burn_role_globally<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("setBurnRoleGlobally")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Reverse operation of `set_burn_role_globally`.
+    pub fn unset_burn_role_globally<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("unsetBurnRoleGlobally")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Re-sends the list of addresses holding `ESDTTransferRole` to all shards.
+    pub fn send_all_transfer_role_addresses<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("sendAllTransferRoleAddresses")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Lists all addresses that hold special roles for a token.
+    ///
+    /// The result is a flat list: each address is followed by its role names
+    /// (e.g. `addr1, ESDTRoleLocalMint, ESDTRoleLocalBurn, addr2, ESDTRoleNFTCreate`).
+    /// Addresses are 32 bytes long, role names are ASCII strings.
+    pub fn get_all_addresses_and_roles<Arg0: ProxyArg<EsdtTokenIdentifier<Env::Api>>>(
+        self,
+        token_id: Arg0,
+    ) -> TxTypedCall<
+        Env,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>,
+    > {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getAllAddressesAndRoles")
+            .argument(&token_id)
+            .original_result()
+    }
+
+    /// Returns the ESDT system SC configuration:
+    /// owner address, base issuing cost, min token name length, max token name length.
+    pub fn get_contract_config(
+        self,
+    ) -> TxTypedCall<
+        Env,
+        From,
+        To,
+        NotPayable,
+        Gas,
+        MultiValue4<ManagedAddress<Env::Api>, BigUint<Env::Api>, u32, u32>,
+    > {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("getContractConfig")
             .original_result()
     }
 }
