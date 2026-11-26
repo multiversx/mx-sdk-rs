@@ -35,6 +35,8 @@ impl ComposabilityInteract {
             &InterpreterContext::default(),
         );
 
+        interactor.generate_blocks(30u64).await.unwrap();
+
         ComposabilityInteract {
             interactor,
             wallets: ComposabilityInteractWallets {
